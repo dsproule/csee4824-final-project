@@ -291,6 +291,7 @@ typedef struct packed {
  * Data exchanged from the ID to the EX stage
  */
 typedef struct packed {
+    /* Can use many of these to assign RS entry via rs_idx */
     INST              inst;
     logic [`XLEN-1:0] PC;
     logic [`XLEN-1:0] NPC; // PC + 4
@@ -310,6 +311,8 @@ typedef struct packed {
     logic       halt;          // Is this a halt?
     logic       illegal;       // Is this instruction illegal?
     logic       csr_op;        // Is this a CSR operation? (we use this to get return code)
+    
+    logic [RS_SZ-1:0] rs_idx;       
 
     logic       valid;
 } ID_EX_PACKET;
@@ -357,10 +360,12 @@ typedef struct packed {
  */
 
 typedef struct packed {
-    logic [6:0] opcode;
     logic [$clog2(ROB_SZ)-1:0] T;
     logic [$clog2(ROB_SZ)-1:0] T1;
     logic [$clog2(ROB_SZ)-1:0] T2;
+
+    ALU_OPA_SELECT opa_select;
+    ALU_OPB_SELECT opb_select;
 
     logic busy;
     logic ready;
@@ -369,17 +374,24 @@ typedef struct packed {
 } RS_ENTRY;
 
 typedef struct packed {
-    logic [5:0] reg;
-    logic [$clog2(ROB_SZ)-1:0] T;
+    logic [$clog2(ROB_SZ)-1:0] tag;
+    logic [`XLEN:0] value;
     logic plus;             // signify if in ROB buf or reg file
 } MT_ENTRY;
 
 
 typedef struct packed {
-    // havent figured it out yet, probably very similar to id_ex at a glance w/ FU fields
+    logic [$clog2(ROB_SZ)-1:0] T;
+    logic [$clog2(ROB_SZ)-1:0] V1;
+    logic [$clog2(ROB_SZ)-1:0] V2;
+
+    ALU_OPA_SELECT opa_select;
+    ALU_OPB_SELECT opb_select;
+
+    ALU_FUNC    alu_func;      // ALU function select (ALU_xxx *)
+
     logic ready;
     logic go;
-    logic [$clog2(ROB_SZ)-1:0] T;
 } S_X_PACKET;
 
 typedef struct packed {
