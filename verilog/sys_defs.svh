@@ -25,7 +25,7 @@
 
 // sizes
 `define ROB_SZ xx
-`define RS_SZ xx
+`define RS_SZ 4
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
 // worry about these later
@@ -355,5 +355,43 @@ typedef struct packed {
 /**
  * No WB output packet as it would be more cumbersome than useful
  */
+
+typedef struct packed {
+    logic [6:0] opcode;
+    logic [$clog2(ROB_SZ)-1:0] T;
+    logic [$clog2(ROB_SZ)-1:0] T1;
+    logic [$clog2(ROB_SZ)-1:0] T2;
+
+    logic busy;
+    logic ready;
+    logic [`XLEN:0] V1;        // assuming 32 bit values
+    logic [`XLEN:0] V2;        // assuming 32 bit values
+} RS_ENTRY;
+
+typedef struct packed {
+    logic [5:0] reg;
+    logic [$clog2(ROB_SZ)-1:0] T;
+    logic plus;             // signify if in ROB buf or reg file
+} MT_ENTRY;
+
+
+typedef struct packed {
+    // havent figured it out yet, probably very similar to id_ex at a glance w/ FU fields
+    logic ready;
+    logic go;
+    logic [$clog2(ROB_SZ)-1:0] T;
+} S_X_PACKET;
+
+typedef struct packed {
+    logic done;
+    logic [$clog2(ROB_SZ)-1:0] T;
+    logic [`XLEN:0]            result;
+} X_C_PACKET;
+
+typedef struct packed {
+    logic valid;
+    logic [$clog2(ROB_SZ)-1:0]  T;
+    logic [`XLEN:0]             V;
+} CDB;
 
 `endif // __SYS_DEFS_SVH__
