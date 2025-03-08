@@ -33,10 +33,10 @@
 `define LSQ_SZ xx
 
 // functional units (you should decide if you want more or fewer types of FUs)
-`define NUM_FU_ALU xx
-`define NUM_FU_MULT xx
-`define NUM_FU_LOAD xx
-`define NUM_FU_STORE xx
+`define NUM_FU_ALU 0
+`define NUM_FU_MULT 1
+`define NUM_FU_LOAD 2
+`define NUM_FU_STORE 3
 
 // number of mult stages (2, 4, or 8)
 `define MULT_STAGES 4
@@ -359,51 +359,52 @@ typedef struct packed {
  * No WB output packet as it would be more cumbersome than useful
  */
 
+typedef logic [$clog2(ROB_SZ)-1:0] ROB_T;
+
 typedef struct packed {
-    logic [$clog2(ROB_SZ)-1:0] T;
-    logic [$clog2(ROB_SZ)-1:0] T1;
-    logic [$clog2(ROB_SZ)-1:0] T2;
+    ROB_T T;
+    ROB_T T1;
+    ROB_T T2;
 
     ALU_OPA_SELECT opa_select;
     ALU_OPB_SELECT opb_select;
 
     logic busy;
     logic ready;
-    logic [`XLEN:0] V1;        // assuming 32 bit values
-    logic [`XLEN:0] V2;        // assuming 32 bit values
+    logic [`XLEN-1:0] V1;        // assuming 32 bit values
+    logic [`XLEN-1:0] V2;        // assuming 32 bit values
 } RS_ENTRY;
 
 typedef struct packed {
-    logic [$clog2(ROB_SZ)-1:0] tag;
-    logic [`XLEN:0] value;
-    logic plus;             // signify if in ROB buf or reg file
+    ROB_T T;
+    logic plus;                // signify if in ROB buf or reg file
 } MT_ENTRY;
 
 
 typedef struct packed {
-    logic [$clog2(ROB_SZ)-1:0] T;
-    logic [$clog2(ROB_SZ)-1:0] V1;
-    logic [$clog2(ROB_SZ)-1:0] V2;
+    ROB_T T;
+    logic [`XLEN-1:0] V1;
+    logic [`XLEN-1:0] V2;
 
     ALU_OPA_SELECT opa_select;
     ALU_OPB_SELECT opb_select;
 
-    ALU_FUNC    alu_func;      // ALU function select (ALU_xxx *)
+    ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
 
     logic ready;
     logic go;
 } S_X_PACKET;
 
 typedef struct packed {
+    logic [`XLEN-1:0] result;
     logic done;
-    logic [$clog2(ROB_SZ)-1:0] T;
-    logic [`XLEN:0]            result;
+    ROB_T T;
 } X_C_PACKET;
 
 typedef struct packed {
+    logic [`XLEN-1:0] V;
+    ROB_T T;
     logic valid;
-    logic [$clog2(ROB_SZ)-1:0]  T;
-    logic [`XLEN:0]             V;
 } CDB;
 
 `endif // __SYS_DEFS_SVH__

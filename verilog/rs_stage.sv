@@ -4,7 +4,7 @@
 module RS_ALLOC(
     input             reset,
     input [RS_SZ-1:0] rs_idx,
-    input [RS_SZ-1:0] rs_free,             // line coming from value that it just got freed
+    input [RS_SZ-1:0] rs_free,               // line coming from value that it just got freed
     input MT_PACKET   MT_T, MT_T1, MT_T2,    // from the Map Table
     input CDB         cdb,
 
@@ -30,22 +30,22 @@ module RS_ALLOC(
             // checks if RS is free to allocate
             if (~rs_table[rs_idx].busy | rs_free[rs_idx]) begin
                 rs_table[rs_idx].busy = `TRUE;
-                rs_table[rs_idx].T = MT_T.tag;
+                rs_table[rs_idx].T = MT_T.T;
 
                 // checks if we can put just the value in or if we need the tag for t1
-                if (MT_T1.tag == 0 | MT_T1.plus) begin
+                if (MT_T1.T == 0 | MT_T1.plus) begin
                     rs_table[rs_idx].T1 = 0;
                     rs_table[rs_idx].V1 = MT_T1.value;
                 end else begin
-                    rs_table[rs_idx].T1 = MT_T1.tag;
+                    rs_table[rs_idx].T1 = MT_T1.T;
                 end
 
                 // checks if we can put just the value in or if we need the tag for t2
-                if (MT_T2.tag == 0 | MT_T2.plus) begin
+                if (MT_T2.T == 0 | MT_T2.plus) begin
                     rs_table[rs_idx].T1 = 0;
                     rs_table[rs_idx].V1 = MT_T2.value;
                 end else begin
-                    rs_table[rs_idx].T1 = MT_T2.tag;
+                    rs_table[rs_idx].T1 = MT_T2.T;
                 end
             end
 
@@ -110,7 +110,7 @@ module rs_stage(
     input CDB          cdb,
     input ID_EX_PACKET ID_EX_reg,
     input S_X_PACKET   S_X_reg,
-    input [$clog2(ROB_SZ)-1:0] T, T1, T2,    // from the Map Table
+    input ROB_T T, T1, T2,    // from the Map Table
 
     output stall_d,                         
     output S_X_PACKET [RS_SZ-1:0] S_X_packet
