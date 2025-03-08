@@ -24,7 +24,7 @@
 `define N 1
 
 // sizes
-`define ROB_SZ xx
+`define ROB_SZ 10       // need to set this. i put as tmp for RS
 `define RS_SZ 4
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
@@ -312,7 +312,7 @@ typedef struct packed {
     logic       illegal;       // Is this instruction illegal?
     logic       csr_op;        // Is this a CSR operation? (we use this to get return code)
     
-    logic [RS_SZ-1:0] rs_idx;       
+    logic [`RS_SZ-1:0] rs_idx;       
 
     logic       valid;
 } ID_EX_PACKET;
@@ -359,7 +359,7 @@ typedef struct packed {
  * No WB output packet as it would be more cumbersome than useful
  */
 
-typedef logic [$clog2(ROB_SZ)-1:0] ROB_T;
+typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
 
 typedef struct packed {
     ROB_T T;
@@ -370,7 +370,7 @@ typedef struct packed {
     ALU_OPB_SELECT opb_select;
 
     logic busy;
-    logic ready;
+    logic [1:0] ready;
     logic [`XLEN-1:0] V1;        // assuming 32 bit values
     logic [`XLEN-1:0] V2;        // assuming 32 bit values
 } RS_ENTRY;
@@ -396,14 +396,16 @@ typedef struct packed {
 } S_X_PACKET;
 
 typedef struct packed {
-    logic [`XLEN-1:0] result;
-    logic done;
     ROB_T T;
+    logic [`XLEN-1:0] result;
+    
+    logic done;
 } X_C_PACKET;
 
 typedef struct packed {
-    logic [`XLEN-1:0] V;
     ROB_T T;
+    logic [`XLEN-1:0] V;
+
     logic valid;
 } CDB;
 
