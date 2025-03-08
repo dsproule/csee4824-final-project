@@ -3,9 +3,10 @@
 // Dispatch stage
 module RS_ALLOC(
     input             reset,
-    input [RS_SZ-1:0] rs_idx,
-    input [RS_SZ-1:0] rs_free,               // line coming from value that it just got freed
-    input MT_PACKET   MT_T, MT_T1, MT_T2,    // from the Map Table
+    input [RS_SZ-1:0] rs_idx, rs_free,
+    input ROB_T       T, 
+    input MT_ENTRY    MT_T1, MT_T2,          // from the Map Table     
+    input [`XLEN-1:0] V1, V2,
     input CDB         cdb,
 
     output stall,
@@ -30,23 +31,25 @@ module RS_ALLOC(
             // checks if RS is free to allocate
             if (~rs_table[rs_idx].busy | rs_free[rs_idx]) begin
                 rs_table[rs_idx].busy = `TRUE;
-                rs_table[rs_idx].T = MT_T.T;
+                rs_table[rs_idx].T = T;
 
                 // checks if we can put just the value in or if we need the tag for t1
-                if (MT_T1.T == 0 | MT_T1.plus) begin
+                if (MT_T1 == 0 | MT_T1.plus) begin
+                    // value exists somewhere
+                    rs_table[rs_idx].V1 = V1;
                     rs_table[rs_idx].T1 = 0;
-                    rs_table[rs_idx].V1 = MT_T1.value;
                 end else begin
                     rs_table[rs_idx].T1 = MT_T1.T;
                 end
 
-                // checks if we can put just the value in or if we need the tag for t2
-                if (MT_T2.T == 0 | MT_T2.plus) begin
-                    rs_table[rs_idx].T1 = 0;
-                    rs_table[rs_idx].V1 = MT_T2.value;
+                if (MT_T2 == 0 | MT_T2.plus) begin
+                    // value exists somewhere
+                    rs_table[rs_idx].V2 = V2;
+                    rs_table[rs_idx].T2 = 0;
                 end else begin
-                    rs_table[rs_idx].T1 = MT_T2.T;
+                    rs_table[rs_idx].T2 = MT_T2.T;
                 end
+                
             end
 
             // if a CDB line came in 
@@ -110,7 +113,9 @@ module rs_stage(
     input CDB          cdb,
     input ID_EX_PACKET ID_EX_reg,
     input S_X_PACKET   S_X_reg,
-    input ROB_T T, T1, T2,    // from the Map Table
+    input ROB_T        T,                // coming from dispatch
+    input MT_ENTRY     T1, T2,
+    input [`XLEN-1:0]  V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
 
     output stall_d,                         
     output S_X_PACKET [RS_SZ-1:0] S_X_packet
@@ -122,9 +127,9 @@ module rs_stage(
     RS_ALLOC rs_alloc(
         // Inputs
         .reset(reset),
-        .rs_idx(ID_EX_packet.rs_idx),
-        .rs_free(free_bus),
-        .MT_T(T), .MT_T1(T1), .MT_T2(T2),
+        .rs_idx(ID_EX_packet.rs_idx), .rs_free(free_bus),
+        .T(T), .MT_T1(T1), .MT_T2(T2),
+        .V1(V1), .V2(V2),
         .cdb(cdb),
 
         // Outputs
