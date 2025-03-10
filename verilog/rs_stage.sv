@@ -77,9 +77,9 @@ endmodule   // RS_alloc
 // Issue stage
 module RS_VALUE(
     input RS_ENTRY    [`RS_SZ-1:0]  rs_table,
-    input logic       [`RS_SZ-1:0]  rs_free, // used to signal that RS_entry is now freed
     input S_X_PACKET  [`RS_SZ-1:0]  S_X_reg,
 
+    output logic       [`RS_SZ-1:0] rs_free, // used to signal that RS_entry is now freed
     output S_X_PACKET [`RS_SZ-1:0]  S_X_packet
 );
     /* 
@@ -112,14 +112,14 @@ module RS_VALUE(
 
 endmodule   // RS_VALUE
 
-module rs_stage(
+module RS_STAGE(
     input reset,
-    input CDB          cdb,
-    input ID_EX_PACKET ID_EX_reg,
-    input S_X_PACKET   S_X_reg,
-    input ROB_T        T,                // coming from dispatch
-    input MT_ENTRY     T1, T2,
-    input [`XLEN-1:0]  V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
+    input CDB                      cdb,
+    input ID_EX_PACKET             ID_EX_reg,
+    input S_X_PACKET   [`RS_SZ-1:0] S_X_reg,
+    input ROB_T                    T,                // coming from dispatch
+    input MT_ENTRY                 T1, T2,
+    input [`XLEN-1:0]              V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
 
     output stall_d,                         
     output S_X_PACKET [`RS_SZ-1:0] S_X_packet
@@ -131,7 +131,7 @@ module rs_stage(
     RS_ALLOC rs_alloc(
         // Inputs
         .reset(reset),
-        .rs_idx(ID_EX_packet.rs_idx), .rs_free(free_bus),
+        .rs_idx(ID_EX_reg.rs_idx), .rs_free(free_bus),
         .T(T), .MT_T1(T1), .MT_T2(T2),
         .V1(V1), .V2(V2),
         .cdb(cdb),
@@ -145,7 +145,7 @@ module rs_stage(
         // Input
         .rs_table(rs_table),
         .rs_free(free_bus),
-        .S_X_reg(s_x_reg),
+        .S_X_reg(S_X_reg),
 
         // Output
         .S_X_packet(S_X_packet)

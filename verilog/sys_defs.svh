@@ -369,6 +369,8 @@ typedef struct packed {
     ALU_OPA_SELECT opa_select;
     ALU_OPB_SELECT opb_select;
 
+    ALU_FUNC alu_func;
+
     logic busy;
     logic [1:0] ready;
     logic [`XLEN-1:0] V1;        // assuming 32 bit values
