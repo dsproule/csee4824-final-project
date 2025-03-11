@@ -385,6 +385,7 @@ typedef struct packed {
 typedef struct packed {
     logic [4:0] r;
     logic [`XLEN-1:0] V;
+    logic ready;               // to commit to regfile
 } ROB_ENTRY;
 
 typedef struct packed {
