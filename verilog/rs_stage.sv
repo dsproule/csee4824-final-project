@@ -91,7 +91,7 @@ module RS_VALUE(
 
     // Issue Stage
     always_comb begin
-        for (s_idx = 0; s_idx <    `RS_SZ; s_idx++) begin
+        for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
             if ((rs_table[s_idx].ready == 2'b11) & S_X_reg[s_idx].ready) begin
                 S_X_packet[s_idx] = {
                     rs_table[s_idx].T, 
@@ -122,7 +122,8 @@ module RS_STAGE(
     input [`XLEN-1:0]              V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
 
     output stall_d,                         
-    output S_X_PACKET [`RS_SZ-1:0] S_X_packet
+    output S_X_PACKET [`RS_SZ-1:0] S_X_packet,
+    output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg
 );
     logic [`RS_SZ-1:0] free_bus;
     RS_ENTRY [ `RS_SZ-1:0] rs_table;
