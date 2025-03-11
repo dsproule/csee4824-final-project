@@ -114,12 +114,12 @@ endmodule   // RS_VALUE
 
 module RS_STAGE(
     input reset,
-    input CDB                      cdb,
-    input ID_EX_PACKET             ID_EX_reg,
+    input CDB                       cdb,
+    input [`RS_SZ-1:0]              rs_idxrs_idx,
     input S_X_PACKET   [`RS_SZ-1:0] S_X_reg,
-    input ROB_T                    T,                // coming from dispatch
-    input MT_ENTRY                 T1, T2,
-    input [`XLEN-1:0]              V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
+    input ROB_T                     T,                // coming from dispatch
+    input MT_ENTRY                  T1, T2,
+    input [`XLEN-1:0]               V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
 
     output stall_d,                         
     output S_X_PACKET [`RS_SZ-1:0] S_X_packet,

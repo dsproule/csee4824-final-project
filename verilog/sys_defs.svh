@@ -24,7 +24,7 @@
 `define N 1
 
 // sizes
-`define ROB_SZ 10       // need to set this. i put as tmp for RS
+`define ROB_SZ 10
 `define RS_SZ 4
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
@@ -382,6 +382,10 @@ typedef struct packed {
     logic plus;                // signify if in ROB buf or reg file
 } MT_ENTRY;
 
+typedef struct packed {
+    logic [4:0] r;
+    logic [`XLEN-1:0] V;
+} ROB_ENTRY;
 
 typedef struct packed {
     ROB_T T;
