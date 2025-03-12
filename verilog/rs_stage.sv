@@ -115,7 +115,7 @@ endmodule   // RS_VALUE
 module RS_STAGE(
     input reset,
     input CDB                       cdb,
-    input [`RS_SZ-1:0]              rs_idxrs_idx,
+    input [`RS_SZ-1:0]              rs_idx,
     input S_X_PACKET   [`RS_SZ-1:0] S_X_reg,
     input ROB_T                     T,                // coming from dispatch
     input MT_ENTRY                  T1, T2,
@@ -123,16 +123,15 @@ module RS_STAGE(
 
     output stall_d,                         
     output S_X_PACKET [`RS_SZ-1:0] S_X_packet,
-    output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg
+    output RS_ENTRY [ `RS_SZ-1:0] rs_table
 );
     logic [`RS_SZ-1:0] free_bus;
-    RS_ENTRY [ `RS_SZ-1:0] rs_table;
     
     // connect alloc with value with cdb
     RS_ALLOC rs_alloc(
         // Inputs
         .reset(reset),
-        .rs_idx(ID_EX_reg.rs_idx), .rs_free(free_bus),
+        .rs_idx(rs_idx), .rs_free(free_bus),
         .T(T), .MT_T1(T1), .MT_T2(T2),
         .V1(V1), .V2(V2),
         .cdb(cdb),

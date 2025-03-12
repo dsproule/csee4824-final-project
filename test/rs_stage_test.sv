@@ -10,6 +10,7 @@ module testbench;
     S_X_PACKET [`RS_SZ-1:0] S_X_reg;    // commited reg value passing back
     ROB_T T;
     MT_ENTRY T1, T2;                    // from map table
+    RS_ENTRY [ `RS_SZ-1:0] rs_table;
 
     // Outputs
     logic stall_d;
@@ -19,7 +20,7 @@ module testbench;
     RS_STAGE rs_stage(
         .reset(reset),
         .cdb(cdb),
-        .ID_EX_reg(ID_EX_reg),
+        .rs_idx(ID_EX_reg.rs_idx),
         .S_X_reg(S_X_reg), // won't cause combinational loop if you don't have clock?
         .T(T),
         .T1(T1),
@@ -27,8 +28,16 @@ module testbench;
         .V1(V1),
         .V2(V2),
         .stall_d(stall_d),
-        .S_X_packet(S_X_pack)
+        .S_X_packet(S_X_pack),
+        .rs_table(rs_table)
     );
+
+    task print_rs;
+        $display("\n(RS_TABLE)\n------------------------------------------");
+        for(j = 0; j < `RS_SZ; j=j+1)
+            $display("index:%d T:%d V1:%d V2:%d ready:%b", j, rs_table[j].T, rs_table[j].V1, rs_table[j].V2, rs_table[j].ready);
+        $display("------------------------------------------");
+    endtask
 
     always begin
         #(`CLOCK_PERIOD/2.0);
@@ -60,11 +69,7 @@ module testbench;
         };
         V1 = 0;
         V2 = 0;
-        cdb = {
-            0, // T
-            0, // V
-            0 // valid
-        };
+        cdb = 0;
         T = 0;
         T1 = 0;
         T2 = 0;
@@ -73,6 +78,8 @@ module testbench;
         @(posedge clock);
         reset = 0;
         // during reset, clear the reservation table
+
+        print_rs();
         
         // ld X(r4), r2
         @(posedge clock);
@@ -88,10 +95,7 @@ module testbench;
         T1 = 0;
         T2 = 0;
         @(negedge clock);
-        for(j = 0; j < `RS_SZ; j=j+1) begin
-            $display("index:%d T:%d V1:%d V2:%d ready:%b go:%b", j, S_X_pack[j].T, S_X_pack[j].V1, S_X_pack[j].V2, S_X_pack[j].ready, S_X_pack[j].go);
-        end
-        $display("-----------------------------------------");
+        print_rs();
 
         // mul r1, r2, r3
         @(posedge clock);
@@ -106,10 +110,7 @@ module testbench;
         T = 2;
         T1 = 0;
         T2 = 1;
-        for(j = 0; j < `RS_SZ; j=j+1) begin
-            $display("index:%d T:%d V1:%d V2:%d ready:%b go:%b", j, S_X_pack[j].T, S_X_pack[j].V1, S_X_pack[j].V2, S_X_pack[j].ready, S_X_pack[j].go);
-        end
-        $display("-----------------------------------------");
+        print_rs();
 
         // st r3, Z(r4)
         @(posedge clock);
@@ -124,10 +125,7 @@ module testbench;
         T = 3;
         T1 = 2;
         T2 = 0;
-        for(j = 0; j < `RS_SZ; j=j+1) begin
-            $display("index:%d T:%d V1:%d V2:%d ready:%b go:%b", j, S_X_pack[j].T, S_X_pack[j].V1, S_X_pack[j].V2, S_X_pack[j].ready, S_X_pack[j].go);
-        end
-        $display("-----------------------------------------");
+        print_rs();
 
         @(posedge clock);
         @(posedge clock);
@@ -135,25 +133,14 @@ module testbench;
         $finish;
     end
 
-    always_ff @(posedge clock or posedge reset) begin
+    always_ff @(posedge clock) begin
         if(reset) begin
-            for(i = 0; i < `RS_SZ; i=i+1) begin
-                S_X_reg[i] <= {
-                    0, // T
-                    0, // T1
-                    0, // T2
-                    0, // OPA
-                    0, // OPB
-                    0, // alu func
-                    0, // ready
-                    0 // go
-                };
-            end
+            for(i = 0; i < `RS_SZ; i=i+1)
+                S_X_reg[i] <= 0;
         end
         else begin
-            for(i = 0; i < `RS_SZ; i=i+1) begin
+            for(i = 0; i < `RS_SZ; i++)
                 S_X_reg[i] <= S_X_pack[i];
-            end
         end
     end
 
