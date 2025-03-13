@@ -13,8 +13,8 @@ module MAP_TABLE (
     MT_ENTRY next_tag;
 
     // forwards signal that rob has value present if cdb collides
-    assign T1 = (cdb.valid & (cdb.T == mt_table[r1])) ?  {mt_table[r1].T, `TRUE} : mt_table[r1];
-    assign T2 = (cdb.valid & (cdb.T == mt_table[r2])) ?  {mt_table[r2].T, `TRUE} : mt_table[r2];
+    assign T1 = (cdb.valid & (cdb.T == mt_table[r1].T)) ?  {mt_table[r1].T, `TRUE} : mt_table[r1];
+    assign T2 = (cdb.valid & (cdb.T == mt_table[r2].T)) ?  {mt_table[r2].T, `TRUE} : mt_table[r2];
 
     always_ff @(posedge clock) begin
         if (reset) begin
