@@ -21,7 +21,7 @@ module testbench;
     S_X_PACKET [`RS_SZ-1:0] S_X_pack;
     integer i, j;
     logic [3:0] clock_count;
-    logic error_count;
+    logic [5:0] error_count;
 
     rs_stage rs_stage(
         .clock(clock),
@@ -43,18 +43,27 @@ module testbench;
     );
 
     task print_rs;
-        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 1);
+        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 2);
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table[j].T, rs_table[j].T1, rs_table[j].T2, rs_table[j].V1, rs_table[j].V2, busy[j], rs_table[j].ready);
         $display("------------------------------------------");
     endtask
 
     task compare;
-        input [15:0] idx, t, t1, t2, v1, v2, busy;
+        input [15:0] idx, t, t1, t2, v1, v2;
+        input busy;
         if((rs_table[idx].T != t) || (rs_table[idx].T1 != t1) || (rs_table[idx].T2 != t2) || (rs_table[idx].V1 != v1) || (rs_table[idx].V2 != v2)) begin
             error_count = error_count + 1;
-            $display("@@@error time: %d\t", clock_count - 1);
-            $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b", idx, t, t1, t2, v1, v2, busy);
+            $display("@@@error time: %d\t", clock_count - 2);
+            $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:%b", idx, t, t1, t2, v1, v2, busy);
+        end
+    endtask
+
+    task compare_stall;
+        input stall;
+        if(d_stall !== stall) begin
+            // $display("@@@error time: %d\t", clock_count - 1);
+            // $display("@@@stall error");
         end
     endtask
 
@@ -69,6 +78,7 @@ module testbench;
 
     initial begin
         clock = 0;
+        error_count = 0;
         clock_count = 0;
         reset = 0;
         ID_EX_reg = {
@@ -103,6 +113,7 @@ module testbench;
         reset = 0;
         // during reset, clear the reservation table
 
+        @(posedge clock);
         // ld X(r4), r2 // 1
         V1 = 0;
         V2 = 8;
@@ -117,15 +128,18 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        compare_stall(0);
         @(negedge clock);
         // expected change
         // index:    0   T:   1   T1:   0   T2:   0   V1:   5   V2:   1   busy:   1   ready:11
+        // 1
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 1, 0, 0, 0, 8, 1);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 0, 0, 0, 0, 0, 0);
 
+        @(posedge clock);
         // mul r1, r2, r3 // 2
         V1 = 5;
         V2 = 0;
@@ -140,13 +154,16 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        compare_stall(0);
+        // 2
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(1, 1, 0, 0, 0, 8, 1);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 2, 0, 1, 5, 0, 1);
 
+        @(posedge clock);
         // st r3, Z(r4) // 3
         V1 = 0;
         V2 = 8;
@@ -161,13 +178,16 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        compare_stall(0);
         @(negedge clock);
+        // 3
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 2, 0, 1, 5, 0, 1);
 
+        @(posedge clock);
         // addi r4, 4, r4 // 4
         V1 = 8;
         V2 = 0;
@@ -182,13 +202,16 @@ module testbench;
         cdb.valid = 1;
         cdb.T = 1;
         cdb.V = 10;
+        compare_stall(0);
+        // 4
         @(negedge clock);
         print_rs();
         compare(0, 4, 0, 0, 8, 0, 1);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
-        compare(3, 0, 0, 0, 0, 0, 0);
+        compare(3, 2, 0, 0, 5, 10, 1); // cdb value should be inside // tag should be removed after cdb?
 
+        @(posedge clock);
         // ldf X(r4), r2 // 5
         V1 = 0;
         V2 = 0;
@@ -203,13 +226,16 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        compare_stall(0);
         @(negedge clock);
+        // 5
         print_rs();
-        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(0, 4, 0, 0, 8, 0, 1);
         compare(1, 5, 0, 4, 0, 0, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 0, 0, 0, 0, 0, 0);
 
+        @(posedge clock);
         // mul r1, r2, r3 // 6
         V1 = 5;
         V2 = 0;
@@ -224,6 +250,8 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        compare_stall(0);
+        // 6
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
@@ -231,7 +259,14 @@ module testbench;
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
 
+        @(posedge clock);
         // 7
+        V1 = 0;
+        V2 = 1;
+        T = 7;
+        ID_EX_reg.rs_idx = 2;
+        T1 = {6, 1'b0};
+        T2 = {0, 1'b0};
         cdb.valid = 1;
         cdb.T = 4;
         cdb.V = 12;
@@ -239,25 +274,41 @@ module testbench;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
         S_X_reg[3].ready = 0;
+        compare_stall(1);
+        // 7
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(1, 5, 0, 4, 0, 12, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
 
+        @(posedge clock);
         // 8
+        V1 = 0;
+        V2 = 1;
+        T = 7;
+        ID_EX_reg.rs_idx = 2;
+        S_X_reg[0].ready = 1;
+        S_X_reg[1].ready = 0;
+        S_X_reg[2].ready = 1;
+        S_X_reg[3].ready = 1;
+        T1 = {6, 1'b0};
+        T2 = {0, 1'b0};
         cdb.valid = 1;
         cdb.T = 2;
         cdb.V = 11;
+        compare_stall(1);
         @(negedge clock);
+        // 8
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
-        compare(2, 0, 0, 0, 0, 0, 0);
+        compare(2, 3, 2, 0, 11, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
     
         // st r3, Z(r4) // 9
+        @(posedge clock);
         V1 = 0;
         V2 = 1;
         T = 7;
@@ -271,19 +322,21 @@ module testbench;
         cdb.valid = 1;
         cdb.T = 5;
         cdb.V = 15;
+        compare_stall(0);
         @(negedge clock);
+        // 9
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 7, 6, 0, 0, 1, 1);
-        compare(3, 0, 0, 0, 0, 0, 0);
+        compare(3, 6, 0, 5, 5, 15, 1);
 
         @(negedge clock);
         if(error_count == 0) begin
             $display("@@@correct");
         end
         else begin
-            $display("@@@error");
+            $display("@@@error: error count = %d", error_count);
         end
         @(negedge clock);
         $finish;
