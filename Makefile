@@ -98,7 +98,7 @@
 # there should be no need to change anything for project 3
 
 # this is a global clock period variable used in the tcl script and referenced in testbenches
-export CLOCK_PERIOD = 1000.0
+export CLOCK_PERIOD = 100.0
 
 # Path variables
 export RISCV32_HOME = /homes/user/fac/tk3070/tmp/riscv-gcc/riscv-32/bin
@@ -112,7 +112,7 @@ endif
 
 # the Verilog Compiler command and arguments
 VCS = SW_VCS=2020.12-SP2-1 vcs -CFLAGS "-I /homes/user/fac/tk3070/conda/include" -sverilog +vc -Mupdate -line -full64 -kdb -lca -nc \
-      -debug_access+all+reverse $(VCS_BAD_WARNINGS) +define+CLOCK_PERIOD=$(CLOCK_PERIOD)ps
+     -debug_access+all+reverse $(VCS_BAD_WARNINGS) +define+CLOCK_PERIOD=$(CLOCK_PERIOD)ps
 # a SYNTH define is added when compiling for synthesis that can be used in testbenches
 
 # remove certain warnings that generate MB of text but can be safely ignored
@@ -177,7 +177,7 @@ GREP = grep -E --color=auto
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
 # TODO: add more modules here
-TESTED_MODULES = mult rob
+TESTED_MODULES = map_table rs_stage # mult rob
 
 MODULE = pipeline
 
@@ -321,7 +321,7 @@ HEADERS = verilog/sys_defs.svh \
 
 TESTBENCH = test/pipeline_test.sv \
             test/pipeline_print.c \
-            test/mem.sv
+            test/mem.sv test/rs_stage_test.sv				# added
 
 # you could simplify this line with $(wildcard verilog/*.sv) - but the manual way is more explicit
 SOURCES = verilog/pipeline.sv \
@@ -329,8 +329,26 @@ SOURCES = verilog/pipeline.sv \
           verilog/icache.sv \
           verilog/mult.sv \
           verilog/mult_stage.sv \
+		  verilog/rs_stage.sv				# added
 
 SYNTH_FILES = synth/pipeline.vg
+
+VCS = SW_VCS=2020.12-SP2-1 vcs -sverilog +vc -Mupdate -line -full64 -kdb -lca -nc \
+      -debug_access+all+reverse $(VCS_BAD_WARNINGS) +define+CLOCK_PERIOD=$(CLOCK_PERIOD)
+
+# rs_stage: $(TESTBENCH_RS) $(SOURCES_RS)
+# 	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
+# 	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
+# 	$(VCS) $^ -o $@
+# 	@$(call PRINT_COLOR, 6, finished compiling $@)
+
+# rs_stage_sim: rs_stage
+# 	@$(call PRINT_COLOR, 5, running $<)
+# 	./rs_stage | tee program.out
+# 	@$(call PRINT_COLOR, 2, output saved to program.out)
+
+# rs_stage_verdi: rs_stage novas.rc verdi_dir
+# 	./rs_stage -gui=$(VERDI_EXE)
 
 # the normal simulation executable will run your testbench on the original modules
 simv: $(TESTBENCH) $(SOURCES) $(HEADERS)
