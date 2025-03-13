@@ -23,9 +23,10 @@ module ROB(
     assign next_head = (empty & ~rob_table[head].ready) ? head :
                        (`ROB_SZ - 1 == head)            ? 0 : head + 1;
 
-    // if value isn't in regfiles yet, ok if invalid because map table will MUX values from regfile
-    assign V1 = rob_table[r1];
-    assign V2 = rob_table[r2];
+    // if value isn't in regfiles yet, ok if invalid because map table will MUX values from regfile. 
+    // only for plus forwarding
+    assign V1 = (cdb.valid & (cdb.T == rob_table[r1].T)) ? cdb.V : rob_table[r1].V;
+    assign V2 = (cdb.valid & (cdb.T == rob_table[r2].T)) ? cdb.V : rob_table[r2].V;
 
     always_ff @(posedge clock) begin
         if (cdb.valid) begin
