@@ -57,7 +57,7 @@ module RS_ALLOC(
                 end
 
                 // change these to LD/ST in pipeline. Like this for the tbs
-                if (MT_T2 == 0 | MT_T2.plus | (rs_idx == 2 | rs_idx == 3)) begin
+                if (MT_T2 == 0 | MT_T2.plus) begin
                     // value exists somewhere
                     rs_table[rs_idx].V2 = V2;
                     rs_table[rs_idx].T2 = 0;
