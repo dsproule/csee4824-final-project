@@ -8,6 +8,7 @@ module testbench;
     logic [4:0] r, r1, r2, retire_r;
     CDB cdb;
     ROB_T T, retire_T;
+    MT_ENTRY mt_table [31:0];
 
     // Outputs
     MT_ENTRY T1, T2;
@@ -21,13 +22,19 @@ module testbench;
         end
     endtask
 
+    task dump_mt(logic [5:0] start_i, logic [5:0] end_i);
+        $display("(Map table [%2d:%2d])", start_i, end_i);
+        for (logic [5:0] i = start_i; i < end_i; i++) 
+            $display("r: %3d    Tag: %3d    Plus: %3d    ", i, mt_table[i].T, mt_table[i].plus);
+    endtask
+
     always begin
         #5 clock = ~clock;
     end
 
     initial begin
         $display("Map table testbench starting...");
-        $monitor("r: %2d, r1: %2d, r2: %2d\n", r, r1, r2);
+        // $monitor("r: %2d, r1: %2d, r2: %2d\n", r, r1, r2);
         r = 0;
         clock = 0;
         r1 = 0;
@@ -84,9 +91,10 @@ module testbench;
             exit_on_error;
         end else $display("\n@@@ Passed WAW hazard test!");
 
-
+        dump_mt(6, 7);
         r1 = 6; r = 6; T = 14; @(negedge clock);
         if (T1.T == 14) begin
+            dump_mt(6, 7);
             $display("\n@@@ Failed WAR hazard test! r1 should read old value.");
             exit_on_error;
         end else $display("\n@@@ Passed WAR hazard test!");

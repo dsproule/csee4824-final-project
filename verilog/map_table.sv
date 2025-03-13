@@ -6,11 +6,10 @@ module MAP_TABLE (
     input CDB   cdb,
     input ROB_T T, retire_T,
     
-    output MT_ENTRY T1, T2
+    output MT_ENTRY T1, T2,
+    MT_ENTRY mt_table [31:0]
 );
     logic [5:0] reset_idx, cdb_idx;
-    MT_ENTRY [4:0] mt_table;
-    MT_ENTRY next_tag;
 
     // forwards signal that rob has value present if cdb collides
     assign T1 = (cdb.valid & (cdb.T == mt_table[r1].T)) ?  {mt_table[r1].T, `TRUE} : mt_table[r1];

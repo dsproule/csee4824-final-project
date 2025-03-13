@@ -24,7 +24,7 @@
 `define N 1
 
 // sizes
-`define ROB_SZ 10
+`define ROB_SZ 20
 `define RS_SZ 4
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
