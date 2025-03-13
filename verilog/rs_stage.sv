@@ -1,5 +1,7 @@
 `include "verilog/sys_defs.svh"
 
+// `define USE_D_S_REG
+
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
     input              clock, reset, en,
@@ -96,7 +98,11 @@ endmodule   // RS_alloc
 // Issue stage (clocked)
 module RS_VALUE(
     input                          clock, reset, en,
+`ifdef USE_D_S_REG
     input D_S_PACKET  [`RS_SZ-1:0] D_S_reg,
+`else
+    input RS_ENTRY [`RS_SZ-1:0] rs_table,
+`endif
     input S_X_PACKET  [`RS_SZ-1:0] S_X_reg,
 
     output logic      [`RS_SZ-1:0] s_valid, rs_free,  
@@ -116,6 +122,7 @@ module RS_VALUE(
                 s_valid[s_idx] = 1'b0;
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
+`ifdef USE_D_S_REG
                 if (D_S_reg[s_idx].valid & S_X_reg[s_idx].ready & en) begin
                     S_X_packet[s_idx] = {
                         D_S_reg[s_idx].T, 
@@ -127,6 +134,19 @@ module RS_VALUE(
                         `FALSE,                     // ready (reg cannot be overwritten in use)
                         `TRUE                       // go (deploys FUs inside)
                         };
+`else
+                if ((rs_table[s_idx].ready == 2'b11) & S_X_reg[s_idx].ready & en) begin
+                    S_X_packet[s_idx] = {
+                        rs_table[s_idx].T, 
+                        rs_table[s_idx].V1, 
+                        rs_table[s_idx].V2,
+                        rs_table[s_idx].opa_select,
+                        rs_table[s_idx].opb_select,
+                        rs_table[s_idx].alu_func,
+                        `FALSE,                     // ready (reg cannot be overwritten in use)
+                        `TRUE                       // go (deploys FUs inside)
+                        };
+`endif
                     s_valid[s_idx] = 1'b1;
                 end else begin
                     S_X_packet[s_idx] = 0;
@@ -164,8 +184,6 @@ module rs_stage(
     output RS_ENTRY [ `RS_SZ-1:0] rs_table
 );
     logic [`RS_SZ-1:0] free_bus;
-    D_S_PACKET [`RS_SZ-1:0] D_S_reg;
-    logic [`RS_SZ-1:0] D_S_reg_idx;
     
     // connect alloc with value with cdb
     RS_ALLOC rs_alloc(
@@ -181,6 +199,10 @@ module rs_stage(
         .rs_table(rs_table),
         .busy(busy)
     );
+
+`ifdef USE_D_S_REG
+    D_S_PACKET [`RS_SZ-1:0] D_S_reg;
+    logic [`RS_SZ-1:0] D_S_reg_idx;
 
     // add registers in between parts of pipeline. This will force 
     // consisten number of cycles for every time.
@@ -198,12 +220,16 @@ module rs_stage(
                     };
         end
     end
+`endif
 
     RS_VALUE rs_value(
         // Input
         .clock(clock), .reset(reset), .en(en),
-        // .rs_table(rs_table),
+`ifdef USE_D_S_REG
         .D_S_reg(D_S_reg),
+`else
+        .rs_table(rs_table),
+`endif
         .rs_free(free_bus),
         .S_X_reg(S_X_reg),
 
