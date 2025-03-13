@@ -2,14 +2,15 @@
 
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
-    input             reset, en,
+    input              clock, reset, en,
     input [`RS_SZ-1:0] rs_idx, rs_free,
-    input ROB_T       T, 
-    input MT_ENTRY    MT_T1, MT_T2,          // from the Map Table     
-    input [`XLEN-1:0] V1, V2,
-    input CDB         cdb,
+    input ROB_T        T, 
+    input MT_ENTRY     MT_T1, MT_T2,          // from the Map Table     
+    input [`XLEN-1:0]  V1, V2,
+    input CDB          cdb,
 
     output stall,
+    output logic [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
 );
     /* 
@@ -19,9 +20,19 @@ module RS_ALLOC(
      * In here we assume the ROB & Map Table feed the proper values based on the decode stage.
      */
 
-    logic [`RS_SZ:0] reset_idx, cdb_idx, rs_free_idx;
+    logic [`RS_SZ:0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx;
 
-    assign stall = rs_table[rs_idx].busy;
+    assign stall = busy[rs_idx];
+
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
+                busy[busy_reset_idx] <= `FALSE;
+        end else if (en) begin  
+            // needs to turn busy off based on free bus
+            busy[rs_idx] <= `TRUE;
+        end
+    end
 
     always_comb begin
         if (reset) begin
@@ -29,8 +40,7 @@ module RS_ALLOC(
                 rs_table[reset_idx] = 0;
         end else if (en) begin
             // checks if RS is free to allocate
-            if (~rs_table[rs_idx].busy | rs_free[rs_idx]) begin
-                rs_table[rs_idx].busy = `TRUE;
+            if (~busy[rs_idx] | rs_free[rs_idx]) begin
                 rs_table[rs_idx].T = T;
 
                 // checks if we can put just the value in or if we need the tag for t1
@@ -145,7 +155,8 @@ module rs_stage(
     input MT_ENTRY                  T1, T2,
     input [`XLEN-1:0]               V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
 
-    output d_stall,                         
+    output d_stall,              
+    output [`RS_SZ-1:0] busy,           
     output S_X_PACKET [`RS_SZ-1:0] S_X_packet,
     output RS_ENTRY [ `RS_SZ-1:0] rs_table
 );
@@ -154,7 +165,7 @@ module rs_stage(
     // connect alloc with value with cdb
     RS_ALLOC rs_alloc(
         // Inputs
-        .reset(reset), .en(en),
+        .clock(clock), .reset(reset), .en(en),
         .rs_idx(rs_idx), .rs_free(free_bus),
         .T(T), .MT_T1(T1), .MT_T2(T2),
         .V1(V1), .V2(V2),
@@ -162,7 +173,8 @@ module rs_stage(
 
         // Outputs
         .stall(d_stall),
-        .rs_table(rs_table)
+        .rs_table(rs_table),
+        .busy(busy)
     );
 
     RS_VALUE rs_value(

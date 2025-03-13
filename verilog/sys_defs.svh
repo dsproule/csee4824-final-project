@@ -371,7 +371,6 @@ typedef struct packed {
 
     ALU_FUNC alu_func;
 
-    logic busy;
     logic [1:0] ready;
     logic [`XLEN-1:0] V1;        // assuming 32 bit values
     logic [`XLEN-1:0] V2;        // assuming 32 bit values
