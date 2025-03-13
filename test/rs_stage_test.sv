@@ -20,7 +20,7 @@ module testbench;
     S_X_PACKET [`RS_SZ-1:0] S_X_pack;
     integer i, j;
 
-    RS_STAGE rs_stage(
+    rs_stage rs_stage(
         .clock(clock),
         .reset(reset),
         .en(1'b1),
