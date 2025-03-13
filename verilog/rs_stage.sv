@@ -10,6 +10,7 @@ module RS_ALLOC(
     input CDB          cdb,
 
     output stall,
+    output logic [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
 );
     /* 
@@ -19,15 +20,16 @@ module RS_ALLOC(
      * In here we assume the ROB & Map Table feed the proper values based on the decode stage.
      */
 
-    logic [`RS_SZ:0] reset_idx, cdb_idx, rs_free_idx;
-    logic [`RS_SZ-1:0] busy;
+    logic [`RS_SZ:0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx;
 
     assign stall = busy[rs_idx];
 
     always_ff @(posedge clock) begin
         if (reset) begin
-            busy[rs_idx] <= `FALSE;
+            for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
+                busy[busy_reset_idx] <= `FALSE;
         end else if (en) begin  
+            // needs to turn busy off based on free bus
             busy[rs_idx] <= `TRUE;
         end
     end
@@ -153,7 +155,8 @@ module rs_stage(
     input MT_ENTRY                  T1, T2,
     input [`XLEN-1:0]               V1, V2,           // uses MT_ENTRY.plus to mux val from regfile or ROB
 
-    output d_stall,                         
+    output d_stall,              
+    output [`RS_SZ-1:0] busy,           
     output S_X_PACKET [`RS_SZ-1:0] S_X_packet,
     output RS_ENTRY [ `RS_SZ-1:0] rs_table
 );
@@ -170,7 +173,8 @@ module rs_stage(
 
         // Outputs
         .stall(d_stall),
-        .rs_table(rs_table)
+        .rs_table(rs_table),
+        .busy(busy)
     );
 
     RS_VALUE rs_value(

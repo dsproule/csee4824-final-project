@@ -14,6 +14,7 @@ module testbench;
     ROB_T T;
     MT_ENTRY T1, T2;                    // from map table
     RS_ENTRY [ `RS_SZ-1:0] rs_table;
+    logic [`RS_SZ-1:0] busy;
 
     // Outputs
     logic d_stall;
@@ -32,15 +33,17 @@ module testbench;
         .T2(T2),
         .V1(V1),
         .V2(V2),
+
         .d_stall(d_stall),
         .S_X_packet(S_X_pack),
-        .rs_table(rs_table)
+        .rs_table(rs_table),
+        .busy(busy)
     );
 
     task print_rs;
         $display("\n(RS_TABLE)\n------------------------------------------");
         for(j = 0; j < `RS_SZ; j=j+1)
-            $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b    stall:%b", j, rs_table[j].T, rs_table[j].T1, rs_table[j].T2, rs_table[j].V1, rs_table[j].V2, rs_table[j].busy, rs_table[j].ready, d_stall);
+            $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table[j].T, rs_table[j].T1, rs_table[j].T2, rs_table[j].V1, rs_table[j].V2, busy[j], rs_table[j].ready);
         $display("------------------------------------------");
     endtask
 
