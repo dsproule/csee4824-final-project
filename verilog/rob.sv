@@ -1,6 +1,6 @@
 `include "verilog/sys_defs.svh"
 
-module ROB(
+module rob(
     input clock, reset,
     input [4:0] r, r1, r2,
     input CDB cdb,
@@ -14,7 +14,7 @@ module ROB(
     logic [$clog2(`ROB_SZ)-1:0] next_tail, next_head, tail, head;
     logic [$clog2(`ROB_SZ):0] reset_idx;
 
-    ROB_ENTRY [ROB_SZ-1:0] rob_table;
+    ROB_ENTRY [`ROB_SZ-1:0] rob_table;
 
     // wraparound logic for incrementing pointers
     assign next_tail = (full & ~dispatch_valid) ? tail : 

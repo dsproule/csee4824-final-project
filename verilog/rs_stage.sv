@@ -136,7 +136,7 @@ module RS_VALUE(
 
 endmodule   // RS_VALUE
 
-module RS_STAGE(
+module rs_stage(
     input clock, reset, en,
     input CDB                       cdb,
     input [`RS_SZ-1:0]              rs_idx,
