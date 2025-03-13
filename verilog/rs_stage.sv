@@ -2,12 +2,12 @@
 
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
-    input             reset, en,
+    input              clock, reset, en,
     input [`RS_SZ-1:0] rs_idx, rs_free,
-    input ROB_T       T, 
-    input MT_ENTRY    MT_T1, MT_T2,          // from the Map Table     
-    input [`XLEN-1:0] V1, V2,
-    input CDB         cdb,
+    input ROB_T        T, 
+    input MT_ENTRY     MT_T1, MT_T2,          // from the Map Table     
+    input [`XLEN-1:0]  V1, V2,
+    input CDB          cdb,
 
     output stall,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
@@ -20,8 +20,17 @@ module RS_ALLOC(
      */
 
     logic [`RS_SZ:0] reset_idx, cdb_idx, rs_free_idx;
+    logic [`RS_SZ-1:0] busy;
 
-    assign stall = rs_table[rs_idx].busy;
+    assign stall = busy[rs_idx];
+
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            busy[rs_idx] <= `FALSE;
+        end else if (en) begin  
+            busy[rs_idx] <= `TRUE;
+        end
+    end
 
     always_comb begin
         if (reset) begin
@@ -29,8 +38,7 @@ module RS_ALLOC(
                 rs_table[reset_idx] = 0;
         end else if (en) begin
             // checks if RS is free to allocate
-            if (~rs_table[rs_idx].busy | rs_free[rs_idx]) begin
-                rs_table[rs_idx].busy = `TRUE;
+            if (~busy[rs_idx] | rs_free[rs_idx]) begin
                 rs_table[rs_idx].T = T;
 
                 // checks if we can put just the value in or if we need the tag for t1
@@ -154,7 +162,7 @@ module rs_stage(
     // connect alloc with value with cdb
     RS_ALLOC rs_alloc(
         // Inputs
-        .reset(reset), .en(en),
+        .clock(clock), .reset(reset), .en(en),
         .rs_idx(rs_idx), .rs_free(free_bus),
         .T(T), .MT_T1(T1), .MT_T2(T2),
         .V1(V1), .V2(V2),
