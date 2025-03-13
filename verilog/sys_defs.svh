@@ -360,6 +360,7 @@ typedef struct packed {
  */
 
 typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
+typedef logic [$clog2(`RS_SZ)-1:0]  RS_IDX;
 
 typedef struct packed {
     ROB_T T;
@@ -386,6 +387,19 @@ typedef struct packed {
     logic [`XLEN-1:0] V;
     logic ready;               // to commit to regfile
 } ROB_ENTRY;
+
+// used between the reg 
+typedef struct packed {
+    ROB_T T;
+    logic [`XLEN-1:0] V1;
+    logic [`XLEN-1:0] V2;
+
+    ALU_OPA_SELECT opa_select;
+    ALU_OPB_SELECT opb_select;
+
+    ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
+    logic valid;
+} D_S_PACKET;
 
 typedef struct packed {
     ROB_T T;
