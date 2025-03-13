@@ -3,7 +3,7 @@
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
     input              clock, reset, en,
-    input [`RS_SZ-1:0] rs_idx, rs_free,
+    input logic [`RS_SZ-1:0]       rs_idx, rs_free,
     input ROB_T        T, 
     input MT_ENTRY     MT_T1, MT_T2,          // from the Map Table     
     input [`XLEN-1:0]  V1, V2,
@@ -20,7 +20,7 @@ module RS_ALLOC(
      * In here we assume the ROB & Map Table feed the proper values based on the decode stage.
      */
 
-    logic [`RS_SZ:0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx;
+    logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx;
 
     assign stall = busy[rs_idx];
 
@@ -29,6 +29,7 @@ module RS_ALLOC(
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
                 busy[busy_reset_idx] <= `FALSE;
         end else if (en) begin  
+            // busy handling. Isolated 
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
                 if ((rs_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
                     busy[busy_reset_idx] <= `FALSE;
@@ -86,8 +87,6 @@ module RS_ALLOC(
                         rs_table[cdb_idx].ready[1] = `TRUE;
                     end
                 end
-
-            
         end
     end
 
@@ -96,7 +95,8 @@ endmodule   // RS_alloc
 // Issue stage (clocked)
 module RS_VALUE(
     input                          clock, reset, en,
-    input RS_ENTRY    [`RS_SZ-1:0] rs_table,
+    // input RS_ENTRY    [`RS_SZ-1:0] rs_table,
+    input D_S_PACKET  [`RS_SZ-1:0] D_S_reg,
     input S_X_PACKET  [`RS_SZ-1:0] S_X_reg,
 
     output logic      [`RS_SZ-1:0] s_valid, rs_free,  
@@ -107,7 +107,7 @@ module RS_VALUE(
      *  they are valid to begin computing.
      */
 
-    logic [`RS_SZ:0] s_idx, reset_idx, rs_free_idx;
+    logic [`RS_SZ-1:0] s_idx, reset_idx, rs_free_idx;
 
     // Issue Stage
     always_comb begin
@@ -116,20 +116,21 @@ module RS_VALUE(
                 s_valid[s_idx] = 1'b0;
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
-                if ((rs_table[s_idx].ready == 2'b11) & S_X_reg[s_idx].ready & en) begin
+                if (D_S_reg[s_idx].valid & S_X_reg[s_idx].ready & en) begin
                     S_X_packet[s_idx] = {
-                        rs_table[s_idx].T, 
-                        rs_table[s_idx].V1, 
-                        rs_table[s_idx].V2,
-                        rs_table[s_idx].opa_select,
-                        rs_table[s_idx].opb_select,
-                        rs_table[s_idx].alu_func,
+                        D_S_reg[s_idx].T, 
+                        D_S_reg[s_idx].V1, 
+                        D_S_reg[s_idx].V2,
+                        D_S_reg[s_idx].opa_select,
+                        D_S_reg[s_idx].opb_select,
+                        D_S_reg[s_idx].alu_func,
                         `FALSE,                     // ready (reg cannot be overwritten in use)
                         `TRUE                       // go (deploys FUs inside)
                         };
                     s_valid[s_idx] = 1'b1;
                 end else begin
                     S_X_packet[s_idx] = 0;
+                    s_valid[s_idx] = 0;
                 end
             end
         end
@@ -151,7 +152,7 @@ endmodule   // RS_VALUE
 module rs_stage(
     input clock, reset, en,
     input CDB                       cdb,
-    input [`RS_SZ-1:0]              rs_idx,
+    input logic [`RS_SZ-1:0]                    rs_idx,
     input S_X_PACKET   [`RS_SZ-1:0] S_X_reg,
     input ROB_T                     T,                // coming from dispatch
     input MT_ENTRY                  T1, T2,
@@ -163,6 +164,8 @@ module rs_stage(
     output RS_ENTRY [ `RS_SZ-1:0] rs_table
 );
     logic [`RS_SZ-1:0] free_bus;
+    D_S_PACKET [`RS_SZ-1:0] D_S_reg;
+    logic [`RS_SZ-1:0] D_S_reg_idx;
     
     // connect alloc with value with cdb
     RS_ALLOC rs_alloc(
@@ -179,10 +182,28 @@ module rs_stage(
         .busy(busy)
     );
 
+    // add registers in between parts of pipeline. This will force 
+    // consisten number of cycles for every time.
+    always_ff @(posedge clock) begin
+        for (D_S_reg_idx = 0; D_S_reg_idx < `RS_SZ; D_S_reg_idx++) begin
+            if ((rs_table[D_S_reg_idx].ready == 2'b11) & en)
+                D_S_reg <= {
+                        rs_table[D_S_reg_idx].T, 
+                        rs_table[D_S_reg_idx].V1, 
+                        rs_table[D_S_reg_idx].V2,
+                        rs_table[D_S_reg_idx].opa_select,
+                        rs_table[D_S_reg_idx].opb_select,
+                        rs_table[D_S_reg_idx].alu_func,
+                        (rs_table[D_S_reg_idx].ready == 2'b11)
+                    };
+        end
+    end
+
     RS_VALUE rs_value(
         // Input
         .clock(clock), .reset(reset), .en(en),
-        .rs_table(rs_table),
+        // .rs_table(rs_table),
+        .D_S_reg(D_S_reg),
         .rs_free(free_bus),
         .S_X_reg(S_X_reg),
 
