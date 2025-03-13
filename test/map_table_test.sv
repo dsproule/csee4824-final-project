@@ -13,7 +13,16 @@ module testbench;
     // Outputs
     MT_ENTRY T1, T2;
 
-    MAP_TABLE mt(.*);
+    map_table mt(
+        .clock(clock),
+        .reset(reset),
+        .r(r),
+        .r1(r1),
+        .r2(r2),
+        .retire_r(retire_r),
+        .T(T),
+        .retire_T(retire_T)
+        );
 
     task exit_on_error;
         begin
@@ -109,6 +118,9 @@ module testbench;
 
 
         r = 7; T = 15; @(negedge clock);
+        //need to change r to r != 7, bc if not will keep writing to r = 7 and not reture
+        r = 0; T = 0; @(negedge clock);
+
         retire_r = 7; retire_T = 15; @(negedge clock);
         r1 = 7; @(negedge clock);
         if (T1.T != 0) begin
