@@ -1,6 +1,6 @@
 `include "verilog/sys_defs.svh"
 
-module MAP_TABLE (
+module map_table (
     input clock, reset,
     input [4:0] r, r1, r2, retire_r,
     input CDB   cdb,

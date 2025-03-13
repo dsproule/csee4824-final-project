@@ -24,8 +24,8 @@
 `define N 1
 
 // sizes
-`define ROB_SZ xx
-`define RS_SZ xx
+`define ROB_SZ 10
+`define RS_SZ 4
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
 // worry about these later
@@ -33,10 +33,10 @@
 `define LSQ_SZ xx
 
 // functional units (you should decide if you want more or fewer types of FUs)
-`define NUM_FU_ALU xx
-`define NUM_FU_MULT xx
-`define NUM_FU_LOAD xx
-`define NUM_FU_STORE xx
+`define NUM_FU_ALU 0
+`define NUM_FU_MULT 1
+`define NUM_FU_LOAD 2
+`define NUM_FU_STORE 3
 
 // number of mult stages (2, 4, or 8)
 `define MULT_STAGES 4
@@ -291,6 +291,7 @@ typedef struct packed {
  * Data exchanged from the ID to the EX stage
  */
 typedef struct packed {
+    /* Can use many of these to assign RS entry via rs_idx */
     INST              inst;
     logic [`XLEN-1:0] PC;
     logic [`XLEN-1:0] NPC; // PC + 4
@@ -310,6 +311,8 @@ typedef struct packed {
     logic       halt;          // Is this a halt?
     logic       illegal;       // Is this instruction illegal?
     logic       csr_op;        // Is this a CSR operation? (we use this to get return code)
+    
+    logic [`RS_SZ-1:0] rs_idx;       
 
     logic       valid;
 } ID_EX_PACKET;
@@ -355,5 +358,62 @@ typedef struct packed {
 /**
  * No WB output packet as it would be more cumbersome than useful
  */
+
+typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
+
+typedef struct packed {
+    ROB_T T;
+    ROB_T T1;
+    ROB_T T2;
+
+    ALU_OPA_SELECT opa_select;
+    ALU_OPB_SELECT opb_select;
+
+    ALU_FUNC alu_func;
+
+    logic busy;
+    logic [1:0] ready;
+    logic [`XLEN-1:0] V1;        // assuming 32 bit values
+    logic [`XLEN-1:0] V2;        // assuming 32 bit values
+} RS_ENTRY;
+
+typedef struct packed {
+    ROB_T T;
+    logic plus;                // signify if in ROB buf or reg file
+} MT_ENTRY;
+
+typedef struct packed {
+    logic [4:0] r;
+    logic [`XLEN-1:0] V;
+    logic ready;               // to commit to regfile
+} ROB_ENTRY;
+
+typedef struct packed {
+    ROB_T T;
+    logic [`XLEN-1:0] V1;
+    logic [`XLEN-1:0] V2;
+
+    ALU_OPA_SELECT opa_select;
+    ALU_OPB_SELECT opb_select;
+
+    ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
+
+    logic ready;
+    logic go;
+} S_X_PACKET;
+
+typedef struct packed {
+    ROB_T T;
+    logic [`XLEN-1:0] result;
+    
+    logic done;
+} X_C_PACKET;
+
+typedef struct packed {
+    ROB_T T;
+    logic [`XLEN-1:0] V;
+
+    logic valid;
+} CDB;
 
 `endif // __SYS_DEFS_SVH__

@@ -331,24 +331,10 @@ SOURCES = verilog/pipeline.sv \
           verilog/mult_stage.sv \
 		  verilog/rs_stage.sv				# added
 
-SYNTH_FILES = synth/pipeline.vg
+SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 
 VCS = SW_VCS=2020.12-SP2-1 vcs -sverilog +vc -Mupdate -line -full64 -kdb -lca -nc \
       -debug_access+all+reverse $(VCS_BAD_WARNINGS) +define+CLOCK_PERIOD=$(CLOCK_PERIOD)
-
-# rs_stage: $(TESTBENCH_RS) $(SOURCES_RS)
-# 	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
-# 	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
-# 	$(VCS) $^ -o $@
-# 	@$(call PRINT_COLOR, 6, finished compiling $@)
-
-# rs_stage_sim: rs_stage
-# 	@$(call PRINT_COLOR, 5, running $<)
-# 	./rs_stage | tee program.out
-# 	@$(call PRINT_COLOR, 2, output saved to program.out)
-
-# rs_stage_verdi: rs_stage novas.rc verdi_dir
-# 	./rs_stage -gui=$(VERDI_EXE)
 
 # the normal simulation executable will run your testbench on the original modules
 simv: $(TESTBENCH) $(SOURCES) $(HEADERS)
