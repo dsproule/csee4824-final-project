@@ -56,7 +56,8 @@ module RS_ALLOC(
                     rs_table[rs_idx].T1 = MT_T1.T;
                 end
 
-                if (MT_T2 == 0 | MT_T2.plus) begin
+                // change these to LD/ST in pipeline. Like this for the tbs
+                if (MT_T2 == 0 | MT_T2.plus | (rs_idx == 2 | rs_idx == 3)) begin
                     // value exists somewhere
                     rs_table[rs_idx].V2 = V2;
                     rs_table[rs_idx].T2 = 0;
@@ -95,7 +96,6 @@ endmodule   // RS_alloc
 // Issue stage (clocked)
 module RS_VALUE(
     input                          clock, reset, en,
-    // input RS_ENTRY    [`RS_SZ-1:0] rs_table,
     input D_S_PACKET  [`RS_SZ-1:0] D_S_reg,
     input S_X_PACKET  [`RS_SZ-1:0] S_X_reg,
 
@@ -186,15 +186,15 @@ module rs_stage(
     // consisten number of cycles for every time.
     always_ff @(posedge clock) begin
         for (D_S_reg_idx = 0; D_S_reg_idx < `RS_SZ; D_S_reg_idx++) begin
-            if ((rs_table[D_S_reg_idx].ready == 2'b11) & en)
-                D_S_reg <= {
+            if (en & (rs_table[D_S_reg_idx].ready == 2'b11))
+                D_S_reg[D_S_reg_idx] <= {
                         rs_table[D_S_reg_idx].T, 
                         rs_table[D_S_reg_idx].V1, 
                         rs_table[D_S_reg_idx].V2,
                         rs_table[D_S_reg_idx].opa_select,
                         rs_table[D_S_reg_idx].opb_select,
                         rs_table[D_S_reg_idx].alu_func,
-                        (rs_table[D_S_reg_idx].ready == 2'b11)
+                        `TRUE
                     };
         end
     end
