@@ -4,7 +4,7 @@
 module testbench;
 
     // Inputs
-    logic reset;
+    logic clock, reset;
     logic [4:0] r, r1, r2, retire_r;
     CDB cdb;
     ROB_T T, retire_T;
@@ -21,10 +21,15 @@ module testbench;
         end
     endtask
 
+    always begin
+        #5 clock = ~clock;
+    end
+
     initial begin
         $display("Map table testbench starting...");
         $monitor("r: %2d, r1: %2d, r2: %2d\n", r, r1, r2);
         r = 0;
+        clock = 0;
         r1 = 0;
         r2 = 0;
         retire_r = 0;
