@@ -61,7 +61,7 @@ module RS_ALLOC(
                     // value exists somewhere
                     next_re.V1 <= V1;
                     next_re.T1 <= 0;
-                    next_re.ready <= next_re.ready | 2'b01;
+                    next_re.ready[0] <= `TRUE;
                 end else begin
                     next_re.T1 <= MT_T1.T;
                     next_re.V1 <= 0;
@@ -72,7 +72,7 @@ module RS_ALLOC(
                     // value exists somewhere
                     next_re.V2 <= V2;
                     next_re.T2 <= 0;
-                    next_re.ready <= next_re.ready | 2'b10;
+                    next_re.ready[1] <= `TRUE;
                 end else begin
                     next_re.T2 <= MT_T2.T;
                     next_re.V2 <= 0;
@@ -91,13 +91,13 @@ module RS_ALLOC(
                     if (rs_table[cdb_idx].T1 == cdb.T) begin
                         rs_table[cdb_idx].V1 <= cdb.V;
                         rs_table[cdb_idx].T1 <= 0;
-                        rs_table[cdb_idx].ready <= rs_table[cdb_idx].ready | 2'b01;
+                        rs_table[cdb_idx].ready[0] <= `TRUE;
                     end
 
                     if (rs_table[cdb_idx].T2 == cdb.T) begin
                         rs_table[cdb_idx].V2 <= cdb.V;
                         rs_table[cdb_idx].T2 <= 0;
-                        rs_table[cdb_idx].ready <= rs_table[cdb_idx].ready | 2'b10;
+                        rs_table[cdb_idx].ready[1] <= `TRUE;
                     end
                 end
         end
