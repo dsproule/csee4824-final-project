@@ -22,10 +22,15 @@ grading it manually.
 TODO: Add commands to run your single module testbench here
 
 # To run and check the output:
-TODO
+
+# both synthesizable/simulated versions give same output. We included two modules because
+# we started working on the whole processor but want to be graded primarily on rs_stage
+
+make map_table.syn.out
+make rs_stage.syn.out
 
 # To view coverage:
-TODO
+make rs_stage.coverage
 ```
 
 For other autograder submissions, we require these three things:
