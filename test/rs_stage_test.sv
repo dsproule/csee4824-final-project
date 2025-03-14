@@ -29,7 +29,7 @@ module testbench;
         .reset(reset),
         .en(en),
         .cdb(cdb),
-        .rs_idx(ID_EX_reg.rs_idx),
+        .ID_EX_reg(ID_EX_reg),
         .S_X_reg(S_X_reg), 
         .T(T),
         .T1(T1),
@@ -55,8 +55,9 @@ module testbench;
         input busy;
         if((rs_table[idx].T != t) || (rs_table[idx].T1 != t1) || (rs_table[idx].T2 != t2) || (rs_table[idx].V1 != v1) || (rs_table[idx].V2 != v2) || (busy[idx] != busy)) begin
             error_count = error_count + 1;
-            $display("@@@error time: %d\t", (clock_count - 2)/2);
+            $display("@@@Failed at time: %d\t", (clock_count - 2)/2);
             $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:%b", idx, t, t1, t2, v1, v2, busy);
+            $finish;
         end
     endtask
 
@@ -64,8 +65,9 @@ module testbench;
         input stall;
         if(d_stall != stall) begin
             error_count = error_count + 1;
-            $display("@@@error time: %d\t", (clock_count - 2)/2);
+            $display("@@@Failed at time: %d\t", (clock_count - 2)/2);
             $display("@@@stall error: d_stall: %b", d_stall);
+            $finish;
         end
     endtask
 
@@ -122,6 +124,7 @@ module testbench;
         V1 = 0;
         V2 = 8;
         T = 1;
+        ID_EX_reg.rs_idx = 1;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -349,10 +352,7 @@ module testbench;
         
 
         if(error_count == 0) begin
-            $display("@@@correct");
-        end
-        else begin
-            $display("@@@error: error count = %d", error_count);
+            $display("@@@Passed");
         end
         @(negedge clock);
         $finish;
