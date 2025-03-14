@@ -29,6 +29,7 @@ module RS_ALLOC(
     RS_ENTRY next_re;
     logic [$clog2(`RS_SZ):0] rs_update_idx;
     logic on;
+    logic [`RS_SZ-1:0] next_busy;
 `endif
 
     assign stall = busy[rs_idx];
@@ -38,6 +39,7 @@ module RS_ALLOC(
         if (reset) begin
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
                 busy[reset_idx] <= `FALSE;
+                next_busy[reset_idx] <= `FALSE;
                 rs_table[reset_idx] <= 0;
             end
 
@@ -48,12 +50,13 @@ module RS_ALLOC(
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
                 if ((rs_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
                     busy[busy_reset_idx] <= `FALSE;
-            busy[rs_idx] <= `TRUE;
-
+            
+            busy[rs_update_idx] <= next_busy[rs_update_idx];
             rs_table[rs_update_idx] <= next_re;
 
             // if RS entry is empty, allocate it
             if (~busy[rs_idx] | rs_free[rs_idx]) begin
+                next_busy[rs_idx] <= `TRUE;
                 next_re.T <= T;
                 rs_update_idx <= rs_idx;
 
@@ -66,6 +69,7 @@ module RS_ALLOC(
                 end else begin
                     next_re.T1 <= MT_T1.T;
                     next_re.V1 <= 0;
+                    next_re.ready[0] <= `FALSE;
                 end
 
                 // change these to LD/ST in pipeline. Like this for the tbs
@@ -77,6 +81,7 @@ module RS_ALLOC(
                 end else begin
                     next_re.T2 <= MT_T2.T;
                     next_re.V2 <= 0;
+                    next_re.ready[1] <= `FALSE;
                 end
                 
             end
