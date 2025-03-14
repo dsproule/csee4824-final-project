@@ -284,14 +284,20 @@ module rs_stage(
             `ifdef AGG_CDB
             if (en & (rs_table[D_S_reg_idx].ready == 2'b11))
             `else 
+            // huge block saying if rs_entry == ready or (rs_entry + cdb == ready)      -> enables a bypass 
             if (en & ((rs_table[D_S_reg_idx].ready == 2'b11) |
                     ((rs_table[D_S_reg_idx].ready == 2'b01) & (cdb.T == rs_table[D_S_reg_idx].T1)) | 
                     ((rs_table[D_S_reg_idx].ready == 2'b10) & (cdb.T == rs_table[D_S_reg_idx].T2))))
             `endif
                 D_S_reg[D_S_reg_idx] <= {
                         rs_table[D_S_reg_idx].T, 
+                        `ifdef AGG_CDB
+                        (cdb.T == rs_table[D_S_reg_idx].T1) ? cdb.V : rs_table[D_S_reg_idx].V1, 
+                        (cdb.T == rs_table[D_S_reg_idx].T2) ? cdb.V : rs_table[D_S_reg_idx].V2,
+                        `else
                         rs_table[D_S_reg_idx].V1, 
                         rs_table[D_S_reg_idx].V2,
+                        `endif
                         rs_table[D_S_reg_idx].opa_select,
                         rs_table[D_S_reg_idx].opb_select,
                         rs_table[D_S_reg_idx].alu_func,
