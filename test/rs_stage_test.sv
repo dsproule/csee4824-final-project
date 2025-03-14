@@ -62,9 +62,10 @@ module testbench;
 
     task compare_stall;
         input stall;
-        if(d_stall !== stall) begin
-            // $display("@@@error time: %d\t", clock_count - 1);
-            // $display("@@@stall error");
+        if(d_stall != stall) begin
+            error_count = error_count + 1;
+            $display("@@@error time: %d\t", (clock_count - 2)/2);
+            $display("@@@stall error: d_stall: %b", d_stall);
         end
     endtask
 
@@ -121,7 +122,6 @@ module testbench;
         V1 = 0;
         V2 = 8;
         T = 1;
-        ID_EX_reg.rs_idx = 1;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -131,6 +131,7 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        @(posedge clock);
         compare_stall(0);
         @(negedge clock);
         print_rs();
@@ -158,6 +159,7 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        @(posedge clock);
         compare_stall(0);
         // 2
         @(negedge clock);
@@ -182,6 +184,7 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        @(posedge clock);
         compare_stall(0);
         @(negedge clock);
         // 3
@@ -206,6 +209,7 @@ module testbench;
         cdb.valid = 1;
         cdb.T = 1;
         cdb.V = 10;
+        @(posedge clock);
         compare_stall(0);
         // 4
         @(negedge clock);
@@ -230,6 +234,7 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        @(posedge clock);
         compare_stall(0);
         @(negedge clock);
         // 5
@@ -255,6 +260,7 @@ module testbench;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
+        @(posedge clock);
         compare_stall(0);
         // 6
         @(negedge clock);
@@ -280,6 +286,7 @@ module testbench;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
         S_X_reg[3].ready = 0;
+        @(posedge clock);
         compare_stall(1);
         // 7
         @(negedge clock);
@@ -304,6 +311,7 @@ module testbench;
         cdb.valid = 1;
         cdb.T = 2;
         cdb.V = 11;
+        @(posedge clock);
         compare_stall(1);
         @(negedge clock); 
         // 8
@@ -329,9 +337,10 @@ module testbench;
         cdb.valid = 1;
         cdb.T = 5;
         cdb.V = 15;
-        compare_stall(0);
-        @(negedge clock);
+        @(posedge clock);
+        compare_stall(1);
         // 9
+        @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
