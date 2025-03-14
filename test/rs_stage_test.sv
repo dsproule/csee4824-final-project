@@ -113,9 +113,10 @@ module testbench;
         reset = 1;
         @(negedge clock);
         reset = 0;
+        @(negedge clock);
         // during reset, clear the reservation table
 
-        @(posedge clock); #10
+        // @(posedge clock); #10
         en = 1;
         // ld X(r4), r2 // 1
         V1 = 0;

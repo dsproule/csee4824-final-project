@@ -1,6 +1,6 @@
 `include "verilog/sys_defs.svh"
 
-// `define USE_D_S_REG
+`define USE_D_S_REG
 
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
@@ -23,22 +23,66 @@ module RS_ALLOC(
      */
 
     logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx;
+`ifdef USE_D_S_REG
+    RS_ENTRY next_re;
+    logic [$clog2(`RS_SZ):0] rs_update_idx;
+    logic on;
+`endif
 
     assign stall = busy[rs_idx];
 
+`ifdef USE_D_S_REG
     always_ff @(posedge clock) begin
         if (reset) begin
-            for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
-                busy[busy_reset_idx] <= `FALSE;
+            for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
+                busy[reset_idx] <= `FALSE;
+                rs_table[reset_idx] <= 0;
+            end
+
+            next_re <= 0;
+            rs_update_idx <= 0;
         end else if (en) begin  
             // busy handling. Isolated 
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
                 if ((rs_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
                     busy[busy_reset_idx] <= `FALSE;
             busy[rs_idx] <= `TRUE;
+
+            rs_table[rs_update_idx] <= next_re;
+
+            // if RS entry is empty, allocate it
+            if (~busy[rs_idx] | rs_free[rs_idx]) begin
+                next_re.T <= T;
+                rs_update_idx <= rs_idx;
+
+                // checks if we can put just the value in or if we need the tag for t1
+                if (MT_T1 == 0 | MT_T1.plus) begin
+                    // value exists somewhere
+                    next_re.V1 <= V1;
+                    next_re.T1 <= 0;
+                    next_re.ready[0] <= `TRUE;
+                end else begin
+                    next_re.T1 <= MT_T1.T;
+                    next_re.V1 <= 0;
+                end
+
+                // change these to LD/ST in pipeline. Like this for the tbs
+                if (MT_T2 == 0 | MT_T2.plus) begin
+                    // value exists somewhere
+                    next_re.V2 <= V2;
+                    next_re.T2 <= 0;
+                    next_re.ready[1] <= `TRUE;
+                end else begin
+                    next_re.T2 <= MT_T2.T;
+                    next_re.V2 <= 0;
+                end
+                
+            end
         end
     end
 
+    // fold this
+`else
     always_comb begin
         if (reset) begin
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
@@ -94,6 +138,7 @@ module RS_ALLOC(
                 end
         end
     end
+`endif
 
 endmodule   // RS_alloc
 
