@@ -1,8 +1,6 @@
 `include "verilog/sys_defs.svh"
 
-// `define USE_D_S_REG
 `define MAKE_RS_REG
-`define AGG_CDB
 
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
@@ -24,17 +22,13 @@ module RS_ALLOC(
      * In here we assume the ROB & Map Table feed the proper values based on the decode stage.
      */
 
-    logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx;
-`ifdef MAKE_RS_REG
-    RS_ENTRY next_re;
-    logic [$clog2(`RS_SZ):0] rs_update_idx;
-    logic on;
+    logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx, rs_update_idx;
     logic [`RS_SZ-1:0] next_busy;
-`endif
+    RS_ENTRY next_re;
+    logic on;
 
     assign stall = busy[rs_idx];
 
-`ifdef MAKE_RS_REG
     always_ff @(posedge clock) begin
         if (reset) begin
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
@@ -109,75 +103,12 @@ module RS_ALLOC(
         end
     end
 
-    // fold this
-`else
-    always_comb begin
-        if (reset) begin
-            for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
-                rs_table[reset_idx] = 0;
-        end else if (en) begin
-            // checks if RS is free to allocate
-            if (~busy[rs_idx] | rs_free[rs_idx]) begin
-                rs_table[rs_idx].T = T;
-
-                // checks if we can put just the value in or if we need the tag for t1
-                if (MT_T1 == 0 | MT_T1.plus) begin
-                    // value exists somewhere
-                    rs_table[rs_idx].V1 = V1;
-                    rs_table[rs_idx].T1 = 0;
-                    rs_table[rs_idx].ready[0] = `TRUE;
-                end else begin
-                    rs_table[rs_idx].T1 = MT_T1.T;
-                    rs_table[rs_idx].V1 = 0;
-                end
-
-                // change these to LD/ST in pipeline. Like this for the tbs
-                if (MT_T2 == 0 | MT_T2.plus) begin
-                    // value exists somewhere
-                    rs_table[rs_idx].V2 = V2;
-                    rs_table[rs_idx].T2 = 0;
-                    rs_table[rs_idx].ready[1] = `TRUE;
-                end else begin
-                    rs_table[rs_idx].T2 = MT_T2.T;
-                    rs_table[rs_idx].V2 = 0;
-                end
-                
-            end
-
-            // free a line that isn't about to be allocated (should be handled by above)
-            for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
-                if ((rs_free_idx != rs_idx) & (rs_free[rs_free_idx]))
-                    rs_table[rs_free_idx] = 0;
-
-            // if a CDB line came in 
-            if (cdb.valid)
-                for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
-                    if (rs_table[cdb_idx].T1 == cdb.T) begin
-                        rs_table[cdb_idx].V1 = cdb.V;
-                        rs_table[cdb_idx].T1 = 0;
-                        rs_table[cdb_idx].ready[0] = `TRUE;
-                    end
-
-                    if (rs_table[cdb_idx].T2 == cdb.T) begin
-                        rs_table[cdb_idx].V2 = cdb.V;
-                        rs_table[cdb_idx].T2 = 0;
-                        rs_table[cdb_idx].ready[1] = `TRUE;
-                    end
-                end
-        end
-    end
-`endif
-
 endmodule   // RS_alloc
 
 // Issue stage (clocked)
 module RS_VALUE(
-    input                          clock, reset, en,
-`ifdef USE_D_S_REG
-    input D_S_PACKET  [`RS_SZ-1:0] D_S_reg,
-`else
+    input clock, reset, en,
     input RS_ENTRY [`RS_SZ-1:0] rs_table,
-`endif
     input S_X_PACKET  [`RS_SZ-1:0] S_X_reg,
 
     output logic      [`RS_SZ-1:0] s_valid, rs_free,  
@@ -197,19 +128,6 @@ module RS_VALUE(
                 s_valid[s_idx] = 1'b0;
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
-`ifdef USE_D_S_REG
-                if (D_S_reg[s_idx].valid & S_X_reg[s_idx].ready & en) begin
-                    S_X_packet[s_idx] = {
-                        D_S_reg[s_idx].T, 
-                        D_S_reg[s_idx].V1, 
-                        D_S_reg[s_idx].V2,
-                        D_S_reg[s_idx].opa_select,
-                        D_S_reg[s_idx].opb_select,
-                        D_S_reg[s_idx].alu_func,
-                        `FALSE,                     // ready (reg cannot be overwritten in use)
-                        `TRUE                       // go (deploys FUs inside)
-                        };
-`else
                 if ((rs_table[s_idx].ready == 2'b11) & S_X_reg[s_idx].ready & en) begin
                     S_X_packet[s_idx] = {
                         rs_table[s_idx].T, 
@@ -221,7 +139,6 @@ module RS_VALUE(
                         `FALSE,                     // ready (reg cannot be overwritten in use)
                         `TRUE                       // go (deploys FUs inside)
                         };
-`endif
                     s_valid[s_idx] = 1'b1;
                 end else begin
                     S_X_packet[s_idx] = 0;
@@ -246,8 +163,8 @@ endmodule   // RS_VALUE
 
 module rs_stage(
     input clock, reset, en,
-    input CDB                       cdb,
-    input logic [`RS_SZ-1:0]                    rs_idx,
+    input CDB cdb,
+    input logic [`RS_SZ-1:0]        rs_idx,
     input S_X_PACKET   [`RS_SZ-1:0] S_X_reg,
     input ROB_T                     T,                // coming from dispatch
     input MT_ENTRY                  T1, T2,
@@ -275,52 +192,10 @@ module rs_stage(
         .busy(busy)
     );
 
-`ifdef USE_D_S_REG
-    D_S_PACKET [`RS_SZ-1:0] D_S_reg;
-    logic [`RS_SZ-1:0] D_S_reg_idx;
-
-    // add registers in between parts of pipeline. This will force 
-    // consisten number of cycles for every time.
-    `ifdef AGG_CDB
-    always_ff @(posedge clock or posedge cdb.valid) begin
-    `else 
-    always_ff @(posedge clock) begin
-    `endif
-        for (D_S_reg_idx = 0; D_S_reg_idx < `RS_SZ; D_S_reg_idx++) begin
-            `ifdef AGG_CDB
-            if (en & (rs_table[D_S_reg_idx].ready == 2'b11))
-            `else 
-            // huge block saying if rs_entry == ready or (rs_entry + cdb == ready)      -> enables a bypass 
-            if (en & ((rs_table[D_S_reg_idx].ready == 2'b11) |
-                    ((rs_table[D_S_reg_idx].ready == 2'b01) & (cdb.T == rs_table[D_S_reg_idx].T1)) | 
-                    ((rs_table[D_S_reg_idx].ready == 2'b10) & (cdb.T == rs_table[D_S_reg_idx].T2))))
-            `endif
-                D_S_reg[D_S_reg_idx] <= {
-                        rs_table[D_S_reg_idx].T, 
-                        `ifdef AGG_CDB
-                        (cdb.T == rs_table[D_S_reg_idx].T1) ? cdb.V : rs_table[D_S_reg_idx].V1, 
-                        (cdb.T == rs_table[D_S_reg_idx].T2) ? cdb.V : rs_table[D_S_reg_idx].V2,
-                        `else
-                        rs_table[D_S_reg_idx].V1, 
-                        rs_table[D_S_reg_idx].V2,
-                        `endif
-                        rs_table[D_S_reg_idx].opa_select,
-                        rs_table[D_S_reg_idx].opb_select,
-                        rs_table[D_S_reg_idx].alu_func,
-                        `TRUE
-                    };
-        end
-    end
-`endif
-
     RS_VALUE rs_value(
         // Input
         .clock(clock), .reset(reset), .en(en),
-`ifdef USE_D_S_REG
-        .D_S_reg(D_S_reg),
-`else
         .rs_table(rs_table),
-`endif
         .rs_free(free_bus),
         .S_X_reg(S_X_reg),
 
