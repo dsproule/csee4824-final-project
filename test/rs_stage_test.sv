@@ -115,7 +115,7 @@ module testbench;
         reset = 0;
         // during reset, clear the reservation table
 
-        @(posedge clock); 
+        @(negedge clock); 
         en = 1;
         // ld X(r4), r2 // 1
         V1 = 0;
@@ -132,17 +132,12 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         compare_stall(0);
-        @(negedge clock);
+        @(posedge clock);
         // expected change
         // index:    0   T:   1   T1:   0   T2:   0   V1:   5   V2:   1   busy:   1   ready:11
         // 1
-        print_rs();
-        compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 0, 0, 0, 0, 0, 0);
-        compare(2, 0, 0, 0, 0, 0, 0);
-        compare(3, 0, 0, 0, 0, 0, 0);
 
-        @(posedge clock); #10
+        @(negedge clock); 
         // mul r1, r2, r3 // 2
         V1 = 5;
         V2 = 0;
@@ -159,14 +154,14 @@ module testbench;
         cdb.V = 0;
         compare_stall(0);
         // 2
-        @(negedge clock);
+        @(posedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 1, 0, 0, 0, 8, 1);
+        compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 0, 0, 0, 0, 0, 0);
 
-        @(posedge clock); #10
+        @(negedge clock);
         // st r3, Z(r4) // 3
         V1 = 0;
         V2 = 8;
@@ -182,15 +177,16 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         compare_stall(0);
-        @(negedge clock);
+        @(posedge clock);
         // 3
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(1, 1, 0, 0, 0, 8, 1);
         compare(2, 0, 0, 0, 0, 0, 0);
-        compare(3, 2, 0, 1, 5, 0, 1);
+        compare(3, 0, 0, 0, 0, 0, 0);
+        
 
-        @(posedge clock); #10
+        @(negedge clock); 
         // addi r4, 4, r4 // 4
         V1 = 8;
         V2 = 0;
@@ -207,14 +203,15 @@ module testbench;
         cdb.V = 10;
         compare_stall(0);
         // 4
-        @(negedge clock);
+        @(posedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 0, 0, 0, 0, 0, 0);
-        compare(2, 3, 2, 0, 0, 8, 1);
+        compare(1, 1, 0, 0, 0, 8, 1);
+        compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 2, 0, 1, 5, 0, 1);
+        
 
-        @(posedge clock); #10
+        @(negedge clock); 
         // ldf X(r4), r2 // 5
         V1 = 0;
         V2 = 0;
@@ -230,15 +227,16 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         compare_stall(0);
-        @(negedge clock);
+        @(posedge clock);
         // 5
         print_rs();
-        compare(0, 4, 0, 0, 8, 0, 1);
+        compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 2, 0, 0, 5, 10, 1);
+        
 
-        @(posedge clock); #10
+        @(negedge clock); 
         // mul r1, r2, r3 // 6
         V1 = 5;
         V2 = 0;
@@ -255,14 +253,15 @@ module testbench;
         cdb.V = 0;
         compare_stall(0);
         // 6
-        @(negedge clock);
+        @(posedge clock);
         print_rs();
-        compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 5, 0, 4, 0, 0, 1);
+        compare(0, 4, 0, 0, 8, 0, 1);
+        compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
-        compare(3, 0, 0, 0, 0, 0, 0);
+        compare(3, 2, 0, 0, 5, 10, 1);
+        
 
-        @(posedge clock); #10
+        @(negedge clock); 
         // 7
         V1 = 0;
         V2 = 1;
@@ -279,14 +278,15 @@ module testbench;
         S_X_reg[3].ready = 0;
         compare_stall(1);
         // 7
-        @(negedge clock);
+        @(posedge clock);
         print_rs();
-        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(0, 4, 0, 0, 8, 0, 1);
         compare(1, 5, 0, 4, 0, 0, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
-        compare(3, 6, 0, 5, 5, 0, 1);
+        compare(3, 0, 0, 0, 0, 0, 0);
+        
 
-        @(posedge clock); #10
+        @(negedge clock); 
         // 8
         V1 = 0;
         V2 = 1;
@@ -302,16 +302,17 @@ module testbench;
         cdb.T = 2;
         cdb.V = 11;
         compare_stall(1);
-        @(negedge clock);
+        @(posedge clock);
         // 8
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 5, 0, 0, 0, 12, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
+        
     
         // st r3, Z(r4) // 9
-        @(posedge clock); #10
+        @(negedge clock); 
         V1 = 0;
         V2 = 1;
         T = 7;
@@ -326,13 +327,20 @@ module testbench;
         cdb.T = 5;
         cdb.V = 15;
         compare_stall(0);
-        @(negedge clock);
+        @(posedge clock);
         // 9
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 0, 0, 0, 0, 0, 0);
-        compare(2, 3, 0, 0, 11, 8, 0);
+        compare(1, 5, 0, 0, 0, 12, 1);
+        compare(2, 3, 0, 0, 11, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
+        
+        @(posedge clock);
+        print_rs();
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 3, 0, 0, 11, 8, 1);
+        compare(3, 6, 0, 0, 5, 15, 1);
 
         if(error_count == 0) begin
             $display("@@@correct");

@@ -48,7 +48,7 @@ module RS_ALLOC(
         end else if (en) begin  
             // busy handling
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
-                if ((rs_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
+                if ((rs_update_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
                     busy[busy_reset_idx] <= `FALSE;
             
             busy[rs_update_idx] <= next_busy[rs_update_idx];
