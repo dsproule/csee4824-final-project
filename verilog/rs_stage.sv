@@ -1,6 +1,7 @@
 `include "verilog/sys_defs.svh"
 
 `define USE_D_S_REG
+`define AGG_CDB
 
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
@@ -42,7 +43,7 @@ module RS_ALLOC(
             next_re <= 0;
             rs_update_idx <= 0;
         end else if (en) begin  
-            // busy handling. Isolated 
+            // busy handling
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
                 if ((rs_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
                     busy[busy_reset_idx] <= `FALSE;
@@ -60,7 +61,7 @@ module RS_ALLOC(
                     // value exists somewhere
                     next_re.V1 <= V1;
                     next_re.T1 <= 0;
-                    next_re.ready[0] <= `TRUE;
+                    next_re.ready <= next_re.ready | 2'b01;
                 end else begin
                     next_re.T1 <= MT_T1.T;
                     next_re.V1 <= 0;
@@ -71,13 +72,34 @@ module RS_ALLOC(
                     // value exists somewhere
                     next_re.V2 <= V2;
                     next_re.T2 <= 0;
-                    next_re.ready[1] <= `TRUE;
+                    next_re.ready <= next_re.ready | 2'b10;
                 end else begin
                     next_re.T2 <= MT_T2.T;
                     next_re.V2 <= 0;
                 end
                 
             end
+
+            // free a line that isn't about to be allocated (should be handled by above)
+            for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
+                if ((rs_free_idx != rs_update_idx) & (rs_free[rs_free_idx]))
+                    rs_table[rs_free_idx] <= 0;
+
+            // if a CDB line came in 
+            if (cdb.valid)
+                for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
+                    if (rs_table[cdb_idx].T1 == cdb.T) begin
+                        rs_table[cdb_idx].V1 <= cdb.V;
+                        rs_table[cdb_idx].T1 <= 0;
+                        rs_table[cdb_idx].ready <= rs_table[cdb_idx].ready | 2'b01;
+                    end
+
+                    if (rs_table[cdb_idx].T2 == cdb.T) begin
+                        rs_table[cdb_idx].V2 <= cdb.V;
+                        rs_table[cdb_idx].T2 <= 0;
+                        rs_table[cdb_idx].ready <= rs_table[cdb_idx].ready | 2'b10;
+                    end
+                end
         end
     end
 
@@ -253,9 +275,19 @@ module rs_stage(
 
     // add registers in between parts of pipeline. This will force 
     // consisten number of cycles for every time.
+    `ifdef AGG_CDB
+    always_ff @(posedge clock or posedge cdb.valid) begin
+    `else 
     always_ff @(posedge clock) begin
+    `endif
         for (D_S_reg_idx = 0; D_S_reg_idx < `RS_SZ; D_S_reg_idx++) begin
+            `ifdef AGG_CDB
             if (en & (rs_table[D_S_reg_idx].ready == 2'b11))
+            `else 
+            if (en & ((rs_table[D_S_reg_idx].ready == 2'b11) |
+                    ((rs_table[D_S_reg_idx].ready == 2'b01) & (cdb.T == rs_table[D_S_reg_idx].T1)) | 
+                    ((rs_table[D_S_reg_idx].ready == 2'b10) & (cdb.T == rs_table[D_S_reg_idx].T2))))
+            `endif
                 D_S_reg[D_S_reg_idx] <= {
                         rs_table[D_S_reg_idx].T, 
                         rs_table[D_S_reg_idx].V1, 
