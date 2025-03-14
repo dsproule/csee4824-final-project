@@ -56,6 +56,7 @@ module RS_ALLOC(
                     rs_table[rs_idx].ready[0] = `TRUE;
                 end else begin
                     rs_table[rs_idx].T1 = MT_T1.T;
+                    rs_table[rs_idx].V1 = 0;
                 end
 
                 // change these to LD/ST in pipeline. Like this for the tbs
@@ -66,6 +67,7 @@ module RS_ALLOC(
                     rs_table[rs_idx].ready[1] = `TRUE;
                 end else begin
                     rs_table[rs_idx].T2 = MT_T2.T;
+                    rs_table[rs_idx].V2 = 0;
                 end
                 
             end

@@ -6,6 +6,7 @@ module testbench;
     // Inputs
     logic clock;
     logic reset;
+    logic en;
     logic d_valid;
     logic [`XLEN-1:0] V1, V2;           // values from ROB/regfile
     CDB cdb;
@@ -26,7 +27,7 @@ module testbench;
     rs_stage rs_stage(
         .clock(clock),
         .reset(reset),
-        .en(1'b1),
+        .en(en),
         .cdb(cdb),
         .rs_idx(ID_EX_reg.rs_idx),
         .S_X_reg(S_X_reg), 
@@ -81,6 +82,7 @@ module testbench;
         error_count = 0;
         clock_count = 0;
         reset = 0;
+        en = 0;
         ID_EX_reg = {
             `NOP, 
             {`XLEN{1'b0}}, // PC
@@ -113,7 +115,8 @@ module testbench;
         reset = 0;
         // during reset, clear the reservation table
 
-        @(posedge clock);
+        @(posedge clock); #10
+        en = 1;
         // ld X(r4), r2 // 1
         V1 = 0;
         V2 = 8;
@@ -139,7 +142,7 @@ module testbench;
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 0, 0, 0, 0, 0, 0);
 
-        @(posedge clock);
+        @(posedge clock); #10
         // mul r1, r2, r3 // 2
         V1 = 5;
         V2 = 0;
@@ -159,17 +162,17 @@ module testbench;
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 1, 0, 0, 0, 8, 1);
+        compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 2, 0, 1, 5, 0, 1);
 
-        @(posedge clock);
+        @(posedge clock); #10
         // st r3, Z(r4) // 3
         V1 = 0;
         V2 = 8;
         T = 3;
         ID_EX_reg.rs_idx = 2;
-        S_X_reg[0].ready = 0;
+        S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
         S_X_reg[3].ready = 1;
@@ -187,14 +190,14 @@ module testbench;
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 2, 0, 1, 5, 0, 1);
 
-        @(posedge clock);
+        @(posedge clock); #10
         // addi r4, 4, r4 // 4
         V1 = 8;
         V2 = 0;
         T = 4;
         ID_EX_reg.rs_idx = 0;
         S_X_reg[0].ready = 1;
-        S_X_reg[1].ready = 1;
+        S_X_reg[1].ready = 0;
         S_X_reg[2].ready = 1;
         S_X_reg[3].ready = 1;
         T1 = {0, 1'b0};
@@ -211,7 +214,7 @@ module testbench;
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 2, 0, 0, 5, 10, 1); // cdb value should be inside // tag should be removed after cdb?
 
-        @(posedge clock);
+        @(posedge clock); #10
         // ldf X(r4), r2 // 5
         V1 = 0;
         V2 = 0;
@@ -220,7 +223,7 @@ module testbench;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
-        S_X_reg[3].ready = 0;
+        S_X_reg[3].ready = 1;
         T1 = {0, 1'b0};
         T2 = {4, 1'b0};
         cdb.valid = 0;
@@ -230,18 +233,18 @@ module testbench;
         @(negedge clock);
         // 5
         print_rs();
-        compare(0, 4, 0, 0, 8, 0, 1);
+        compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 5, 0, 4, 0, 0, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 0, 0, 0, 0, 0, 0);
 
-        @(posedge clock);
+        @(posedge clock); #10
         // mul r1, r2, r3 // 6
         V1 = 5;
         V2 = 0;
         T = 6;
         ID_EX_reg.rs_idx = 3;
-        S_X_reg[0].ready = 0;
+        S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
         S_X_reg[3].ready = 0;
@@ -259,7 +262,7 @@ module testbench;
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
 
-        @(posedge clock);
+        @(posedge clock); #10
         // 7
         V1 = 0;
         V2 = 1;
@@ -270,7 +273,7 @@ module testbench;
         cdb.valid = 1;
         cdb.T = 4;
         cdb.V = 12;
-        S_X_reg[0].ready = 1;
+        S_X_reg[0].ready = 0;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
         S_X_reg[3].ready = 0;
@@ -279,20 +282,20 @@ module testbench;
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 5, 0, 4, 0, 12, 1);
+        compare(1, 5, 0, 0, 0, 12, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
 
-        @(posedge clock);
+        @(posedge clock); #10
         // 8
         V1 = 0;
         V2 = 1;
         T = 7;
         ID_EX_reg.rs_idx = 2;
         S_X_reg[0].ready = 1;
-        S_X_reg[1].ready = 0;
+        S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
-        S_X_reg[3].ready = 1;
+        S_X_reg[3].ready = 0;
         T1 = {6, 1'b0};
         T2 = {0, 1'b0};
         cdb.valid = 1;
@@ -304,21 +307,21 @@ module testbench;
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
-        compare(2, 3, 2, 0, 11, 8, 1);
+        compare(2, 3, 0, 0, 11, 8, 0);
         compare(3, 6, 0, 5, 5, 0, 1);
     
         // st r3, Z(r4) // 9
-        @(posedge clock);
+        @(posedge clock); #10
         V1 = 0;
         V2 = 1;
         T = 7;
         ID_EX_reg.rs_idx = 2;
         S_X_reg[0].ready = 1;
-        S_X_reg[1].ready = 1;
-        S_X_reg[2].ready = 0;
+        S_X_reg[1].ready = 0;
+        S_X_reg[2].ready = 1;
         S_X_reg[3].ready = 1;
         T1 = {6, 1'b0};
-        T2 = {0, 1'b0};
+        T2 = {4, 1'b1};
         cdb.valid = 1;
         cdb.T = 5;
         cdb.V = 15;
@@ -329,7 +332,7 @@ module testbench;
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 7, 6, 0, 0, 1, 1);
-        compare(3, 6, 0, 5, 5, 15, 1);
+        compare(3, 6, 0, 0, 5, 15, 1);
 
         @(negedge clock);
         if(error_count == 0) begin
