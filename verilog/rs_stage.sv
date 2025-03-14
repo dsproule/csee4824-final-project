@@ -1,6 +1,7 @@
 `include "verilog/sys_defs.svh"
 
-`define USE_D_S_REG
+// `define USE_D_S_REG
+`define MAKE_RS_REG
 `define AGG_CDB
 
 // Dispatch stage (fully combinational)
@@ -24,7 +25,7 @@ module RS_ALLOC(
      */
 
     logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx;
-`ifdef USE_D_S_REG
+`ifdef MAKE_RS_REG
     RS_ENTRY next_re;
     logic [$clog2(`RS_SZ):0] rs_update_idx;
     logic on;
@@ -32,7 +33,7 @@ module RS_ALLOC(
 
     assign stall = busy[rs_idx];
 
-`ifdef USE_D_S_REG
+`ifdef MAKE_RS_REG
     always_ff @(posedge clock) begin
         if (reset) begin
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
