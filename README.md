@@ -1,3 +1,14 @@
+# Milestone 1
+Finish Reservation Station
+```
+rs_stage.out
+rs_stage.syn.out
+```
+Finish Map Table
+```
+map_table.out
+map_table.syn.out
+```
 
 # EECS 470 Final Project
 
