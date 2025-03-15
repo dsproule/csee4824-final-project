@@ -13,6 +13,7 @@ module decoder (
     output ALU_OPA_SELECT opa_select,
     output ALU_OPB_SELECT opb_select,
     output logic          has_dest, // if there is a destination register
+    output [`RS_SZ-1:0]   rs_idx,
     output ALU_FUNC       alu_func,
     output logic          rd_mem, wr_mem, cond_branch, uncond_branch,
     output logic          csr_op, // used for CSR operations, we only use this as a cheap way to get the return code out
@@ -185,6 +186,18 @@ module decoder (
                     illegal = `TRUE;
                 end
         endcase // casez (inst)
+
+        // designates instructions to the reservation station
+        if (rd_mem | cond_branch | uncond_branch)
+            rs_idx = NUM_FU_LOAD;
+        else if (wr_mem)
+            rs_idx = NUM_FU_STORE;
+        else if (alu_func == ALU_MUL    | alu_func == ALU_MULHSU |
+                 alu_func == ALU_MULHSU | alu_func == ALU_MULHU)
+            rs_idx = NUM_FU_MULT;
+        else
+            rs_idx = NUM_FU_ALU;
+
         end // if (valid)
     end // always
 

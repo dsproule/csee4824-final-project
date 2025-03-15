@@ -1,7 +1,7 @@
 `include "verilog/sys_defs.svh"
 
 module map_table (
-    input clock, reset,
+    input clock, reset, en,
     input [4:0] r, r1, r2, retire_r,
     input CDB   cdb,
     input ROB_T T, retire_T,
@@ -37,7 +37,7 @@ module map_table (
         if (reset) begin
             for (reset_idx = 0; reset_idx < 32; reset_idx++)
                 mt_table[reset_idx] <= 0;
-        end else begin
+        end else (en) begin
             mt_table[r] <= (r != 0) ? {T, `FALSE} : 0;
             T1 <= next_T1;
             T2 <= next_T2;

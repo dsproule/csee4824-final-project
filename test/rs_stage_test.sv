@@ -12,6 +12,7 @@ module testbench;
     CDB cdb;
     ID_EX_PACKET ID_EX_reg;
     S_X_PACKET [`RS_SZ-1:0] S_X_reg;    // commited reg value passing back
+    logic 
     ROB_T T;
     MT_ENTRY T1, T2;                    // from map table
     RS_ENTRY [ `RS_SZ-1:0] rs_table;
@@ -23,6 +24,10 @@ module testbench;
     integer i, j;
     logic [7:0] clock_count;
     logic [5:0] error_count;
+    logic [`RS_SZ-1:0] FU_ready;
+
+    for (integer k = 0; k < `RS_SZ; k++)
+        assign FU_ready[k] = S_X_reg[k].ready;
 
     rs_stage rs_stage(
         .clock(clock),
@@ -30,7 +35,8 @@ module testbench;
         .en(en),
         .cdb(cdb),
         .ID_EX_reg(ID_EX_reg),
-        .S_X_reg(S_X_reg), 
+        // .S_X_reg(S_X_reg), 
+        .FU_ready(FU_ready),
         .T(T),
         .T1(T1),
         .T2(T2),
