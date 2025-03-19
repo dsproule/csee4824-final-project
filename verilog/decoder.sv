@@ -188,8 +188,15 @@ module decoder (
         endcase // casez (inst)
 
         // designates instructions to the reservation station
-        if (rd_mem | cond_branch | uncond_branch)
-            rs_idx = NUM_FU_LOAD;
+
+        /*
+            FU_0: alu/branch instr. Takes 1 cycle
+            FU_1: mult inst.        Takes `MULT_STAGES cycles
+            FU_2: ld inst.          reg interfaces directly to mem if not in lsq
+            FU_3: st inst.          pushes to lsq. Takes 1 cycle
+        */
+        if (rd_mem)
+            rs_idx = NUM_FU_LOAD;   
         else if (wr_mem)
             rs_idx = NUM_FU_STORE;
         else if (alu_func == ALU_MUL    | alu_func == ALU_MULHSU |

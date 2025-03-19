@@ -402,17 +402,19 @@ typedef struct packed {
 } D_S_PACKET;
 
 typedef struct packed {
-    ROB_T T;
-    logic [`XLEN-1:0] V1;
-    logic [`XLEN-1:0] V2;
+    INST inst;                  // Can probably be abstracted out
 
-    ALU_OPA_SELECT opa_select;
-    ALU_OPB_SELECT opb_select;
+    ROB_T T;                    // all
+    logic [`XLEN-1:0] V1;       // alu/mult/ld
+    logic [`XLEN-1:0] V2;       // alu/mult/ld
 
-    ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
+    ALU_OPA_SELECT opa_select;  // alu/mult
+    ALU_OPB_SELECT opb_select;  // alu/mult
 
-    logic ready;
-    logic go;
+    ALU_FUNC alu_func;          // alu/mult and (ld_br can use this to choose ld_br)
+
+    logic ready;                // signal that it is done
+    logic go;                   // signal that a new inst is ex
 } S_X_PACKET;
 
 typedef struct packed {
