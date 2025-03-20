@@ -11,7 +11,7 @@ module RS_ALLOC(
     input CDB                 cdb,
 
     output stall,
-    output logic [`RS_SZ-1:0] busy,
+    output logic    [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
 );
     /* 
@@ -114,8 +114,8 @@ endmodule   // RS_alloc
 // Issue stage (clocked)
 module RS_VALUE(
     input clock, reset, en,
-    input RS_ENTRY [`RS_SZ-1:0]    rs_table,
-    input S_X_PACKET  [`RS_SZ-1:0] S_X_reg,
+    input RS_ENTRY    [`RS_SZ-1:0] rs_table,
+    input  logic      [`RS_SZ-1:0] FU_ready,
 
     output logic      [`RS_SZ-1:0] s_valid, rs_free,  
     output S_X_PACKET [`RS_SZ-1:0] S_X_packet
@@ -134,7 +134,7 @@ module RS_VALUE(
                 s_valid[s_idx] = 1'b0;
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
-                if ((rs_table[s_idx].ready == 2'b11) & S_X_reg[s_idx].ready & en) begin
+                if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx] & en) begin
                     S_X_packet[s_idx] = {
                         rs_table[s_idx].T, 
                         rs_table[s_idx].V1, 
@@ -171,7 +171,7 @@ module rs_stage(
     input clock, reset, en,
     input CDB cdb,
     input ID_EX_PACKET ID_EX_reg,
-    input S_X_PACKET [`RS_SZ-1:0] S_X_reg,
+    input [`RS_SZ-1:0] FU_ready,
     input ROB_T       T,                       // coming from dispatch
     input MT_ENTRY    T1, T2,
     input [`XLEN-1:0] V1, V2,                  // uses MT_ENTRY.plus to mux val from regfile or ROB
@@ -204,7 +204,7 @@ module rs_stage(
         .clock(clock), .reset(reset), .en(en),
         .rs_table(rs_table),
         .rs_free(free_bus),
-        .S_X_reg(S_X_reg),
+        .FU_ready(FU_ready),
 
         // Output
         .S_X_packet(S_X_packet)
