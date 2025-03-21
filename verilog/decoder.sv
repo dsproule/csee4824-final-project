@@ -187,14 +187,15 @@ module decoder (
                 end
         endcase // casez (inst)
 
-        // designates instructions to the reservation station
-
         /*
+
+        Designates instructions to the reservation station
             FU_0: alu/branch instr. Takes 1 cycle
             FU_1: mult inst.        Takes `MULT_STAGES cycles
             FU_2: ld inst.          reg interfaces directly to mem if not in lsq
             FU_3: st inst.          pushes to lsq. Takes 1 cycle
         */
+
         if (rd_mem)
             rs_idx = NUM_FU_LOAD;   
         else if (wr_mem)
@@ -209,3 +210,23 @@ module decoder (
     end // always
 
 endmodule // decoder
+
+module fu_sel (
+    // Inputs
+    input [3:0] req,
+    
+    // Outputs
+    output [3:0] gnt
+);
+    always_comb begin
+        if (req[0])
+            gnt = 4'b0001;
+        else if (req[1])
+            gnt = 4'b0010;
+        else if (req[2])
+            gnt = 4'b0100;
+        else if (req[3])
+            gnt = 4'b1000;
+    end
+
+endmodule // fu_sel (arbiter)

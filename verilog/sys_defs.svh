@@ -402,26 +402,32 @@ typedef struct packed {
 } D_S_PACKET;
 
 typedef struct packed {
+    /* General pipeline*/
+
     INST inst;                  // Can probably be abstracted out
 
-    ROB_T T;                    // all
-    logic [`XLEN-1:0] V1;       // alu/mult/ld
-    logic [`XLEN-1:0] V2;       // alu/mult/ld
+    logic cond_branch;
+    logic uncond_branch;
 
     ALU_OPA_SELECT opa_select;  // alu/mult
     ALU_OPB_SELECT opb_select;  // alu/mult
 
     ALU_FUNC alu_func;          // alu/mult and (ld_br can use this to choose ld_br)
+    
+    /* P6-microarchitecture specific */
 
-    logic ready;                // signal that it is done
-    logic go;                   // signal that a new inst is ex
+    ROB_T T;                    // all
+    logic [`XLEN-1:0] V1;       // alu/mult/ld
+    logic [`XLEN-1:0] V2;       // alu/mult/ld
+
+    logic valid;                // the FU is allowed to use this val
 } S_X_PACKET;
 
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] result;
     
-    logic done;
+    logic ready;
 } X_C_PACKET;
 
 typedef struct packed {

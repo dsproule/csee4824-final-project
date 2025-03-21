@@ -1,8 +1,6 @@
 `include "verilog/sys_defs.svh"
 `include "verilog/ISA.svh"
 
-// ALU: computes the result of FUNC applied with operands A and B
-// This module is purely combinational
 module alu (
     input [`XLEN-1:0] opa,
     input [`XLEN-1:0] opb,
@@ -12,8 +10,6 @@ module alu (
 );
 
     logic signed [`XLEN-1:0]   signed_opa, signed_opb;
-    logic signed [2*`XLEN-1:0] signed_mul, mixed_mul;
-    logic        [2*`XLEN-1:0] unsigned_mul;
 
     assign signed_opa   = opa;
     assign signed_opb   = opb;
@@ -65,31 +61,43 @@ module conditional_branch (
 
 endmodule // conditional_branch
 
-module func_unit_0(
+
+module stage_ex (
     input S_X_PACKET S_X_reg,
 
     output X_C_PACKET X_C_packet
 );
+    logic take_conditional;
 
-    alu alu(
+    // Pass-throughs
+    assign X_C_packet.T = S_X_reg.T;
+    assign X_C_packet.branch = (S_X_reg.cond_branch | S_X_reg.uncond_branch);
+    assign X_C_packet.ready = `TRUE;
+
+    // ultimate "take branch" signal:
+    // unconditional, or conditional and the condition is true
+    assign ex_packet.take_branch = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+
+    // Assume the muxing from before is handled by RS/decode stage
+    alu alu_0 (
         // Inputs
         .opa(S_X_reg.V1),
         .opb(S_X_reg.V2),
-        .func(S_X_reg.alu_func)
+        .func(S_X_reg.alu_func),
 
-        // Outputs
-        .result(/*TODO*/)
+        // Output
+        .result(X_C_reg.result)
     );
 
-    conditional_branch cond_branch(
+    // Instantiate the conditional branch module
+    conditional_branch conditional_branch_0 (
         // Inputs
-        .func(S_X_reg.inst.b.funct3),
+        .func(S_X_reg.inst.b.funct3), // instruction bits for which condition to check
         .rs1(S_X_reg.V1),
         .rs2(S_X_reg.V2),
 
         // Output
-        .take(/*TODO*/)
+        .take(take_conditional)
     );
 
-
-endmodule
+endmodule // stage_ex

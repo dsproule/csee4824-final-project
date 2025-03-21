@@ -3,12 +3,12 @@
 // Dispatch stage (fully combinational)
 module RS_ALLOC(
     input clock, reset, en,
-    input ID_EX_PACKET       ID_EX_reg,
-    input       [`RS_SZ-1:0] rs_free,
-    input ROB_T               T, 
-    input MT_ENTRY            MT_T1, MT_T2,          // from the Map Table     
-    input [`XLEN-1:0]         V1, V2,
-    input CDB                 cdb,
+    input ID_EX_PACKET ID_EX_reg,
+    input [`RS_SZ-1:0] rs_free,
+    input ROB_T         T, 
+    input MT_ENTRY      MT_T1, MT_T2,          // from the Map Table     
+    input [`XLEN-1:0]   V1, V2,
+    input CDB           cdb,
 
     output stall,
     output          [`RS_SZ-1:0] busy,
@@ -142,8 +142,7 @@ module RS_VALUE(
                         rs_table[s_idx].opa_select,
                         rs_table[s_idx].opb_select,
                         rs_table[s_idx].alu_func,
-                        `FALSE,                     // ready (reg cannot be overwritten in use)
-                        `TRUE                       // go (deploys FUs inside)
+                        `TRUE                     // ready (reg cannot be overwritten in use)
                         };
                     s_valid[s_idx] = 1'b1;
                 end else begin
