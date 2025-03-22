@@ -13,9 +13,13 @@ module testbench;
     ID_EX_PACKET ID_EX_reg;
     S_X_PACKET [`RS_SZ-1:0] S_X_reg;    // commited reg value passing back
     ROB_T T;
-    MT_ENTRY T1, T2;                    // from map table
+    // MT_ENTRY T1, T2;                    
+    MT_ENTRY T1_wire, T2_wire;                    // from map table
     RS_ENTRY [ `RS_SZ-1:0] rs_table;
     logic [`RS_SZ-1:0] busy;
+    logic [4:0] r, r1, r2; // the original register value
+    ROB_T retire_T;
+    logic [4:0] retire_r;
 
     // Outputs
     logic d_stall;
@@ -24,6 +28,20 @@ module testbench;
     logic [7:0] clock_count;
     logic [5:0] error_count;
     logic [`RS_SZ-1:0] FU_ready;
+
+    map_table map_table(
+        .clock(clock),
+        .reset(reset),
+        .r(r), // 5 bits // finished
+        .r1(r1), // 5 bits // finished 
+        .r2(r2), // 5 bits // finished
+        .retire_r(retire_r), // 5 bits
+        .cdb(cdb), // CDB
+        .T(T), // ROB_T
+        .retire_T(retire_T), // ROB_T
+        .T1(T1_wire), // MT_ENTRY // output // finished 
+        .T2(T2_wire), // MT_ENTRY // output // finished
+    );
 
     rs_stage rs_stage(
         .clock(clock),
@@ -34,8 +52,8 @@ module testbench;
         // .S_X_reg(S_X_reg), 
         .FU_ready(FU_ready),
         .T(T),
-        .T1(T1),
-        .T2(T2),
+        .T1(T1_wire),
+        .T2(T2_wire),
         .V1(V1),
         .V2(V2),
 
@@ -113,8 +131,13 @@ module testbench;
         V2 = 0;
         cdb = 0;
         T = 0;
-        T1 = 0;
-        T2 = 0;
+        // T1 = 0;
+        // T2 = 0;
+        r = 0;
+        r1 = 0;
+        r2 = 0;
+        retire_r = 0;
+        retire_T = 0;
         @(negedge clock);
         reset = 1;
         @(negedge clock);
@@ -132,8 +155,13 @@ module testbench;
         FU_ready[1] = 1;
         FU_ready[2] = 1;
         FU_ready[3] = 1;
-        T1 = {0, 1'b0};
-        T2 = {0, 1'b0};
+        // T1 = {0, 1'b0};
+        // T2 = {0, 1'b0};
+        r = 2;
+        r1 = 0;
+        r2 = 4;
+        retire_r = 0;
+        retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -160,8 +188,13 @@ module testbench;
         FU_ready[1] = 1;
         FU_ready[2] = 1;
         FU_ready[3] = 1;
-        T1 = {0, 1'b0};
-        T2 = {1, 1'b0};
+        // T1 = {0, 1'b0};
+        // T2 = {1, 1'b0};
+        r = 3;
+        r1 = 1;
+        r2 = 2;
+        retire_r = 0;
+        retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -185,8 +218,13 @@ module testbench;
         FU_ready[1] = 1;
         FU_ready[2] = 1;
         FU_ready[3] = 1;
-        T1 = {2, 1'b0};
-        T2 = {0, 1'b0};
+        // T1 = {2, 1'b0};
+        // T2 = {0, 1'b0};
+        r = 0; // question: what should be the r for store function
+        r1 = 3;
+        r2 = 4;
+        retire_r = 0;
+        retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -210,8 +248,13 @@ module testbench;
         FU_ready[1] = 0;
         FU_ready[2] = 1;
         FU_ready[3] = 1;
-        T1 = {0, 1'b0};
-        T2 = {0, 1'b0};
+        // T1 = {0, 1'b0};
+        // T2 = {0, 1'b0};
+        r = 4;
+        r1 = 4;
+        r2 = 0;
+        retire_r = 0;
+        retire_T = 0;
         cdb.valid = 1;
         cdb.T = 1;
         cdb.V = 10;
@@ -235,8 +278,13 @@ module testbench;
         FU_ready[1] = 1;
         FU_ready[2] = 1;
         FU_ready[3] = 1;
-        T1 = {0, 1'b0};
-        T2 = {4, 1'b0};
+        // T1 = {0, 1'b0};
+        // T2 = {4, 1'b0};
+        r = 2;
+        r1 = 0;
+        r2 = 4;
+        retire_r = 2;
+        retire_T = 1;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -261,8 +309,13 @@ module testbench;
         FU_ready[1] = 1;
         FU_ready[2] = 1;
         FU_ready[3] = 0;
-        T1 = {0, 1'b0};
-        T2 = {5, 1'b0};
+        // T1 = {0, 1'b0};
+        // T2 = {5, 1'b0};
+        r = 3;
+        r1 = 1;
+        r2 = 2;
+        retire_r = 0;
+        retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -283,8 +336,13 @@ module testbench;
         V2 = 1;
         T = 7;
         ID_EX_reg.rs_idx = 2;
-        T1 = {6, 1'b0};
-        T2 = {0, 1'b0};
+        // T1 = {6, 1'b0};
+        // T2 = {0, 1'b0};
+        r = 0;
+        r1 = 3;
+        r2 = 4;
+        retire_r = 0;
+        retire_T = 0;
         cdb.valid = 1;
         cdb.T = 4;
         cdb.V = 12;
@@ -312,8 +370,13 @@ module testbench;
         FU_ready[1] = 1;
         FU_ready[2] = 1;
         FU_ready[3] = 0;
-        T1 = {6, 1'b0};
-        T2 = {0, 1'b0};
+        // T1 = {6, 1'b0};
+        // T2 = {0, 1'b0};
+        r = 0;
+        r1 = 3;
+        r2 = 4;
+        retire_r = 0;
+        retire_T = 0;
         cdb.valid = 1;
         cdb.T = 2;
         cdb.V = 11;
@@ -338,8 +401,13 @@ module testbench;
         FU_ready[1] = 0;
         FU_ready[2] = 1;
         FU_ready[3] = 1;
-        T1 = {6, 1'b0};
-        T2 = {4, 1'b1};
+        // T1 = {6, 1'b0};
+        // T2 = {4, 1'b1};
+        r = 0;
+        r1 = 3;
+        r2 = 4;
+        retire_r = 3;
+        retire_T = 2; // question: do store inst need to retire?
         cdb.valid = 1;
         cdb.T = 5;
         cdb.V = 15;
