@@ -7,43 +7,30 @@ module testbench;
     logic clock, reset, done, correct;
     logic [63:0] value, cycles;
     logic [31:0] result, target;
-    
-    task wait_until_done_reset(logic [63:0] val, logic [31:0] targ);
-        reset = 1;
-        @(negedge clock);
-        @(negedge clock);
-        value = val;
-        target = targ;
-        @(negedge clock);
-        reset = 0;
-        cycles = 0;
-        forever begin : wait_loop
-            @(posedge done);
-            @(negedge clock);
-            if (done) begin
-                $display("Took %1d cycles to complete sqrt(%1d) = %4d", cycles, val, result);
-                disable wait_until_done_reset;
-            end
-        end
-    endtask
 
-    task wait_until_done_no_reset(logic [63:0] V1, logic [63:0] V2, logic [31:0] targ, ALU_FUNC alu_func);
+    S_X_PACKET S_X_reg;
+    X_C_PACKET X_C_packet;
+
+    task wait_until_done_no_reset(logic [31:0] V1, logic [31:0] V2, logic [31:0] targ, ALU_FUNC alu_func);
         // load up S_X_reg
         @(negedge clock);
         S_X_reg.V1 = V1;
         S_X_reg.V2 = V2;
         S_X_reg.valid = `TRUE;
         S_X_reg.alu_func = alu_func;
+        @(negedge clock);
+        S_X_reg.valid = `FALSE;
         forever begin : wait_loop
             @(posedge done);
             @(negedge clock);
             if (done) begin
-                $display("Took %1d cycles to complete. (no reset)", cycles);
+                $display("%0d x %0d = %0d", $signed(V1), $signed(V2), $signed(targ));
                 disable wait_until_done_no_reset;
             end
         end
     endtask
 
+    assign done = X_C_packet.ready;
     assign correct = (done == 1 && target == X_C_packet.result);
 
     initial begin
@@ -62,9 +49,6 @@ module testbench;
             $finish;
         end
     end
-
-    S_X_PACKET S_X_reg;
-    X_C_PACKET X_C_packet;
     
     func_unit_1 FU_1(
         .clock(clock), .reset(reset),
@@ -74,44 +58,26 @@ module testbench;
     );
 
     initial begin
-        $dumpfile("ISR.vcd");
-        $dumpvars(0, testbench);
         clock = 0;
         reset = 1;
 
-        $display("\n");
+        $display("Mult TB\n----------------------------------\n");
         // normal cases
-        wait_until_done_no_reset(64'd2, 64'd2, 32'd4, ALU_MUL);
-        // wait_until_done_reset(64'd4, 32'd2);
-        // wait_until_done_reset(64'd9, 32'd3);
-        // wait_until_done_reset(64'd16, 32'd4);        
-        // wait_until_done_reset(64'd25, 32'd5);
-        // // under cases
-        // wait_until_done_reset(64'd24, 32'd4);
-        // wait_until_done_reset(64'd15, 32'd3);
-        // wait_until_done_reset(64'd2, 32'd1);
-        // // edge cases
-        // wait_until_done_reset(64'd1, 32'd1);
-        // wait_until_done_reset(64'd0, 32'd0);
-        // wait_until_done_reset(64'hFFFFFFFFFFFFFFFF, 32'hFFFFFFFF);
+        @(negedge clock);
+        @(negedge clock);
+        reset = 0;
+        // signed tests 
+        wait_until_done_no_reset(32'd2, 32'd2, 32'd4, ALU_MUL);
+        wait_until_done_no_reset(32'd3, 32'd2, 32'd15, ALU_MUL);
+        wait_until_done_no_reset(32'd0, 32'd2, 32'd0, ALU_MUL);
+        wait_until_done_no_reset(32'd44589, 32'd345, 32'd15383205, ALU_MUL);
+        wait_until_done_no_reset(-32'd1, 32'd2, -32'd2, ALU_MUL);
 
-        // // change value during execution
-        // reset = 1;
-        // @(negedge clock);
-        // @(negedge clock);
-        // value = 64'd35;
-        // target = 32'd5;
-        // @(negedge clock);
-        // cycles = 0;
-        // reset = 0;
-        // #(`CLOCK_PERIOD*20);
-        // value = 64'd1;
-        // @(negedge clock);
-        // @(negedge clock);
-        // @(negedge clock);
-        // @(negedge clock);
+        // unsigned tests 
+
+        // mixed tests
         
-        $display("@@@ Passed\n");
+        $display("\n@@@ Passed\n");
         $finish;
     end
 

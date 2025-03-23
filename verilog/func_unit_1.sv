@@ -1,4 +1,5 @@
 `include "verilog/sys_defs.svh"
+`include "verilog/mult.sv"
 
 module func_unit_1(
     input clock, reset,
@@ -16,7 +17,7 @@ module func_unit_1(
 
     mult mult_1(
         .clock(clock), .reset(reset),
-        .mcand(S_X_reg.V1), .mplier(S_X_reg.V2),
+        .mcand({32'b0, S_X_reg.V1}), .mplier({32'b0, S_X_reg.V2}),
         .signs(signs),               //  [1] -> s_mplier, [0] -> s_mcand
         .start(S_X_reg.valid),
 

@@ -7,8 +7,9 @@
 `include "verilog/sys_defs.svh"
 
 module mult_stage (
-    input clock, reset, start, signs,
+    input clock, reset, start, 
     input [63:0] prev_sum, mplier, mcand,
+    input [1:0] signs,
 
     output logic [63:0] product_sum, next_mplier, next_mcand,
     output logic done
@@ -30,7 +31,7 @@ module mult_stage (
             2'b00: partial_product = mplier[SHIFT-1:0] * mcand;
             2'b10: partial_product = s_mplier[SHIFT-1:0] * mcand;
             2'b11: partial_product = s_mplier[SHIFT-1:0] * s_mcand;
-            2'01: partial_product = 64'hDEADFACE;
+            default: partial_product = 64'hDEADFACE;
         endcase
     end
 

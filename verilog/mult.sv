@@ -5,6 +5,7 @@
 // period than straight multiplication.
 
 `include "verilog/sys_defs.svh"
+`include "verilog/mult_stage.sv"
 
 module mult (
     input clock, reset,
