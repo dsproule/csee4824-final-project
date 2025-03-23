@@ -11,6 +11,7 @@ module testbench;
     S_X_PACKET S_X_reg;
     X_C_PACKET X_C_packet;
 
+    /* Call this to run a test */
     task wait_until_done_no_reset(logic [31:0] V1, logic [31:0] V2, logic [31:0] targ, ALU_FUNC alu_func);
         // load up S_X_reg
         @(negedge clock);
@@ -45,7 +46,7 @@ module testbench;
         #(`CLOCK_PERIOD*0.2); // a short wait to let signals stabilize
         if (!correct && done) begin
             $display("@@@ Incorrect");
-            $display("Module returned a value of (%3d) when it was supposed to give (%3d)", result, target);
+            $display("Module returned a value of (%0d) when it was supposed to give (%0d)", $signed(result), $signed(target));
             $finish;
         end
     end
@@ -57,6 +58,7 @@ module testbench;
         .X_C_packet(X_C_packet)
     );
 
+    logic signed [63:0] tmp;
     initial begin
         clock = 0;
         reset = 1;
@@ -73,9 +75,9 @@ module testbench;
         wait_until_done_no_reset(32'd44589, 32'd345, 32'd15383205, ALU_MUL);
         wait_until_done_no_reset(-32'd1, 32'd2, -32'd2, ALU_MUL);
 
-        // unsigned tests 
-
-        // mixed tests
+        // Could check other ALU modes for thoroughness but fine as is
+        wait_until_done_no_reset(32'd2, 32'd2, 32'd0, ALU_MULHSU);
+        wait_until_done_no_reset(32'd4454589, 32'd355545, 32'd368, ALU_MULHSU);
         
         $display("\n@@@ Passed\n");
         $finish;

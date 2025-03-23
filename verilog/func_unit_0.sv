@@ -78,7 +78,8 @@ module func_unit_0 (
     // unconditional, or conditional and the condition is true
     assign ex_packet.take_branch = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
 
-    // Assume the muxing from before is handled by RS/decode stage
+    // TODO: Assume the muxing from before is handled by RS/decode stage
+    
     alu alu_0 (
         // Inputs
         .opa(S_X_reg.V1),
