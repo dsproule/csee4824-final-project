@@ -12,8 +12,10 @@ module func_unit_1(
 
     assign X_C_packet.T = S_X_reg.T;
     // pass to mult signed vector
-    assign signs[1] = (S_X_reg.alu_func == ALU_MULHU);
-    assign signs[0] = (S_X_reg.alu_func == ALU_MUL | S_X_reg.alu_func == ALU_MULH);
+    assign signs = {
+            S_X_reg.alu_func == ALU_MULHU, 
+            (S_X_reg.alu_func == ALU_MUL) | (S_X_reg.alu_func == ALU_MULH)
+        };
 
     mult mult_1(
         .clock(clock), .reset(reset),
@@ -22,7 +24,7 @@ module func_unit_1(
         .start(S_X_reg.valid),
 
         .product(mult_result),
-        .done(X_C_packet.ready)
+        .done(X_C_packet.valid)
     );
 
     always_comb begin

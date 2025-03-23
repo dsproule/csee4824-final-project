@@ -7,7 +7,7 @@ module map_table (
     input ROB_T T, retire_T,
     
     output MT_ENTRY T1, T2,
-    MT_ENTRY mt_table [31:0]
+    output MT_ENTRY mt_table [31:0]
 );
     logic [5:0] reset_idx, cdb_idx;
     logic retire_entry;

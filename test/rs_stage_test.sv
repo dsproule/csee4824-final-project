@@ -10,7 +10,7 @@ module testbench;
     logic d_valid;
     logic [`XLEN-1:0] V1, V2;           // values from ROB/regfile
     CDB cdb;
-    ID_EX_PACKET ID_EX_reg;
+    D_S_PACKET D_S_reg;
     S_X_PACKET [`RS_SZ-1:0] S_X_reg;    // commited reg value passing back
     logic 
     ROB_T T;
@@ -34,8 +34,7 @@ module testbench;
         .reset(reset),
         .en(en),
         .cdb(cdb),
-        .ID_EX_reg(ID_EX_reg),
-        // .S_X_reg(S_X_reg), 
+        .D_S_reg(D_S_reg),
         .FU_ready(FU_ready),
         .T(T),
         .T1(T1),
@@ -92,24 +91,22 @@ module testbench;
         clock_count = 0;
         reset = 0;
         en = 0;
-        ID_EX_reg = {
+        D_S_reg = {
             `NOP, 
             {`XLEN{1'b0}}, // PC
             {`XLEN{1'b0}}, // NPC
-            {`XLEN{1'b0}}, // rs1 value // XLEN is 32 for now
-            {`XLEN{1'b0}}, // rs2 value
+            {`XLEN{1'b0}}, // r
+            {`XLEN{1'b0}}, // r1
+            {`XLEN{1'b0}}, // r2
             OPA_IS_RS1,
             OPB_IS_RS2,
-            `ZERO_REG,
-            ALU_ADD,
-            1'b0, // rd_mem
-            1'b0, // wr_mem
-            1'b0, // cond
-            1'b0, // uncond
+            1'b0,          // cond
+            1'b0,          // uncond
+            ALU_ADD,       // alu_func
+            `RS_SZ'd2, // the functional unit is use
             1'b0, // halt
             1'b0, // illegal
             1'b0, // csr_op
-            `RS_SZ'd2, // the functional unit is use
             1'b0  // valid
         };
         V1 = 0;
@@ -130,7 +127,7 @@ module testbench;
         V1 = 0;
         V2 = 8;
         T = 1;
-        ID_EX_reg.rs_idx = 1;
+        D_S_reg.rs_idx = 1;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -158,7 +155,7 @@ module testbench;
         V1 = 5;
         V2 = 0;
         T = 2;
-        ID_EX_reg.rs_idx = 3;
+        D_S_reg.rs_idx = 3;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -183,7 +180,7 @@ module testbench;
         V1 = 0;
         V2 = 8;
         T = 3;
-        ID_EX_reg.rs_idx = 2;
+        D_S_reg.rs_idx = 2;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -208,7 +205,7 @@ module testbench;
         V1 = 8;
         V2 = 0;
         T = 4;
-        ID_EX_reg.rs_idx = 0;
+        D_S_reg.rs_idx = 0;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 0;
         S_X_reg[2].ready = 1;
@@ -233,7 +230,7 @@ module testbench;
         V1 = 0;
         V2 = 0;
         T = 5;
-        ID_EX_reg.rs_idx = 1;
+        D_S_reg.rs_idx = 1;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -259,7 +256,7 @@ module testbench;
         V1 = 5;
         V2 = 0;
         T = 6;
-        ID_EX_reg.rs_idx = 3;
+        D_S_reg.rs_idx = 3;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -285,7 +282,7 @@ module testbench;
         V1 = 0;
         V2 = 1;
         T = 7;
-        ID_EX_reg.rs_idx = 2;
+        D_S_reg.rs_idx = 2;
         T1 = {6, 1'b0};
         T2 = {0, 1'b0};
         cdb.valid = 1;
@@ -310,7 +307,7 @@ module testbench;
         V1 = 0;
         V2 = 1;
         T = 7;
-        ID_EX_reg.rs_idx = 2;
+        D_S_reg.rs_idx = 2;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 1;
         S_X_reg[2].ready = 1;
@@ -336,7 +333,7 @@ module testbench;
         V1 = 0;
         V2 = 1;
         T = 7;
-        ID_EX_reg.rs_idx = 2;
+        D_S_reg.rs_idx = 2;
         S_X_reg[0].ready = 1;
         S_X_reg[1].ready = 0;
         S_X_reg[2].ready = 1;

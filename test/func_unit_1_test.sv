@@ -72,10 +72,6 @@ module testbench;
         wait_until_done_no_reset(32'd0, 32'd2, 32'd0, ALU_MUL);
         wait_until_done_no_reset(32'd44589, 32'd345, 32'd15383205, ALU_MUL);
         wait_until_done_no_reset(-32'd1, 32'd2, -32'd2, ALU_MUL);
-
-        // unsigned tests 
-
-        // mixed tests
         
         $display("\n@@@ Passed\n");
         $finish;

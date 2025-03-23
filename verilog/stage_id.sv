@@ -4,8 +4,6 @@
 `include "verilog/sys_defs.svh"
 `include "verilog/ISA.svh"
 
-// Decode an instruction: generate useful datapath control signals by matching the RISC-V ISA
-// This module is purely combinational
 module decoder (
     input INST  inst,
     input logic valid, // when low, ignore inst. Output will look like a NOP
@@ -13,7 +11,6 @@ module decoder (
     output ALU_OPA_SELECT opa_select,
     output ALU_OPB_SELECT opb_select,
     output logic          has_dest, // if there is a destination register
-    output [`RS_SZ-1:0]   rs_idx,
     output ALU_FUNC       alu_func,
     output logic          rd_mem, wr_mem, cond_branch, uncond_branch,
     output logic          csr_op, // used for CSR operations, we only use this as a cheap way to get the return code out
@@ -186,27 +183,61 @@ module decoder (
                     illegal = `TRUE;
                 end
         endcase // casez (inst)
-
-        /*
-
-        Designates instructions to the reservation station
-            FU_0: alu/branch instr. Takes 1 cycle
-            FU_1: mult inst.        Takes `MULT_STAGES cycles
-            FU_2: ld inst.          reg interfaces directly to mem if not in lsq
-            FU_3: st inst.          pushes to lsq. Takes 1 cycle
-        */
-
-        if (rd_mem)
-            rs_idx = NUM_FU_LOAD;   
-        else if (wr_mem)
-            rs_idx = NUM_FU_STORE;
-        else if (alu_func == ALU_MUL    | alu_func == ALU_MULHSU |
-                 alu_func == ALU_MULHSU | alu_func == ALU_MULHU)
-            rs_idx = NUM_FU_MULT;
-        else
-            rs_idx = NUM_FU_ALU;
-
         end // if (valid)
     end // always
 
 endmodule // decoder
+
+module stage_id (
+    input IF_ID_PACKET if_id_reg,
+
+    output D_S_PACKET D_S_packet
+);
+
+    logic has_dest_reg, rd_mem, wr_mem;
+    logic [`RS_SZ-1:0] rs_idx;   
+
+    // Pass throughs (Used by the X stage if needed)
+    assign D_S_packet.inst = if_id_reg.inst;
+    assign D_S_packet.PC   = if_id_reg.PC;
+    assign D_S_packet.NPC  = if_id_reg.NPC;
+
+    // Register values for map table signals
+    assign D_S_packet.r = (has_dest_reg) ? if_id_reg.inst.r.rd : `ZERO_REG;
+    assign D_S_packet.r1 = if_id_reg.inst.r.rs1;
+    assign D_S_packet.r2 = if_id_reg.inst.r.rs2;
+
+    assign D_S_packet.valid = if_id_reg.valid & ~D_S_packet.illegal;
+
+    always_comb begin
+        if (rd_mem)
+            ID_X_packet.rs_idx = NUM_FU_LOAD;   
+        else if (wr_mem)
+            ID_X_packet.rs_idx = NUM_FU_STORE;
+        else if (alu_func == ALU_MUL    | alu_func == ALU_MULHSU |
+                 alu_func == ALU_MULHSU | alu_func == ALU_MULHU)
+            ID_X_packet.rs_idx = NUM_FU_MULT;
+        else
+            ID_X_packet.rs_idx = NUM_FU_ALU;
+    end
+
+    decoder decoder_0 (
+        // Inputs
+        .inst  (if_id_reg.inst),
+        .valid (if_id_reg.valid),
+
+        // Outputs
+        .opa_select    (D_S_packet.opa_select),
+        .opb_select    (D_S_packet.opb_select),
+        .alu_func      (D_S_packet.alu_func),
+        .has_dest      (has_dest_reg),
+        .rd_mem        (rd_mem),
+        .wr_mem        (wr_mem),
+        .cond_branch   (D_S_packet.cond_branch),
+        .uncond_branch (D_S_packet.uncond_branch),
+        .csr_op        (D_S_packet.csr_op),
+        .halt          (D_S_packet.halt),
+        .illegal       (D_S_packet.illegal)
+    );
+
+endmodule // stage_id
