@@ -7,7 +7,7 @@
 `include "verilog/sys_defs.svh"
 
 module mult_stage (
-    input clock, reset, start,
+    input clock, reset, start, signs,
     input [63:0] prev_sum, mplier, mcand,
 
     output logic [63:0] product_sum, next_mplier, next_mcand,
@@ -17,11 +17,22 @@ module mult_stage (
     parameter SHIFT = 64/`MULT_STAGES;
 
     logic [63:0] partial_product, shifted_mplier, shifted_mcand;
+    logic signed [63:0] s_mplier, s_mcand;         
 
-    assign partial_product = mplier[SHIFT-1:0] * mcand;
+    assign s_mplier = mplier;
+    assign s_mcand = mcand;
 
-    assign shifted_mplier = {SHIFT'('b0), mplier[63:SHIFT]};
-    assign shifted_mcand = {mcand[63-SHIFT:0], SHIFT'('b0)};
+    assign shifted_mcand = (signs[0]) ? {s_mcand[63-SHIFT:0], SHIFT'('b0)} : {mcand[63-SHIFT:0], SHIFT'('b0)};
+    assign shifted_mplier = (signs[1]) ? {SHIFT'('b0), s_mplier[63:SHIFT]} : {SHIFT'('b0), mplier[63:SHIFT]};
+    
+    always_comb begin
+        case (signs)
+            2'b00: partial_product = mplier[SHIFT-1:0] * mcand;
+            2'b10: partial_product = s_mplier[SHIFT-1:0] * mcand;
+            2'b11: partial_product = s_mplier[SHIFT-1:0] * s_mcand;
+            2'01: partial_product = 64'hDEADFACE;
+        endcase
+    end
 
     always_ff @(posedge clock) begin
         product_sum <= prev_sum + partial_product;

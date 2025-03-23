@@ -62,7 +62,7 @@ module conditional_branch (
 endmodule // conditional_branch
 
 
-module stage_ex (
+module func_unit_0 (
     input S_X_PACKET S_X_reg,
 
     output X_C_PACKET X_C_packet

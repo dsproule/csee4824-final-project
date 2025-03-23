@@ -203,7 +203,6 @@ module rs_stage(
         .clock(clock), .reset(reset), .en(en),
         .rs_table(rs_table),
         .rs_free(free_bus),
-        // .S_X_reg(S_X_reg),
         .FU_ready(FU_ready),
 
         // Output

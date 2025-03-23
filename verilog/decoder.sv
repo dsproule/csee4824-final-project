@@ -210,23 +210,3 @@ module decoder (
     end // always
 
 endmodule // decoder
-
-module fu_sel (
-    // Inputs
-    input [3:0] req,
-    
-    // Outputs
-    output [3:0] gnt
-);
-    always_comb begin
-        if (req[0])
-            gnt = 4'b0001;
-        else if (req[1])
-            gnt = 4'b0010;
-        else if (req[2])
-            gnt = 4'b0100;
-        else if (req[3])
-            gnt = 4'b1000;
-    end
-
-endmodule // fu_sel (arbiter)
