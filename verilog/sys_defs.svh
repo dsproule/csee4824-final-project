@@ -286,95 +286,18 @@ typedef struct packed {
     logic             valid;
 } IF_ID_PACKET;
 
-/**
- * ID_EX Packet:
- * Data exchanged from the ID to the EX stage
- */
-typedef struct packed {
-    /* Can use many of these to assign RS entry via rs_idx */
-    INST              inst;
-    logic [`XLEN-1:0] PC;
-    logic [`XLEN-1:0] NPC; // PC + 4
-
-    logic [`XLEN-1:0] rs1_value; // reg A value
-    logic [`XLEN-1:0] rs2_value; // reg B value
-
-    ALU_OPA_SELECT opa_select; // ALU opa mux select (ALU_OPA_xxx *)
-    ALU_OPB_SELECT opb_select; // ALU opb mux select (ALU_OPB_xxx *)
-
-    logic [4:0] dest_reg_idx;  // destination (writeback) register index
-    ALU_FUNC    alu_func;      // ALU function select (ALU_xxx *)
-    logic       rd_mem;        // Does inst read memory?
-    logic       wr_mem;        // Does inst write memory?
-    logic       cond_branch;   // Is inst a conditional branch?
-    logic       uncond_branch; // Is inst an unconditional branch?
-    logic       halt;          // Is this a halt?
-    logic       illegal;       // Is this instruction illegal?
-    logic       csr_op;        // Is this a CSR operation? (we use this to get return code)
-    
-    logic [`RS_SZ-1:0] rs_idx;       
-
-    logic       valid;
-} ID_EX_PACKET;
-
-/**
- * EX_MEM Packet:
- * Data exchanged from the EX to the MEM stage
- */
-typedef struct packed {
-    logic [`XLEN-1:0] alu_result;
-    logic [`XLEN-1:0] NPC;
-
-    logic             take_branch; // Is this a taken branch?
-    // Pass-through from decode stage
-    logic [`XLEN-1:0] rs2_value;
-    logic             rd_mem;
-    logic             wr_mem;
-    logic [4:0]       dest_reg_idx;
-    logic             halt;
-    logic             illegal;
-    logic             csr_op;
-    logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
-    MEM_SIZE          mem_size;
-    logic             valid;
-} EX_MEM_PACKET;
-
-/**
- * MEM_WB Packet:
- * Data exchanged from the MEM to the WB stage
- *
- * Does not include data sent from the MEM stage to memory
- */
-typedef struct packed {
-    logic [`XLEN-1:0] result;
-    logic [`XLEN-1:0] NPC;
-    logic [4:0]       dest_reg_idx; // writeback destination (ZERO_REG if no writeback)
-    logic             take_branch;
-    logic             halt;    // not used by wb stage
-    logic             illegal; // not used by wb stage
-    logic             valid;
-} MEM_WB_PACKET;
-
-/**
- * No WB output packet as it would be more cumbersome than useful
- */
-
 typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
-typedef logic [$clog2(`RS_SZ)-1:0]  RS_IDX;
 
 typedef struct packed {
     ROB_T T;
     ROB_T T1;
     ROB_T T2;
 
-    ALU_OPA_SELECT opa_select;
-    ALU_OPB_SELECT opb_select;
-
-    ALU_FUNC alu_func;
-
-    logic [1:0] ready;
     logic [`XLEN-1:0] V1;        // assuming 32 bit values
     logic [`XLEN-1:0] V2;        // assuming 32 bit values
+
+    D_S_PACKET D_S_reg;
+    logic [1:0] ready;
 } RS_ENTRY;
 
 typedef struct packed {
@@ -390,35 +313,52 @@ typedef struct packed {
 
 // used between the reg 
 typedef struct packed {
-    ROB_T T;
-    logic [`XLEN-1:0] V1;
-    logic [`XLEN-1:0] V2;
+    INST inst;
+    logic [`XLEN-1:0] PC;
+    logic [`XLEN-1:0] NPC; // PC + 4
+
+    logic [4:0] r;
+    logic [4:0] r1;
+    logic [4:0] r2;
 
     ALU_OPA_SELECT opa_select;
     ALU_OPB_SELECT opb_select;
 
+    logic cond_branch;
+    logic uncond_branch;
+
     ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
-    logic valid;
+    
+    logic [`RS_SZ-1:0] rs_idx;   
+
+    logic       halt;          // Is this a halt?
+    logic       illegal;       // Is this instruction illegal?
+    logic       csr_op;        // Is this a CSR operation? (we use this to get return code)
+    
+    logic       valid;
+
 } D_S_PACKET;
 
 typedef struct packed {
     /* General pipeline*/
 
-    INST inst;                  // Can probably be abstracted out
+    INST inst;
+    logic [`XLEN-1:0] PC;
+    logic [`XLEN-1:0] NPC; // PC + 4
 
     logic cond_branch;
     logic uncond_branch;
 
-    ALU_OPA_SELECT opa_select;  // alu/mult
-    ALU_OPB_SELECT opb_select;  // alu/mult
+    ALU_OPA_SELECT opa_select;
+    ALU_OPB_SELECT opb_select;
 
-    ALU_FUNC alu_func;          // alu/mult and (ld_br can use this to choose ld_br)
+    ALU_FUNC alu_func;
     
     /* P6-microarchitecture specific */
 
-    ROB_T T;                    // all
-    logic [`XLEN-1:0] V1;       // alu/mult/ld
-    logic [`XLEN-1:0] V2;       // alu/mult/ld
+    ROB_T T;
+    logic [`XLEN-1:0] V1;
+    logic [`XLEN-1:0] V2;
 
     logic valid;                // the FU is allowed to use this val
 } S_X_PACKET;
@@ -427,7 +367,7 @@ typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] result;
     
-    logic ready;
+    logic valid;
 } X_C_PACKET;
 
 typedef struct packed {
