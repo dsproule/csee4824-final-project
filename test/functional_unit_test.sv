@@ -66,7 +66,7 @@ module testbench;
                     cdb.valid = `TRUE;
                 end
 
-                FU_ready[i] = X_C_packet[i].ready;
+                FU_ready[i] = X_C_packet[i].valid;
             end
         end
     end
@@ -75,7 +75,7 @@ module testbench;
     initial begin
         if (reset | gnt[0])
             S_X_reg[0] <= (S_X_packet[0].valid) ? S_X_packet[0] : 0;    // handled by the RS
-        else if (X_C_packet[0].ready)
+        else if (X_C_packet[0].valid)
             X_C_reg[0] <= X_C_packet[0];
         
     end

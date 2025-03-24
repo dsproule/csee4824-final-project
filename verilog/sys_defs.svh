@@ -286,32 +286,7 @@ typedef struct packed {
     logic             valid;
 } IF_ID_PACKET;
 
-typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
-
-typedef struct packed {
-    ROB_T T;
-    ROB_T T1;
-    ROB_T T2;
-
-    logic [`XLEN-1:0] V1;        // assuming 32 bit values
-    logic [`XLEN-1:0] V2;        // assuming 32 bit values
-
-    D_S_PACKET D_S_reg;
-    logic [1:0] ready;
-} RS_ENTRY;
-
-typedef struct packed {
-    ROB_T T;
-    logic plus;                // signify if in ROB buf or reg file
-} MT_ENTRY;
-
-typedef struct packed {
-    logic [4:0] r;
-    logic [`XLEN-1:0] V;
-    logic ready;               // to commit to regfile
-} ROB_ENTRY;
-
-// used between the reg 
+// Decode -> RS
 typedef struct packed {
     INST inst;
     logic [`XLEN-1:0] PC;
@@ -338,6 +313,31 @@ typedef struct packed {
     logic       valid;
 
 } D_S_PACKET;
+
+typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
+
+typedef struct packed {
+    ROB_T T;
+    ROB_T T1;
+    ROB_T T2;
+
+    logic [`XLEN-1:0] V1;        // assuming 32 bit values
+    logic [`XLEN-1:0] V2;        // assuming 32 bit values
+
+    D_S_PACKET D_S_reg;
+    logic [1:0] ready;
+} RS_ENTRY;
+
+typedef struct packed {
+    ROB_T T;
+    logic plus;                // signify if in ROB buf or reg file
+} MT_ENTRY;
+
+typedef struct packed {
+    logic [4:0] r;
+    logic [`XLEN-1:0] V;
+    logic ready;               // to commit to regfile
+} ROB_ENTRY;
 
 typedef struct packed {
     /* General pipeline*/
