@@ -429,4 +429,13 @@ typedef struct packed {
     logic valid;
 } CDB;
 
+typedef struct packed {
+    logic valid,
+    logic [`XLEN-1:0] addr, 
+    logic [`XLEN-1:0] data,
+    logic is_store,
+    ROB_T T,
+    logic ready; // store ready to proceed
+} LSQ_ENTRY;
+
 `endif // __SYS_DEFS_SVH__
