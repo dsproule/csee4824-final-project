@@ -4,14 +4,14 @@
 module RS_ALLOC(
     input clock, reset, en,
     input D_S_PACKET D_S_reg,
-    input [`RS_SZ-1:0] rs_free,
-    input ROB_T         T, 
-    input MT_ENTRY      MT_T1, MT_T2,          // from the Map Table     
-    input [`XLEN-1:0]   V1, V2,
-    input CDB           cdb,
+    input logic [`RS_SZ-1:0] rs_free,
+    input ROB_T               T, 
+    input MT_ENTRY            MT_T1, MT_T2,          // from the Map Table     
+    input [`XLEN-1:0]         V1, V2,
+    input CDB                 cdb,
 
     output stall,
-    output          [`RS_SZ-1:0] busy,
+    output logic    [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
 );
     /* 
@@ -86,10 +86,8 @@ module RS_ALLOC(
 
             // free a line that isn't about to be allocated (should be handled by above)
             for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
-                if ((rs_free_idx != rs_update_idx) & (rs_free[rs_free_idx])) begin
+                if ((rs_free_idx != rs_update_idx) & (rs_free[rs_free_idx]))
                     rs_table[rs_free_idx] <= 0;
-
-                end
 
             // if a CDB line came in 
             if (cdb.valid)
@@ -115,9 +113,9 @@ endmodule   // RS_alloc
 module RS_VALUE(
     input clock, reset, en,
     input RS_ENTRY    [`RS_SZ-1:0] rs_table,
-    input             [`RS_SZ-1:0] FU_ready,
+    input logic      [`RS_SZ-1:0] FU_ready,
 
-    output            [`RS_SZ-1:0] s_valid, rs_free,  
+    output logic      [`RS_SZ-1:0] s_valid, rs_free,  
     output S_X_PACKET [`RS_SZ-1:0] S_X_packet
 );
     /* 
@@ -174,9 +172,9 @@ module rs_stage(
     input clock, reset, en,
     input CDB cdb,
     input D_S_PACKET D_S_reg,
-    input [`RS_SZ-1:0] FU_ready,               // coming from OoO arbiter
-    input ROB_T       T,                       // coming from map table
-    input MT_ENTRY    T1, T2,                  // coming from map table
+    input [`RS_SZ-1:0] FU_ready,
+    input ROB_T       T,
+    input MT_ENTRY    T1, T2,
     input [`XLEN-1:0] V1, V2,                  // uses MT_ENTRY.plus to mux val from regfile or ROB
 
     output d_stall,              
