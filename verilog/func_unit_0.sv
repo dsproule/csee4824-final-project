@@ -65,15 +65,15 @@ endmodule // conditional_branch
 module func_unit_0 (
     input S_X_PACKET S_X_reg,
 
-    output X_C_PACKET X_C_packet
+    output X_C_PACKET X_packet
 );
     logic take_conditional;
 
     // Pass-throughs
-    assign X_C_packet.T = S_X_reg.T;
-    assign X_C_packet.take_branch = (S_X_reg.cond_branch | S_X_reg.uncond_branch);
+    assign X_packet.T = S_X_reg.T;
+    assign X_packet.take_branch = (S_X_reg.cond_branch | S_X_reg.uncond_branch);
 
-    assign X_C_packet.valid = `TRUE;
+    assign X_packet.valid = `TRUE;
 
     // ultimate "take branch" signal:
     // unconditional, or conditional and the condition is true

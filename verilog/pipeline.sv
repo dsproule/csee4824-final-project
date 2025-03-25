@@ -49,11 +49,22 @@ module pipeline (
     // Outputs from decode to rs, mt and rob
     D_S_PACKET D_packet, D_S_reg;
     
-    // Outputs from S stage and ID/EX Pipeline Register
-    S_X_PACKET S_packet, S_X_reg;
+    // Outputs from rs to FU
+    S_X_PACKET [`RS_SZ-1:0] S_packet, S_X_reg;
+    logic [`RS_SZ:0] S_idx;
 
-    // Outputs from EX-Stage and EX/MEM Pipeline Register
-    X_C_PACKET X_packet, X_C_reg;
+    // Outputs from FU to X_C (cdb)
+    X_C_PACKET [`RS_SZ-1:0] X_packet, X_C_reg;
+    logic [`RS_SZ:0] X_idx;
+    logic [`RS_SZ-1:0] gnt;
+    logic [`RS_SZ*2-1:0] gnt_bus;
+    CDB cdb;
+
+    // Outputs and inputs for RS alloc stage
+    logic rs_busy;
+    ROB_T T;
+    MT_ENTRY T1, T2;
+    logic [`XLEN-1:0] regfile_V1, regfile_V2, rs_V1, rs_V2, rob_V1, rob_V2;
 
     // Outputs from MEM-Stage to memory
     logic [`XLEN-1:0] proc2Dmem_addr;
@@ -61,10 +72,16 @@ module pipeline (
     logic [1:0]       proc2Dmem_command;
     MEM_SIZE          proc2Dmem_size;
 
-    // Outputs from WB-Stage (These loop back to the register file in ID)
-    logic             wb_regfile_en;
-    logic [4:0]       wb_regfile_idx;
-    logic [`XLEN-1:0] wb_regfile_data;
+    // Outputs from Commit-rob
+    logic              rob_regfile_en, rob_full;
+    logic [4:0]        rob_regfile_idx;
+    logic [`XLEN-1:0]  rob_regfile_data;
+    logic [`RS_SZ-1:0] FU_ready;
+
+    // Debug values
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_dbg
+    logic [`RS_SZ-1:0] busy_dbg;
+    RS_ENTRY [`RS_SZ-1:0]  rs_table_dbg;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -122,8 +139,10 @@ module pipeline (
     //////////////////////////////////////////////////
 
     d_stage d_stage_0(
+        // Inputs
         .IF_ID_reg(IF_ID_reg),
 
+        // Outputs
         .D_packet(D_packet)
     );
 
@@ -162,11 +181,174 @@ module pipeline (
 
     //////////////////////////////////////////////////
     //                                              //
-    //            RS, Map table, ROB                //
+    //            RS, Map table                     //
     //          (when shit gets serious)            //
     //////////////////////////////////////////////////
 
+    map_table map_table_0(
+        // Inputs
+        .clock(clock), .reset(reset),
+        .en(D_S_reg.valid & ~rs_busy),
+        .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2),
+        .cdb(cdb),
+        .T(T), .retire_t(cdb.T),
+
+        // Outputs
+        .T1(T1), .T2(T2)
+
+        // Debug Outputs
+        .mt_table_out(mt_table_dbg);
+
+    );
+
+    rs_stage rs_stage_0(
+        // Inputs
+        .clock(clock), .reset(reset),
+        .en(D_S_reg.valid),
+        .cdb(cdb),
+        .D_S_reg(D_S_reg),      
+        .FU_ready(FU_ready),    // from fu arb
+        .T(T),                  // from rob
+        .T1(T1), .T2(T2),       // from mt
+        .V1(rs_V1), .V2(rs_V2),       // mux between mt & rob
+
+        // Outputs
+        .d_stall(rs_busy),
+        .S_packet(S_packet),
+
+        // Debug Outputs
+        .rs_table(rs_table_dbg),
+        .busy(busy_dbg)
+    );
+
+    regfile regfile_0(
+        // Inputs
+        .clock(clock),
+        .read_idx_1(D_S_reg.r1), .read_idx_2(D_S_reg.r2), .write_idx(rob_regfile_idx),
+        .write_en(rob_regfile_en),
+        .write_data(rob_regfile_data),
+
+        // Outputs
+        .read_out_1(regfile_V1), .read_out_2(regfile_V2)
+    );
     
+    //////////////////////////////////////////////////
+    //                                              //
+    //                  S/X reg                     //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    assign S_X_enable = 1'b1; // always enabled
+    // synopsys sync_set_reset "reset"
+    always_ff @(posedge clock) begin
+        for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
+            if (reset) begin
+                S_X_reg[S_idx] <= 0;                // may need to be more graceful one day but for rn idc
+            end else if (FU_ready[S_idx]) begin
+                S_X_reg[S_idx] <= S_packet[S_idx];
+            end
+    end
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //              Functional Units                //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    func_unit_0 func_unit_00(
+        .S_X_reg(S_X_reg[0]),
+
+        .X_packet(X_packet[0])
+    );
+
+    func_unit_1 func_unit_01(
+        .clock(clock), .reset(reset),
+        .S_X_reg(S_X_reg[1]),
+
+        .X_packet(X_packet[1])
+    )
+
+    func_unit_2 func_unit_02(
+        .S_X_reg(S_X_reg[2]),
+
+        .X_packet(X_packet[2])
+    );
+
+    func_unit_3 func_unit_03(
+        .S_X_reg(S_X_reg[3]),
+
+        .X_packet(X_packet[3])
+    );
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //               X/C regs and CDB               //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    assign X_C_enable = 1'b1; // always enabled
+    // synopsys sync_set_reset "reset"
+    always_ff @(posedge clock) begin
+        for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
+            if (reset) begin
+                FU_ready[X_idx] <= `TRUE;
+                X_C_reg[X_idx] <= 0;
+            end else if (X_packet[X_idx].valid) begin
+                X_C_reg[X_idx] <= X_packet[X_idx];
+                FU_ready[X_idx] <= `TRUE;
+            end
+
+            // Frees up FU if cdb currently has it
+            if (gnt[X_idx])
+                FU_ready <= 0;
+    end
+
+    // forces a more balanced arbiter to avoid starvation
+    assign gnt = (clock) ? gnt_bus[`RS_SZ-1:0] : gnt_bus[`RS_SZ*2-1:`RS_SZ];
+
+    // just 4-bit priority selector
+    psel arb #(.WIDTH(`RS_SZ), .REQS(2)) 
+    (
+        .req(FU_ready), 
+
+        .gnt(),
+        .gnt_bus(gnt_bus),
+        .empty()
+    );
+
+    always_comb begin
+        cdb.valid = `FALSE;
+        
+        for (logic [$clog2(`RS_SZ):0] i; i < `RS_SZ; i++) begin
+            if (gnt[i] & ~rob_ready) begin
+                cdb.T = X_C_reg.T;
+                cdb.V = X_C_reg.result;
+                cdb.valid = `TRUE;
+            end
+        end
+    end
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //                  ROB stage                   //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    rob rob_0(
+        // Inputs
+        .clock(clock), .reset(reset),
+        .flush(/*TODO*/),
+        .r(D_S_reg.r), 
+        .T1(T1), .T2(T2),
+        .cdb(cdb),
+        .dispatch_valid(D_S_reg.valid & ~rs_busy),
+
+        // Outputs
+        .T(T),
+        .full(rob_full), .empty(), .regfile_write_en(rob_regfile_en),
+        .regfile_write_idx(rob_regfile_idx),
+        .V1(rob_V1), .V2(rob_V2), .regfile_write_data(rob_regfile_data)
+    );
 
     //////////////////////////////////////////////////
     //                                              //
@@ -179,9 +361,9 @@ module pipeline (
                                    mem_wb_reg.halt           ? HALTED_ON_WFI :
                                    (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
 
-    assign pipeline_commit_wr_en   = wb_regfile_en;
-    assign pipeline_commit_wr_idx  = wb_regfile_idx;
-    assign pipeline_commit_wr_data = wb_regfile_data;
-    assign pipeline_commit_NPC     = mem_wb_reg.NPC;
+    assign pipeline_commit_wr_en   = rob_regfile_en;
+    assign pipeline_commit_wr_idx  = rob_regfile_idx;
+    assign pipeline_commit_wr_data = rob_regfile_data;
+    // assign pipeline_commit_NPC     = mem_wb_reg.NPC;
 
 endmodule // pipeline

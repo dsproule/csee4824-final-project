@@ -180,7 +180,7 @@ module rs_stage(
     output d_stall,              
     output [`RS_SZ-1:0] busy,           
     output S_X_PACKET [`RS_SZ-1:0] S_packet,
-    output RS_ENTRY [ `RS_SZ-1:0]  rs_table
+    output RS_ENTRY [`RS_SZ-1:0]  rs_table
 );
     logic [`RS_SZ-1:0] free_bus;
     
