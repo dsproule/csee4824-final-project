@@ -221,15 +221,15 @@ $(call DEPS,rob): $(ROB_DEPS)
 
 # for multiple modules
 # Define the testbench and source files
-TESTBENCH = ./test/multi_module_test
+TESTBENCH = multi_module_test
 MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv
-OUTPUT_DIR = output
+OUTPUT_DIR = ./output
 SIMV = $(TESTBENCH).simv
-SIM_OUT = $(TESTBENCH).out
-SYN_OUT = $(TESTBENCH).syn.out
+SIM_OUT = $(OUTPUT_DIR)/$(TESTBENCH).out
+SYN_OUT = $(OUTPUT_DIR)/$(TESTBENCH).syn.out
 
 # Compile the simulation executable
-$(SIMV): $(TESTBENCH).sv $(MODULES) $(HEADERS)
+$(SIMV): ./test/$(TESTBENCH).sv $(MODULES) $(HEADERS)
 	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
 	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
 	$(VCS) $(filter-out $(HEADERS),$^) -o $@
