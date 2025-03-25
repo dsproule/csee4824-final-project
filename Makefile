@@ -219,6 +219,38 @@ $(call DEPS,rob): $(ROB_DEPS)
 
 # You shouldn't need to change things below here
 
+# for multiple modules
+# Define the testbench and source files
+TESTBENCH = ./test/multi_module_test
+MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv
+OUTPUT_DIR = output
+SIMV = $(TESTBENCH).simv
+SIM_OUT = $(TESTBENCH).out
+SYN_OUT = $(TESTBENCH).syn.out
+
+# Compile the simulation executable
+$(SIMV): $(TESTBENCH).sv $(MODULES) $(HEADERS)
+	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
+	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
+	$(VCS) $(filter-out $(HEADERS),$^) -o $@
+	@$(call PRINT_COLOR, 6, finished compiling $@)
+
+# Run simulation
+$(SIM_OUT): $(SIMV) | $(OUTPUT_DIR)
+	@$(call PRINT_COLOR, 5, Running $<)
+	./$< | tee $@
+	@$(call PRINT_COLOR, 2, Output is in $@)
+
+# Run synthesis (if needed)
+$(SYN_OUT): $(SIMV) | $(OUTPUT_DIR)
+	@$(call PRINT_COLOR, 5, Running synthesis on $<)
+	./$< -synthesis | tee $@
+	@$(call PRINT_COLOR, 2, Synthesis output is in $@)
+
+# Ensure output directory exists
+$(OUTPUT_DIR):
+	mkdir -p $(OUTPUT_DIR)
+
 # ---- Running ---- #
 
 # run compiled executables ('make %.out' is linked to 'make output/%.out' further below)
