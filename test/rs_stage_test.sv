@@ -19,7 +19,7 @@ module testbench;
 
     // Outputs
     logic d_stall;
-    S_X_PACKET [`RS_SZ-1:0] S_X_pack;
+    S_X_PACKET [`RS_SZ-1:0] S_pack;
     integer i, j;
     logic [7:0] clock_count;
     logic [5:0] error_count;
@@ -38,7 +38,7 @@ module testbench;
         .V2(V2),
 
         .d_stall(d_stall),
-        .S_X_packet(S_X_pack),
+        .S_packet(S_pack),
         .rs_table(rs_table),
         .busy(busy)
     );

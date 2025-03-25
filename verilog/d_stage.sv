@@ -188,26 +188,26 @@ module decoder (
 
 endmodule // decoder
 
-module stage_id (
+module d_stage (
     input IF_ID_PACKET if_id_reg,
 
-    output D_S_PACKET D_S_packet
+    output D_S_PACKET D_packet
 );
 
     logic has_dest_reg, rd_mem, wr_mem;
     logic [`RS_SZ-1:0] rs_idx;   
 
     // Pass throughs (Used by the X stage if needed)
-    assign D_S_packet.inst = if_id_reg.inst;
-    assign D_S_packet.PC   = if_id_reg.PC;
-    assign D_S_packet.NPC  = if_id_reg.NPC;
+    assign D_packet.inst = if_id_reg.inst;
+    assign D_packet.PC   = if_id_reg.PC;
+    assign D_packet.NPC  = if_id_reg.NPC;
 
     // Register values for map table signals
-    assign D_S_packet.r = (has_dest_reg) ? if_id_reg.inst.r.rd : `ZERO_REG;
-    assign D_S_packet.r1 = if_id_reg.inst.r.rs1;
-    assign D_S_packet.r2 = if_id_reg.inst.r.rs2;
+    assign D_packet.r = (has_dest_reg) ? if_id_reg.inst.r.rd : `ZERO_REG;
+    assign D_packet.r1 = if_id_reg.inst.r.rs1;
+    assign D_packet.r2 = if_id_reg.inst.r.rs2;
 
-    assign D_S_packet.valid = if_id_reg.valid & ~D_S_packet.illegal;
+    assign D_packet.valid = if_id_reg.valid & ~D_packet.illegal;
 
     always_comb begin
         if (rd_mem)
@@ -227,17 +227,17 @@ module stage_id (
         .valid (if_id_reg.valid),
 
         // Outputs
-        .opa_select    (D_S_packet.opa_select),
-        .opb_select    (D_S_packet.opb_select),
-        .alu_func      (D_S_packet.alu_func),
+        .opa_select    (D_packet.opa_select),
+        .opb_select    (D_packet.opb_select),
+        .alu_func      (D_packet.alu_func),
         .has_dest      (has_dest_reg),
         .rd_mem        (rd_mem),
         .wr_mem        (wr_mem),
-        .cond_branch   (D_S_packet.cond_branch),
-        .uncond_branch (D_S_packet.uncond_branch),
-        .csr_op        (D_S_packet.csr_op),
-        .halt          (D_S_packet.halt),
-        .illegal       (D_S_packet.illegal)
+        .cond_branch   (D_packet.cond_branch),
+        .uncond_branch (D_packet.uncond_branch),
+        .csr_op        (D_packet.csr_op),
+        .halt          (D_packet.halt),
+        .illegal       (D_packet.illegal)
     );
 
 endmodule // stage_id

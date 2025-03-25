@@ -116,7 +116,7 @@ module RS_VALUE(
     input logic      [`RS_SZ-1:0] FU_ready,
 
     output logic      [`RS_SZ-1:0] s_valid, rs_free,  
-    output S_X_PACKET [`RS_SZ-1:0] S_X_packet
+    output S_X_PACKET [`RS_SZ-1:0] S_packet
 );
     /* 
      *  Reads values from rs_table that has the dispatch and passes them to the s_x_regs when
@@ -133,7 +133,7 @@ module RS_VALUE(
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
                 if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx] & en) begin
-                    S_X_packet[s_idx] = {
+                    S_packet[s_idx] = {
                         rs_table[s_idx].D_S_reg.inst,
                         rs_table[s_idx].D_S_reg.PC,
                         rs_table[s_idx].D_S_reg.NPC,
@@ -148,7 +148,7 @@ module RS_VALUE(
                     };
                     s_valid[s_idx] = 1'b1;
                 end else begin
-                    S_X_packet[s_idx] = 0;
+                    S_packet[s_idx] = 0;
                     s_valid[s_idx] = 0;
                 end
             end
@@ -179,7 +179,7 @@ module rs_stage(
 
     output d_stall,              
     output [`RS_SZ-1:0] busy,           
-    output S_X_PACKET [`RS_SZ-1:0] S_X_packet,
+    output S_X_PACKET [`RS_SZ-1:0] S_packet,
     output RS_ENTRY [ `RS_SZ-1:0]  rs_table
 );
     logic [`RS_SZ-1:0] free_bus;
@@ -208,7 +208,7 @@ module rs_stage(
         .FU_ready(FU_ready),
 
         // Output
-        .S_X_packet(S_X_packet)
+        .S_packet(S_packet)
     );
 
 endmodule   // top-level module
