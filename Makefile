@@ -187,7 +187,7 @@ MODULE = pipeline
 DEPS = $(1).simv $(1).cov synth/$(1).vg
 
 MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
-$(call DEPS,mult): $(MULT_DEPS)
+$(call DEPS,func_unit_1): $(MULT_DEPS)
 
 # No dependencies for the rob (TODO: add any you create)
 ROB_DEPS =

@@ -31,7 +31,7 @@ module testbench;
         end
     endtask
 
-    assign done = X_C_packet.ready;
+    assign done = X_C_packet.valid;
     assign correct = (done == 1 && target == X_C_packet.result);
 
     initial begin

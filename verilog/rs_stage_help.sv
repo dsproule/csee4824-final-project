@@ -1,0 +1,213 @@
+`include "verilog/sys_defs.svh"
+
+// Dispatch stage (fully combinational)
+module RS_ALLOC(
+    input clock, reset, en,
+    input ID_EX_PACKET       ID_EX_reg,
+    input logic [`RS_SZ-1:0] rs_free,
+    input ROB_T               T, 
+    input MT_ENTRY            MT_T1, MT_T2,          // from the Map Table     
+    input [`XLEN-1:0]         V1, V2,
+    input CDB                 cdb,
+
+    output stall,
+    output logic    [`RS_SZ-1:0] busy,
+    output RS_ENTRY [`RS_SZ-1:0] rs_table
+);
+    /* 
+     * Handles just the Dispatch. Passes values to 
+     * RS_VALUE for issue stage.
+     * 
+     * In here we assume the ROB & Map Table feed the proper values based on the decode stage.
+     */
+
+    logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx, rs_update_idx;
+    logic [`RS_SZ-1:0] next_busy, rs_idx;
+    RS_ENTRY next_re;
+    logic on;
+
+    assign rs_idx = ID_EX_reg.rs_idx;
+    assign stall = busy[rs_idx];
+
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
+                busy[reset_idx] <= `FALSE;
+                next_busy[reset_idx] <= `FALSE;
+                rs_table[reset_idx] <= 0;
+            end
+
+            next_re <= 0;
+            rs_update_idx <= 0;
+        end else if (en) begin  
+            // busy handling
+            for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
+                if ((rs_update_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
+                    busy[busy_reset_idx] <= `FALSE;
+            
+            busy[rs_update_idx] <= next_busy[rs_update_idx];
+            rs_table[rs_update_idx] <= next_re;
+
+            // if RS entry is empty, allocate it
+            if (~busy[rs_idx] | rs_free[rs_idx]) begin
+                next_busy[rs_idx] <= `TRUE;
+                
+                // save values in next_re from decode stage (always saved for allocation)
+                next_re.T <= T;
+                next_re.alu_func   <= ID_EX_reg.alu_func;
+                next_re.opa_select <= ID_EX_reg.opa_select;
+                next_re.opb_select <= ID_EX_reg.opb_select;
+
+                rs_update_idx <= rs_idx;
+
+                // checks if we can put just the value in or if we need the tag for t1
+                if (MT_T1 == 0 | MT_T1.plus) begin
+                    // value exists somewhere
+                    next_re.V1 <= V1;
+                    next_re.T1 <= 0;
+                    next_re.ready[0] <= `TRUE;
+                end else begin
+                    next_re.T1 <= MT_T1.T;
+                    next_re.V1 <= 0;
+                    next_re.ready[0] <= `FALSE;
+                end
+
+                // change these to LD/ST in pipeline. Like this for the tbs
+                if (MT_T2 == 0 | MT_T2.plus) begin
+                    // value exists somewhere
+                    next_re.V2 <= V2;
+                    next_re.T2 <= 0;
+                    next_re.ready[1] <= `TRUE;
+                end else begin
+                    next_re.T2 <= MT_T2.T;
+                    next_re.V2 <= 0;
+                    next_re.ready[1] <= `FALSE;
+                end
+                
+            end
+
+            // free a line that isn't about to be allocated (should be handled by above)
+            for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
+                if ((rs_free_idx != rs_update_idx) & (rs_free[rs_free_idx]))
+                    rs_table[rs_free_idx] <= 0;
+
+            // if a CDB line came in 
+            if (cdb.valid)
+                for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
+                    if (rs_table[cdb_idx].T1 == cdb.T) begin
+                        rs_table[cdb_idx].V1 <= cdb.V;
+                        rs_table[cdb_idx].T1 <= 0;
+                        rs_table[cdb_idx].ready[0] <= `TRUE;
+                    end
+
+                    if (rs_table[cdb_idx].T2 == cdb.T) begin
+                        rs_table[cdb_idx].V2 <= cdb.V;
+                        rs_table[cdb_idx].T2 <= 0;
+                        rs_table[cdb_idx].ready[1] <= `TRUE;
+                    end
+                end
+        end
+    end
+
+endmodule   // RS_alloc
+
+// Issue stage (clocked)
+module RS_VALUE(
+    input clock, reset, en,
+    input RS_ENTRY    [`RS_SZ-1:0] rs_table,
+    input logic      [`RS_SZ-1:0] FU_ready,
+
+    output logic      [`RS_SZ-1:0] s_valid, rs_free,  
+    output S_X_PACKET [`RS_SZ-1:0] S_X_packet
+);
+    /* 
+     *  Reads values from rs_table that has the dispatch and passes them to the s_x_regs when
+     *  they are valid to begin computing.
+     */
+
+    logic [`RS_SZ-1:0] s_idx, reset_idx, rs_free_idx;
+
+    // Issue Stage
+    always_comb begin
+        if (reset) begin
+            for (s_idx = 0; s_idx < `RS_SZ; s_idx++)
+                s_valid[s_idx] = 1'b0;
+        end else begin
+            for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
+                if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx] & en) begin
+                    S_X_packet[s_idx] = {
+                        rs_table[s_idx].T, 
+                        rs_table[s_idx].V1, 
+                        rs_table[s_idx].V2,
+                        rs_table[s_idx].opa_select,
+                        rs_table[s_idx].opb_select,
+                        rs_table[s_idx].alu_func,
+                        `FALSE,                     // ready (reg cannot be overwritten in use)
+                        `TRUE                       // go (deploys FUs inside)
+                        };
+                    s_valid[s_idx] = 1'b1;
+                end else begin
+                    S_X_packet[s_idx] = 0;
+                    s_valid[s_idx] = 0;
+                end
+            end
+        end
+    end
+
+    // clears the RS on the next cycle (works because rest is comb)
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
+                rs_free[reset_idx] <= 0;
+        end else if (en) begin
+            for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
+                rs_free[rs_free_idx] <= s_valid[rs_free_idx];
+        end
+    end
+
+endmodule   // RS_VALUE
+
+module rs_stage(
+    input clock, reset, en,
+    input CDB cdb,
+    input ID_EX_PACKET ID_EX_reg,
+    input [`RS_SZ-1:0] FU_ready,
+    input ROB_T       T,                       // coming from dispatch
+    input MT_ENTRY    T1, T2,
+    input [`XLEN-1:0] V1, V2,                  // uses MT_ENTRY.plus to mux val from regfile or ROB
+
+    output d_stall,              
+    output [`RS_SZ-1:0] busy,           
+    output S_X_PACKET [`RS_SZ-1:0] S_X_packet,
+    output RS_ENTRY [ `RS_SZ-1:0]  rs_table
+);
+    logic [`RS_SZ-1:0] free_bus;
+    
+    // connect alloc with value with cdb
+    RS_ALLOC rs_alloc(
+        // Inputs
+        .clock(clock), .reset(reset), .en(en),
+        .ID_EX_reg(ID_EX_reg),
+        .rs_free(free_bus),
+        .T(T), .MT_T1(T1), .MT_T2(T2),
+        .V1(V1), .V2(V2),
+        .cdb(cdb),
+
+        // Outputs
+        .stall(d_stall),
+        .rs_table(rs_table),
+        .busy(busy)
+    );
+
+    RS_VALUE rs_value(
+        // Input
+        .clock(clock), .reset(reset), .en(en),
+        .rs_table(rs_table),
+        .rs_free(free_bus),
+        .FU_ready(FU_ready),
+
+        // Output
+        .S_X_packet(S_X_packet)
+    );
+
+endmodule   // top-level module

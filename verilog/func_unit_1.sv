@@ -1,5 +1,4 @@
 `include "verilog/sys_defs.svh"
-`include "verilog/mult.sv"
 
 module func_unit_1(
     input clock, reset,

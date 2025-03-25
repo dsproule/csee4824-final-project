@@ -71,7 +71,8 @@ module func_unit_0 (
 
     // Pass-throughs
     assign X_C_packet.T = S_X_reg.T;
-    assign X_C_packet.branch = (S_X_reg.cond_branch | S_X_reg.uncond_branch);
+    assign X_C_packet.take_branch = (S_X_reg.cond_branch | S_X_reg.uncond_branch);
+
     assign X_C_packet.valid = `TRUE;
 
     // ultimate "take branch" signal:

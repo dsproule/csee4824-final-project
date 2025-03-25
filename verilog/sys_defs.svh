@@ -366,6 +366,7 @@ typedef struct packed {
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] result;
+    logic take_branch;
     
     logic valid;
 } X_C_PACKET;
