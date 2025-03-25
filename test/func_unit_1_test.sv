@@ -9,7 +9,7 @@ module testbench;
     logic [31:0] result, target;
 
     S_X_PACKET S_X_reg;
-    X_C_PACKET X_C_packet;
+    X_C_PACKET X_packet;
 
     /* Call this to run a test */
     task wait_until_done_no_reset(logic [31:0] V1, logic [31:0] V2, logic [31:0] targ, ALU_FUNC alu_func);
@@ -31,8 +31,8 @@ module testbench;
         end
     endtask
 
-    assign done = X_C_packet.valid;
-    assign correct = (done == 1 && target == X_C_packet.result);
+    assign done = X_packet.valid;
+    assign correct = (done == 1 && target == X_packet.result);
 
     initial begin
         forever begin : clcok_gen
@@ -55,7 +55,7 @@ module testbench;
         .clock(clock), .reset(reset),
         .S_X_reg(S_X_reg),
 
-        .X_C_packet(X_C_packet)
+        .X_packet(X_packet)
     );
 
     logic signed [63:0] tmp;

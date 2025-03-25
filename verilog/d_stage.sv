@@ -240,4 +240,4 @@ module d_stage (
         .illegal       (D_packet.illegal)
     );
 
-endmodule // stage_id
+endmodule // d_stage

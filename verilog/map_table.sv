@@ -1,13 +1,13 @@
 `include "verilog/sys_defs.svh"
 
 module map_table (
-    input clock, reset,
+    input clock, reset, en,
     input [4:0] r, r1, r2, retire_r,
     input CDB   cdb,
     input ROB_T T, retire_T,
     
     output MT_ENTRY T1, T2,
-    MT_ENTRY mt_table [31:0]
+    output MT_ENTRY mt_table [31:0]
 );
     logic [5:0] reset_idx, cdb_idx;
     logic retire_entry;
