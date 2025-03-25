@@ -10,6 +10,8 @@ module func_unit_1(
     logic [63:0] mult_result;
 
     assign X_packet.T = S_X_reg.T;
+    assign X_packet.ppl_ctrl = '0;
+
     // pass to mult signed vector
     assign signs = {
             S_X_reg.alu_func == ALU_MULHU, 
