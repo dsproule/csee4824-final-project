@@ -54,7 +54,7 @@ module lsq#(
     assign proc2mem_data = queue[head].data;
 
     //forwarding unit, if load is executing check here and in D$
-    // TODO check with TA
+    // TODO check with TA, basically if head>tail, higher number is younger, if tail>head lower number is younger
     always_comb begin
         store_load_fwd = 0;
         load_data = '0;
@@ -81,7 +81,7 @@ module lsq#(
             if (alloc_en && !full) begin
                 queue[tail] <= lsq_entry;
                 queue[tail].valid <= 1;
-                queue[tail].ready <= lsq_entry.is_store; // TODO store address is ready at issue here, but really set by EX stage
+                queue[tail].ready <= lsq_entry.is_store; // TODO store address is ready at issue here, but really set by EX stage so need to set
                 big_tail <= big_tail + 1;
             end
 
