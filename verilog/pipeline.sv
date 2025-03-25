@@ -31,25 +31,6 @@ module pipeline (
     output logic [`XLEN-1:0] pipeline_commit_wr_data,
     output logic             pipeline_commit_wr_en,
     output logic [`XLEN-1:0] pipeline_commit_NPC
-
-    // Debug outputs: these signals are solely used for debugging in testbenches
-    // Do not change for project 3
-    // You should definitely change these for project 4
-    // output logic [`XLEN-1:0] if_NPC_dbg,
-    // output logic [31:0]      if_inst_dbg,
-    // output logic             if_valid_dbg,
-    // output logic [`XLEN-1:0] if_id_NPC_dbg,
-    // output logic [31:0]      if_id_inst_dbg,
-    // output logic             if_id_valid_dbg,
-    // output logic [`XLEN-1:0] id_ex_NPC_dbg,
-    // output logic [31:0]      id_ex_inst_dbg,
-    // output logic             id_ex_valid_dbg,
-    // output logic [`XLEN-1:0] ex_mem_NPC_dbg,
-    // output logic [31:0]      ex_mem_inst_dbg,
-    // output logic             ex_mem_valid_dbg,
-    // output logic [`XLEN-1:0] mem_wb_NPC_dbg,
-    // output logic [31:0]      mem_wb_inst_dbg,
-    // output logic             mem_wb_valid_dbg
 );
 
     //////////////////////////////////////////////////
@@ -59,20 +40,20 @@ module pipeline (
     //////////////////////////////////////////////////
 
     // Pipeline register enables
-    logic if_id_enable, id_ex_enable, ex_mem_enable, mem_wb_enable;
+    logic IF_ID_enable, D_S_enable, S_X_enable, X_C_enable;
 
     // Outputs from IF-Stage and IF/ID Pipeline Register
     logic [`XLEN-1:0] proc2Imem_addr;
-    IF_ID_PACKET if_packet, if_id_reg;
+    IF_ID_PACKET IF_packet, IF_ID_reg;
 
-    // Outputs from ID stage and ID/EX Pipeline Register
-    ID_EX_PACKET id_packet, id_ex_reg;
+    // Outputs from decode to rs, mt and rob
+    D_S_PACKET D_packet, D_S_reg;
+    
+    // Outputs from S stage and ID/EX Pipeline Register
+    S_X_PACKET S_packet, S_X_reg;
 
     // Outputs from EX-Stage and EX/MEM Pipeline Register
-    EX_MEM_PACKET ex_packet, ex_mem_reg;
-
-    // Outputs from MEM-Stage and MEM/WB Pipeline Register
-    MEM_WB_PACKET mem_packet, mem_wb_reg;
+    X_C_PACKET X_packet, X_C_reg;
 
     // Outputs from MEM-Stage to memory
     logic [`XLEN-1:0] proc2Dmem_addr;
@@ -112,6 +93,35 @@ module pipeline (
         end
         proc2mem_data = {32'b0, proc2Dmem_data};
     end
+
+    // TODO: IF stage
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //            IF/ID Pipeline Register           //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    assign IF_ID_enable = 1'b1; // always enabled
+    // synopsys sync_set_reset "reset"
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            IF_ID_reg.inst  <= `NOP;
+            IF_ID_reg.valid <= `FALSE;
+            IF_ID_reg.NPC   <= 0;
+            IF_ID_reg.PC    <= 0;
+        end else if (IF_ID_enable) begin
+            IF_ID_reg <= IF_packet;
+        end
+    end
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //                   D-Stage                    //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    
 
     //////////////////////////////////////////////////
     //                                              //
