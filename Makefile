@@ -177,7 +177,7 @@ GREP = grep -E --color=auto
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
 # TODO: add more modules here
-TESTED_MODULES = map_table rs_stage # mult rob
+TESTED_MODULES = map_table rs_stage mult func_unit_1
 
 MODULE = pipeline
 
@@ -186,8 +186,8 @@ MODULE = pipeline
 # Helper function:
 DEPS = $(1).simv $(1).cov synth/$(1).vg
 
-MULT_DEPS = verilog/mult_stage.sv
-$(call DEPS,mult): $(MULT_DEPS)
+MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
+$(call DEPS,func_unit_1): $(MULT_DEPS)
 
 # No dependencies for the rob (TODO: add any you create)
 ROB_DEPS =
@@ -321,7 +321,9 @@ HEADERS = verilog/sys_defs.svh \
 
 TESTBENCH = test/pipeline_test.sv \
             test/pipeline_print.c \
-            test/mem.sv test/rs_stage_test.sv				# added
+            test/mem.sv \
+			test/rs_stage_test.sv \
+			test/func_unit_1_test.sv
 
 # you could simplify this line with $(wildcard verilog/*.sv) - but the manual way is more explicit
 SOURCES = verilog/pipeline.sv \
@@ -329,7 +331,7 @@ SOURCES = verilog/pipeline.sv \
           verilog/icache.sv \
           verilog/mult.sv \
           verilog/mult_stage.sv \
-		  verilog/rs_stage.sv				# added
+		  verilog/func_unit_1.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 
@@ -338,20 +340,6 @@ VCS = SW_VCS=2020.12-SP2-1 vcs -sverilog +vc -Mupdate -line -full64 -kdb -lca -n
 
 VCS = SW_VCS=2020.12-SP2-1 vcs -sverilog +vc -Mupdate -line -full64 -kdb -lca -nc \
       -debug_access+all+reverse $(VCS_BAD_WARNINGS) +define+CLOCK_PERIOD=$(CLOCK_PERIOD)
-
-# rs_stage: $(TESTBENCH_RS) $(SOURCES_RS)
-# 	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
-# 	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
-# 	$(VCS) $^ -o $@
-# 	@$(call PRINT_COLOR, 6, finished compiling $@)
-
-# rs_stage_sim: rs_stage
-# 	@$(call PRINT_COLOR, 5, running $<)
-# 	./rs_stage | tee program.out
-# 	@$(call PRINT_COLOR, 2, output saved to program.out)
-
-# rs_stage_verdi: rs_stage novas.rc verdi_dir
-# 	./rs_stage -gui=$(VERDI_EXE)
 
 # the normal simulation executable will run your testbench on the original modules
 simv: $(TESTBENCH) $(SOURCES) $(HEADERS)
