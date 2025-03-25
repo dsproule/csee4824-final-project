@@ -121,6 +121,51 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
+    d_stage d_stage_0(
+        .IF_ID_reg(IF_ID_reg),
+
+        .D_packet(D_packet)
+    );
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //            D/S Pipeline Register             //
+    //          (when shit gets serious)            //
+    //////////////////////////////////////////////////
+
+    assign D_S_enable = 1'b1; // always enabled
+    // synopsys sync_set_reset "reset"
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            D_S_reg <= {
+                `NOP, 
+                {`XLEN{1'b0}}, // PC
+                {`XLEN{1'b0}}, // NPC
+                {`XLEN{1'b0}}, // r
+                {`XLEN{1'b0}}, // r1
+                {`XLEN{1'b0}}, // r2
+                OPA_IS_RS1,
+                OPB_IS_RS2,
+                1'b0,          // cond
+                1'b0,          // uncond
+                ALU_ADD,       // alu_func
+                `RS_SZ'd2, // the functional unit is use
+                1'b0, // halt
+                1'b0, // illegal
+                1'b0, // csr_op
+                `FALSE  // valid
+            };
+        end else if (D_S_enable) begin
+            D_S_reg <= D_packet;
+        end
+    end
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //            RS, Map table, ROB                //
+    //          (when shit gets serious)            //
+    //////////////////////////////////////////////////
+
     
 
     //////////////////////////////////////////////////
