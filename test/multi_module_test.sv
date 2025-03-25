@@ -13,6 +13,7 @@ module testbench;
     D_S_PACKET D_S_reg;
     S_X_PACKET [`RS_SZ-1:0] S_X_reg;    // commited reg value passing back
     ROB_T T;
+    ROB_T T_wire;   // from ROB to rs/map table
     // MT_ENTRY T1, T2;                    
     MT_ENTRY T1_wire, T2_wire;                    // from map table
     RS_ENTRY [ `RS_SZ-1:0] rs_table;
@@ -29,6 +30,14 @@ module testbench;
     logic [5:0] error_count;
     logic [`RS_SZ-1:0] FU_ready;
 
+    // for rob
+    logic full;
+    logic empty;
+    logic regfile_write_en;
+    logic [4:0] regfile_write_idx;
+    logic [`XLEN-1:0] regfile_write_data;
+    logic [`XLEN-1:0] V1_rob, V2_rob;
+
     map_table map_table(
         .clock(clock),
         .reset(reset),
@@ -37,7 +46,7 @@ module testbench;
         .r2(r2), // 5 bits // finished
         .retire_r(retire_r), // 5 bits
         .cdb(cdb), // CDB
-        .T(T), // ROB_T
+        .T(T_wire), // ROB_T
         .retire_T(retire_T), // ROB_T
         .T1(T1_wire), // MT_ENTRY // output // finished 
         .T2(T2_wire) // MT_ENTRY // output // finished
@@ -51,7 +60,7 @@ module testbench;
         .D_S_reg(D_S_reg),
         // .S_X_reg(S_X_reg), 
         .FU_ready(FU_ready),
-        .T(T),
+        .T(T_wire),
         .T1(T1_wire),
         .T2(T2_wire),
         .V1(V1),
@@ -63,8 +72,27 @@ module testbench;
         .busy(busy)
     );
 
+    rob rob_inst (
+        .clock(clock), 
+        .reset(reset), 
+        .flush(1'b0), // 0 for now
+        .r(r), 
+        .T1(T1_wire), // for getting the ROB value
+        .T2(T2_wire), // for getting the ROB value
+        .cdb(cdb),
+        .dispatch_valid(D_S_reg.valid & ~d_stall), // ?
+        .T(T_wire), 
+        .full(full), 
+        .empty(empty),
+        .regfile_write_en(regfile_write_en), 
+        .regfile_write_idx(regfile_write_idx),
+        .V1(V1_rob), 
+        .V2(V2_rob), 
+        .regfile_write_data(regfile_write_data)
+    );
+
     task print_rs;
-        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 2);
+        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 3);
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table[j].T, rs_table[j].T1, rs_table[j].T2, rs_table[j].V1, rs_table[j].V2, busy[j], rs_table[j].ready);
         $display("------------------------------------------");
@@ -75,7 +103,7 @@ module testbench;
         input busy;
         if((rs_table[idx].T != t) || (rs_table[idx].T1 != t1) || (rs_table[idx].T2 != t2) || (rs_table[idx].V1 != v1) || (rs_table[idx].V2 != v2) || (busy[idx] != busy)) begin
             error_count = error_count + 1;
-            $display("@@@Failed at time: %d\t", (clock_count - 2)/2);
+            $display("@@@Failed at time: %d\t", clock_count - 3);
             $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:%b", idx, t, t1, t2, v1, v2, busy);
             // $finish;
         end
@@ -85,7 +113,7 @@ module testbench;
         input stall;
         if(d_stall != stall) begin
             error_count = error_count + 1;
-            $display("@@@Failed at time: %d\t", clock_count - 2);
+            $display("@@@Failed at time: %d\t", clock_count - 3);
             $display("@@@stall error: d_stall: %b", d_stall);
             // $finish;
         end
@@ -123,7 +151,7 @@ module testbench;
             1'b0, // halt
             1'b0, // illegal
             1'b0, // csr_op
-            1'b0  // valid
+            1'b1  // valid
         };
         V1 = 0;
         V2 = 0;
