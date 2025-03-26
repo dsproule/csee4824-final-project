@@ -76,12 +76,13 @@ module pipeline (
     MEM_SIZE          proc2Dmem_size;
 
     // Outputs from Commit-rob
-    logic              rob_regfile_en, rob_full, no_X_req, ppl_flush, mem_store;
+    logic              rob_regfile_en, rob_full, rob_retire, no_X_req, ppl_flush, mem_store;
     logic [4:0]        rob_regfile_idx;
     logic [`XLEN-1:0]  rob_regfile_data;
     logic [$clog2(`RS_SZ)-1:0] cdb_idx;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
     logic [`RS_SZ-1:0] FU_ready;
+    PPLN_CTRL ppln_ctrl;
 
     // Debug values
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_dbg;
@@ -373,7 +374,7 @@ module pipeline (
                 if (gnt[cdb_idx] & ~no_X_req)
                     cdb = {X_C_reg[cdb_idx].T,
                             X_C_reg[cdb_idx].result,
-                            cdb.ppl_ctrl,
+                            cdb.ppln_ctrl,
                             `TRUE
                         };
         else
@@ -396,8 +397,8 @@ module pipeline (
 
         // Outputs
         .T(T),
-        .ppl_ctrl({ppl_flush, mem_store}),
-        .full(rob_full), .empty(), .regfile_write_en(rob_regfile_en),
+        .ppln_ctrl(ppln_ctrl),
+        .full(rob_full), .empty(), .retire(rob_retire),
         .regfile_write_idx(rob_regfile_idx),
         .V1(rob_V1), .V2(rob_V2), .regfile_write_data(rob_regfile_data),
         .rob_table_out(rob_table_out)
@@ -410,10 +411,10 @@ module pipeline (
     //////////////////////////////////////////////////
 
     // TODO:
-    // assign pipeline_completed_insts = {3'b0, mem_wb_reg.valid}; // commit one valid instruction
-    // assign pipeline_error_status = mem_wb_reg.illegal        ? ILLEGAL_INST :
-    //                                mem_wb_reg.halt           ? HALTED_ON_WFI :
-    //                                (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
+    assign pipeline_completed_insts = {3'b0, ppln_ctrl.valid}; // commit one valid instruction
+    assign pipeline_error_status = ppln_ctrl.illegal        ? ILLEGAL_INST :
+                                   ppln_ctrl.halt           ? HALTED_ON_WFI :
+                                   (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
 
     assign pipeline_commit_wr_en   = rob_regfile_en;
     assign pipeline_commit_wr_idx  = rob_regfile_idx;

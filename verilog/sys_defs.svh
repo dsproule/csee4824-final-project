@@ -317,9 +317,15 @@ typedef struct packed {
 typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
 
 typedef struct packed {
-    logic mis_predict;
-    logic store;
-} PPL_CTRL;
+    logic flush;
+
+    logic valid;
+    logic illegal;
+    logic halt;
+    
+    logic is_branch;
+    logic is_store;
+} PPLN_CTRL;
 
 
 typedef struct packed {
@@ -342,7 +348,7 @@ typedef struct packed {
 typedef struct packed {
     logic [4:0] r;
     logic [`XLEN-1:0] V;
-    PPL_CTRL ppl_ctrl;
+    PPLN_CTRL ppln_ctrl;
     
     logic ready;
 } ROB_ENTRY;
@@ -375,7 +381,7 @@ typedef struct packed {
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] result;
-    PPL_CTRL ppl_ctrl;
+    PPLN_CTRL ppln_ctrl;
     
     logic valid;
 } X_C_PACKET;
@@ -384,7 +390,7 @@ typedef struct packed {
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] V;
-    PPL_CTRL ppl_ctrl;
+    PPLN_CTRL ppln_ctrl;
 
     logic valid;
 } CDB;

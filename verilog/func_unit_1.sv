@@ -6,11 +6,22 @@ module func_unit_1(
 
     output X_C_PACKET X_packet
 );
+    PPLN_CTRL ppln_ctrl;
     logic [1:0] signs;
     logic [63:0] mult_result;
 
     assign X_packet.T = S_X_reg.T;
-    assign X_packet.ppl_ctrl = '0;
+    
+    // pipeline control
+    assign ppln_ctrl.flush = `FALSE;
+    assign ppln_ctrl.is_store = `FALSE;
+    assign ppln_ctrl.is_branch = `FALSE;
+
+    assign ppln_ctrl.valid = S_X_reg.valid;
+    assign ppln_ctrl.illegal = 0;
+    assign ppln_ctrl.halt = 0;
+
+    assign X_packet.ppln_ctrl = ppln_ctrl;
 
     // pass to mult signed vector
     assign signs = {

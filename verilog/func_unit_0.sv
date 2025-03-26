@@ -68,16 +68,23 @@ module func_unit_0 (
     output X_C_PACKET X_packet
 );
     logic [`XLEN-1:0] opa_mux_out, opb_mux_out;
+    PPLN_CTRL ppln_ctrl;
     logic take_conditional;
 
     // Pass-throughs
     assign X_packet.T = S_X_reg.T;
     assign X_packet.valid = S_X_reg.valid;
 
-    // ultimate "take branch" signal:
-    // unconditional, or conditional and the condition is true
-    assign X_packet.ppl_ctrl.mis_predict = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
-    assign X_packet.ppl_ctrl.store = 0;
+    // pipeline control
+    assign ppln_ctrl.flush = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+    assign ppln_ctrl.is_store = `FALSE;
+    assign ppln_ctrl.is_branch = S_X_reg.uncond_branch | S_X_reg.cond_branch;
+
+    assign ppln_ctrl.valid = S_X_reg.valid;
+    assign ppln_ctrl.illegal = 0;
+    assign ppln_ctrl.halt = S_X_reg.halt;
+
+    assign X_packet.ppln_ctrl = ppln_ctrl;
 
         // ALU opA mux
     always_comb begin

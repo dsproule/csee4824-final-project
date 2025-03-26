@@ -17,16 +17,16 @@
 
 // these link to the pipeline_print.c file in this directory, and are used below to print
 // detailed output to the pipeline_output_file, initialized by open_pipeline_output_file()
-// import "DPI-C" function void open_pipeline_output_file(string file_name);
-// import "DPI-C" function void print_header(string str);
-// import "DPI-C" function void print_cycles();
-// import "DPI-C" function void print_stage(string div, int inst, int npc, int valid_inst);
-// import "DPI-C" function void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
-//                                        int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
-// import "DPI-C" function void print_membus(int proc2mem_command, int mem2proc_response,
-//                                           int proc2mem_addr_hi, int proc2mem_addr_lo,
-//                                           int proc2mem_data_hi, int proc2mem_data_lo);
-// import "DPI-C" function void print_close();
+import "DPI-C" function void open_pipeline_output_file(string file_name);
+import "DPI-C" function void print_header(string str);
+import "DPI-C" function void print_cycles();
+import "DPI-C" function void print_stage(string div, int inst, int npc, int valid_inst);
+import "DPI-C" function void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
+                                       int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
+import "DPI-C" function void print_membus(int proc2mem_command, int mem2proc_response,
+                                          int proc2mem_addr_hi, int proc2mem_addr_lo,
+                                          int proc2mem_data_hi, int proc2mem_data_lo);
+import "DPI-C" function void print_close();
 
 
 module testbench;
@@ -291,7 +291,7 @@ module testbench;
                 $display("@@  %t : System halted\n@@", $realtime);
 
                 case(pipeline_error_status)
-                    LOAD_ACCESS_FAULT:
+                    LOAD_ACCESS_FAULT:`
                         $display("@@@ System halted on memory error");
                     HALTED_ON_WFI:
                         $display("@@@ System halted on WFI instruction");
