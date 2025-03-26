@@ -375,6 +375,7 @@ typedef struct packed {
     logic [`XLEN-1:0] V1;
     logic [`XLEN-1:0] V2;
 
+    logic halt;
     logic valid;                // the FU is allowed to use this val
 } S_X_PACKET;
 

@@ -360,7 +360,7 @@ module pipeline (
     rps4 arb (
         .clock(clock), .reset(reset),
         .req(FU_ready),
-        .en(rob_ready),
+        .en(rob_full),
 
         .gnt(gnt),
         .count()

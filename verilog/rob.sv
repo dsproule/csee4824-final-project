@@ -9,11 +9,11 @@ module rob(
     input dispatch_valid,
 
     output ROB_T T,
-    output PPL_CTRL ppl_ctrl,
-    output logic full, empty, regfile_write_en,
-    output logic [4:0] regfile_write_idx, retire,
+    output PPLN_CTRL ppln_ctrl,
+    output logic full, empty, retire,
+    output logic [4:0] regfile_write_idx, 
     output logic [`XLEN-1:0] V1, V2, regfile_write_data,
-    output rob_table_out
+    output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
 
@@ -45,7 +45,6 @@ module rob(
     // if value isn't in regfiles yet, ok if invalid because map table will MUX values from regfile. 
     assign V1 = rob_table[T1].V;
     assign V2 = rob_table[T2].V;
-    assign retire = regfile_write_en;
 
     always_comb begin
         for (int i = 0; i < `ROB_SZ; i++) begin
@@ -53,12 +52,12 @@ module rob(
         end
     end
 
-    always_comb begin
+    /* always_comb begin
         if (cdb.valid) begin
             $display("DEBUG UPDATE: ROB[%d] -> Ready: %b, Value: %d", 
                     cdb.T, rob_table[cdb.T].ready, rob_table[cdb.T].V);
         end
-    end
+    end */
 
     always_ff @(posedge clock) begin
         if (reset) begin
@@ -67,19 +66,19 @@ module rob(
             end
             big_tail <= 0;
             big_head <= 0;
-            regfile_write_en <= 0;
+            retire <= 0;
         end else begin
             // load in cdb value into rob# and mark as Complete (C) --> deals with all types of instructions
             if (cdb.valid) begin
-                $display("DEBUG: CDB Write - Target ROB[%d], Value = %d, Valid = %b", cdb.T, cdb.V, cdb.valid);
+                //$display("DEBUG: CDB Write - Target ROB[%d], Value = %d, Valid = %b", cdb.T, cdb.V, cdb.valid);
                 rob_table[cdb.T].V <= cdb.V;
-                rob_table[cdb.T].ppl_ctrl <= cdb.ppl_ctrl;
+                rob_table[cdb.T].ppln_ctrl <= cdb.ppln_ctrl;
                 rob_table[cdb.T].ready <= `TRUE;
             end
 
             // dispatch --> allocate value in ROB
             if (dispatch_valid && !full) begin
-                $display("Dispatching: ROB[%d] with Dest Reg %d", tail, r);  // Debug print
+                //$display("Dispatching: ROB[%d] with Dest Reg %d", tail, r);  // Debug print
                 rob_table[tail] <= 0;
                 rob_table[tail].r <= r;
                 big_tail <= big_tail + 1;
@@ -87,23 +86,23 @@ module rob(
 
             // commit --> retire head/free rob entry [x], write to regfile [x], clear maptable entry if valid, fkush after this if needed
             if (!empty && rob_table[head].ready) begin
-                $display("Committing ROB[%d]: Reg %d <- %d", head, rob_table[head].r, rob_table[head].V);  // Debug print
-                regfile_write_en <= 1;
+                //$display("Committing ROB[%d]: Reg %d <- %d", head, rob_table[head].r, rob_table[head].V);  // Debug print
+                retire <= 1;
                 regfile_write_idx <= rob_table[head].r;
                 regfile_write_data <= rob_table[head].V;
-                ppl_ctrl <= rob_table[head].ppl_ctrl;
+                ppln_ctrl <= rob_table[head].ppln_ctrl;
 
                 big_head <= big_head + 1;
 
-                if (rob_table[head].ppl_ctrl) begin //FLUSH
+                if (rob_table[head].ppln_ctrl) begin //FLUSH
                     for (int i = 0; i < `ROB_SZ; i++) begin
                         rob_table[i] <= 0;  
                     end
-                    big_head <= big_tail;  // flushing just sets tail to head
-                    big_head <= big_head; 
+                    big_head <= 0;  // flushing zeros out the head/tail --> empty
+                    big_tail <= 0; 
                 end
             end else begin
-                regfile_write_en <= 0;
+                retire <= 0;
             end
         end
     end

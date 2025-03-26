@@ -144,6 +144,7 @@ module RS_VALUE(
                         rs_table[s_idx].T, 
                         rs_table[s_idx].V1, 
                         rs_table[s_idx].V2,
+                        rs_table[s_idx].D_S_reg.halt,
                         `TRUE
                     };
                     s_valid[s_idx] = 1'b1;

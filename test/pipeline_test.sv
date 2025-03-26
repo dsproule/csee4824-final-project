@@ -291,7 +291,7 @@ module testbench;
                 $display("@@  %t : System halted\n@@", $realtime);
 
                 case(pipeline_error_status)
-                    LOAD_ACCESS_FAULT:`
+                    LOAD_ACCESS_FAULT:
                         $display("@@@ System halted on memory error");
                     HALTED_ON_WFI:
                         $display("@@@ System halted on WFI instruction");
