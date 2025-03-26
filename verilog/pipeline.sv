@@ -362,13 +362,16 @@ module pipeline (
     assign no_X_req = (FU_ready == '0);
 
     always_comb begin
-        for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++)
-            if (gnt[cdb_idx] & ~no_X_req)
-                cdb = {X_C_reg[cdb_idx].T,
-                        X_C_reg[cdb_idx].result,
-                        cdb.ppl_ctrl,
-                        `TRUE
-                    };
+        if (~no_X_req)
+            for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++)
+                if (gnt[cdb_idx] & ~no_X_req)
+                    cdb = {X_C_reg[cdb_idx].T,
+                            X_C_reg[cdb_idx].result,
+                            cdb.ppl_ctrl,
+                            `TRUE
+                        };
+        else
+            cdb.valid = `FALSE;
     end
 
     //////////////////////////////////////////////////
@@ -391,7 +394,7 @@ module pipeline (
         .full(rob_full), .empty(), .regfile_write_en(rob_regfile_en),
         .regfile_write_idx(rob_regfile_idx),
         .V1(rob_V1), .V2(rob_V2), .regfile_write_data(rob_regfile_data),
-        .rob_table_out()
+        .rob_table_out(rob_table_out)
     );
 
     //////////////////////////////////////////////////
