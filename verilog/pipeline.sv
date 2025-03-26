@@ -44,11 +44,15 @@ module pipeline (
 
     // Outputs from IF-Stage and IF/ID Pipeline Register
     logic [`XLEN-1:0] proc2Imem_addr;
+    logic [`XLEN-1:0] proc2Icache_addr;
+    logic [63:0] Icache_data_out;
+    logic [1:0]  proc2Imem_command;
     IF_ID_PACKET IF_packet, IF_ID_reg;
+    logic next_IF_valid;
 
     // Outputs from decode to rs, mt and rob
     D_S_PACKET D_packet, D_S_reg;
-    
+
     // Outputs from rs to FU
     S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_reg;
     logic [`RS_SZ:0] S_idx;
@@ -96,44 +100,46 @@ module pipeline (
     // but there will be a 100ns latency in project 4
 
     always_comb begin
-        if (proc2Dmem_command != BUS_NONE) begin // read or write DATA from memory
-            proc2mem_command = proc2Dmem_command;
-            proc2mem_addr    = proc2Dmem_addr;
-`ifndef CACHE_MODE
-            proc2mem_size    = proc2Dmem_size;  // size is never DOUBLE in project 3
-`endif
-        end else begin                          // read an INSTRUCTION from memory
-            proc2mem_command = BUS_LOAD;
+//         if (proc2Dmem_command != BUS_NONE) begin // read or write DATA from memory
+//             proc2mem_command = proc2Dmem_command;
+//             proc2mem_addr    = proc2Dmem_addr;
+// `ifndef CACHE_MODE
+//             proc2mem_size    = proc2Dmem_size;  // size is never DOUBLE in project 3
+// `endif
+//         end else begin                          // read an INSTRUCTION from memory
+            // proc2mem_command = BUS_LOAD;
+            proc2mem_command = proc2Imem_command;
             proc2mem_addr    = proc2Imem_addr;
-`ifndef CACHE_MODE
-            proc2mem_size    = DOUBLE;          // instructions load a full memory line (64 bits)
-`endif
-        end
-        proc2mem_data = {32'b0, proc2Dmem_data};
+// `ifndef CACHE_MODE
+//             proc2mem_size    = DOUBLE;          // instructions load a full memory line (64 bits)
+// `endif
+//         end
+//         proc2mem_data = {32'b0, proc2Dmem_data};
     end
 
     //////////////////////////////////////////////////
     //                                              //
-    //                  Valid Bit                   //
+    //                icache-Stage                  //
     //                                              //
     //////////////////////////////////////////////////
 
-    // This state controls the stall signal that artificially forces IF
-    // to stall until the previous instruction has completed.
-    // For project 3, start by setting this to always be 1
+    icache icache_0 (
+        // Inputs
+        .clock(clock), .reset(reset),
+        
+        .Imem2proc_response(mem2proc_response),
+        .Imem2proc_data(mem2proc_data),
+        .Imem2proc_tag(mem2proc_tag),
+        
+        .proc2Icache_addr(proc2Icache_addr),
 
-    logic next_if_valid;
+        // Outputs
+        .proc2Imem_command(proc2Imem_command),
+        .proc2Imem_addr(proc2Imem_addr),
 
-    // synopsys sync_set_reset "reset"
-    always_ff @(posedge clock) begin
-        if (reset) begin
-            // start valid, other stages (ID,EX,MEM,WB) start as invalid
-            next_if_valid <= 1;
-        end else begin
-            // valid bit will cycle through the pipeline and come back from the wb stage
-            next_if_valid <= `TRUE;
-        end
-    end
+        .Icache_data_out(Icache_data_out),
+        .Icache_valid_out(next_IF_valid)
+    );
 
     //////////////////////////////////////////////////
     //                                              //
@@ -145,14 +151,14 @@ module pipeline (
         // Inputs
         .clock (clock),
         .reset (reset),
-        .if_valid       (next_if_valid),
+        .if_valid       (next_IF_valid),
         .take_branch    (ppl_flush),
         .branch_target  (rob_regfile_data),
-        .Imem2proc_data (mem2proc_data),
+        .Imem2proc_data (Icache_data_out),
 
         // Outputs
         .if_packet      (IF_packet),
-        .proc2Imem_addr (proc2Imem_addr)
+        .proc2Imem_addr (proc2Icache_addr)
     );
 
     //////////////////////////////////////////////////
