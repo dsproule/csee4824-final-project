@@ -57,13 +57,12 @@ module pipeline (
     X_C_PACKET [`RS_SZ-1:0] X_packet, X_C_reg;
     logic [`RS_SZ:0] X_idx;
     logic [`RS_SZ-1:0] gnt;
-    logic [`RS_SZ*2-1:0] gnt_bus;
     CDB cdb;
 
     // Outputs and inputs for RS alloc stage
     logic rs_busy;
     ROB_T T;
-    MT_ENTRY T1, T2;
+    MT_ENTRY mt_T1, mt_T2;
     logic [`XLEN-1:0] regfile_V1, regfile_V2, rs_V1, rs_V2, rob_V1, rob_V2;
 
     // Outputs from MEM-Stage to memory
@@ -73,13 +72,14 @@ module pipeline (
     MEM_SIZE          proc2Dmem_size;
 
     // Outputs from Commit-rob
-    logic              rob_regfile_en, rob_full;
+    logic              rob_regfile_en, rob_full, no_X_req;
     logic [4:0]        rob_regfile_idx;
     logic [`XLEN-1:0]  rob_regfile_data;
+    logic [$clog2(`RS_SZ)-1:0] cdb_idx;
     logic [`RS_SZ-1:0] FU_ready;
 
     // Debug values
-    logic [$bits(MT_ENTRY)*32-1:0] mt_table_dbg
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_dbg;
     logic [`RS_SZ-1:0] busy_dbg;
     RS_ENTRY [`RS_SZ-1:0]  rs_table_dbg;
 
@@ -191,13 +191,13 @@ module pipeline (
         .en(D_S_reg.valid & ~rs_busy),
         .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2),
         .cdb(cdb),
-        .T(T), .retire_t(cdb.T),
+        .T(T), .retire_T(cdb.T),
 
         // Outputs
-        .T1(T1), .T2(T2)
+        .T1(mt_T1), .T2(mt_T2),
 
         // Debug Outputs
-        .mt_table_out(mt_table_dbg);
+        .mt_table_out(mt_table_dbg)
 
     );
 
@@ -209,7 +209,7 @@ module pipeline (
         .D_S_reg(D_S_reg),      
         .FU_ready(FU_ready),    // from fu arb
         .T(T),                  // from rob
-        .T1(T1), .T2(T2),       // from mt
+        .T1(mt_T1), .T2(mt_T2),       // from mt
         .V1(rs_V1), .V2(rs_V2),       // mux between mt & rob
 
         // Outputs
@@ -266,7 +266,7 @@ module pipeline (
         .S_X_reg(S_X_reg[1]),
 
         .X_packet(X_packet[1])
-    )
+    );
 
     func_unit_2 func_unit_02(
         .S_X_reg(S_X_reg[2]),
@@ -303,29 +303,25 @@ module pipeline (
                 FU_ready <= 0;
     end
 
-    // forces a more balanced arbiter to avoid starvation
-    assign gnt = (clock) ? gnt_bus[`RS_SZ-1:0] : gnt_bus[`RS_SZ*2-1:`RS_SZ];
+    rps4 arb (
+        .clock(clock), .reset(reset),
+        .req(FU_ready),
+        .en(rob_ready),
 
-    // just 4-bit priority selector
-    psel arb #(.WIDTH(`RS_SZ), .REQS(2)) 
-    (
-        .req(FU_ready), 
-
-        .gnt(),
-        .gnt_bus(gnt_bus),
-        .empty()
+        .gnt(gnt),
+        .count()
     );
 
+    assign no_X_req = (FU_ready == '0);
+
     always_comb begin
-        cdb.valid = `FALSE;
-        
-        for (logic [$clog2(`RS_SZ):0] i; i < `RS_SZ; i++) begin
-            if (gnt[i] & ~rob_ready) begin
-                cdb.T = X_C_reg.T;
-                cdb.V = X_C_reg.result;
-                cdb.valid = `TRUE;
-            end
-        end
+        for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++)
+            if (gnt[cdb_idx] & ~no_X_req)
+                cdb = {X_C_reg[cdb_idx].T,
+                        X_C_reg[cdb_idx].result,
+                        cdb.ppl_ctrl,
+                        `TRUE
+                    };
     end
 
     //////////////////////////////////////////////////
@@ -339,7 +335,7 @@ module pipeline (
         .clock(clock), .reset(reset),
         .flush(/*TODO*/),
         .r(D_S_reg.r), 
-        .T1(T1), .T2(T2),
+        .T1(mt_T1.T), .T2(mt_T2.T),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_busy),
 
@@ -356,10 +352,10 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign pipeline_completed_insts = {3'b0, mem_wb_reg.valid}; // commit one valid instruction
-    assign pipeline_error_status = mem_wb_reg.illegal        ? ILLEGAL_INST :
-                                   mem_wb_reg.halt           ? HALTED_ON_WFI :
-                                   (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
+    // assign pipeline_completed_insts = {3'b0, mem_wb_reg.valid}; // commit one valid instruction
+    // assign pipeline_error_status = mem_wb_reg.illegal        ? ILLEGAL_INST :
+    //                                mem_wb_reg.halt           ? HALTED_ON_WFI :
+    //                                (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
 
     assign pipeline_commit_wr_en   = rob_regfile_en;
     assign pipeline_commit_wr_idx  = rob_regfile_idx;

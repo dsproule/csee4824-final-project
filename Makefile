@@ -319,19 +319,23 @@ $(TESTED_MODULES:=.cov.verdi): %.cov.verdi: %.cov.vdb
 HEADERS = verilog/sys_defs.svh \
           verilog/ISA.svh
 
-TESTBENCH = test/pipeline_test.sv \
+TESTBENCH = test/pipeline_test.sv  \
             test/pipeline_print.c \
-            test/mem.sv \
-			test/rs_stage_test.sv \
-			test/func_unit_1_test.sv
-
+            test/mem.sv
+			
 # you could simplify this line with $(wildcard verilog/*.sv) - but the manual way is more explicit
 SOURCES = verilog/pipeline.sv \
           verilog/regfile.sv \
           verilog/icache.sv \
+		  verilog/d_stage.sv \
+		  verilog/map_table.sv \
+		  verilog/regfile.sv \
+		  verilog/rs_stage.sv \
+		  verilog/func_unit_*.sv \
           verilog/mult.sv \
           verilog/mult_stage.sv \
-		  verilog/func_unit_1.sv
+		  verilog/rps4.sv \
+		  verilog/rob.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 

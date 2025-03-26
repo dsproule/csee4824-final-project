@@ -211,14 +211,14 @@ module d_stage (
 
     always_comb begin
         if (rd_mem)
-            ID_X_packet.rs_idx = NUM_FU_LOAD;   
+            D_packet.rs_idx = `NUM_FU_LOAD;   
         else if (wr_mem)
-            ID_X_packet.rs_idx = NUM_FU_STORE;
-        else if (alu_func == ALU_MUL    | alu_func == ALU_MULHSU |
-                 alu_func == ALU_MULHSU | alu_func == ALU_MULHU)
-            ID_X_packet.rs_idx = NUM_FU_MULT;
+            D_packet.rs_idx = `NUM_FU_STORE;
+        else if (D_packet.alu_func == ALU_MUL    | D_packet.alu_func == ALU_MULHSU |
+                 D_packet.alu_func == ALU_MULHSU | D_packet.alu_func == ALU_MULHU)
+            D_packet.rs_idx = `NUM_FU_MULT;
         else
-            ID_X_packet.rs_idx = NUM_FU_ALU;
+            D_packet.rs_idx = `NUM_FU_ALU;
     end
 
     decoder decoder_0 (
