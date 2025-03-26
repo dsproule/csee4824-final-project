@@ -10,9 +10,11 @@ module rob(
     input dispatch_valid,
 
     output ROB_T T,
+    output PPL_CTRL ppl_ctrl,
     output logic full, empty, regfile_write_en,
     output logic [4:0] regfile_write_idx,
-    output logic [`XLEN-1:0] V1, V2, regfile_write_data
+    output logic [`XLEN-1:0] V1, V2, regfile_write_data,
+    output rob_table_out
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
 

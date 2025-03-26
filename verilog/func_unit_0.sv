@@ -72,13 +72,12 @@ module func_unit_0 (
 
     // Pass-throughs
     assign X_packet.T = S_X_reg.T;
-    assign X_packet.ppl_ctrl.store = 0;
-
-    assign X_packet.valid = `TRUE;
+    assign X_packet.valid = S_X_reg.valid;
 
     // ultimate "take branch" signal:
     // unconditional, or conditional and the condition is true
     assign X_packet.ppl_ctrl.mis_predict = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+    assign X_packet.ppl_ctrl.store = 0;
 
         // ALU opA mux
     always_comb begin

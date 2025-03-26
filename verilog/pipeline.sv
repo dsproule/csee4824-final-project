@@ -50,11 +50,11 @@ module pipeline (
     D_S_PACKET D_packet, D_S_reg;
     
     // Outputs from rs to FU
-    S_X_PACKET [`RS_SZ-1:0] S_packet, S_X_reg;
+    S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_reg;
     logic [`RS_SZ:0] S_idx;
 
     // Outputs from FU to X_C (cdb)
-    X_C_PACKET [`RS_SZ-1:0] X_packet, X_C_reg;
+    X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_reg;
     logic [`RS_SZ:0] X_idx;
     logic [`RS_SZ-1:0] gnt;
     CDB cdb;
@@ -72,10 +72,11 @@ module pipeline (
     MEM_SIZE          proc2Dmem_size;
 
     // Outputs from Commit-rob
-    logic              rob_regfile_en, rob_full, no_X_req;
+    logic              rob_regfile_en, rob_full, no_X_req, ppl_flush, mem_store;
     logic [4:0]        rob_regfile_idx;
     logic [`XLEN-1:0]  rob_regfile_data;
     logic [$clog2(`RS_SZ)-1:0] cdb_idx;
+    logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
     logic [`RS_SZ-1:0] FU_ready;
 
     // Debug values
@@ -111,7 +112,48 @@ module pipeline (
         proc2mem_data = {32'b0, proc2Dmem_data};
     end
 
-    // TODO: IF stage
+    //////////////////////////////////////////////////
+    //                                              //
+    //                  Valid Bit                   //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    // This state controls the stall signal that artificially forces IF
+    // to stall until the previous instruction has completed.
+    // For project 3, start by setting this to always be 1
+
+    logic next_if_valid;
+
+    // synopsys sync_set_reset "reset"
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            // start valid, other stages (ID,EX,MEM,WB) start as invalid
+            next_if_valid <= 1;
+        end else begin
+            // valid bit will cycle through the pipeline and come back from the wb stage
+            next_if_valid <= `TRUE;
+        end
+    end
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //                  IF-Stage                    //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    if_stage if_stage_0 (
+        // Inputs
+        .clock (clock),
+        .reset (reset),
+        .if_valid       (next_if_valid),
+        .take_branch    (ppl_flush),
+        .branch_target  (rob_regfile_data),
+        .Imem2proc_data (mem2proc_data),
+
+        // Outputs
+        .if_packet      (IF_packet),
+        .proc2Imem_addr (proc2Imem_addr)
+    );
 
     //////////////////////////////////////////////////
     //                                              //
@@ -201,6 +243,11 @@ module pipeline (
 
     );
 
+    assign rs_V1 =  (mt_T1.T == 0) ? regfile_V1 :
+                    (mt_T1.plus)   ?   rob_V1   : 0;
+    assign rs_V2 =  (mt_T2.T == 0) ? regfile_V2 :
+                    (mt_T2.plus)   ?   rob_V2   : 0;
+
     rs_stage rs_stage_0(
         // Inputs
         .clock(clock), .reset(reset),
@@ -214,7 +261,7 @@ module pipeline (
 
         // Outputs
         .d_stall(rs_busy),
-        .S_packet(S_packet),
+        .S_packet(S_packets),
 
         // Debug Outputs
         .rs_table(rs_table_dbg),
@@ -245,7 +292,7 @@ module pipeline (
             if (reset) begin
                 S_X_reg[S_idx] <= 0;                // may need to be more graceful one day but for rn idc
             end else if (FU_ready[S_idx]) begin
-                S_X_reg[S_idx] <= S_packet[S_idx];
+                S_X_reg[S_idx] <= S_packets[S_idx];
             end
     end
 
@@ -258,26 +305,26 @@ module pipeline (
     func_unit_0 func_unit_00(
         .S_X_reg(S_X_reg[0]),
 
-        .X_packet(X_packet[0])
+        .X_packet(X_packets[0])
     );
 
     func_unit_1 func_unit_01(
         .clock(clock), .reset(reset),
         .S_X_reg(S_X_reg[1]),
 
-        .X_packet(X_packet[1])
+        .X_packet(X_packets[1])
     );
 
     func_unit_2 func_unit_02(
         .S_X_reg(S_X_reg[2]),
 
-        .X_packet(X_packet[2])
+        .X_packet(X_packets[2])
     );
 
     func_unit_3 func_unit_03(
         .S_X_reg(S_X_reg[3]),
 
-        .X_packet(X_packet[3])
+        .X_packet(X_packets[3])
     );
 
     //////////////////////////////////////////////////
@@ -293,8 +340,8 @@ module pipeline (
             if (reset) begin
                 FU_ready[X_idx] <= `TRUE;
                 X_C_reg[X_idx] <= 0;
-            end else if (X_packet[X_idx].valid) begin
-                X_C_reg[X_idx] <= X_packet[X_idx];
+            end else if (X_packets[X_idx].valid) begin
+                X_C_reg[X_idx] <= X_packets[X_idx];
                 FU_ready[X_idx] <= `TRUE;
             end
 
@@ -333,7 +380,6 @@ module pipeline (
     rob rob_0(
         // Inputs
         .clock(clock), .reset(reset),
-        .flush(/*TODO*/),
         .r(D_S_reg.r), 
         .T1(mt_T1.T), .T2(mt_T2.T),
         .cdb(cdb),
@@ -341,9 +387,11 @@ module pipeline (
 
         // Outputs
         .T(T),
+        .ppl_ctrl({ppl_flush, mem_store}),
         .full(rob_full), .empty(), .regfile_write_en(rob_regfile_en),
         .regfile_write_idx(rob_regfile_idx),
-        .V1(rob_V1), .V2(rob_V2), .regfile_write_data(rob_regfile_data)
+        .V1(rob_V1), .V2(rob_V2), .regfile_write_data(rob_regfile_data),
+        .rob_table_out()
     );
 
     //////////////////////////////////////////////////
@@ -352,6 +400,7 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
+    // TODO:
     // assign pipeline_completed_insts = {3'b0, mem_wb_reg.valid}; // commit one valid instruction
     // assign pipeline_error_status = mem_wb_reg.illegal        ? ILLEGAL_INST :
     //                                mem_wb_reg.halt           ? HALTED_ON_WFI :
