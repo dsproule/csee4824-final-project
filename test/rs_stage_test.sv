@@ -58,7 +58,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 3);
             $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:%b", idx, t, t1, t2, v1, v2, busy);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -68,7 +68,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 3);
             $display("@@@stall error: d_stall: %b", d_stall);
-            $finish;
+            // $finish;
         end
     endtask
 

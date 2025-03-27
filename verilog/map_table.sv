@@ -43,8 +43,14 @@ module map_table (
                 mt_table[retire_r] <= 0;
 
             // checks whole map table and assigns plus if == cdb_tag (in theory only one)
-            for (cdb_idx = 0; cdb_idx < 32; cdb_idx++)
-                mt_table[cdb_idx].plus <= (cdb.T == mt_table[cdb_idx].T & cdb.valid);
+            // shouldn't write like this bcz the plus tag should stay more than one cycle
+            for (cdb_idx = 0; cdb_idx < 32; cdb_idx++) begin
+                if((cdb.T == cdb_idx) & cdb.valid)
+                    mt_table[cdb_idx].plus <= 1'b1;
+                else
+                    mt_table[cdb_idx].plus <= mt_table[cdb_idx].plus;
+                // mt_table[cdb_idx].plus <= (cdb.T == mt_table[cdb_idx].T & cdb.valid);
+            end
         end
     end
 

@@ -38,6 +38,11 @@ module testbench;
     logic [`XLEN-1:0] regfile_write_data;
     logic [`XLEN-1:0] V1_rob, V2_rob;
 
+    logic [`XLEN-1:0] V1_rs, V2_rs;
+
+    // assign V1_rs = (T1_wire.plus) ? V1_rob : V1;
+    // assign V2_rs = (T2_wire.plus) ? V2_rob : V2;
+
     map_table map_table(
         .clock(clock),
         .reset(reset),
@@ -175,12 +180,9 @@ module testbench;
         // ld X(r4), r2 // 1
         V1 = 0;
         V2 = 8;
-        T = 1;
+        // T = 1;
         D_S_reg.rs_idx = 1;
-        FU_ready[0] = 1;
-        FU_ready[1] = 1;
-        FU_ready[2] = 1;
-        FU_ready[3] = 1;
+        
         // T1 = {0, 1'b0};
         // T2 = {0, 1'b0};
         r = 2;
@@ -192,8 +194,12 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(0);
-        @(negedge clock);
+        @(negedge clock); // 1
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
@@ -208,12 +214,8 @@ module testbench;
         // mul r1, r2, r3 // 2
         V1 = 5;
         V2 = 0;
-        T = 2;
+        // T = 2;
         D_S_reg.rs_idx = 3;
-        FU_ready[0] = 1;
-        FU_ready[1] = 1;
-        FU_ready[2] = 1;
-        FU_ready[3] = 1;
         // T1 = {0, 1'b0};
         // T2 = {1, 1'b0};
         r = 3;
@@ -225,6 +227,10 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(0);
         // 2
         @(negedge clock);
@@ -238,12 +244,8 @@ module testbench;
         // st r3, Z(r4) // 3
         V1 = 0;
         V2 = 8;
-        T = 3;
+        // T = 3;
         D_S_reg.rs_idx = 2;
-        FU_ready[0] = 1;
-        FU_ready[1] = 1;
-        FU_ready[2] = 1;
-        FU_ready[3] = 1;
         // T1 = {2, 1'b0};
         // T2 = {0, 1'b0};
         r = 0; // question: what should be the r for store function
@@ -255,12 +257,16 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(0);
         @(negedge clock);
         // 3
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 1, 0, 0, 0, 8, 1);
+        compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 2, 0, 1, 5, 0, 1);
     
@@ -268,12 +274,8 @@ module testbench;
         // addi r4, 4, r4 // 4
         V1 = 8;
         V2 = 0;
-        T = 4;
+        // T = 4;
         D_S_reg.rs_idx = 0;
-        FU_ready[0] = 1;
-        FU_ready[1] = 0;
-        FU_ready[2] = 1;
-        FU_ready[3] = 1;
         // T1 = {0, 1'b0};
         // T2 = {0, 1'b0};
         r = 4;
@@ -285,6 +287,10 @@ module testbench;
         cdb.T = 1;
         cdb.V = 10;
         @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(0);
         // 4
         @(negedge clock);
@@ -298,12 +304,8 @@ module testbench;
         // ldf X(r4), r2 // 5
         V1 = 0;
         V2 = 0;
-        T = 5;
+        // T = 5;
         D_S_reg.rs_idx = 1;
-        FU_ready[0] = 1;
-        FU_ready[1] = 1;
-        FU_ready[2] = 1;
-        FU_ready[3] = 1;
         // T1 = {0, 1'b0};
         // T2 = {4, 1'b0};
         r = 2;
@@ -315,6 +317,10 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 0;
         compare_stall(0);
         @(negedge clock);
         // 5
@@ -322,19 +328,15 @@ module testbench;
         compare(0, 4, 0, 0, 8, 0, 1);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
-        compare(3, 2, 0, 0, 5, 10, 1); 
+        compare(3, 0, 0, 0, 0, 0, 0); 
         
 
         // @(negedge clock); 
         // mul r1, r2, r3 // 6
         V1 = 5;
         V2 = 0;
-        T = 6;
+        // T = 6;
         D_S_reg.rs_idx = 3;
-        FU_ready[0] = 1;
-        FU_ready[1] = 1;
-        FU_ready[2] = 1;
-        FU_ready[3] = 0;
         // T1 = {0, 1'b0};
         // T2 = {5, 1'b0};
         r = 3;
@@ -346,11 +348,15 @@ module testbench;
         cdb.T = 0;
         cdb.V = 0;
         @(posedge clock); #2
+        FU_ready[0] = 0;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 0;
         compare_stall(0);
         // 6
         @(negedge clock);
         print_rs();
-        compare(0, 4, 0, 0, 8, 0, 1);
+        compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 5, 0, 4, 0, 0, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 0, 0, 0, 0, 0, 0);
@@ -360,7 +366,7 @@ module testbench;
         // 7
         V1 = 0;
         V2 = 1;
-        T = 7;
+        // T = 7;
         D_S_reg.rs_idx = 2;
         // T1 = {6, 1'b0};
         // T2 = {0, 1'b0};
@@ -372,11 +378,11 @@ module testbench;
         cdb.valid = 1;
         cdb.T = 4;
         cdb.V = 12;
-        FU_ready[0] = 0;
+        @(posedge clock); #2
+        FU_ready[0] = 1;
         FU_ready[1] = 1;
         FU_ready[2] = 1;
         FU_ready[3] = 0;
-        @(posedge clock); #2
         compare_stall(1);
         // 7
         @(negedge clock);
@@ -390,12 +396,8 @@ module testbench;
         // 8
         V1 = 0;
         V2 = 1;
-        T = 7;
+        // T = 7;
         D_S_reg.rs_idx = 2;
-        FU_ready[0] = 1;
-        FU_ready[1] = 1;
-        FU_ready[2] = 1;
-        FU_ready[3] = 0;
         // T1 = {6, 1'b0};
         // T2 = {0, 1'b0};
         r = 0;
@@ -407,26 +409,26 @@ module testbench;
         cdb.T = 2;
         cdb.V = 11;
         @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 0;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(1);
         @(negedge clock); 
         // 8
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 5, 0, 0, 0, 12, 1);
-        compare(2, 3, 0, 0, 11, 8, 0);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 3, 0, 0, 11, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);    
         
     
         // st r3, Z(r4) // 9
         // @(negedge clock); 
         V1 = 0;
-        V2 = 1;
-        T = 7;
+        V2 = 12;
+        // T = 7;
         D_S_reg.rs_idx = 2;
-        FU_ready[0] = 1;
-        FU_ready[1] = 0;
-        FU_ready[2] = 1;
-        FU_ready[3] = 1;
         // T1 = {6, 1'b0};
         // T2 = {4, 1'b1};
         r = 0;
@@ -438,15 +440,48 @@ module testbench;
         cdb.T = 5;
         cdb.V = 15;
         @(posedge clock); #2
-        compare_stall(1);
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 0;
+        FU_ready[3] = 1;
+        compare_stall(0);
         // 9
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
-        compare(2, 3, 0, 0, 11, 8, 1);
+        compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 6, 0, 0, 5, 15, 1);
-        
+
+        // none // 10
+        // @(negedge clock); 
+        V1 = 0;
+        V2 = 0;
+        // T = 7;
+        D_S_reg.rs_idx = 0;
+        // T1 = {6, 1'b0};
+        // T2 = {4, 1'b1};
+        r = 0;
+        r1 = 0;
+        r2 = 0;
+        retire_r = 0;
+        retire_T = 0; // question: do store inst need to retire?
+        cdb.valid = 0;
+        cdb.T = 0;
+        cdb.V = 0;
+        @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 0;
+        compare_stall(0);
+        // 10
+        @(negedge clock);
+        print_rs();
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 7, 6, 0, 0, 12, 1);
+        compare(3, 0, 0, 0, 0, 0, 0);
 
         if(error_count == 0) begin
             $display("@@@Passed");
