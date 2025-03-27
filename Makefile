@@ -222,7 +222,7 @@ $(call DEPS,rob): $(ROB_DEPS)
 # for multiple modules
 # Define the testbench and source files
 TESTBENCH = multi_module_test
-MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv
+MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv
 OUTPUT_DIR = ./output
 SIMV = $(TESTBENCH).simv
 SIM_OUT = $(OUTPUT_DIR)/$(TESTBENCH).out

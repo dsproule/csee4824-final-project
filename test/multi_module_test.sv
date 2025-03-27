@@ -25,7 +25,7 @@ module testbench;
     // Outputs
     logic d_stall;
     S_X_PACKET [`RS_SZ-1:0] S_X_pack;
-    integer i, j, k;
+    integer i, j, k, l;
     logic [7:0] clock_count;
     logic [5:0] error_count;
     logic [`RS_SZ-1:0] FU_ready;
@@ -39,9 +39,10 @@ module testbench;
     logic [`XLEN-1:0] V1_rob, V2_rob;
 
     logic [`XLEN-1:0] V1_rs, V2_rs;
+    MT_ENTRY mt_table [31:0];
 
-    // assign V1_rs = (T1_wire.plus) ? V1_rob : V1;
-    // assign V2_rs = (T2_wire.plus) ? V2_rob : V2;
+    assign V1_rs = (T1_wire.plus) ? V1_rob : V1;
+    assign V2_rs = (T2_wire.plus) ? V2_rob : V2;
 
     map_table map_table(
         .clock(clock),
@@ -54,7 +55,8 @@ module testbench;
         .T(T_wire), // ROB_T
         .retire_T(retire_T), // ROB_T
         .T1(T1_wire), // MT_ENTRY // output // finished 
-        .T2(T2_wire) // MT_ENTRY // output // finished
+        .T2(T2_wire), // MT_ENTRY // output // finished
+        .mt_table(mt_table)
     );
 
     rs_stage rs_stage(
@@ -68,8 +70,8 @@ module testbench;
         .T(T_wire),
         .T1(T1_wire),
         .T2(T2_wire),
-        .V1(V1),
-        .V2(V2),
+        .V1(V1_rs),
+        .V2(V2_rs),
 
         .d_stall(d_stall),
         .S_packet(S_X_pack),
@@ -96,10 +98,28 @@ module testbench;
         .regfile_write_data(regfile_write_data)
     );
 
+    // regfile regfile_0(
+    //     // Inputs
+    //     .clock(clock),
+    //     .read_idx_1(r1), .read_idx_2(r2), .write_idx(regfile_write_idx),
+    //     .write_en(regfile_write_en),
+    //     .write_data(regfile_write_data),
+
+    //     // Outputs
+    //     .read_out_1(regfile_V1), .read_out_2(regfile_V2)
+    // );
+
     task print_rs;
         $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 3);
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table[j].T, rs_table[j].T1, rs_table[j].T2, rs_table[j].V1, rs_table[j].V2, busy[j], rs_table[j].ready);
+        $display("------------------------------------------");
+    endtask
+
+    task print_mt;
+        $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count - 3);
+        for(l = 1; l < 5; l=l+1)
+            $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
         $display("------------------------------------------");
     endtask
 
@@ -182,7 +202,6 @@ module testbench;
         V2 = 8;
         // T = 1;
         D_S_reg.rs_idx = 1;
-        
         // T1 = {0, 1'b0};
         // T2 = {0, 1'b0};
         r = 2;
@@ -201,6 +220,7 @@ module testbench;
         compare_stall(0);
         @(negedge clock); // 1
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
@@ -235,6 +255,7 @@ module testbench;
         // 2
         @(negedge clock);
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 1, 0, 0, 0, 8, 1);
         compare(2, 0, 0, 0, 0, 0, 0);
@@ -265,6 +286,7 @@ module testbench;
         @(negedge clock);
         // 3
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
@@ -295,6 +317,7 @@ module testbench;
         // 4
         @(negedge clock);
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
@@ -325,6 +348,7 @@ module testbench;
         @(negedge clock);
         // 5
         print_rs();
+        print_mt();
         compare(0, 4, 0, 0, 8, 0, 1);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
@@ -356,6 +380,7 @@ module testbench;
         // 6
         @(negedge clock);
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 5, 0, 4, 0, 0, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
@@ -387,6 +412,7 @@ module testbench;
         // 7
         @(negedge clock);
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 5, 0, 0, 0, 12, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
@@ -417,6 +443,7 @@ module testbench;
         @(negedge clock); 
         // 8
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 0, 0, 11, 8, 1);
@@ -426,7 +453,7 @@ module testbench;
         // st r3, Z(r4) // 9
         // @(negedge clock); 
         V1 = 0;
-        V2 = 12;
+        V2 = 0;
         // T = 7;
         D_S_reg.rs_idx = 2;
         // T1 = {6, 1'b0};
@@ -448,6 +475,7 @@ module testbench;
         // 9
         @(negedge clock);
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
@@ -478,6 +506,7 @@ module testbench;
         // 10
         @(negedge clock);
         print_rs();
+        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 7, 6, 0, 0, 12, 1);
