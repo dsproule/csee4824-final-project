@@ -37,6 +37,7 @@ module testbench;
     logic [4:0] regfile_write_idx;
     logic [`XLEN-1:0] regfile_write_data;
     logic [`XLEN-1:0] V1_rob, V2_rob;
+    logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
 
     logic [`XLEN-1:0] V1_rs, V2_rs;
     MT_ENTRY mt_table [31:0];
@@ -84,8 +85,8 @@ module testbench;
         .reset(reset), 
         .flush(1'b0), // 0 for now
         .r(r), 
-        .T1(T1_wire), // for getting the ROB value
-        .T2(T2_wire), // for getting the ROB value
+        .T1(T1_wire.T), // for getting the ROB value
+        .T2(T2_wire.T), // for getting the ROB value
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~d_stall), // ?
         .T(T_wire), 
@@ -95,7 +96,8 @@ module testbench;
         .regfile_write_idx(regfile_write_idx),
         .V1(V1_rob), 
         .V2(V2_rob), 
-        .regfile_write_data(regfile_write_data)
+        .regfile_write_data(regfile_write_data),
+        .rob_table_out(rob_table_out)
     );
 
     // regfile regfile_0(
@@ -453,7 +455,7 @@ module testbench;
         // st r3, Z(r4) // 9
         // @(negedge clock); 
         V1 = 0;
-        V2 = 0;
+        V2 = 2;
         // T = 7;
         D_S_reg.rs_idx = 2;
         // T1 = {6, 1'b0};

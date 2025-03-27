@@ -39,16 +39,16 @@ module map_table (
             mt_table[r] <= (r != 0) ? {T, `FALSE} : 0;
 
             // clears a tag if its not being reassigned
-            if (retire_entry)
-                mt_table[retire_r] <= 0;
-
+            if (retire_entry) begin
+                mt_table[retire_r].T <= 0;
+                mt_table[retire_r].plus <= 0;
+            end
             // checks whole map table and assigns plus if == cdb_tag (in theory only one)
             // shouldn't write like this bcz the plus tag should stay more than one cycle
             for (cdb_idx = 0; cdb_idx < 32; cdb_idx++) begin
-                if((cdb.T == cdb_idx) & cdb.valid)
+                // if((cdb.T == cdb_idx) & cdb.valid)
+                if((cdb.T == mt_table[cdb_idx].T) & cdb.valid)
                     mt_table[cdb_idx].plus <= 1'b1;
-                else
-                    mt_table[cdb_idx].plus <= mt_table[cdb_idx].plus;
                 // mt_table[cdb_idx].plus <= (cdb.T == mt_table[cdb_idx].T & cdb.valid);
             end
         end
