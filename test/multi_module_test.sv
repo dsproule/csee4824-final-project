@@ -21,6 +21,7 @@ module testbench;
     logic [4:0] r, r1, r2; // the original register value
     ROB_T retire_T;
     logic [4:0] retire_r;
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_out;
 
     // Outputs
     logic d_stall;
@@ -33,8 +34,7 @@ module testbench;
     // for rob
     logic full;
     logic empty;
-    // for regfile input
-    logic regfile_write_en;
+    logic retire;
     logic [4:0] regfile_write_idx;
     logic [`XLEN-1:0] regfile_write_data;
     logic [`XLEN-1:0] V1_rob, V2_rob;
@@ -57,6 +57,7 @@ module testbench;
     logic [`XLEN-1:0] V1_rs, V2_rs;
     logic [`XLEN-1:0] regfile_V1, regfile_V2;
     MT_ENTRY mt_table [31:0];
+    ROB_ENTRY rob_table [`ROB_SZ-1:0];
 
     assign V1_rs = (T1_wire.plus) ? V1_rob : regfile_V1;
     assign V2_rs = (T2_wire.plus) ? V2_rob : regfile_V2;
@@ -64,6 +65,7 @@ module testbench;
     map_table map_table(
         .clock(clock),
         .reset(reset),
+        .en(en),
         .r(r), // 5 bits // finished
         .r1(r1), // 5 bits // finished 
         .r2(r2), // 5 bits // finished
@@ -73,8 +75,15 @@ module testbench;
         .retire_T(retire_T), // ROB_T
         .T1(T1_wire), // MT_ENTRY // output // finished 
         .T2(T2_wire), // MT_ENTRY // output // finished
-        .mt_table(mt_table)
+        .mt_table_out(mt_table_out)
     );
+
+    always_comb begin
+        //re-unpack array for debugging    
+        for (int i = 0; i < 32; i++) begin
+            mt_table[i] = mt_table_out[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
+        end
+    end
 
     rs_stage rs_stage(
         .clock(clock),
@@ -99,19 +108,18 @@ module testbench;
     rob rob_inst (
         .clock(clock), 
         .reset(reset), 
-        // .flush(1'b0), // 0 for now
         .r(r), 
         .T1(T1_wire.T), // for getting the ROB value
         .T2(T2_wire.T), // for getting the ROB value
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~d_stall), // ?
         .T(T_wire), 
-        .ppl_ctrl(),
+        .retire_T(retire_T), //TODO
+        .ppl_ctrl(), //this has fields for mispredicted branches to be used elsewhere in ppl
         .full(full), 
         .empty(empty),
-        .retire(),
-        // .regfile_write_en(rob_write_en), 
-        .regfile_write_idx(rob_write_idx),
+        .retire(retire), 
+        .regfile_write_idx(retire_r), //TODO
         .V1(V1_rob), 
         .V2(V2_rob), 
         .regfile_write_data(rob_write_data),
@@ -122,18 +130,30 @@ module testbench;
         // Inputs
         .clock(clock),
         .read_idx_1(r1), .read_idx_2(r2), .write_idx(regfile_write_idx),
-        .write_en(regfile_write_en),
+        .write_en(retire),
         .write_data(regfile_write_data),
-
         // Outputs
         .read_out_1(regfile_V1), .read_out_2(regfile_V2)
     );
+
+    always_comb begin
+        for (int i = 0; i < `ROB_SZ; i++) begin
+            rob_table[i] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
+        end
+    end
 
     task print_rs;
         $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 3);
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table[j].T, rs_table[j].T1, rs_table[j].T2, rs_table[j].V1, rs_table[j].V2, busy[j], rs_table[j].ready);
         $display("------------------------------------------");
+    endtask
+
+    task print_rob;
+        $display("\\n=== ROB Dump [%2d:%2d] ===", start_i, end_i);
+        for (int i = 0; i < `ROB_SZ; i++)
+            $display("| %2d | ready=%1b | r=%2d | V=%0d", i, rob_table[i].ready, rob_table[i].r, rob_table[i].V);
+        $display("==============================\\n");
     endtask
 
     task print_mt;
@@ -208,7 +228,7 @@ module testbench;
         r1 = 0;
         r2 = 0;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         @(negedge clock);
         reset = 1;
         ppl_write_en = 1;
@@ -243,7 +263,7 @@ module testbench;
         r1 = 0;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -277,7 +297,7 @@ module testbench;
         r1 = 1;
         r2 = 2;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -308,7 +328,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        //retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -339,7 +359,7 @@ module testbench;
         r1 = 4;
         r2 = 0;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 1;
         cdb.V = 10;
@@ -370,7 +390,7 @@ module testbench;
         r1 = 0;
         r2 = 4;
         retire_r = 2;
-        retire_T = 1;
+        // retire_T = 1;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -402,7 +422,7 @@ module testbench;
         r1 = 1;
         r2 = 2;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -434,7 +454,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 4;
         cdb.V = 12;
@@ -465,7 +485,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 2;
         cdb.V = 11;
@@ -497,7 +517,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 3;
-        retire_T = 2; // question: do store inst need to retire?
+        // retire_T = 2; // question: do store inst need to retire? YES - Nico
         cdb.valid = 1;
         cdb.T = 5;
         cdb.V = 15;
@@ -528,7 +548,7 @@ module testbench;
         r1 = 0;
         r2 = 0;
         retire_r = 0;
-        retire_T = 0; // question: do store inst need to retire?
+        // retire_T = 0; // question: do store inst need to retire?
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;

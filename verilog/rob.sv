@@ -8,7 +8,7 @@ module rob(
     input CDB cdb,
     input dispatch_valid,
 
-    output ROB_T T,
+    output ROB_T T, retire_T,
     output PPL_CTRL ppl_ctrl,
     output logic full, empty, retire,
     output logic [4:0] regfile_write_idx, 
@@ -92,6 +92,7 @@ module rob(
                 regfile_write_data <= rob_table[head].V;
                 ppl_ctrl <= rob_table[head].ppl_ctrl;
 
+                retire_T <= head;
                 big_head <= big_head + 1;
 
                 if (rob_table[head].ppl_ctrl) begin //FLUSH
