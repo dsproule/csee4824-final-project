@@ -177,7 +177,7 @@ GREP = grep -E --color=auto
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
 # TODO: add more modules here
-TESTED_MODULES = pipeline
+TESTED_MODULES = multi_module if_stage
 
 MODULE = pipeline
 
@@ -192,6 +192,12 @@ $(call DEPS,func_unit_1): $(MULT_DEPS)
 # No dependencies for the rob (TODO: add any you create)
 ROB_DEPS =
 $(call DEPS,rob): $(ROB_DEPS)
+
+MULTI_MODULE_DEPS = verilog/*.sv
+$(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
+
+IF_STAGE_DEPS = test/mem.sv verilog/icache.sv
+$(call DEPS,if_stage): $(IF_STAGE_DEPS)
 
 # This allows you to use the following make targets:
 # make <module>.pass   <- greps for "@@@ Passed" or "@@@ Incorrect" in the output
