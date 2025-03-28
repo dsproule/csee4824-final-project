@@ -17,7 +17,7 @@ module rob(
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
 
-    ROB_ENTRY rob_table [`ROB_SZ-1:0];
+    ROB_ENTRY rob_table [`ROB_SZ:1];
     
     ROB_T retire_T;
     logic [4:0] regfile_write_idx;
@@ -38,15 +38,17 @@ module rob(
                         tail=head=1, but big_tail[MSB] == 1 and big_head[MSB] == 0)
     */
 
-    ROB_T head, tail;
-    logic [PTR_WIDTH:0] big_head, big_tail;
-    assign head = big_head[PTR_WIDTH-1:0];
-    assign tail = big_tail[PTR_WIDTH-1:0];
+    ROB_T head, tail; 
+    logic wraparound;
 
-    //outputs
-    assign full = (head == tail) && (big_tail[PTR_WIDTH] != big_head[PTR_WIDTH]);
-    assign empty = (big_head == big_tail);
-    assign T = tail; //value that gets sent to RS
+    // logic [PTR_WIDTH:0] big_head, big_tail;
+    // assign head = big_head[PTR_WIDTH-1:0];
+    // assign tail = big_tail[PTR_WIDTH-1:0];
+
+    //outputs // change here
+    assign full = (head == tail) && wraparound;
+    assign empty = (head == tail) && !wraparound;
+    // assign T = tail; //value that gets sent to RS
 
     // if value isn't in regfiles yet, ok if invalid because map table will MUX values from regfile. 
     assign V1 = rob_table[T1].V;
@@ -54,8 +56,9 @@ module rob(
 
     always_comb begin
         for (int i = 0; i < `ROB_SZ; i++) begin
-            rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)] = rob_table[i];
+            rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)] = rob_table[i+1];
         end
+        T = tail; // change here
     end
 
     /* always_comb begin
@@ -67,16 +70,17 @@ module rob(
 
     always_ff @(posedge clock) begin
         if (reset) begin
-            for (int i = 0; i < `ROB_SZ; i++) begin
+            for (int i = 1; i <= `ROB_SZ; i++) begin
                 rob_table[i] <= 0;
             end
-            big_tail <= 0;
-            big_head <= 1;
+            tail <= 1;
+            head <= 1;
             retire <= 0;
             retire_T <= 0;
             regfile_write_idx <= 0;
             regfile_write_data <= 0;
             ppl_ctrl <= 0;
+            wraparound <= 0; // change here
 
         end else begin
             // load in cdb value into rob# and mark as Complete (C) --> deals with all types of instructions
@@ -92,27 +96,30 @@ module rob(
                 //$display("Dispatching: ROB[%d] with Dest Reg %d", tail, r);  // Debug print
                 rob_table[tail] <= 0;
                 rob_table[tail].r <= r;
-                big_tail <= big_tail + 1;
+                tail <= (tail == `ROB_SZ) ? 1 : (tail + 1);
+                wraparound <= (tail == `ROB_SZ) ? ~wraparound : wraparound; // change here
+                // T <= tail; // change here
             end
 
             // commit --> retire head/free rob entry [x], write to regfile [x], clear maptable entry if valid, fkush after this if needed
             if (!empty && rob_table[head].ready) begin
                 //$display("Committing ROB[%d]: Reg %d <- %d", head, rob_table[head].r, rob_table[head].V);  // Debug print
                 retire <= 1;
-                regfile_write_idx <= rob_table[head].r;
-                regfile_write_data <= rob_table[head].V;
+                regfile_write_idx <= rob_table[head].r; 
+                regfile_write_data <= rob_table[head].V; 
                 ppl_ctrl <= rob_table[head].ppl_ctrl;
                 rob_table[head] <= 0;
 
                 retire_T <= head;
-                big_head <= big_head + 1;
+                head <= (head == `ROB_SZ) ? 1 : head + 1; // change here
+                wraparound <= (tail == `ROB_SZ) ? ~wraparound : wraparound; // change here
 
                 if (rob_table[head].ppl_ctrl.flush) begin //FLUSH
-                    for (int i = 0; i < `ROB_SZ; i++) begin
+                    for (int i = 1; i <= `ROB_SZ; i++) begin
                         rob_table[i] <= 0;  
                     end
-                    big_head <= 0;  // flushing zeros out the head/tail --> empty
-                    big_tail <= 0; 
+                    head <= 1;  // flushing zeros out the head/tail --> empty
+                    tail <= 1; 
                 end
             end else begin
                 retire <= 0;

@@ -43,13 +43,12 @@ module testbench;
     logic full;
     logic empty;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out; // original ROB output
-    ROB_ENTRY rob_table [`ROB_SZ-1:0];                  // formatted ROB
+    ROB_ENTRY rob_table [`ROB_SZ:1];                  // formatted ROB
 
     // Regfile Write Signals
     logic [4:0] regfile_write_idx;          // Final idx to Regfile
     logic [`XLEN-1:0] regfile_write_data;   // Final data to Regfile
     logic regfile_write_en;                 // Final en to Regfile
-    logic rob_write_en;                     // ROB -> Regfile
     logic [4:0] rob_write_idx;              // ROB -> Regfile
     logic [`XLEN-1:0] rob_write_data;       // ROB -> Regfile
     logic ppl_write_en;                     // initialization
@@ -108,7 +107,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:%b", idx, t, t1, t2, v1, v2, busy);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -118,7 +117,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@stall error: d_stall: %b", d_stall);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -128,7 +127,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@correct answer should be = index: %4d   T:%4d   plus:%4d", idx, t, plus);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -138,7 +137,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@correct answer should be = index: %4d   r:%4d   V:%4d", idx, r, V);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -154,7 +153,7 @@ module testbench;
     // ROB Table formatting
     always_comb begin
         for (int i = 0; i < `ROB_SZ; i++) begin
-            rob_table[i] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
+            rob_table[i+1] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
         end
     end
 
@@ -182,7 +181,7 @@ module testbench;
             1'b0, // halt
             1'b0, // illegal
             1'b0, // csr_op
-            1'b1  // valid
+            1'b0  // valid
         };
         cdb = 0;
         r = 0;
@@ -211,6 +210,7 @@ module testbench;
 
         @(negedge clock); 
         en = 1;
+        D_S_reg.valid = 1;
         // ld X(r4), r2 // 1
         // V1 = 0; V2 = 8; T = 1; T1 = {0, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
         D_S_reg.rs_idx = 1;
