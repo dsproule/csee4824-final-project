@@ -38,6 +38,7 @@ module testbench;
     
     // Map Table
     MT_ENTRY mt_table [31:0];
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_out;
 
     // ROB Signals
     logic full;
@@ -63,8 +64,15 @@ module testbench;
     logic [7:0] clock_count;
     logic [5:0] error_count;
 
-    map_table map_table_inst (.clock(clock), .reset(reset), .r(r), .r1(r1), .r2(r2), .retire_r(retire_r_wire), 
-                              .cdb(cdb), .T(T_wire), .retire_T(retire_T_wire), .T1(T1_wire), .T2(T2_wire), .mt_table(mt_table));
+    map_table map_table_inst (.clock(clock), .reset(reset), .en(en), .r(r), .r1(r1), .r2(r2), .retire_r(retire_r_wire), 
+                              .cdb(cdb), .T(T_wire), .retire_T(retire_T_wire), .T1(T1_wire), .T2(T2_wire), .mt_table_out(mt_table_out));
+
+    always_comb begin
+        //re-unpack array for debugging, needed for synthesis debugging   
+        for (int i = 0; i < 32; i++) begin
+            mt_table[i] = mt_table_out[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
+        end
+    end
 
     rs_stage rs_stage_inst (.clock(clock), .reset(reset), .en(en), .cdb(cdb), .D_S_reg(D_S_reg), .FU_ready(FU_ready),
                             .T(T_wire), .T1(T1_wire), .T2(T2_wire), .V1(V1_rs), .V2(V2_rs), .d_stall(d_stall),
