@@ -21,6 +21,7 @@ module testbench;
     logic [4:0] r, r1, r2; // the original register value
     ROB_T retire_T;
     logic [4:0] retire_r;
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_out;
 
     // Outputs
     logic d_stall;
@@ -48,6 +49,7 @@ module testbench;
     map_table map_table(
         .clock(clock),
         .reset(reset),
+        .en(en),
         .r(r), // 5 bits // finished
         .r1(r1), // 5 bits // finished 
         .r2(r2), // 5 bits // finished
@@ -57,8 +59,15 @@ module testbench;
         .retire_T(retire_T), // ROB_T
         .T1(T1_wire), // MT_ENTRY // output // finished 
         .T2(T2_wire), // MT_ENTRY // output // finished
-        .mt_table(mt_table)
+        .mt_table_out(mt_table_out)
     );
+
+    always_comb begin
+        //re-unpack array for debugging    
+        for (int i = 0; i < 32; i++) begin
+            mt_table[i] = mt_table_out[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
+        end
+    end
 
     rs_stage rs_stage(
         .clock(clock),
