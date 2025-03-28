@@ -97,7 +97,7 @@
 # don't be afraid to change these, but be diligent about testing changes and using git commits
 # there should be no need to change anything for project 3
 
-# this is a global clock period variable used in the tcl script and referenced in testbenches
+# this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
 export CLOCK_PERIOD = 350.0
 
 # Path variables
@@ -319,7 +319,7 @@ $(TESTED_MODULES:=.cov.verdi): %.cov.verdi: %.cov.vdb
 HEADERS = verilog/sys_defs.svh \
           verilog/ISA.svh
 
-TESTBENCH = test/pipeline_test.sv  \
+TESTBENCH = test/ppln_chunk.sv  \
             test/pipeline_print.c \
             test/mem.sv
 			
