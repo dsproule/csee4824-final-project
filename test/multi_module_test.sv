@@ -25,7 +25,7 @@ module testbench;
     // Outputs
     logic d_stall;
     S_X_PACKET [`RS_SZ-1:0] S_X_pack;
-    integer i, j, k, l;
+    integer i, j, k, l, m;
     logic [7:0] clock_count;
     logic [5:0] error_count;
     logic [`RS_SZ-1:0] FU_ready;
@@ -33,17 +33,33 @@ module testbench;
     // for rob
     logic full;
     logic empty;
+    // for regfile input
     logic regfile_write_en;
     logic [4:0] regfile_write_idx;
     logic [`XLEN-1:0] regfile_write_data;
     logic [`XLEN-1:0] V1_rob, V2_rob;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
 
+    // for handcraft value
+    logic ppl_write_en;
+    logic [4:0] ppl_write_idx;
+    logic [`XLEN-1:0] ppl_write_data;
+
+    // for rob output
+    logic rob_write_en;
+    logic [4:0] rob_write_idx;
+    logic [`XLEN-1:0] rob_write_data;
+
+    assign regfile_write_en = en ? rob_write_en : ppl_write_en;
+    assign regfile_write_data = en ? rob_write_data : ppl_write_data;
+    assign regfile_write_idx = en ? rob_write_idx : ppl_write_idx;
+
     logic [`XLEN-1:0] V1_rs, V2_rs;
+    logic [`XLEN-1:0] regfile_V1, regfile_V2;
     MT_ENTRY mt_table [31:0];
 
-    assign V1_rs = (T1_wire.plus) ? V1_rob : V1;
-    assign V2_rs = (T2_wire.plus) ? V2_rob : V2;
+    assign V1_rs = (T1_wire.plus) ? V1_rob : regfile_V1;
+    assign V2_rs = (T2_wire.plus) ? V2_rob : regfile_V2;
 
     map_table map_table(
         .clock(clock),
@@ -83,33 +99,35 @@ module testbench;
     rob rob_inst (
         .clock(clock), 
         .reset(reset), 
-        .flush(1'b0), // 0 for now
+        // .flush(1'b0), // 0 for now
         .r(r), 
         .T1(T1_wire.T), // for getting the ROB value
         .T2(T2_wire.T), // for getting the ROB value
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~d_stall), // ?
         .T(T_wire), 
+        .ppl_ctrl(),
         .full(full), 
         .empty(empty),
-        .regfile_write_en(regfile_write_en), 
-        .regfile_write_idx(regfile_write_idx),
+        .retire(),
+        // .regfile_write_en(rob_write_en), 
+        .regfile_write_idx(rob_write_idx),
         .V1(V1_rob), 
         .V2(V2_rob), 
-        .regfile_write_data(regfile_write_data),
+        .regfile_write_data(rob_write_data),
         .rob_table_out(rob_table_out)
     );
 
-    // regfile regfile_0(
-    //     // Inputs
-    //     .clock(clock),
-    //     .read_idx_1(r1), .read_idx_2(r2), .write_idx(regfile_write_idx),
-    //     .write_en(regfile_write_en),
-    //     .write_data(regfile_write_data),
+    regfile regfile_0(
+        // Inputs
+        .clock(clock),
+        .read_idx_1(r1), .read_idx_2(r2), .write_idx(regfile_write_idx),
+        .write_en(regfile_write_en),
+        .write_data(regfile_write_data),
 
-    //     // Outputs
-    //     .read_out_1(regfile_V1), .read_out_2(regfile_V2)
-    // );
+        // Outputs
+        .read_out_1(regfile_V1), .read_out_2(regfile_V2)
+    );
 
     task print_rs;
         $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 3);
@@ -193,6 +211,21 @@ module testbench;
         retire_T = 0;
         @(negedge clock);
         reset = 1;
+        ppl_write_en = 1;
+        ppl_write_idx = 1;
+        ppl_write_data = 5;
+        @(negedge clock);
+        ppl_write_en = 1;
+        ppl_write_idx = 2;
+        ppl_write_data = 6;
+        @(negedge clock);
+        ppl_write_en = 1;
+        ppl_write_idx = 3;
+        ppl_write_data = 7;
+        @(negedge clock);
+        ppl_write_en = 1;
+        ppl_write_idx = 4;
+        ppl_write_data = 8;
         @(negedge clock);
         reset = 0;
         // during reset, clear the reservation table
@@ -200,8 +233,8 @@ module testbench;
         @(negedge clock); 
         en = 1;
         // ld X(r4), r2 // 1
-        V1 = 0;
-        V2 = 8;
+        // V1 = 0;
+        // V2 = 8;
         // T = 1;
         D_S_reg.rs_idx = 1;
         // T1 = {0, 1'b0};
@@ -234,8 +267,8 @@ module testbench;
 
         // @(negedge clock); 
         // mul r1, r2, r3 // 2
-        V1 = 5;
-        V2 = 0;
+        // V1 = 5;
+        // V2 = 0;
         // T = 2;
         D_S_reg.rs_idx = 3;
         // T1 = {0, 1'b0};
@@ -265,8 +298,8 @@ module testbench;
 
         // @(negedge clock);
         // st r3, Z(r4) // 3
-        V1 = 0;
-        V2 = 8;
+        // V1 = 0;
+        // V2 = 8;
         // T = 3;
         D_S_reg.rs_idx = 2;
         // T1 = {2, 1'b0};
@@ -296,8 +329,8 @@ module testbench;
     
         // @(negedge clock); 
         // addi r4, 4, r4 // 4
-        V1 = 8;
-        V2 = 0;
+        // V1 = 8;
+        // V2 = 0;
         // T = 4;
         D_S_reg.rs_idx = 0;
         // T1 = {0, 1'b0};
@@ -327,8 +360,8 @@ module testbench;
 
         // @(negedge clock); 
         // ldf X(r4), r2 // 5
-        V1 = 0;
-        V2 = 0;
+        // V1 = 0;
+        // V2 = 0;
         // T = 5;
         D_S_reg.rs_idx = 1;
         // T1 = {0, 1'b0};
@@ -359,8 +392,8 @@ module testbench;
 
         // @(negedge clock); 
         // mul r1, r2, r3 // 6
-        V1 = 5;
-        V2 = 0;
+        // V1 = 5;
+        // V2 = 0;
         // T = 6;
         D_S_reg.rs_idx = 3;
         // T1 = {0, 1'b0};
@@ -391,8 +424,8 @@ module testbench;
 
         // @(negedge clock); 
         // 7
-        V1 = 0;
-        V2 = 1;
+        // V1 = 0;
+        // V2 = 1;
         // T = 7;
         D_S_reg.rs_idx = 2;
         // T1 = {6, 1'b0};
@@ -422,8 +455,8 @@ module testbench;
         
         // @(negedge clock); 
         // 8
-        V1 = 0;
-        V2 = 1;
+        // V1 = 0;
+        // V2 = 1;
         // T = 7;
         D_S_reg.rs_idx = 2;
         // T1 = {6, 1'b0};
@@ -454,8 +487,8 @@ module testbench;
     
         // st r3, Z(r4) // 9
         // @(negedge clock); 
-        V1 = 0;
-        V2 = 2;
+        // V1 = 0;
+        // V2 = 2;
         // T = 7;
         D_S_reg.rs_idx = 2;
         // T1 = {6, 1'b0};
@@ -485,8 +518,8 @@ module testbench;
 
         // none // 10
         // @(negedge clock); 
-        V1 = 0;
-        V2 = 0;
+        // V1 = 0;
+        // V2 = 0;
         // T = 7;
         D_S_reg.rs_idx = 0;
         // T1 = {6, 1'b0};
