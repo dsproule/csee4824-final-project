@@ -34,7 +34,7 @@ module testbench;
     // for rob
     logic full;
     logic empty;
-    logic regfile_write_en;
+    logic retire;
     logic [4:0] regfile_write_idx;
     logic [`XLEN-1:0] regfile_write_data;
     logic [`XLEN-1:0] V1_rob, V2_rob;
@@ -42,6 +42,7 @@ module testbench;
 
     logic [`XLEN-1:0] V1_rs, V2_rs;
     MT_ENTRY mt_table [31:0];
+    ROB_ENTRY rob_table [`ROB_SZ-1:0];
 
     assign V1_rs = (T1_wire.plus) ? V1_rob : V1;
     assign V2_rs = (T2_wire.plus) ? V2_rob : V2;
@@ -92,28 +93,35 @@ module testbench;
     rob rob_inst (
         .clock(clock), 
         .reset(reset), 
-        .flush(1'b0), // 0 for now
         .r(r), 
         .T1(T1_wire.T), // for getting the ROB value
         .T2(T2_wire.T), // for getting the ROB value
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~d_stall), // ?
         .T(T_wire), 
+        .retire_T(retire_T), //TODO
+        .ppl_ctrl(), //this has fields for mispredicted branches to be used elsewhere in ppl
         .full(full), 
         .empty(empty),
-        .regfile_write_en(regfile_write_en), 
-        .regfile_write_idx(regfile_write_idx),
+        .retire(retire), 
+        .regfile_write_idx(retire_r), //TODO
         .V1(V1_rob), 
         .V2(V2_rob), 
         .regfile_write_data(regfile_write_data),
         .rob_table_out(rob_table_out)
     );
 
+    always_comb begin
+        for (int i = 0; i < `ROB_SZ; i++) begin
+            rob_table[i] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
+        end
+    end
+
     // regfile regfile_0(
     //     // Inputs
     //     .clock(clock),
     //     .read_idx_1(r1), .read_idx_2(r2), .write_idx(regfile_write_idx),
-    //     .write_en(regfile_write_en),
+    //     .write_en(retire),
     //     .write_data(regfile_write_data),
 
     //     // Outputs
@@ -125,6 +133,13 @@ module testbench;
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table[j].T, rs_table[j].T1, rs_table[j].T2, rs_table[j].V1, rs_table[j].V2, busy[j], rs_table[j].ready);
         $display("------------------------------------------");
+    endtask
+
+    task print_rob;
+        $display("\\n=== ROB Dump [%2d:%2d] ===", start_i, end_i);
+        for (int i = 0; i < `ROB_SZ; i++)
+            $display("| %2d | ready=%1b | r=%2d | V=%0d", i, rob_table[i].ready, rob_table[i].r, rob_table[i].V);
+        $display("==============================\\n");
     endtask
 
     task print_mt;
@@ -199,7 +214,7 @@ module testbench;
         r1 = 0;
         r2 = 0;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         @(negedge clock);
         reset = 1;
         @(negedge clock);
@@ -219,7 +234,7 @@ module testbench;
         r1 = 0;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -253,7 +268,7 @@ module testbench;
         r1 = 1;
         r2 = 2;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -284,7 +299,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        //retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -315,7 +330,7 @@ module testbench;
         r1 = 4;
         r2 = 0;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 1;
         cdb.V = 10;
@@ -346,7 +361,7 @@ module testbench;
         r1 = 0;
         r2 = 4;
         retire_r = 2;
-        retire_T = 1;
+        // retire_T = 1;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -378,7 +393,7 @@ module testbench;
         r1 = 1;
         r2 = 2;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -410,7 +425,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 4;
         cdb.V = 12;
@@ -441,7 +456,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 0;
-        retire_T = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 2;
         cdb.V = 11;
@@ -473,7 +488,7 @@ module testbench;
         r1 = 3;
         r2 = 4;
         retire_r = 3;
-        retire_T = 2; // question: do store inst need to retire?
+        // retire_T = 2; // question: do store inst need to retire? YES - Nico
         cdb.valid = 1;
         cdb.T = 5;
         cdb.V = 15;
@@ -504,7 +519,7 @@ module testbench;
         r1 = 0;
         r2 = 0;
         retire_r = 0;
-        retire_T = 0; // question: do store inst need to retire?
+        // retire_T = 0; // question: do store inst need to retire?
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;

@@ -24,7 +24,7 @@
 `define N 1
 
 // sizes
-`define ROB_SZ 20
+`define ROB_SZ 32
 `define RS_SZ 4
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
@@ -317,6 +317,12 @@ typedef struct packed {
 typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
 
 typedef struct packed {
+    logic flush;
+    logic store;
+} PPL_CTRL;
+
+
+typedef struct packed {
     ROB_T T;
     ROB_T T1;
     ROB_T T2;
@@ -336,8 +342,11 @@ typedef struct packed {
 typedef struct packed {
     logic [4:0] r;
     logic [`XLEN-1:0] V;
-    logic ready;               // to commit to regfile
+    PPL_CTRL ppl_ctrl;
+    
+    logic ready;
 } ROB_ENTRY;
+
 
 typedef struct packed {
     /* General pipeline*/
@@ -366,14 +375,16 @@ typedef struct packed {
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] result;
-    logic take_branch;
+    PPL_CTRL ppl_ctrl;
     
     logic valid;
 } X_C_PACKET;
 
+
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] V;
+    PPL_CTRL ppl_ctrl;
 
     logic valid;
 } CDB;
