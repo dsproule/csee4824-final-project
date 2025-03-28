@@ -67,6 +67,11 @@ module rob(
             big_tail <= 0;
             big_head <= 0;
             retire <= 0;
+            retire_T <= 0;
+            regfile_write_idx <= 0;
+            regfile_write_data <= 0;
+            ppl_ctrl <= 0;
+
         end else begin
             // load in cdb value into rob# and mark as Complete (C) --> deals with all types of instructions
             if (cdb.valid) begin
@@ -91,11 +96,12 @@ module rob(
                 regfile_write_idx <= rob_table[head].r;
                 regfile_write_data <= rob_table[head].V;
                 ppl_ctrl <= rob_table[head].ppl_ctrl;
+                rob_table[head] <= 0;
 
                 retire_T <= head;
                 big_head <= big_head + 1;
 
-                if (rob_table[head].ppl_ctrl) begin //FLUSH
+                if (rob_table[head].ppl_ctrl.flush) begin //FLUSH
                     for (int i = 0; i < `ROB_SZ; i++) begin
                         rob_table[i] <= 0;  
                     end
