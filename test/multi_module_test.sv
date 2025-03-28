@@ -28,7 +28,7 @@ module testbench;
     // Outputs
     logic d_stall;
     S_X_PACKET [`RS_SZ-1:0] S_X_pack;
-    integer i, j, k, l, m;
+    integer i, j, k, l, m, n;
     logic [7:0] clock_count;
     logic [5:0] error_count;
     logic [`RS_SZ-1:0] FU_ready;
@@ -71,7 +71,7 @@ module testbench;
         .r(r), // 5 bits // finished
         .r1(r1), // 5 bits // finished 
         .r2(r2), // 5 bits // finished
-        .retire_r(retire_r), // 5 bits
+        .retire_r(retire_r_wire), // 5 bits
         .cdb(cdb), // CDB
         .T(T_wire), // ROB_T
         .retire_T(retire_T_wire), // ROB_T
@@ -109,12 +109,12 @@ module testbench;
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~d_stall), // ?
         .T(T_wire), 
-        .retire_T(retire_T_wire), //TODO
+        .retire_T_out(retire_T_wire), //TODO
         .ppl_ctrl(), //this has fields for mispredicted branches to be used elsewhere in ppl
         .full(full), 
         .empty(empty),
         .retire(retire), 
-        .regfile_write_idx(retire_r_wire), //TODO
+        .regfile_write_idx_out(retire_r_wire), //TODO
         .V1(V1_rob), 
         .V2(V2_rob), 
         .regfile_write_data(rob_write_data),
@@ -131,11 +131,11 @@ module testbench;
         .read_out_1(regfile_V1), .read_out_2(regfile_V2)
     );
 
-    // always_comb begin
-    //     for (int i = 0; i < `ROB_SZ; i++) begin
-    //         rob_table[i] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
-    //     end
-    // end
+    always_comb begin
+        for (int i = 0; i < `ROB_SZ; i++) begin
+            rob_table[i] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
+        end
+    end
 
     task print_rs;
         $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
@@ -144,12 +144,12 @@ module testbench;
         $display("------------------------------------------");
     endtask
 
-    // task print_rob;
-    //     $display("\\n=== ROB Dump [%2d:%2d] ===", start_i, end_i);
-    //     for (int i = 0; i < `ROB_SZ; i++)
-    //         $display("| %2d | ready=%1b | r=%2d | V=%0d", i, rob_table[i].ready, rob_table[i].r, rob_table[i].V);
-    //     $display("==============================\\n");
-    // endtask
+    task print_rob;
+        $display("\n(ROB_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        for(n = 1; n < 8; n=n+1)
+            $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
+        $display("------------------------------------------");
+    endtask
 
     task print_mt;
         $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
@@ -175,6 +175,26 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@stall error: d_stall: %b", d_stall);
+            // $finish;
+        end
+    endtask
+
+    task compare_mt;
+        input [15:0] idx, t, plus;
+        if((mt_table[idx].T != t) || (mt_table[idx].plus != plus)) begin
+            error_count = error_count + 1;
+            $display("@@@Failed at time: %d\t", clock_count - 6);
+            $display("@@@correct answer should be = index: %4d   T:%4d   plus:%4d", idx, t, plus);
+            // $finish;
+        end
+    endtask
+
+    task compare_rob;
+        input [15:0] idx, r, V;
+        if((rob_table[idx].r != r) || (rob_table[idx].V != V)) begin
+            error_count = error_count + 1;
+            $display("@@@Failed at time: %d\t", clock_count - 6);
+            $display("@@@correct answer should be = index: %4d   r:%4d   V:%4d", idx, r, V);
             // $finish;
         end
     endtask
@@ -257,8 +277,8 @@ module testbench;
         r = 2;
         r1 = 0;
         r2 = 4;
-        retire_r = 0;
-        retire_T = 0;
+        // retire_r = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -270,15 +290,23 @@ module testbench;
         compare_stall(0);
         @(negedge clock); // 1
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 0, 0, 0, 0, 0, 0);
-
-        // expected change
-        // index:    0   T:   1   T1:   0   T2:   0   V1:   5   V2:   1   busy:   1   ready:11
-        // 1
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 1, 0);
+        compare_mt(3, 0, 0);
+        compare_mt(4, 0, 0);
+        print_rob();
+        compare_rob(1, 2, 0);
+        compare_rob(2, 0, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 0, 0);
+        compare_rob(5, 0, 0);
+        compare_rob(6, 0, 0);
+        compare_rob(7, 0, 0);
 
         // @(negedge clock); 
         // mul r1, r2, r3 // 2
@@ -291,8 +319,8 @@ module testbench;
         r = 3;
         r1 = 1;
         r2 = 2;
-        retire_r = 0;
-        retire_T = 0;
+        // retire_r = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -305,11 +333,23 @@ module testbench;
         // 2
         @(negedge clock);
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 1, 0, 0, 0, 8, 1);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 0, 0, 0, 0, 0, 0);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 1, 0);
+        compare_mt(3, 2, 0);
+        compare_mt(4, 0, 0);
+        print_rob();
+        compare_rob(1, 2, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 0, 0);
+        compare_rob(5, 0, 0);
+        compare_rob(6, 0, 0);
+        compare_rob(7, 0, 0);
 
         // @(negedge clock);
         // st r3, Z(r4) // 3
@@ -322,8 +362,8 @@ module testbench;
         r = 0; // question: what should be the r for store function
         r1 = 3;
         r2 = 4;
-        retire_r = 0;
-        retire_T = 0;
+        // retire_r = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -336,11 +376,24 @@ module testbench;
         @(negedge clock);
         // 3
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 2, 0, 1, 5, 0, 1);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 1, 0);
+        compare_mt(3, 2, 0);
+        compare_mt(4, 0, 0);
+        print_rob();
+        compare_rob(1, 2, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 0, 0);
+        compare_rob(5, 0, 0);
+        compare_rob(6, 0, 0);
+        compare_rob(7, 0, 0);
+        
     
         // @(negedge clock); 
         // addi r4, 4, r4 // 4
@@ -353,8 +406,8 @@ module testbench;
         r = 4;
         r1 = 4;
         r2 = 0;
-        retire_r = 0;
-        retire_T = 0;
+        // retire_r = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 1;
         cdb.V = 10;
@@ -367,11 +420,23 @@ module testbench;
         // 4
         @(negedge clock);
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 2, 0, 0, 5, 10, 1); 
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 1, 1);
+        compare_mt(3, 2, 0);
+        compare_mt(4, 4, 0);
+        print_rob();
+        compare_rob(1, 2, 10);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 0);
+        compare_rob(5, 0, 0);
+        compare_rob(6, 0, 0);
+        compare_rob(7, 0, 0);
 
         // @(negedge clock); 
         // ldf X(r4), r2 // 5
@@ -384,8 +449,8 @@ module testbench;
         r = 2;
         r1 = 0;
         r2 = 4;
-        retire_r = 2;
-        retire_T = 1;
+        // retire_r = 2;
+        // retire_T = 1;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -398,11 +463,23 @@ module testbench;
         @(negedge clock);
         // 5
         print_rs();
-        print_mt();
         compare(0, 4, 0, 0, 8, 0, 1);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 0, 0, 0, 0, 0, 0); 
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 2, 0);
+        compare_mt(4, 4, 0);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 0);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 0, 0);
+        compare_rob(7, 0, 0);
         
 
         // @(negedge clock); 
@@ -416,8 +493,8 @@ module testbench;
         r = 3;
         r1 = 1;
         r2 = 2;
-        retire_r = 0;
-        retire_T = 0;
+        // retire_r = 0;
+        // retire_T = 0;
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -430,11 +507,23 @@ module testbench;
         // 6
         @(negedge clock);
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 5, 0, 4, 0, 0, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 0, 0, 0, 0, 0, 0);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 0);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 0);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
         
 
         // @(negedge clock); 
@@ -448,8 +537,8 @@ module testbench;
         r = 0;
         r1 = 3;
         r2 = 4;
-        retire_r = 0;
-        retire_T = 0;
+        // retire_r = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 4;
         cdb.V = 12;
@@ -462,11 +551,23 @@ module testbench;
         // 7
         @(negedge clock);
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 5, 0, 0, 0, 12, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
         
         // @(negedge clock); 
         // 8
@@ -479,8 +580,8 @@ module testbench;
         r = 0;
         r1 = 3;
         r2 = 4;
-        retire_r = 0;
-        retire_T = 0;
+        // retire_r = 0;
+        // retire_T = 0;
         cdb.valid = 1;
         cdb.T = 2;
         cdb.V = 11;
@@ -493,11 +594,23 @@ module testbench;
         @(negedge clock); 
         // 8
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 0, 0, 11, 8, 1);
         compare(3, 6, 0, 5, 5, 0, 1);    
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 11);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
         
     
         // st r3, Z(r4) // 9
@@ -511,8 +624,8 @@ module testbench;
         r = 0;
         r1 = 3;
         r2 = 4;
-        retire_r = 3;
-        retire_T = 2; // question: do store inst need to retire? YES - Nico
+        // retire_r = 3;
+        // retire_T = 2; // question: do store inst need to retire? YES - Nico
         cdb.valid = 1;
         cdb.T = 5;
         cdb.V = 15;
@@ -525,11 +638,23 @@ module testbench;
         // 9
         @(negedge clock);
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 6, 0, 0, 5, 15, 1);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 1);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 0, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 15);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
 
         // none // 10
         // @(negedge clock); 
@@ -542,8 +667,8 @@ module testbench;
         r = 0;
         r1 = 0;
         r2 = 0;
-        retire_r = 0;
-        retire_T = 0; // question: do store inst need to retire?
+        // retire_r = 0;
+        // retire_T = 0; // question: do store inst need to retire?
         cdb.valid = 0;
         cdb.T = 0;
         cdb.V = 0;
@@ -556,11 +681,23 @@ module testbench;
         // 10
         @(negedge clock);
         print_rs();
-        print_mt();
         compare(0, 0, 0, 0, 0, 0, 0);
         compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 7, 6, 0, 0, 12, 1);
         compare(3, 0, 0, 0, 0, 0, 0);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 1);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 0, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 15);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
 
         if(error_count == 0) begin
             $display("@@@Passed");

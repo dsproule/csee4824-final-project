@@ -8,16 +8,22 @@ module rob(
     input CDB cdb,
     input dispatch_valid,
 
-    output ROB_T T, retire_T,
+    output ROB_T T, retire_T_out,
     output PPL_CTRL ppl_ctrl,
     output logic full, empty, retire,
-    output logic [4:0] regfile_write_idx, 
+    output logic [4:0] regfile_write_idx_out, 
     output logic [`XLEN-1:0] V1, V2, regfile_write_data,
     output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
 
     ROB_ENTRY rob_table [`ROB_SZ-1:0];
+    
+    ROB_T retire_T;
+    logic [4:0] regfile_write_idx;
+
+    assign retire_T_out = (retire) ? retire_T : 0;
+    assign regfile_write_idx_out = (retire) ? regfile_write_idx : 0;
 
     /* ONLY WORKS IF SIZE IS POWER OF TWO, BUT MORE EFFICIENT AND SIMPLER LOGIC FOR CONTROL BITS/MULTIPLE ISSUES WHEN WE SUPERSCALAR
 
@@ -65,7 +71,7 @@ module rob(
                 rob_table[i] <= 0;
             end
             big_tail <= 0;
-            big_head <= 0;
+            big_head <= 1;
             retire <= 0;
             retire_T <= 0;
             regfile_write_idx <= 0;
