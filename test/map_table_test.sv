@@ -117,7 +117,7 @@ module testbench;
         end else $display("@@@ Passed WAW hazard test!");
 
         // WAR hazard test
-        r1 = 6; r = 6; T = 14; @(posedge clock);
+        r1 = 6; r = 6; T = 14; @(negedge clock);
         if (T1.T === 14) begin
             $display("@@@ Failed WAR hazard test! r1 should read old value.");
             dump_mt(6, 7);

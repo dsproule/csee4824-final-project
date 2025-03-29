@@ -97,7 +97,7 @@
 # don't be afraid to change these, but be diligent about testing changes and using git commits
 # there should be no need to change anything for project 3
 
-# this is a global clock period variable used in the tcl script and referenced in testbenches
+# this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
 export CLOCK_PERIOD = 350.0
 
 # Path variables
@@ -177,7 +177,7 @@ GREP = grep -E --color=auto
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
 # TODO: add more modules here
-TESTED_MODULES = map_table rs_stage rob # mult rob
+TESTED_MODULES = multi_module if_stage
 
 MODULE = pipeline
 
@@ -186,12 +186,18 @@ MODULE = pipeline
 # Helper function:
 DEPS = $(1).simv $(1).cov synth/$(1).vg
 
-MULT_DEPS = verilog/mult_stage.sv
-$(call DEPS,mult): $(MULT_DEPS)
+MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
+$(call DEPS,func_unit_1): $(MULT_DEPS)
 
 # No dependencies for the rob (TODO: add any you create)
 ROB_DEPS =
 $(call DEPS,rob): $(ROB_DEPS)
+
+MULTI_MODULE_DEPS = verilog/*.sv
+$(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
+
+IF_STAGE_DEPS = test/mem.sv verilog/icache.sv
+$(call DEPS,if_stage): $(IF_STAGE_DEPS)
 
 # This allows you to use the following make targets:
 # make <module>.pass   <- greps for "@@@ Passed" or "@@@ Incorrect" in the output
@@ -218,38 +224,6 @@ $(call DEPS,rob): $(ROB_DEPS)
 # - https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
 
 # You shouldn't need to change things below here
-
-# for multiple modules
-# Define the testbench and source files
-TESTBENCH = multi_module_test
-MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv
-OUTPUT_DIR = ./output
-SIMV = $(TESTBENCH).simv
-SIM_OUT = $(OUTPUT_DIR)/$(TESTBENCH).out
-SYN_OUT = $(OUTPUT_DIR)/$(TESTBENCH).syn.out
-
-# Compile the simulation executable
-$(SIMV): ./test/$(TESTBENCH).sv $(MODULES) $(HEADERS)
-	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
-	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
-	$(VCS) $(filter-out $(HEADERS),$^) -o $@
-	@$(call PRINT_COLOR, 6, finished compiling $@)
-
-# Run simulation
-$(SIM_OUT): $(SIMV) | $(OUTPUT_DIR)
-	@$(call PRINT_COLOR, 5, Running $<)
-	./$< | tee $@
-	@$(call PRINT_COLOR, 2, Output is in $@)
-
-# Run synthesis (if needed)
-$(SYN_OUT): $(SIMV) | $(OUTPUT_DIR)
-	@$(call PRINT_COLOR, 5, Running synthesis on $<)
-	./$< -synthesis | tee $@
-	@$(call PRINT_COLOR, 2, Synthesis output is in $@)
-
-# Ensure output directory exists
-$(OUTPUT_DIR):
-	mkdir -p $(OUTPUT_DIR)
 
 # ---- Running ---- #
 
@@ -351,17 +325,24 @@ $(TESTED_MODULES:=.cov.verdi): %.cov.verdi: %.cov.vdb
 HEADERS = verilog/sys_defs.svh \
           verilog/ISA.svh
 
-TESTBENCH = test/pipeline_test.sv \
+TESTBENCH = test/ppln_chunk.sv  \
             test/pipeline_print.c \
-            test/mem.sv test/rs_stage_test.sv				# added
-
+            test/mem.sv
+			
 # you could simplify this line with $(wildcard verilog/*.sv) - but the manual way is more explicit
 SOURCES = verilog/pipeline.sv \
           verilog/regfile.sv \
           verilog/icache.sv \
+		  verilog/d_stage.sv \
+		  verilog/map_table.sv \
+		  verilog/regfile.sv \
+		  verilog/rs_stage.sv \
+		  verilog/func_unit_*.sv \
           verilog/mult.sv \
           verilog/mult_stage.sv \
-		  verilog/rs_stage.sv				# added
+		  verilog/rps4.sv \
+		  verilog/rob.sv \
+		  verilog/if_stage.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 
@@ -370,20 +351,6 @@ VCS = SW_VCS=2020.12-SP2-1 vcs -sverilog +vc -Mupdate -line -full64 -kdb -lca -n
 
 VCS = SW_VCS=2020.12-SP2-1 vcs -sverilog +vc -Mupdate -line -full64 -kdb -lca -nc \
       -debug_access+all+reverse $(VCS_BAD_WARNINGS) +define+CLOCK_PERIOD=$(CLOCK_PERIOD)
-
-# rs_stage: $(TESTBENCH_RS) $(SOURCES_RS)
-# 	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
-# 	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
-# 	$(VCS) $^ -o $@
-# 	@$(call PRINT_COLOR, 6, finished compiling $@)
-
-# rs_stage_sim: rs_stage
-# 	@$(call PRINT_COLOR, 5, running $<)
-# 	./rs_stage | tee program.out
-# 	@$(call PRINT_COLOR, 2, output saved to program.out)
-
-# rs_stage_verdi: rs_stage novas.rc verdi_dir
-# 	./rs_stage -gui=$(VERDI_EXE)
 
 # the normal simulation executable will run your testbench on the original modules
 simv: $(TESTBENCH) $(SOURCES) $(HEADERS)

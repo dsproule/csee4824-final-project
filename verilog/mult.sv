@@ -6,13 +6,10 @@
 
 `include "verilog/sys_defs.svh"
 
-// P4 TODO: You must implement the different types of multiplication here and
-//          in mult_stage. See the original ALU and it's different behavior for
-//          different multiply functions.
-
 module mult (
     input clock, reset,
     input [63:0] mcand, mplier,
+    input [1:0] signs,
     input start,
 
     output [63:0] product,
@@ -28,6 +25,7 @@ module mult (
     mult_stage mstage [`MULT_STAGES-1:0] (
         .clock (clock),
         .reset (reset),
+        .signs (signs),   
         .start       ({internal_dones,        start}), // forward prev done as next start
         .prev_sum    ({internal_product_sums, 64'h0}), // start the sum at 0
         .mplier      ({internal_mpliers,      mplier}),

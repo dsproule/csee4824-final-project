@@ -128,10 +128,8 @@ module RS_VALUE(
     // Issue Stage
     always_comb begin
         if (reset) begin
-            for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
+            for (s_idx = 0; s_idx < `RS_SZ; s_idx++)
                 s_valid[s_idx] = 1'b0;
-                rs_free[s_idx] = 1'b0;
-            end
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
                 if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx] & en) begin
@@ -146,27 +144,28 @@ module RS_VALUE(
                         rs_table[s_idx].T, 
                         rs_table[s_idx].V1, 
                         rs_table[s_idx].V2,
+                        rs_table[s_idx].D_S_reg.halt,
                         `TRUE
                     };
-                    rs_free[s_idx] = 1'b1;
+                    s_valid[s_idx] = 1'b1;
                 end else begin
                     S_packet[s_idx] = 0;
-                    rs_free[s_idx] = 0;
+                    s_valid[s_idx] = 0;
                 end
             end
         end
     end
 
     // clears the RS on the next cycle (works because rest is comb)
-    // always_ff @(posedge clock) begin
-    //     if (reset) begin
-    //         for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
-    //             rs_free[reset_idx] <= 0;
-    //     end else if (en) begin
-    //         for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
-    //             rs_free[rs_free_idx] <= s_valid[rs_free_idx];
-    //     end
-    // end
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
+                rs_free[reset_idx] <= 0;
+        end else if (en) begin
+            for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
+                rs_free[rs_free_idx] <= s_valid[rs_free_idx];
+        end
+    end
 
 endmodule   // RS_VALUE
 
@@ -182,7 +181,7 @@ module rs_stage(
     output d_stall,              
     output [`RS_SZ-1:0] busy,           
     output S_X_PACKET [`RS_SZ-1:0] S_packet,
-    output RS_ENTRY [ `RS_SZ-1:0]  rs_table
+    output RS_ENTRY [`RS_SZ-1:0]  rs_table
 );
     logic [`RS_SZ-1:0] free_bus;
     
