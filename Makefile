@@ -193,7 +193,7 @@ $(call DEPS,func_unit_1): $(MULT_DEPS)
 ROB_DEPS =
 $(call DEPS,rob): $(ROB_DEPS)
 
-MULTI_MODULE_DEPS = verilog/*.sv
+MULTI_MODULE_DEPS = verilog/regfile.sv verilog/map_table.sv verilog/rob.sv verilog/rs_stage.sv
 $(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
 
 IF_STAGE_DEPS = test/mem.sv verilog/icache.sv
@@ -325,9 +325,10 @@ $(TESTED_MODULES:=.cov.verdi): %.cov.verdi: %.cov.vdb
 HEADERS = verilog/sys_defs.svh \
           verilog/ISA.svh
 
-TESTBENCH = test/ppln_chunk.sv  \
-            test/pipeline_print.c \
+TESTBENCH = test/pipeline_print.c \
+			test/pipeline_test.sv \
             test/mem.sv
+# test/ppln_chunk.sv
 			
 # you could simplify this line with $(wildcard verilog/*.sv) - but the manual way is more explicit
 SOURCES = verilog/pipeline.sv \

@@ -37,19 +37,19 @@ module testbench;
     logic d_stall;              // If that functional unit is occupied -> stall
     
     // Map Table
-    MT_ENTRY [$bits(MT_ENTRY)*32-1:0] mt_table;
+    MT_ENTRY mt_table [31:0];
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_out;
 
     // ROB Signals
     logic full;
     logic empty;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out; // original ROB output
-    ROB_ENTRY rob_table [`ROB_SZ-1:0];                  // formatted ROB
+    ROB_ENTRY rob_table [`ROB_SZ:1];                  // formatted ROB
 
     // Regfile Write Signals
     logic [4:0] regfile_write_idx;          // Final idx to Regfile
     logic [`XLEN-1:0] regfile_write_data;   // Final data to Regfile
     logic regfile_write_en;                 // Final en to Regfile
-    logic rob_write_en;                     // ROB -> Regfile
     logic [4:0] rob_write_idx;              // ROB -> Regfile
     logic [`XLEN-1:0] rob_write_data;       // ROB -> Regfile
     logic ppl_write_en;                     // initialization
@@ -64,18 +64,23 @@ module testbench;
     logic [7:0] clock_count;
     logic [5:0] error_count;
 
-    map_table map_table_inst (.clock(clock), .reset(reset), .r(r), .r1(r1), .r2(r2), .retire_r(retire_r_wire), 
-                              .cdb(cdb), .T(T_wire), .retire_T(retire_T_wire), .T1(T1_wire), .T2(T2_wire), .mt_table_out(mt_table));
+    map_table map_table_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid), .r(r), .r1(r1), .r2(r2), .retire_r(retire_r_wire), 
+                              .cdb(cdb), .T(T_wire), .retire_T(retire_T_wire), .T1(T1_wire), .T2(T2_wire), .mt_table_out(mt_table_out));
 
-    rs_stage rs_stage_inst (.clock(clock), .reset(reset), .en(en), .cdb(cdb), .D_S_reg(D_S_reg), .FU_ready(FU_ready),
+    always_comb begin
+        //re-unpack array for debugging, needed for synthesis debugging   
+        for (int i = 0; i < 32; i++) begin
+            mt_table[i] = mt_table_out[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
+        end
+    end
+
+    rs_stage rs_stage_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid), .cdb(cdb), .D_S_reg(D_S_reg), .FU_ready(FU_ready),
                             .T(T_wire), .T1(T1_wire), .T2(T2_wire), .V1(V1_rs), .V2(V2_rs), .d_stall(d_stall),
                             .S_packet(S_X_pack), .rs_table(rs_table), .busy(busy));
 
-    assign retire_T_wire = (retire) ? T_wire : '0;
-
     rob rob_inst (.clock(clock), .reset(reset), .r(r), .T1(T1_wire.T), .T2(T2_wire.T), .cdb(cdb),
-                  .dispatch_valid(D_S_reg.valid & ~d_stall), .T(T_wire), 
-                  .ppln_ctrl(), .full(full), .empty(empty), .retire(retire), .regfile_write_idx(retire_r_wire), 
+                  .dispatch_valid(D_S_reg.valid & ~d_stall), .T(T_wire), .retire_T_out(retire_T_wire), 
+                  .ppln_ctrl(), .full(full), .empty(empty), .retire(retire), .regfile_write_idx_out(retire_r_wire), 
                   .V1(V1_rob), .V2(V2_rob), .regfile_write_data(rob_write_data),.rob_table_out(rob_table_out));
 
     regfile regfile_inst (.clock(clock), .read_idx_1(r1), .read_idx_2(r2), .write_idx(regfile_write_idx),
@@ -110,7 +115,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:%b", idx, t, t1, t2, v1, v2, busy);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -120,7 +125,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@stall error: d_stall: %b", d_stall);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -130,7 +135,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@correct answer should be = index: %4d   T:%4d   plus:%4d", idx, t, plus);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -140,7 +145,7 @@ module testbench;
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
             $display("@@@correct answer should be = index: %4d   r:%4d   V:%4d", idx, r, V);
-            $finish;
+            // $finish;
         end
     endtask
 
@@ -156,7 +161,7 @@ module testbench;
     // ROB Table formatting
     always_comb begin
         for (int i = 0; i < `ROB_SZ; i++) begin
-            rob_table[i] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
+            rob_table[i+1] = rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
         end
     end
 
@@ -184,7 +189,7 @@ module testbench;
             1'b0, // halt
             1'b0, // illegal
             1'b0, // csr_op
-            1'b1  // valid
+            1'b0  // valid
         };
         cdb = 0;
         r = 0;
@@ -213,6 +218,7 @@ module testbench;
 
         @(negedge clock); 
         en = 1;
+        D_S_reg.valid = 1;
         // ld X(r4), r2 // 1
         // V1 = 0; V2 = 8; T = 1; T1 = {0, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
         D_S_reg.rs_idx = 1;

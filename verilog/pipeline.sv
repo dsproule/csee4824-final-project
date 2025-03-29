@@ -83,6 +83,7 @@ module pipeline (
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
     logic [`RS_SZ-1:0] FU_ready;
     PPLN_CTRL ppln_ctrl;
+    ROB_T rob_retire_T;
 
     // Debug values
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_dbg;
@@ -237,13 +238,16 @@ module pipeline (
     map_table map_table_0(
         // Inputs
         .clock(clock), .reset(reset),
-        .en(D_S_reg.valid & ~rs_busy),
+        // .en(D_S_reg.valid & ~rs_busy),
+        .en(D_S_reg.valid), // shouldn't care about stall because you can do cdb broadcast even if rs stall
         .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2),
+        .retire_r(rob_regfile_idx), // todo: from ROB
         .cdb(cdb),
-        .T(T), .retire_T(cdb.T),
+        .T(T), // from ROB
+        .retire_T(rob_retire_T), // from ROB
 
         // Outputs
-        .T1(mt_T1), .T2(mt_T2),
+        .T1(mt_T1), .T2(mt_T2), // to rs
 
         // Debug Outputs
         .mt_table_out(mt_table_dbg)
@@ -279,7 +283,7 @@ module pipeline (
         // Inputs
         .clock(clock),
         .read_idx_1(D_S_reg.r1), .read_idx_2(D_S_reg.r2), .write_idx(rob_regfile_idx),
-        .write_en(rob_regfile_en),
+        .write_en(rob_retire),
         .write_data(rob_regfile_data),
 
         // Outputs
@@ -397,10 +401,13 @@ module pipeline (
 
         // Outputs
         .T(T),
+        .retire_T_out(rob_retire_T),
         .ppln_ctrl(ppln_ctrl),
         .full(rob_full), .empty(), .retire(rob_retire),
-        .regfile_write_idx(rob_regfile_idx),
+        .regfile_write_idx_out(rob_regfile_idx),
         .V1(rob_V1), .V2(rob_V2), .regfile_write_data(rob_regfile_data),
+
+        // debug
         .rob_table_out(rob_table_out)
     );
 
