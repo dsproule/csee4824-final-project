@@ -35,7 +35,6 @@ module map_table (
 
     end
     
-
     always_ff @(posedge clock) begin
         if (reset) begin
             for (reset_idx = 0; reset_idx < 32; reset_idx++)

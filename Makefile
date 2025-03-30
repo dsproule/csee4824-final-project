@@ -176,6 +176,36 @@ GREP = grep -E --color=auto
 # - added to TESTED_MODULES as: 'rob'
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
+TESTBENCH = multi_module_test_done
+MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv
+OUTPUT_DIR = ./output
+SIMV = $(TESTBENCH).simv
+SIM_OUT = $(OUTPUT_DIR)/$(TESTBENCH).out
+SYN_OUT = $(OUTPUT_DIR)/$(TESTBENCH).syn.out
+
+# Compile the simulation executable
+$(SIMV): ./test/$(TESTBENCH).sv $(MODULES) $(HEADERS)
+	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
+	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
+	$(VCS) $(filter-out $(HEADERS),$^) -o $@
+	@$(call PRINT_COLOR, 6, finished compiling $@)
+
+# Run simulation
+$(SIM_OUT): $(SIMV) | $(OUTPUT_DIR)
+	@$(call PRINT_COLOR, 5, Running $<)
+	./$< | tee $@
+	@$(call PRINT_COLOR, 2, Output is in $@)
+
+# Run synthesis (if needed)
+$(SYN_OUT): $(SIMV) | $(OUTPUT_DIR)
+	@$(call PRINT_COLOR, 5, Running synthesis on $<)
+	./$< -synthesis | tee $@
+	@$(call PRINT_COLOR, 2, Synthesis output is in $@)
+
+# Ensure output directory exists
+$(OUTPUT_DIR):
+	mkdir -p $(OUTPUT_DIR)
+
 # TODO: add more modules here
 TESTED_MODULES = multi_module if_stage
 
@@ -193,7 +223,7 @@ $(call DEPS,func_unit_1): $(MULT_DEPS)
 ROB_DEPS =
 $(call DEPS,rob): $(ROB_DEPS)
 
-MULTI_MODULE_DEPS = verilog/regfile.sv verilog/map_table.sv verilog/rob.sv verilog/rs_stage.sv
+MULTI_MODULE_DEPS = verilog/regfile.sv verilog/map_table.sv verilog/rob.sv verilog/rs_stage.sv verilog/func_unit_*.sv verilog/mult.sv verilog/mult_stage.sv verilog/rps4.sv
 $(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
 
 IF_STAGE_DEPS = test/mem.sv verilog/icache.sv
@@ -333,7 +363,6 @@ TESTBENCH = test/pipeline_print.c \
 # you could simplify this line with $(wildcard verilog/*.sv) - but the manual way is more explicit
 SOURCES = verilog/pipeline.sv \
           verilog/regfile.sv \
-          verilog/icache.sv \
 		  verilog/d_stage.sv \
 		  verilog/map_table.sv \
 		  verilog/regfile.sv \
@@ -343,7 +372,7 @@ SOURCES = verilog/pipeline.sv \
           verilog/mult_stage.sv \
 		  verilog/rps4.sv \
 		  verilog/rob.sv \
-		  verilog/if_stage.sv
+		  verilog/stage_if.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 
