@@ -1,0 +1,67 @@
+Magic 271485
+Revision Verdi_U-2023.03-SP2-1
+
+; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
+viewPort 0 25 1204 442 183 114
+
+; File list:
+; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
+openDirFile -d / "" "/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/inter.fsdb"
+
+; file time scale:
+; fileTimeScale ### s|ms|us|ns|ps
+
+; signal spacing:
+signalSpacing 5
+
+; windowTimeUnit is used for zoom, cursor & marker
+; waveform viewport range
+zoom 60682.857143 100682.857143
+cursor 80500.000000
+marker 0.000000
+
+; user define markers
+; userMarker time_pos marker_name color linestyle
+; visible top row signal index
+top 0
+; marker line index
+markerPos 8
+
+; event list
+; addEvent event_name event_expression
+; curEvent event_name
+
+
+
+COMPLEX_EVENT_BEGIN
+
+
+COMPLEX_EVENT_END
+
+
+
+; toolbar current search type
+; curSTATUS search_type
+curSTATUS ByChange
+
+
+addGroup "G1"
+activeDirFile "" "/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/inter.fsdb"
+addSignal -h 15 /testbench_chunk/clock
+addSignal -h 15 /testbench_chunk/reset
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/lastI_addr[31:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/IF_ID_reg.NPC[31:0]
+addSignal -h 15 /testbench_chunk/new_addr
+addSignal -h 15 /testbench_chunk/IF_ID_reg
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/Icache2mem_command[1:0]
+addSignal -h 15 /testbench_chunk/IF_ID_reg.valid
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/Icache2mem_addr[31:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/nextIcache_tag[3:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/mem2Icache_response[3:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/mem2Icache_tag[3:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench_chunk/mem2Icache_data[63:0]
+addGroup "G2"
+
+; getSignalForm Scope Hierarchy Status
+; active file of getSignalForm
+

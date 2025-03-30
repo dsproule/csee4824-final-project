@@ -33,6 +33,7 @@ module if_stage (
         end else if (if_valid) begin
             PC_reg <= PC_reg + 4;    // or transition to next PC if valid
         end
+
     end
 
     // address of the instruction we're fetching (64 bit memory lines)

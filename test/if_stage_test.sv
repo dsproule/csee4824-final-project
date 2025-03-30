@@ -1,8 +1,8 @@
 `include "verilog/sys_defs.svh"
 
-/* Pipeline test where we will manually feed instructions*/
+/* Pipeline test where we will manually feed instructions. Includes I-stage and D-stage */
 
-module testbench_chunk;
+module testbench;
     logic clock, reset;
 
     // Show contents of a range of Unified Memory, in both hex and decimal
@@ -28,11 +28,11 @@ module testbench_chunk;
 
     logic Icache_valid;
     IF_ID_PACKET IF_ID_reg, IF_packet;
-    logic [`XLEN-1:0] Icache2mem_addr, proc2Icache_addr, proc2mem_addr, proc2Dmem_addr;
+    logic [`XLEN-1:0] Icache2mem_addr, proc2Icache_addr, proc2mem_addr, proc2Dmem_addr, next_addr;
     logic [63:0] mem2Icache_data, Icache2proc_data;
     logic [1:0] Icache2mem_command, proc2Dmem_command, proc2mem_command;
     logic [3:0] mem2Icache_response, mem2Icache_tag;
-    logic [31:0] proc2Dmem_data;
+    logic [31:0] proc2Dmem_data_lsb, proc2Dmem_data_msb;
 
     // new signals
     logic [`XLEN-1:0] lastI_addr;
@@ -42,23 +42,13 @@ module testbench_chunk;
     mem memory(
         .clk(clock),
         .proc2mem_addr(proc2mem_addr),
-        .proc2mem_data({32'b0, proc2Dmem_data}),
+        .proc2mem_data({proc2Dmem_data_msb, proc2Dmem_data_lsb}),
         .proc2mem_command(proc2mem_command),
 
         .mem2proc_response(mem2Icache_response),        // will need to change when Dmem gets introduced
         .mem2proc_data(mem2Icache_data),                // will need to change when Dmem gets introduced
         .mem2proc_tag(mem2Icache_tag)                   // will need to change when Dmem gets introduced
     );
-
-    always_comb begin
-        if (proc2Dmem_command == BUS_NONE) begin
-            proc2mem_addr    = Icache2mem_addr;
-            proc2mem_command = Icache2mem_command;
-        end else begin
-            proc2mem_addr    = proc2Dmem_addr;
-            proc2mem_command = proc2Dmem_command;
-        end
-    end
     
     // icache icache_0 (
     //     // Inputs
@@ -85,6 +75,22 @@ module testbench_chunk;
      * through on the next valid index and so forth.
      */
 
+    initial begin
+        forever #(`CLOCK_PERIOD / 2.0) clock = ~clock;
+    end
+
+    /* Module start */
+
+    always_comb begin
+        if (proc2Dmem_command == BUS_NONE) begin
+            proc2mem_addr    = Icache2mem_addr;
+            proc2mem_command = Icache2mem_command;
+        end else begin
+            proc2mem_addr    = proc2Dmem_addr;
+            proc2mem_command = proc2Dmem_command;
+        end
+    end
+
     if_stage if_stage_0(
         // Inputs
         .clock (clock),
@@ -99,21 +105,17 @@ module testbench_chunk;
         .proc2Imem_addr (Icache2mem_addr)
     );
 
-    initial begin
-        forever #(`CLOCK_PERIOD / 2.0) clock = ~clock;
-    end
-
-    // pulses on new addr in IF_ID_reg (we just got a new inst)
-    assign new_addr = (lastI_addr != IF_ID_reg.PC);
-
     // makes the last_addr trail the PC
     always_ff @(posedge clock) begin
+        new_addr <= (lastI_addr != IF_ID_reg.NPC) & ~reset & IF_ID_reg.valid;
+        IF_ID_reg <= '0;
+
         if (reset) begin
-            lastI_addr <= 64'hFFFFFFFFFFFFFFFF;
+            lastI_addr <= `XLEN'hFFFFFFFF;
 
             IF_ID_reg.inst  <= `NOP;
-            IF_ID_reg.valid <= `FALSE;
-            IF_ID_reg.NPC   <= 0;
+            IF_ID_reg.valid <= `TRUE;
+            IF_ID_reg.NPC   <= 'h0;
             IF_ID_reg.PC    <= 0;
         end else begin
             lastI_addr <= IF_ID_reg.PC;
@@ -124,37 +126,46 @@ module testbench_chunk;
     end
 
     // when response comes back in turn on the if_stage
-    assign Icache_valid = (mem2Icache_tag == nextIcache_tag);
+    assign Icache_valid = (mem2Icache_tag == nextIcache_tag) & (nextIcache_tag != '0);
 
     always_comb begin
         if (new_addr) begin
             Icache2mem_command = BUS_LOAD;
-            Icache2mem_addr    = IF_ID_reg.NPC;
             nextIcache_tag     = mem2Icache_response;
         end else begin
             Icache2mem_command = BUS_NONE;
         end
     end
 
+    /* Module end */
+
+    always @(posedge clock) begin
+        if (IF_ID_reg.inst != 0) begin
+            $display("PC: %0h, INST: %0h", IF_ID_reg.PC, IF_ID_reg.inst);
+        end
+    end
+
     initial begin
         clock = 0;
-        $monitor("Icache_valid: %d", Icache_valid);
+        // $monitor("PC: %0h, INST: %0h", IF_ID_reg.PC, IF_ID_reg.inst);
         reset = 1;
 
         @(negedge clock);
         reset = 0;
+        @(negedge clock);
 
         // Load data to pull from
-        proc2Dmem_addr = `XLEN'd0;
-        proc2Dmem_data = 64'h100;
+        proc2Dmem_addr = `XLEN'h0;
+        proc2Dmem_data_lsb = 32'h00200113;
+        proc2Dmem_data_msb = 32'h00100093;
         proc2Dmem_command = BUS_STORE;
         @(negedge clock);
         proc2Dmem_addr = `XLEN'd4;
-        proc2Dmem_data = 64'h200;
-        proc2Dmem_command = BUS_STORE;
+        proc2Dmem_command = BUS_STORE;          // no idea why but this needs to be here to load properly
         @(negedge clock);
         proc2Dmem_addr = `XLEN'd8;
-        proc2Dmem_data = 64'h300;
+        proc2Dmem_data_lsb = 32'h002081b3;
+        proc2Dmem_data_msb = 32'h00210233;
         proc2Dmem_command = BUS_STORE;
         @(negedge clock);
         proc2Dmem_command = BUS_NONE;
@@ -164,11 +175,14 @@ module testbench_chunk;
         @(negedge clock);
         @(negedge clock);
         @(negedge clock);
+        show_mem_with_decimal(0, 12);
         reset = 1;
         @(negedge clock);
         reset = 0;
 
         // magic should start happening now
+        @(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);
+        @(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);
 
         $finish;
     end
