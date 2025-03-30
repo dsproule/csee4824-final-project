@@ -70,7 +70,7 @@ module testbench;
     logic [`RS_SZ-1:0] FU_req;
     logic [`RS_SZ-1:0] cdb_valid; // clocked signal for gnt
     CDB cdb;
-    logic [$clog2(`RS_SZ)-1:0] cdb_idx;
+    logic [`RS_SZ:0] cdb_idx;
 
     // Count
     integer i, j, k, l, m, n, o;
@@ -213,7 +213,10 @@ module testbench;
 
     always_comb begin
         for(req_idx = 0; req_idx <`RS_SZ; req_idx++) begin
-            FU_req[req_idx] = X_packets[req_idx].valid;
+            if(X_packets[req_idx].valid === 1)
+                FU_req[req_idx] = 1;
+            else
+                FU_req[req_idx] = 0;
         end
     end
 
@@ -237,26 +240,26 @@ module testbench;
             end else if (X_packets[X_idx].valid) begin
                 X_C_reg[X_idx] <= X_packets[X_idx];
             end
-            cdb_valid[X_idx] <= gnt[X_idx];
     end
 
     // CDB stage
-    // always_comb begin
-    //     for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
-    //         if (cdb_valid[cdb_idx] == 1) begin
-    //             cdb.valid = `TRUE;
-    //             cdb.T = X_C_reg[cdb_idx].T;
-    //             cdb.V = X_C_reg[cdb_idx].result;
-    //             cdb.ppln_ctrl = `TRUE;
-    //         end
-    //         else begin
-    //             cdb.valid = `FALSE;
-    //             cdb.T = 0;
-    //             cdb.V = 0;
-    //             cdb.ppln_ctrl = `TRUE;
-    //         end
-    //     end
-    // end
+    always_comb begin
+        cdb_idx = (gnt[0]) ? (0) :
+                  (gnt[1] ? (1) : 
+                  (gnt[2] ? 2 : 3));
+        if(|gnt) begin
+            cdb.valid = `TRUE;
+            cdb.T = X_packets[cdb_idx].T;
+            cdb.V = X_packets[cdb_idx].result;
+            cdb.ppln_ctrl = `TRUE;
+        end
+        else begin
+            cdb.valid = `FALSE;
+            cdb.T = 0;
+            cdb.V = 0;
+            cdb.ppln_ctrl = `TRUE;
+        end
+    end
 
     initial begin
         // reset
@@ -284,7 +287,7 @@ module testbench;
             1'b0, // csr_op
             1'b0  // valid
         };
-        cdb = 0;
+        // cdb = 0;
         r = 0;
         r1 = 0;
         r2 = 0;
@@ -443,7 +446,7 @@ module testbench;
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 2, 0, 0, 5, 10, 1);
+        compare(1, 2, 0, 0, 5, 8, 1);
         compare(2, 3, 2, 0, 0, 8, 1);
         compare(3, 0, 0, 0, 0, 0, 0); 
         print_mt();
@@ -452,7 +455,7 @@ module testbench;
         compare_mt(3, 2, 0);
         compare_mt(4, 0, 0);
         print_rob();
-        compare_rob(1, 2, 10);
+        compare_rob(1, 2, 8);
         compare_rob(2, 3, 0);
         compare_rob(3, 1, 0);
         compare_rob(4, 0, 0);
@@ -461,6 +464,8 @@ module testbench;
         compare_rob(7, 0, 0);
         print_fu();
         print_cdb();
+        @(negedge clock);
+        @(negedge clock);
 
         if(error_count == 0) begin
             $display("@@@Passed");
