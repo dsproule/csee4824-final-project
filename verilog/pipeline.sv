@@ -296,7 +296,8 @@ module pipeline (
         // Inputs
         .clock(clock), .reset(reset),
         // .en(D_S_reg.valid & ~rs_busy),
-        .en(D_S_reg.valid), // shouldn't care about stall because you can do cdb broadcast even if rs stall
+        .en(D_S_reg.valid & ~d_stall), // shouldn't care about stall because you can do cdb broadcast even if rs stall
+        .en_r(retire),
         .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2),
         .retire_r(rob_regfile_idx), // from ROB
         .cdb(cdb),
@@ -319,7 +320,7 @@ module pipeline (
     rs_stage rs_stage_0(
         // Inputs
         .clock(clock), .reset(reset),
-        .en(D_S_reg.valid),
+        .en(D_S_reg.valid & ~d_stall),
         .cdb(cdb),
         .D_S_reg(D_S_reg),      
         .FU_ready(FU_ready),    // from fu arb

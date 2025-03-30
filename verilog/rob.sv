@@ -58,7 +58,7 @@ module rob(
         for (int i = 0; i < `ROB_SZ; i++) begin
             rob_table_out[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)] = rob_table[i+1];
         end
-        T = tail; // change here
+        T = dispatch_valid ? tail : 0; // change here
     end
 
     /* always_comb begin

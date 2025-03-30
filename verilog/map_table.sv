@@ -1,7 +1,7 @@
 `include "verilog/sys_defs.svh"
 
 module map_table (
-    input clock, reset, en,
+    input clock, reset, en, en_r,
     input [4:0] r, r1, r2, retire_r,
     input CDB   cdb,
     input ROB_T T, retire_T,
@@ -40,14 +40,18 @@ module map_table (
         if (reset) begin
             for (reset_idx = 0; reset_idx < 32; reset_idx++)
                 mt_table[reset_idx] <= 0;
-        end else if (en) begin
-            mt_table[r] <= (r != 0) ? {T, `FALSE} : 0;
-
-            // clears a tag if its not being reassigned
-            if (retire_entry) begin
-                mt_table[retire_r].T <= 0;
-                mt_table[retire_r].plus <= 0;
+        end else begin
+            if(en) begin
+                mt_table[r] <= (r != 0) ? {T, `FALSE} : 0;
             end
+            if(en_r) begin // can still retire when stall?
+                // clears a tag if its not being reassigned
+                if (retire_entry) begin
+                    mt_table[retire_r].T <= 0;
+                    mt_table[retire_r].plus <= 0;
+                end
+            end
+            // enable signal included in cdb.valid?
             // checks whole map table and assigns plus if == cdb_tag (in theory only one)
             // shouldn't write like this bcz the plus tag should stay more than one cycle
             for (cdb_idx = 0; cdb_idx < 32; cdb_idx++) begin
