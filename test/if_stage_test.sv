@@ -28,6 +28,7 @@ module testbench;
 
     logic Icache_valid;
     IF_ID_PACKET IF_ID_reg, IF_packet;
+    D_S_PACKET D_S_reg, D_packet;
     logic [`XLEN-1:0] Icache2mem_addr, proc2Icache_addr, proc2mem_addr, proc2Dmem_addr, next_addr;
     logic [63:0] mem2Icache_data, Icache2proc_data;
     logic [1:0] Icache2mem_command, proc2Dmem_command, proc2mem_command;
@@ -108,7 +109,6 @@ module testbench;
     // makes the last_addr trail the PC
     always_ff @(posedge clock) begin
         new_addr <= (lastI_addr != IF_ID_reg.NPC) & ~reset & IF_ID_reg.valid;
-        IF_ID_reg <= '0;
 
         if (reset) begin
             lastI_addr <= `XLEN'hFFFFFFFF;
@@ -120,8 +120,8 @@ module testbench;
         end else begin
             lastI_addr <= IF_ID_reg.PC;
 
-            if (IF_packet.valid)
-                IF_ID_reg <= IF_packet;
+            // if (IF_packet.valid)
+            IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
         end
     end
 
@@ -137,12 +137,29 @@ module testbench;
         end
     end
 
+    d_stage d_stage_0(
+        .IF_ID_reg(IF_ID_reg),
+
+        .D_packet(D_packet)
+    );
+
+    // always_ff @(posedge clock) begin
+    //     if (reset) begin
+    //         D_S_reg <= '0;
+    //     end else begin
+    //         D_S_reg <= (D_packet.valid) ? D_packet : '0;
+    //     end
+    // end
+
     /* Module end */
 
     always @(posedge clock) begin
         if (IF_ID_reg.inst != 0) begin
-            $display("PC: %0h, INST: %0h", IF_ID_reg.PC, IF_ID_reg.inst);
+            $display("IF_ID_reg -- PC: %0h, INST: %0h", IF_ID_reg.PC, IF_ID_reg.inst);
+            $display("D_packet -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+                    D_packet.inst, D_packet.PC, D_packet.NPC, D_packet.r, D_packet.r1, D_packet.r2, D_packet.opa_select, D_packet.opb_select, D_packet.cond_branch,D_packet.uncond_branch,D_packet.alu_func, D_packet.rs_idx, D_packet.halt, D_packet.illegal, D_packet.csr_op, D_packet.valid);
         end
+            
     end
 
     initial begin
@@ -156,16 +173,16 @@ module testbench;
 
         // Load data to pull from
         proc2Dmem_addr = `XLEN'h0;
-        proc2Dmem_data_lsb = 32'h00200113;
-        proc2Dmem_data_msb = 32'h00100093;
+        proc2Dmem_data_lsb = 32'h00100093;
+        proc2Dmem_data_msb = 32'h00200113;
         proc2Dmem_command = BUS_STORE;
         @(negedge clock);
         proc2Dmem_addr = `XLEN'd4;
         proc2Dmem_command = BUS_STORE;          // no idea why but this needs to be here to load properly
         @(negedge clock);
         proc2Dmem_addr = `XLEN'd8;
-        proc2Dmem_data_lsb = 32'h002081b3;
-        proc2Dmem_data_msb = 32'h00210233;
+        proc2Dmem_data_lsb = 32'h00210233;
+        proc2Dmem_data_msb = 32'h002081b3;
         proc2Dmem_command = BUS_STORE;
         @(negedge clock);
         proc2Dmem_command = BUS_NONE;

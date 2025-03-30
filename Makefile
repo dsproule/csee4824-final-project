@@ -177,7 +177,7 @@ GREP = grep -E --color=auto
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage
+TESTED_MODULES = multi_module if_stage d_stage
 
 MODULE = pipeline
 
@@ -196,7 +196,7 @@ $(call DEPS,rob): $(ROB_DEPS)
 MULTI_MODULE_DEPS = verilog/*.sv
 $(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
 
-IF_STAGE_DEPS = test/mem.sv verilog/icache.sv
+IF_STAGE_DEPS = test/mem.sv verilog/icache.sv verilog/d_stage.sv
 $(call DEPS,if_stage): $(IF_STAGE_DEPS)
 
 # This allows you to use the following make targets:
