@@ -20,7 +20,9 @@ module pipeline (
     output logic [1:0]       proc2mem_command, // Command sent to memory
     output logic [`XLEN-1:0] proc2mem_addr,    // Address sent to memory
     output logic [63:0]      proc2mem_data,    // Data sent to memory
+`ifndef CACHE_MODE // no longer sending size to memory
     output MEM_SIZE          proc2mem_size,    // Data size sent to memory
+`endif
 
     // Note: these are assigned at the very bottom of the module
     output logic [3:0]       pipeline_completed_insts,
@@ -28,26 +30,7 @@ module pipeline (
     output logic [4:0]       pipeline_commit_wr_idx,
     output logic [`XLEN-1:0] pipeline_commit_wr_data,
     output logic             pipeline_commit_wr_en,
-    output logic [`XLEN-1:0] pipeline_commit_NPC,
-
-    // Debug outputs: these signals are solely used for debugging in testbenches
-    // Do not change for project 3
-    // You should definitely change these for project 4
-    output logic [`XLEN-1:0] if_NPC_dbg,
-    output logic [31:0]      if_inst_dbg,
-    output logic             if_valid_dbg,
-    output logic [`XLEN-1:0] if_id_NPC_dbg,
-    output logic [31:0]      if_id_inst_dbg,
-    output logic             if_id_valid_dbg,
-    output logic [`XLEN-1:0] id_ex_NPC_dbg,
-    output logic [31:0]      id_ex_inst_dbg,
-    output logic             id_ex_valid_dbg,
-    output logic [`XLEN-1:0] ex_mem_NPC_dbg,
-    output logic [31:0]      ex_mem_inst_dbg,
-    output logic             ex_mem_valid_dbg,
-    output logic [`XLEN-1:0] mem_wb_NPC_dbg,
-    output logic [31:0]      mem_wb_inst_dbg,
-    output logic             mem_wb_valid_dbg
+    output logic [`XLEN-1:0] pipeline_commit_NPC
 );
 
     //////////////////////////////////////////////////
@@ -57,11 +40,15 @@ module pipeline (
     //////////////////////////////////////////////////
 
     // Pipeline register enables
-    logic if_id_enable, id_ex_enable, ex_mem_enable, mem_wb_enable;
+    logic IF_ID_enable, D_S_enable, S_X_enable, X_C_enable;
 
     // Outputs from IF-Stage and IF/ID Pipeline Register
     logic [`XLEN-1:0] proc2Imem_addr;
-    IF_ID_PACKET if_packet, if_id_reg;
+    logic [`XLEN-1:0] proc2Icache_addr;
+    logic [63:0] Icache_data_out;
+    logic [1:0]  proc2Imem_command;
+    IF_ID_PACKET IF_packet, IF_ID_reg;
+    logic next_IF_valid;
 
     // Outputs from decode to rs, mt and rob
     D_S_PACKET D_packet, D_S_reg;
@@ -82,20 +69,11 @@ module pipeline (
     MT_ENTRY mt_T1, mt_T2;
     logic [`XLEN-1:0] regfile_V1, regfile_V2, rs_V1, rs_V2, rob_V1, rob_V2;
 
-    // Outputs from ID stage and ID/EX Pipeline Register
-    // ID_EX_PACKET id_packet, id_ex_reg;
-
-    // Outputs from EX-Stage and EX/MEM Pipeline Register // ?needed
-    // EX_MEM_PACKET ex_packet, ex_mem_reg;
-
-    // // Outputs from MEM-Stage and MEM/WB Pipeline Register
-    // MEM_WB_PACKET mem_packet, mem_wb_reg;
-
     // Outputs from MEM-Stage to memory
-    // logic [`XLEN-1:0] proc2Dmem_addr;
-    // logic [`XLEN-1:0] proc2Dmem_data;
-    // logic [1:0]       proc2Dmem_command;
-    // MEM_SIZE          proc2Dmem_size;
+    logic [`XLEN-1:0] proc2Dmem_addr;
+    logic [`XLEN-1:0] proc2Dmem_data;
+    logic [1:0]       proc2Dmem_command;
+    MEM_SIZE          proc2Dmem_size;
 
     // Outputs from Commit-rob
     logic              rob_regfile_en, rob_full, rob_retire, no_X_req, ppl_flush, mem_store;
@@ -106,11 +84,6 @@ module pipeline (
     logic [`RS_SZ-1:0] FU_ready;
     PPLN_CTRL ppln_ctrl;
     ROB_T rob_retire_T;
-
-    // // Outputs from WB-Stage (These loop back to the register file in ID)
-    // logic             wb_regfile_en;
-    // logic [4:0]       wb_regfile_idx;
-    // logic [`XLEN-1:0] wb_regfile_data;
 
     // Debug values
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_dbg;
@@ -128,59 +101,47 @@ module pipeline (
     // note that there is no latency in project 3
     // but there will be a 100ns latency in project 4
 
-    // always_comb begin
-    //     if (proc2Dmem_command != BUS_NONE) begin // read or write DATA from memory
-    //         proc2mem_command = proc2Dmem_command;
-    //         proc2mem_addr    = proc2Dmem_addr;
-    //         proc2mem_size    = proc2Dmem_size;  // size is never DOUBLE in project 3
-    //     end else begin                          // read an INSTRUCTION from memory
-    //         proc2mem_command = BUS_LOAD;
-    //         proc2mem_addr    = proc2Imem_addr;
-    //         proc2mem_size    = DOUBLE;          // instructions load a full memory line (64 bits)
-    //     end
-    //     proc2mem_data = {32'b0, proc2Dmem_data};
-    // end
-
     always_comb begin
-        // read an INSTRUCTION from memory
-        proc2mem_command = BUS_LOAD;
-        proc2mem_addr    = proc2Imem_addr;
-        proc2mem_size    = DOUBLE;          // instructions load a full memory line (64 bits)
-        proc2mem_data = {64'b0};
+//         if (proc2Dmem_command != BUS_NONE) begin // read or write DATA from memory
+//             proc2mem_command = proc2Dmem_command;
+//             proc2mem_addr    = proc2Dmem_addr;
+// `ifndef CACHE_MODE
+//             proc2mem_size    = proc2Dmem_size;  // size is never DOUBLE in project 3
+// `endif
+//         end else begin                          // read an INSTRUCTION from memory
+            // proc2mem_command = BUS_LOAD;
+            proc2mem_command = proc2Imem_command;
+            proc2mem_addr    = proc2Imem_addr;
+// `ifndef CACHE_MODE
+//             proc2mem_size    = DOUBLE;          // instructions load a full memory line (64 bits)
+// `endif
+//         end
+//         proc2mem_data = {32'b0, proc2Dmem_data};
     end
 
     //////////////////////////////////////////////////
     //                                              //
-    //                  Valid Bit                   //
+    //                icache-Stage                  //
     //                                              //
     //////////////////////////////////////////////////
 
-    // This state controls the stall signal that artificially forces IF
-    // to stall until the previous instruction has completed.
-    // For project 3, start by setting this to always be 1
-    logic struct_hazard;
-    logic control_hazard;
-    logic ex_forward_a;
-    logic ex_forward_b;
-    logic mem_forward_a;
-    logic mem_forward_b;
-    logic load_hazard;
+    icache icache_0 (
+        // Inputs
+        .clock(clock), .reset(reset),
+        
+        .Imem2proc_response(mem2proc_response),
+        .Imem2proc_data(mem2proc_data),
+        .Imem2proc_tag(mem2proc_tag),
+        
+        .proc2Icache_addr(proc2Icache_addr),
 
-    // always_comb begin
-    //     struct_hazard = (ex_mem_reg.rd_mem == 1'b1) | (ex_mem_reg.wr_mem == 1'b1);
-    //     control_hazard = ex_mem_reg.take_branch;
+        // Outputs
+        .proc2Imem_command(proc2Imem_command),
+        .proc2Imem_addr(proc2Imem_addr),
 
-    //     ex_forward_a = (ex_mem_reg.dest_reg_idx != `ZERO_REG) & (ex_mem_reg.dest_reg_idx == id_ex_reg.inst.r.rs1);
-    //     ex_forward_b = (ex_mem_reg.dest_reg_idx != `ZERO_REG) & (ex_mem_reg.dest_reg_idx == id_ex_reg.inst.r.rs2);
-    //     mem_forward_a = (mem_wb_reg.dest_reg_idx != `ZERO_REG) & (mem_wb_reg.dest_reg_idx == id_ex_reg.inst.r.rs1);
-    //     mem_forward_b = (mem_wb_reg.dest_reg_idx != `ZERO_REG) & (mem_wb_reg.dest_reg_idx == id_ex_reg.inst.r.rs2);
-
-    //     load_hazard = (id_ex_reg.rd_mem) & ((id_ex_reg.dest_reg_idx == if_id_reg.inst.r.rs1) | (id_ex_reg.dest_reg_idx == if_id_reg.inst.r.rs2));
-    // end
-
-    logic next_if_valid;
-    assign next_if_valid = 1;
-    // assign next_if_valid = (load_hazard | struct_hazard) ? 0 : 1;
+        .Icache_data_out(Icache_data_out),
+        .Icache_valid_out(next_IF_valid)
+    );
 
     //////////////////////////////////////////////////
     //                                              //
@@ -188,25 +149,19 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    stage_if stage_if_0 (
+    if_stage if_stage_0 (
         // Inputs
         .clock (clock),
         .reset (reset),
-        .if_valid       (next_if_valid),
-        .take_branch    (0), // TODO: no branch for now
-        .branch_target  (64'b0), // TODO: no branch for now
-        .Imem2proc_data (mem2proc_data),
-        .load_hazard    (load_hazard),
+        .if_valid       (next_IF_valid),
+        .take_branch    (ppl_flush),
+        .branch_target  (rob_regfile_data),
+        .Imem2proc_data (Icache_data_out),
 
         // Outputs
-        .if_packet      (if_packet),
-        .proc2Imem_addr (proc2Imem_addr)
+        .if_packet      (IF_packet),
+        .proc2Imem_addr (proc2Icache_addr)
     );
-
-    // debug outputs
-    assign if_NPC_dbg   = if_packet.NPC;
-    assign if_inst_dbg  = if_packet.inst;
-    assign if_valid_dbg = if_packet.valid;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -214,40 +169,28 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign if_id_enable = 1'b1; // always enabled
+    assign IF_ID_enable = 1'b1; // always enabled
     // synopsys sync_set_reset "reset"
     always_ff @(posedge clock) begin
         if (reset) begin
-            if_id_reg.inst  <= `NOP;
-            if_id_reg.valid <= `FALSE;
-            if_id_reg.NPC   <= 0;
-            if_id_reg.PC    <= 0;
-        // end else if (control_hazard) begin
-        //     if_id_reg.inst  <= `NOP;
-        //     if_id_reg.valid <= `FALSE;
-        //     if_id_reg.NPC   <= 0;
-        //     if_id_reg.PC    <= 0;
-        // end else if (load_hazard) begin
-        //     if_id_reg <= if_id_reg;
-        end else if (if_id_enable) begin
-            if_id_reg <= if_packet;
+            IF_ID_reg.inst  <= `NOP;
+            IF_ID_reg.valid <= `FALSE;
+            IF_ID_reg.NPC   <= 0;
+            IF_ID_reg.PC    <= 0;
+        end else if (IF_ID_enable) begin
+            IF_ID_reg <= IF_packet;
         end
     end
 
-    // debug outputs
-    assign if_id_NPC_dbg   = if_id_reg.NPC;
-    assign if_id_inst_dbg  = if_id_reg.inst;
-    assign if_id_valid_dbg = if_id_reg.valid;
-
     //////////////////////////////////////////////////
     //                                              //
-    //                  ID-Stage                    //
+    //                   D-Stage                    //
     //                                              //
     //////////////////////////////////////////////////
 
     d_stage d_stage_0(
         // Inputs
-        .IF_ID_reg(if_id_reg),
+        .IF_ID_reg(IF_ID_reg),
 
         // Outputs
         .D_packet(D_packet)
@@ -256,7 +199,7 @@ module pipeline (
     //////////////////////////////////////////////////
     //                                              //
     //            D/S Pipeline Register             //
-    //                                              //
+    //          (when shit gets serious)            //
     //////////////////////////////////////////////////
 
     assign D_S_enable = 1'b1; // always enabled
@@ -289,7 +232,7 @@ module pipeline (
     //////////////////////////////////////////////////
     //                                              //
     //            RS, Map table                     //
-    //                                              //
+    //          (when shit gets serious)            //
     //////////////////////////////////////////////////
 
     map_table map_table_0(
@@ -298,7 +241,7 @@ module pipeline (
         // .en(D_S_reg.valid & ~rs_busy),
         .en(D_S_reg.valid), // shouldn't care about stall because you can do cdb broadcast even if rs stall
         .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2),
-        .retire_r(rob_regfile_idx), // from ROB
+        .retire_r(rob_regfile_idx), // todo: from ROB
         .cdb(cdb),
         .T(T), // from ROB
         .retire_T(rob_retire_T), // from ROB
@@ -354,6 +297,7 @@ module pipeline (
     //////////////////////////////////////////////////
 
     assign S_X_enable = 1'b1; // always enabled
+    // synopsys sync_set_reset "reset"
     always_ff @(posedge clock) begin
         for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
             if (reset) begin
@@ -465,7 +409,7 @@ module pipeline (
 
         // debug
         .rob_table_out(rob_table_out)
-    );    
+    );
 
     //////////////////////////////////////////////////
     //                                              //
@@ -473,14 +417,15 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    // assign pipeline_completed_insts = {3'b0, mem_wb_reg.valid}; // commit one valid instruction
-    // assign pipeline_error_status = mem_wb_reg.illegal        ? ILLEGAL_INST :
-    //                                mem_wb_reg.halt           ? HALTED_ON_WFI :
-    //                                (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
+    // TODO:
+    assign pipeline_completed_insts = {3'b0, ppln_ctrl.valid}; // commit one valid instruction
+    assign pipeline_error_status = ppln_ctrl.illegal        ? ILLEGAL_INST :
+                                   ppln_ctrl.halt           ? HALTED_ON_WFI :
+                                   (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
 
-    // assign pipeline_commit_wr_en   = wb_regfile_en;
-    // assign pipeline_commit_wr_idx  = wb_regfile_idx;
-    // assign pipeline_commit_wr_data = wb_regfile_data;
+    assign pipeline_commit_wr_en   = rob_regfile_en;
+    assign pipeline_commit_wr_idx  = rob_regfile_idx;
+    assign pipeline_commit_wr_data = rob_regfile_data;
     // assign pipeline_commit_NPC     = mem_wb_reg.NPC;
 
 endmodule // pipeline
