@@ -8,13 +8,11 @@ module rps2 (
     output logic       req_up
 );
 
+    // P1 TODO: create a two-bit rotating priority selector using logic
     assign req_up = req[0] | req[1];
+    assign gnt[1] = (sel) ? (en & req[1]) : (en & req[1] & ~req[0]);
+    assign gnt[0] = (sel) ? (en & req[0] & ~req[1]) : (en & req[0]);
 
-    always_comb begin
-        gnt[sel] = req[sel] & en;
-       gnt[~sel] = req[~sel] & ~req[sel] & en;  
-    end
-    
 endmodule
 
 
@@ -27,31 +25,20 @@ module rps4 (
     output logic [3:0] gnt,
     output logic [1:0] count
 );
-  
-    logic [1:0] req_ups, gnt_en, gnt_buf;
-    logic low_req_buf;
+    // P1 TODO: create a 4-bit rotating priority selector using rps2 modules
+    rps2 p0(.sel(count[0]), .req(req[3:2]), .en(en0), .gnt(gnt[3:2]), .req_up(req_up0));
+    rps2 p1(.sel(count[0]), .req(req[1:0]), .en(en1), .gnt(gnt[1:0]), .req_up(req_up1));
 
-    /* if sel is on wrap-around case, other req is asserted, use that instead */
-    always_comb begin
-        if ((count == 2 || count == 0) && req_ups == 2'b11 && req[count] == 0) begin
-            gnt_en = ~gnt_buf;
-            low_req_buf = ~count[0];
-        end else begin
-            low_req_buf = count[0];
-            gnt_en = gnt_buf;
-        end
-    end
+    rps2 p2(.sel(count[1]), .req({req_up0, req_up1}), .en(en), .gnt({en0, en1}), .req_up(req_up2));
 
-    rps2 msb(.sel(low_req_buf), .req(req[3:2]), .en(gnt_en[1]), .gnt(gnt[3:2]), .req_up(req_ups[1]));
-    rps2 lsb(.sel(low_req_buf), .req(req[1:0]), .en(gnt_en[0]), .gnt(gnt[1:0]), .req_up(req_ups[0]));
-    rps2 top(.sel(count[1]), .req(req_ups), .en(en), .gnt(gnt_buf), .req_up(req_up));
-
+    // P1 TODO: add the sequential counter here
 	always_ff @(posedge clock) begin
-        if (reset)
-            count <= 2'b00;
-        else
-            count <= count + 1'b1;
-
+        if(reset) begin
+            count <= 2'b0;
+        end
+        else begin
+            count <= count + 2'b01;
+        end
 	end
 
-endmodule // rps4
+endmodule

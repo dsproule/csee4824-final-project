@@ -10,13 +10,14 @@
 
 `include "verilog/sys_defs.svh"
 
-module if_stage (
+module stage_if (
     input             clock,          // system clock
     input             reset,          // system reset
     input             if_valid,       // only go to next PC when true
     input             take_branch,    // taken-branch signal
     input [`XLEN-1:0] branch_target,  // target pc: use if take_branch is TRUE
     input [63:0]      Imem2proc_data, // data coming back from Instruction memory
+    input             load_hazard,
 
     output IF_ID_PACKET      if_packet,
     output logic [`XLEN-1:0] proc2Imem_addr // address sent to Instruction memory
@@ -30,6 +31,8 @@ module if_stage (
             PC_reg <= 0;             // initial PC value is 0 (the memory address where our program starts)
         end else if (take_branch) begin
             PC_reg <= branch_target; // update to a taken branch (does not depend on valid bit)
+        // end else if(load_hazard) begin
+        //     PC_reg <= PC_reg;
         end else if (if_valid) begin
             PC_reg <= PC_reg + 4;    // or transition to next PC if valid
         end
@@ -48,4 +51,4 @@ module if_stage (
 
     assign if_packet.valid = if_valid;
 
-endmodule // if_stage
+endmodule // stage_if

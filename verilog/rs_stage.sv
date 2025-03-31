@@ -4,6 +4,7 @@
 module RS_ALLOC(
     input clock, reset, en,
     input D_S_PACKET D_S_reg,
+    input D_S_PACKET D_S_reg,
     input logic [`RS_SZ-1:0] rs_free,
     input ROB_T               T, 
     input MT_ENTRY            MT_T1, MT_T2,          // from the Map Table     
@@ -11,6 +12,7 @@ module RS_ALLOC(
     input CDB                 cdb,
 
     output stall,
+    output logic    [`RS_SZ-1:0] busy,
     output logic    [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
 );
@@ -26,6 +28,7 @@ module RS_ALLOC(
     RS_ENTRY next_re;
     logic on;
 
+    assign rs_idx = D_S_reg.rs_idx;
     assign rs_idx = D_S_reg.rs_idx;
     assign stall = busy[rs_idx];
 
@@ -54,6 +57,7 @@ module RS_ALLOC(
                 
                 // save values in next_re from decode stage (always saved for allocation)
                 next_re.T <= T;
+                next_re.D_S_reg <= D_S_reg;
                 next_re.D_S_reg <= D_S_reg;
 
                 rs_update_idx <= rs_idx;
@@ -117,6 +121,7 @@ module RS_VALUE(
 
     output logic      [`RS_SZ-1:0] s_valid, rs_free,  
     output S_X_PACKET [`RS_SZ-1:0] S_packet
+    output S_X_PACKET [`RS_SZ-1:0] S_packet
 );
     /* 
      *  Reads values from rs_table that has the dispatch and passes them to the s_x_regs when
@@ -128,8 +133,10 @@ module RS_VALUE(
     // Issue Stage
     always_comb begin
         if (reset) begin
-            for (s_idx = 0; s_idx < `RS_SZ; s_idx++)
+            for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
                 s_valid[s_idx] = 1'b0;
+                rs_free[s_idx] = 1'b0;
+            end
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
                 if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx]) begin
@@ -175,6 +182,9 @@ module rs_stage(
     input D_S_PACKET D_S_reg,
     input [`RS_SZ-1:0] FU_ready,
     input ROB_T       T,
+    input D_S_PACKET D_S_reg,
+    input [`RS_SZ-1:0] FU_ready,
+    input ROB_T       T,
     input MT_ENTRY    T1, T2,
     input [`XLEN-1:0] V1, V2,                  // uses MT_ENTRY.plus to mux val from regfile or ROB
 
@@ -189,6 +199,7 @@ module rs_stage(
     RS_ALLOC rs_alloc(
         // Inputs
         .clock(clock), .reset(reset), .en(en),
+        .D_S_reg(D_S_reg),
         .D_S_reg(D_S_reg),
         .rs_free(free_bus),
         .T(T), .MT_T1(T1), .MT_T2(T2),
@@ -207,8 +218,10 @@ module rs_stage(
         .rs_table(rs_table),
         .rs_free(free_bus),
         .FU_ready(FU_ready),
+        .FU_ready(FU_ready),
 
         // Output
+        .S_packet(S_packet)
         .S_packet(S_packet)
     );
 

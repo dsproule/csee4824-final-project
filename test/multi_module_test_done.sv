@@ -7,7 +7,7 @@ module testbench;
     logic clock;
     logic reset;
     logic en;
-    // CDB cdb;                    // manually assigned value (should come from later stage)
+    CDB cdb;                    // manually assigned value (should come from later stage)
     D_S_PACKET D_S_reg;         // manually assigned value (should come from previous stage)
     logic [4:0] r, r1, r2;      // manually assigned value (should come from previous stage)
     logic [`RS_SZ-1:0] FU_ready;// manually assigned value (should come from functional units)
@@ -23,8 +23,8 @@ module testbench;
     logic [`XLEN-1:0] V1_rs, V2_rs;             // Final value sent into RS
     logic [`XLEN-1:0] V1_rob, V2_rob;           // used when mt_table[i].plus == 1
     logic [`XLEN-1:0] regfile_V1, regfile_V2;   // used when mt_table[i].T == 0
-    assign V1_rs = (T1_wire.plus == 1) ? V1_rob : regfile_V1;
-    assign V2_rs = (T2_wire.plus == 1) ? V2_rob : regfile_V2;
+    assign V1_rs = (T1_wire.plus) ? V1_rob : regfile_V1;
+    assign V2_rs = (T2_wire.plus) ? V2_rob : regfile_V2;
 
     // Retire
     logic retire;
@@ -59,25 +59,12 @@ module testbench;
     assign regfile_write_data = en ? rob_write_data : ppl_write_data;
     assign regfile_write_idx = en ? retire_r_wire : ppl_write_idx;
 
-    // FU
-    S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_reg; // from RS to FU
-    logic [`RS_SZ:0] S_idx;
-
-    // Outputs from FU to Commit
-    X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_reg;
-    logic [`RS_SZ:0] X_idx, req_idx, fu_idx;
-    logic [`RS_SZ-1:0] gnt;
-    logic [`RS_SZ-1:0] FU_req;
-    logic [`RS_SZ-1:0] cdb_valid; // clocked signal for gnt
-    CDB cdb;
-    logic [`RS_SZ:0] cdb_idx;
-
     // Count
-    integer i, j, k, l, m, n, o;
+    integer i, j, k, l, m, n;
     logic [7:0] clock_count;
     logic [5:0] error_count;
 
-    map_table map_table_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid & ~d_stall), .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2), .retire_r(retire_r_wire), 
+    map_table map_table_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid), .r(r), .r1(r1), .r2(r2), .retire_r(retire_r_wire), 
                               .cdb(cdb), .T(T_wire), .retire_T(retire_T_wire), .T1(T1_wire), .T2(T2_wire), .mt_table_out(mt_table_out));
 
     always_comb begin
@@ -87,24 +74,18 @@ module testbench;
         end
     end
 
-    rs_stage rs_stage_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid & ~d_stall), .cdb(cdb), .D_S_reg(D_S_reg), .FU_ready(FU_ready),
+    rs_stage rs_stage_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid), .cdb(cdb), .D_S_reg(D_S_reg), .FU_ready(FU_ready),
                             .T(T_wire), .T1(T1_wire), .T2(T2_wire), .V1(V1_rs), .V2(V2_rs), .d_stall(d_stall),
-                            .S_packet(S_packets), .rs_table(rs_table), .busy(busy));
+                            .S_packet(S_X_pack), .rs_table(rs_table), .busy(busy));
 
-    rob rob_inst (.clock(clock), .reset(reset), .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T), .cdb(cdb),
+    rob rob_inst (.clock(clock), .reset(reset), .r(r), .T1(T1_wire.T), .T2(T2_wire.T), .cdb(cdb),
                   .dispatch_valid(D_S_reg.valid & ~d_stall), .T(T_wire), .retire_T_out(retire_T_wire), 
                   .ppln_ctrl(), .full(full), .empty(empty), .retire(retire), .regfile_write_idx_out(retire_r_wire), 
                   .V1(V1_rob), .V2(V2_rob), .regfile_write_data(rob_write_data),.rob_table_out(rob_table_out));
 
-    regfile regfile_inst (.clock(clock), .read_idx_1(D_S_reg.r1), .read_idx_2(D_S_reg.r2), .write_idx(regfile_write_idx),
+    regfile regfile_inst (.clock(clock), .read_idx_1(r1), .read_idx_2(r2), .write_idx(regfile_write_idx),
                           .write_en(regfile_write_en),.write_data(regfile_write_data),
                           .read_out_1(regfile_V1), .read_out_2(regfile_V2));
-
-    func_unit_0 func_unit_00(.S_X_reg(S_X_reg[0]), .X_packet(X_packets[0]));
-    func_unit_1 func_unit_01(.clock(clock), .reset(reset), .S_X_reg(S_X_reg[1]), .X_packet(X_packets[1]));
-
-    // grant cdb signal
-    rps4 arb (.clock(clock), .reset(reset), .req(FU_req), .en(1'b1), .gnt(gnt), .count());
 
     task print_rs;
         $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
@@ -127,27 +108,13 @@ module testbench;
         $display("------------------------------------------");
     endtask
 
-    task print_fu;
-        $display("\n(FU)\ttime: %d\n------------------------------------------", clock_count - 6);
-        for(o = 0; o < 2; o=o+1)
-            $display("index: %4d   T:%4d\t  result:%4d\t    valid:%4d", o, X_packets[o].T, X_packets[o].result, X_packets[o].valid);
-        $display("------------------------------------------");
-    endtask
-        
-    task print_cdb;
-        $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count - 6);
-        $display("T:%4d\t  V:%4d", cdb.T, cdb.V);
-        $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", {FU_ready[0], FU_ready[1]}, {FU_req[0], FU_req[1]}, {gnt[0], gnt[1]});
-        $display("------------------------------------------");
-    endtask
-
     task compare; // compare rs
         input [15:0] idx, t, t1, t2, v1, v2;
         input busy;
-        if((rs_table[idx].T != t) || (rs_table[idx].T1 != t1) || (rs_table[idx].T2 != t2) || (rs_table[idx].V1 != v1) || (rs_table[idx].V2 != v2)) begin
+        if((rs_table[idx].T != t) || (rs_table[idx].T1 != t1) || (rs_table[idx].T2 != t2) || (rs_table[idx].V1 != v1) || (rs_table[idx].V2 != v2) || (busy[idx] != busy)) begin
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
-            $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d", idx, t, t1, t2, v1, v2);
+            $display("@@@correct answer should be = index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:%b", idx, t, t1, t2, v1, v2, busy);
             // $finish;
         end
     endtask
@@ -187,7 +154,6 @@ module testbench;
         #(`CLOCK_PERIOD/2.0);
         clock = ~clock;
     end
-
     always@(posedge clock) begin
         clock_count <= clock_count + 1;
     end
@@ -199,68 +165,6 @@ module testbench;
         end
     end
 
-    // from issue to execute
-    always_ff @(posedge clock) begin
-        for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
-            if (reset) begin
-                S_X_reg[S_idx] <= 0;            
-            end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
-                S_X_reg[S_idx] <= S_packets[S_idx];
-            end else begin
-                S_X_reg[S_idx] <= 0;
-            end
-    end
-
-    always_comb begin
-        for(req_idx = 0; req_idx <`RS_SZ; req_idx++) begin
-            if(X_packets[req_idx].valid === 1)
-                FU_req[req_idx] = 1;
-            else
-                FU_req[req_idx] = 0;
-        end
-    end
-
-    // for FU_ready
-    always_ff @(posedge clock) begin
-        for (fu_idx = 0; fu_idx < `RS_SZ; fu_idx++)
-            if (reset) begin
-                FU_ready[fu_idx] <= `TRUE; // all FUs are available in the beginning
-            end else if (FU_ready[fu_idx] & S_packets[fu_idx].valid) begin
-                FU_ready[fu_idx] <= `FALSE; // FU is in used
-            end else if (gnt[fu_idx]) begin
-                FU_ready[fu_idx] <= `TRUE;
-            end
-    end
-
-    // from execute to commit
-    always_ff @(posedge clock) begin
-        for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
-            if (reset) begin
-                X_C_reg[X_idx] <= 0;
-            end else if (X_packets[X_idx].valid) begin
-                X_C_reg[X_idx] <= X_packets[X_idx];
-            end
-    end
-
-    // CDB stage
-    always_comb begin
-        cdb_idx = (gnt[0]) ? (0) :
-                  (gnt[1] ? (1) : 
-                  (gnt[2] ? 2 : 3));
-        if(|gnt) begin
-            cdb.valid = `TRUE;
-            cdb.T = X_packets[cdb_idx].T;
-            cdb.V = X_packets[cdb_idx].result;
-            cdb.ppln_ctrl = `TRUE;
-        end
-        else begin
-            cdb.valid = `FALSE;
-            cdb.T = 0;
-            cdb.V = 0;
-            cdb.ppln_ctrl = `TRUE;
-        end
-    end
-
     initial begin
         // reset
         clock = 0;
@@ -268,7 +172,7 @@ module testbench;
         clock_count = 0;
         reset = 0;
         en = 0;
-        // FU_ready = 4'b1111;
+        FU_ready = 4'b1111;
         D_S_reg = {
             `NOP, 
             {`XLEN{1'b0}}, // PC
@@ -287,7 +191,7 @@ module testbench;
             1'b0, // csr_op
             1'b0  // valid
         };
-        // cdb = 0;
+        cdb = 0;
         r = 0;
         r1 = 0;
         r2 = 0;
@@ -311,23 +215,24 @@ module testbench;
         @(negedge clock);
         reset = 0;
 
+
         @(negedge clock); 
         en = 1;
         D_S_reg.valid = 1;
-        // add x2, x0, x4 // 1
+        // ld X(r4), r2 // 1
         // V1 = 0; V2 = 8; T = 1; T1 = {0, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
-        D_S_reg.rs_idx = 0;
-        D_S_reg.r = 2;
-        D_S_reg.r1 = 0;
-        D_S_reg.r2 = 4;
-        // cdb.valid = 0;
-        // cdb.T = 0;
-        // cdb.V = 0;
+        D_S_reg.rs_idx = 1;
+        r = 2;
+        r1 = 0;
+        r2 = 4;
+        cdb.valid = 0;
+        cdb.T = 0;
+        cdb.V = 0;
         @(posedge clock); #2
-        // FU_ready[0] = 1;
-        // FU_ready[1] = 1;
-        // FU_ready[2] = 1;
-        // FU_ready[3] = 1;
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(0);
         @(negedge clock); // 1
         print_rs();
@@ -348,29 +253,27 @@ module testbench;
         compare_rob(5, 0, 0);
         compare_rob(6, 0, 0);
         compare_rob(7, 0, 0);
-        print_fu();
-        print_cdb();
 
-        // mul x3, x1, x2 // 2
+        // mul r1, r2, r3 // 2
         // V1 = 5; V2 = 0; T = 2; T1 = {0, 1'b0}; T2 = {1, 1'b0}; retire_r = 0; retire_T = 0;
-        D_S_reg.rs_idx = 1;
-        D_S_reg.r = 3;
-        D_S_reg.r1 = 1;
-        D_S_reg.r2 = 2;
-        // cdb.valid = 0;
-        // cdb.T = 0;
-        // cdb.V = 0;
+        D_S_reg.rs_idx = 3;
+        r = 3;
+        r1 = 1;
+        r2 = 2;
+        cdb.valid = 0;
+        cdb.T = 0;
+        cdb.V = 0;
         @(posedge clock); #2
-        // FU_ready[0] = 1;
-        // FU_ready[1] = 1;
-        // FU_ready[2] = 1;
-        // FU_ready[3] = 1;
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(0);
         // 2
         @(negedge clock);
         print_rs();
-        compare(0, 1, 0, 0, 0, 8, 1);
-        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 1, 0, 0, 0, 8, 1);
         compare(2, 0, 0, 0, 0, 0, 0);
         compare(3, 0, 0, 0, 0, 0, 0);
         print_mt();
@@ -386,92 +289,298 @@ module testbench;
         compare_rob(5, 0, 0);
         compare_rob(6, 0, 0);
         compare_rob(7, 0, 0);
-        print_fu();
-        print_cdb();
 
-        // add x1, x3, x4 // 3
+        // stf r3, Z(r4) // 3
         // V1 = 0; V2 = 8; T = 3; T1 = {2, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
         D_S_reg.rs_idx = 2;
-        D_S_reg.r = 1; // question: what should be the r for store function
-        D_S_reg.r1 = 3;
-        D_S_reg.r2 = 4;
-        // cdb.valid = 0;
-        // cdb.T = 0;
-        // cdb.V = 0;
+        r = 0; // question: what should be the r for store function
+        r1 = 3;
+        r2 = 4;
+        cdb.valid = 0;
+        cdb.T = 0;
+        cdb.V = 0;
         @(posedge clock); #2
-        // FU_ready[0] = 1;
-        // FU_ready[1] = 1;
-        // FU_ready[2] = 1;
-        // FU_ready[3] = 1;
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
         compare_stall(0);
         @(negedge clock);
         // 3
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 2, 0, 1, 5, 0, 1);
+        compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 0, 0, 0, 0, 0, 0);
-        compare(3, 0, 0, 0, 0, 0, 0);
+        compare(3, 2, 0, 1, 5, 0, 1);
         print_mt();
-        compare_mt(1, 3, 0);
+        compare_mt(1, 0, 0);
         compare_mt(2, 1, 0);
         compare_mt(3, 2, 0);
         compare_mt(4, 0, 0);
         print_rob();
         compare_rob(1, 2, 0);
         compare_rob(2, 3, 0);
-        compare_rob(3, 1, 0);
+        compare_rob(3, 0, 0);
         compare_rob(4, 0, 0);
         compare_rob(5, 0, 0);
         compare_rob(6, 0, 0);
         compare_rob(7, 0, 0);
-        print_fu();
-        print_cdb();
-
-        // add x1, x3, x4 // 3
-        // V1 = 0; V2 = 8; T = 3; T1 = {2, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
-        D_S_reg.rs_idx = 2;
-        D_S_reg.r = 1; // question: what should be the r for store function
-        D_S_reg.r1 = 3;
-        D_S_reg.r2 = 4;
-        // cdb.valid = 1;
-        // cdb.T = 1;
-        // cdb.V = 10;
+        
+        // addi r4, 4, r4 // 4
+        // V1 = 8; V2 = 0; T = 4; T1 = {0, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
+        D_S_reg.rs_idx = 0;
+        r = 4;
+        r1 = 4;
+        r2 = 0;
+        cdb.valid = 1;
+        cdb.T = 1;
+        cdb.V = 10;
         @(posedge clock); #2
-        // FU_ready[0] = 1;
-        // FU_ready[1] = 1;
-        // FU_ready[2] = 1;
-        // FU_ready[3] = 1;
-        compare_stall(1);
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
+        compare_stall(0);
         // 4
         @(negedge clock);
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
-        compare(1, 2, 0, 0, 5, 8, 1);
+        compare(1, 0, 0, 0, 0, 0, 0);
         compare(2, 3, 2, 0, 0, 8, 1);
-        compare(3, 0, 0, 0, 0, 0, 0); 
+        compare(3, 2, 0, 0, 5, 10, 1); 
         print_mt();
-        compare_mt(1, 3, 0);
+        compare_mt(1, 0, 0);
         compare_mt(2, 1, 1);
         compare_mt(3, 2, 0);
-        compare_mt(4, 0, 0);
+        compare_mt(4, 4, 0);
         print_rob();
-        compare_rob(1, 2, 8);
+        compare_rob(1, 2, 10);
         compare_rob(2, 3, 0);
-        compare_rob(3, 1, 0);
-        compare_rob(4, 0, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 0);
         compare_rob(5, 0, 0);
         compare_rob(6, 0, 0);
         compare_rob(7, 0, 0);
-        print_fu();
-        print_cdb();
+
+        // ldf X(r4), r2 // 5
+        // V1 = 0; V2 = 0; T = 5; T1 = {0, 1'b0}; T2 = {4, 1'b0}; retire_r = 2; retire_T = 1;
+        D_S_reg.rs_idx = 1;
+        r = 2;
+        r1 = 0;
+        r2 = 4;
+        cdb.valid = 0;
+        cdb.T = 0;
+        cdb.V = 0;
+        @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 0;
+        compare_stall(0);
         @(negedge clock);
+        // 5
+        print_rs();
+        compare(0, 4, 0, 0, 8, 0, 1);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 3, 2, 0, 0, 8, 1);
+        compare(3, 0, 0, 0, 0, 0, 0); 
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 2, 0);
+        compare_mt(4, 4, 0);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 0);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 0, 0);
+        compare_rob(7, 0, 0);
+
+        // mul r1, r2, r3 // 6
+        // V1 = 5; V2 = 0; T = 6; T1 = {0, 1'b0}; T2 = {5, 1'b0}; retire_r = 0; retire_T = 0;
+        D_S_reg.rs_idx = 3;
+        r = 3;
+        r1 = 1;
+        r2 = 2;
+        cdb.valid = 0;
+        cdb.T = 0;
+        cdb.V = 0;
+        @(posedge clock); #2
+        FU_ready[0] = 0;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 0;
+        compare_stall(0);
+        // 6
         @(negedge clock);
+        print_rs();
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 5, 0, 4, 0, 0, 1);
+        compare(2, 3, 2, 0, 0, 8, 1);
+        compare(3, 0, 0, 0, 0, 0, 0);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 0);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 0);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
+        
+        // stf r3, Z(r4) (stall) // 7
+        // V1 = 0; V2 = 1; T = 7; T1 = {6, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
+        D_S_reg.rs_idx = 2;
+        r = 0;
+        r1 = 3;
+        r2 = 4;
+        cdb.valid = 1;
+        cdb.T = 4;
+        cdb.V = 12;
+        @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 0;
+        compare_stall(1);
+        // 7
+        @(negedge clock);
+        print_rs();
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 5, 0, 0, 0, 12, 1);
+        compare(2, 3, 2, 0, 0, 8, 1);
+        compare(3, 6, 0, 5, 5, 0, 1);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
+        
+        // stf r3, Z(r4) (stall) // 8
+        // V1 = 0; V2 = 1; T = 7; T1 = {6, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
+        D_S_reg.rs_idx = 2;
+        r = 0;
+        r1 = 3;
+        r2 = 4;
+        cdb.valid = 1;
+        cdb.T = 2;
+        cdb.V = 11;
+        @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 0;
+        FU_ready[2] = 1;
+        FU_ready[3] = 1;
+        compare_stall(1);
+        @(negedge clock); 
+        // 8
+        print_rs();
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 3, 0, 0, 11, 8, 1);
+        compare(3, 6, 0, 5, 5, 0, 1);    
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 0);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 3, 11);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 0);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
+        
+        // stf r3, Z(r4) // 9
+        // V1 = 0; V2 = 2; T = 7; T1 = {6, 1'b0}; T2 = {4, 1'b1}; retire_r = 3; retire_T = 2;
+        D_S_reg.rs_idx = 2;
+        r = 0;
+        r1 = 3;
+        r2 = 4;
+        cdb.valid = 1;
+        cdb.T = 5;
+        cdb.V = 15;
+        @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 0;
+        FU_ready[3] = 1;
+        compare_stall(0);
+        // 9
+        @(negedge clock);
+        print_rs();
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 0, 0, 0, 0, 0, 0);
+        compare(3, 6, 0, 0, 5, 15, 1);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 1);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 0, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 15);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
+
+        // none // 10
+        D_S_reg.rs_idx = 0;
+        r = 0;
+        r1 = 0;
+        r2 = 0;
+        cdb.valid = 0;
+        cdb.T = 0;
+        cdb.V = 0;
+        @(posedge clock); #2
+        FU_ready[0] = 1;
+        FU_ready[1] = 1;
+        FU_ready[2] = 1;
+        FU_ready[3] = 0;
+        compare_stall(0);
+        // 10
+        @(negedge clock);
+        print_rs();
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 7, 6, 0, 0, 12, 1);
+        compare(3, 0, 0, 0, 0, 0, 0);
+        print_mt();
+        compare_mt(1, 0, 0);
+        compare_mt(2, 5, 1);
+        compare_mt(3, 6, 0);
+        compare_mt(4, 4, 1);
+        print_rob();
+        compare_rob(1, 0, 0);
+        compare_rob(2, 0, 0);
+        compare_rob(3, 0, 0);
+        compare_rob(4, 4, 12);
+        compare_rob(5, 2, 15);
+        compare_rob(6, 3, 0);
+        compare_rob(7, 0, 0);
 
         if(error_count == 0) begin
             $display("@@@Passed");
         end
         @(negedge clock);
-
         $finish;
     end
 

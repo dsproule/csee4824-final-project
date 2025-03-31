@@ -98,6 +98,7 @@
 # there should be no need to change anything for project 3
 
 # this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
+# this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
 export CLOCK_PERIOD = 350.0
 
 # Path variables
@@ -176,6 +177,36 @@ GREP = grep -E --color=auto
 # - added to TESTED_MODULES as: 'rob'
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
+TESTBENCH = multi_module_test_done
+MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv
+OUTPUT_DIR = ./output
+SIMV = $(TESTBENCH).simv
+SIM_OUT = $(OUTPUT_DIR)/$(TESTBENCH).out
+SYN_OUT = $(OUTPUT_DIR)/$(TESTBENCH).syn.out
+
+# Compile the simulation executable
+$(SIMV): ./test/$(TESTBENCH).sv $(MODULES) $(HEADERS)
+	@$(call PRINT_COLOR, 5, compiling the simulation executable $@)
+	@$(call PRINT_COLOR, 3, NOTE: if this is slow to startup: run '"module load vcs verdi synopsys-synth"')
+	$(VCS) $(filter-out $(HEADERS),$^) -o $@
+	@$(call PRINT_COLOR, 6, finished compiling $@)
+
+# Run simulation
+$(SIM_OUT): $(SIMV) | $(OUTPUT_DIR)
+	@$(call PRINT_COLOR, 5, Running $<)
+	./$< | tee $@
+	@$(call PRINT_COLOR, 2, Output is in $@)
+
+# Run synthesis (if needed)
+$(SYN_OUT): $(SIMV) | $(OUTPUT_DIR)
+	@$(call PRINT_COLOR, 5, Running synthesis on $<)
+	./$< -synthesis | tee $@
+	@$(call PRINT_COLOR, 2, Synthesis output is in $@)
+
+# Ensure output directory exists
+$(OUTPUT_DIR):
+	mkdir -p $(OUTPUT_DIR)
+
 # TODO: add more modules here
 TESTED_MODULES = multi_module if_stage d_stage rs_stage
 
@@ -186,6 +217,8 @@ MODULE = pipeline
 # Helper function:
 DEPS = $(1).simv $(1).cov synth/$(1).vg
 
+MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
+$(call DEPS,func_unit_1): $(MULT_DEPS)
 MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
 $(call DEPS,func_unit_1): $(MULT_DEPS)
 
