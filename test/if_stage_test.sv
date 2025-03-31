@@ -26,18 +26,18 @@ module testbench;
         end
     endtask // task show_mem_with_decimal
 
-    logic Icache_valid;
+    logic Imem2proc_valid;
     IF_ID_PACKET IF_ID_reg, IF_packet;
     D_S_PACKET D_S_reg, D_packet;
-    logic [`XLEN-1:0] Icache2mem_addr, proc2Icache_addr, proc2mem_addr, proc2Dmem_addr, next_addr;
-    logic [63:0] mem2Icache_data, Icache2proc_data;
-    logic [1:0] Icache2mem_command, proc2Dmem_command, proc2mem_command;
-    logic [3:0] mem2Icache_response, mem2Icache_tag;
+    logic [`XLEN-1:0] proc2Imem_addr, proc2Icache_addr, proc2mem_addr, proc2Dmem_addr;
+    logic [63:0] mem2proc_data, Icache2proc_data;
+    logic [1:0] proc2Imem_command, proc2Dmem_command, proc2mem_command;
+    logic [3:0] mem2proc_response, mem2proc_tag;
     logic [31:0] proc2Dmem_data_lsb, proc2Dmem_data_msb;
 
     // new signals
-    logic [`XLEN-1:0] lastI_addr;
-    logic [3:0] nextIcache_tag;
+    logic [`XLEN-1:0] lastImem_addr;
+    logic [3:0] nextImem_tag;
     logic new_addr;
 
     mem memory(
@@ -46,27 +46,27 @@ module testbench;
         .proc2mem_data({proc2Dmem_data_msb, proc2Dmem_data_lsb}),
         .proc2mem_command(proc2mem_command),
 
-        .mem2proc_response(mem2Icache_response),        // will need to change when Dmem gets introduced
-        .mem2proc_data(mem2Icache_data),                // will need to change when Dmem gets introduced
-        .mem2proc_tag(mem2Icache_tag)                   // will need to change when Dmem gets introduced
+        .mem2proc_response(mem2proc_response),        // will need to change when Dmem gets introduced
+        .mem2proc_data(mem2proc_data),                // will need to change when Dmem gets introduced
+        .mem2proc_tag(mem2proc_tag)                   // will need to change when Dmem gets introduced
     );
     
     // icache icache_0 (
     //     // Inputs
     //     .clock(clock), .reset(reset),
         
-    //     .Imem2proc_response(mem2Icache_response),
-    //     .Imem2proc_data(mem2Icache_data),
-    //     .Imem2proc_tag(mem2Icache_tag),
+    //     .Imem2proc_response(mem2proc_response),
+    //     .mem2proc_data(mem2proc_data),
+    //     .Imem2proc_tag(mem2proc_tag),
         
     //     .proc2Icache_addr(proc2Icache_addr),
 
     //     // Outputs
-    //     .proc2Imem_command(Icache2mem_command),
-    //     .proc2Imem_addr(Icache2mem_addr),
+    //     .proc2Imem_command(proc2Imem_command),
+    //     .proc2Imem_addr(proc2Imem_addr),
 
     //     .Icache_data_out(Icache2proc_data),
-    //     .Icache_valid_out(Icache_valid)
+    //     .Imem2proc_valid_out(Imem2proc_valid)
     // );
 
     /* 
@@ -84,8 +84,8 @@ module testbench;
 
     always_comb begin
         if (proc2Dmem_command == BUS_NONE) begin
-            proc2mem_addr    = Icache2mem_addr;
-            proc2mem_command = Icache2mem_command;
+            proc2mem_addr    = proc2Imem_addr;
+            proc2mem_command = proc2Imem_command;
         end else begin
             proc2mem_addr    = proc2Dmem_addr;
             proc2mem_command = proc2Dmem_command;
@@ -96,29 +96,29 @@ module testbench;
         // Inputs
         .clock (clock),
         .reset (reset),
-        .if_valid       (Icache_valid),
+        .if_valid       (Imem2proc_valid),
         .take_branch    (),                 // ignore because this scares me for now
         .branch_target  (),                 // check above comment
-        .Imem2proc_data (mem2Icache_data),
+        .Imem2proc_data (mem2proc_data),
 
         // Outputs
         .if_packet      (IF_packet),
-        .proc2Imem_addr (Icache2mem_addr)
+        .proc2Imem_addr (proc2Imem_addr)
     );
 
     // makes the last_addr trail the PC
     always_ff @(posedge clock) begin
-        new_addr <= (lastI_addr != IF_ID_reg.NPC) & ~reset & IF_ID_reg.valid;
+        new_addr <= (lastImem_addr != IF_ID_reg.NPC) & ~reset & IF_ID_reg.valid;
 
         if (reset) begin
-            lastI_addr <= `XLEN'hFFFFFFFF;
+            lastImem_addr <= `XLEN'hFFFFFFFF;
 
             IF_ID_reg.inst  <= `NOP;
             IF_ID_reg.valid <= `TRUE;
             IF_ID_reg.NPC   <= 'h0;
             IF_ID_reg.PC    <= 0;
         end else begin
-            lastI_addr <= IF_ID_reg.PC;
+            lastImem_addr <= IF_ID_reg.PC;
 
             // if (IF_packet.valid)
             IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
@@ -126,14 +126,14 @@ module testbench;
     end
 
     // when response comes back in turn on the if_stage
-    assign Icache_valid = (mem2Icache_tag == nextIcache_tag) & (nextIcache_tag != '0);
+    assign Imem2proc_valid = (mem2proc_tag == nextImem_tag) & (nextImem_tag != '0);
 
     always_comb begin
         if (new_addr) begin
-            Icache2mem_command = BUS_LOAD;
-            nextIcache_tag     = mem2Icache_response;
+            proc2Imem_command = BUS_LOAD;
+            nextImem_tag     = mem2proc_response;
         end else begin
-            Icache2mem_command = BUS_NONE;
+            proc2Imem_command = BUS_NONE;
         end
     end
 

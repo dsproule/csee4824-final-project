@@ -358,7 +358,7 @@ $(TESTED_MODULES:=.cov.verdi): %.cov.verdi: %.cov.vdb
 HEADERS = verilog/sys_defs.svh \
           verilog/ISA.svh
 
-TESTBENCH = test/ppln_chunk.sv  \
+TESTBENCH = test/pipeline_test.sv  \
             test/pipeline_print.c \
             test/mem.sv
 			

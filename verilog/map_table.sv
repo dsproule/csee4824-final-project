@@ -9,7 +9,7 @@ module map_table (
     output MT_ENTRY T1, T2, 
     output logic [$bits(MT_ENTRY)*32-1:0] mt_table_out
 );
-
+    logic [5:0] reset_idx, cdb_idx;
     logic retire_entry;
     MT_ENTRY mt_table [31:0];
 
@@ -37,7 +37,7 @@ module map_table (
     
     always_ff @(posedge clock) begin
         if (reset) begin
-            for (int reset_idx = 0; reset_idx < 32; reset_idx++) begin
+            for (reset_idx = 0; reset_idx < 32; reset_idx++)
                 mt_table[reset_idx] <= 0;
         end else begin
             if(en) begin

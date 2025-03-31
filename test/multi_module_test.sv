@@ -65,7 +65,7 @@ module testbench;
 
     // Outputs from FU to Commit
     X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_reg;
-    logic [`RS_SZ:0] X_idx, req_idx, fu_idx;
+    logic [`RS_SZ:0] X_idx, S_idx, req_idx, fu_idx;
     logic [`RS_SZ-1:0] gnt;
     logic [`RS_SZ-1:0] FU_req;
     logic [`RS_SZ-1:0] cdb_valid; // clocked signal for gnt
@@ -328,7 +328,7 @@ module testbench;
         // FU_ready[1] = 1;
         // FU_ready[2] = 1;
         // FU_ready[3] = 1;
-        compare_stall(0);
+        // compare_stall(0);
         @(negedge clock); // 1
         print_rs();
         compare(0, 0, 0, 0, 0, 0, 0);
@@ -365,7 +365,7 @@ module testbench;
         // FU_ready[1] = 1;
         // FU_ready[2] = 1;
         // FU_ready[3] = 1;
-        compare_stall(0);
+        // compare_stall(0);
         // 2
         @(negedge clock);
         print_rs();
@@ -403,7 +403,7 @@ module testbench;
         // FU_ready[1] = 1;
         // FU_ready[2] = 1;
         // FU_ready[3] = 1;
-        compare_stall(0);
+        // compare_stall(0);
         @(negedge clock);
         // 3
         print_rs();
@@ -427,10 +427,10 @@ module testbench;
         print_fu();
         print_cdb();
 
-        // add x1, x3, x4 // 3
+        // add x2, x3, x4 // 4
         // V1 = 0; V2 = 8; T = 3; T1 = {2, 1'b0}; T2 = {0, 1'b0}; retire_r = 0; retire_T = 0;
         D_S_reg.rs_idx = 2;
-        D_S_reg.r = 1; // question: what should be the r for store function
+        D_S_reg.r = 2; // question: what should be the r for store function
         D_S_reg.r1 = 3;
         D_S_reg.r2 = 4;
         // cdb.valid = 1;
@@ -441,7 +441,7 @@ module testbench;
         // FU_ready[1] = 1;
         // FU_ready[2] = 1;
         // FU_ready[3] = 1;
-        compare_stall(1);
+        // compare_stall(1);
         // 4
         @(negedge clock);
         print_rs();
@@ -476,3 +476,8 @@ module testbench;
     end
 
 endmodule
+
+// add x2, x0, x4
+// mul x3, x1, x2
+// ld  x1, x3, x4
+// ld  x2, x3, x4

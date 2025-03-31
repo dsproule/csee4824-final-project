@@ -4,7 +4,6 @@
 module RS_ALLOC(
     input clock, reset, en,
     input D_S_PACKET D_S_reg,
-    input D_S_PACKET D_S_reg,
     input logic [`RS_SZ-1:0] rs_free,
     input ROB_T               T, 
     input MT_ENTRY            MT_T1, MT_T2,          // from the Map Table     
@@ -12,7 +11,6 @@ module RS_ALLOC(
     input CDB                 cdb,
 
     output stall,
-    output logic    [`RS_SZ-1:0] busy,
     output logic    [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
 );
@@ -29,8 +27,8 @@ module RS_ALLOC(
     logic on;
 
     assign rs_idx = D_S_reg.rs_idx;
-    assign rs_idx = D_S_reg.rs_idx;
-    assign stall = busy[rs_idx];
+    // assign stall = busy[rs_idx];
+    assign stall = (rs_free[rs_idx]) ? 0 : next_busy[rs_idx];
 
     always_ff @(posedge clock) begin
         if (reset) begin
@@ -42,22 +40,24 @@ module RS_ALLOC(
 
             next_re <= 0;
             rs_update_idx <= 0;
-        end else if (en) begin  
+        end else begin  
             // busy handling
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
-                if ((rs_update_idx != busy_reset_idx) & (rs_free[busy_reset_idx]))
+                if ((rs_update_idx != busy_reset_idx) & (rs_free[busy_reset_idx])) begin
                     busy[busy_reset_idx] <= `FALSE;
+                    next_busy[busy_reset_idx] <= `FALSE;
+                end
             
             busy[rs_update_idx] <= next_busy[rs_update_idx];
             rs_table[rs_update_idx] <= next_re;
 
             // if RS entry is empty, allocate it
-            if (~busy[rs_idx] | rs_free[rs_idx]) begin
+            if ((~busy[rs_idx] | rs_free[rs_idx]) & en) begin
                 next_busy[rs_idx] <= `TRUE;
+                // busy[rs_idx] <= `TRUE;
                 
                 // save values in next_re from decode stage (always saved for allocation)
                 next_re.T <= T;
-                next_re.D_S_reg <= D_S_reg;
                 next_re.D_S_reg <= D_S_reg;
 
                 rs_update_idx <= rs_idx;
@@ -94,7 +94,7 @@ module RS_ALLOC(
                     rs_table[rs_free_idx] <= 0;
 
             // if a CDB line came in 
-            if (cdb.valid)
+            if (cdb.valid) 
                 for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
                     if (rs_table[cdb_idx].T1 == cdb.T) begin
                         rs_table[cdb_idx].V1 <= cdb.V;
@@ -121,7 +121,6 @@ module RS_VALUE(
 
     output logic      [`RS_SZ-1:0] s_valid, rs_free,  
     output S_X_PACKET [`RS_SZ-1:0] S_packet
-    output S_X_PACKET [`RS_SZ-1:0] S_packet
 );
     /* 
      *  Reads values from rs_table that has the dispatch and passes them to the s_x_regs when
@@ -140,39 +139,38 @@ module RS_VALUE(
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
                 if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx]) begin
-                    S_packet[s_idx] = {
-                        rs_table[s_idx].D_S_reg.inst,
-                        rs_table[s_idx].D_S_reg.PC,
-                        rs_table[s_idx].D_S_reg.NPC,
-                        rs_table[s_idx].D_S_reg.cond_branch,
-                        rs_table[s_idx].D_S_reg.uncond_branch,
-                        rs_table[s_idx].D_S_reg.opa_select,
-                        rs_table[s_idx].D_S_reg.opb_select,
-                        rs_table[s_idx].T, 
-                        rs_table[s_idx].V1, 
-                        rs_table[s_idx].V2,
-                        rs_table[s_idx].D_S_reg.halt,
-                        `TRUE
-                    };
-                    s_valid[s_idx] = 1'b1;
+                    S_packet[s_idx].inst = rs_table[s_idx].D_S_reg.inst;
+                    S_packet[s_idx].PC = rs_table[s_idx].D_S_reg.PC;
+                    S_packet[s_idx].NPC = rs_table[s_idx].D_S_reg.NPC;
+                    S_packet[s_idx].cond_branch = rs_table[s_idx].D_S_reg.cond_branch;
+                    S_packet[s_idx].uncond_branch = rs_table[s_idx].D_S_reg.uncond_branch;
+                    S_packet[s_idx].opa_select = rs_table[s_idx].D_S_reg.opa_select;
+                    S_packet[s_idx].opb_select = rs_table[s_idx].D_S_reg.opb_select;
+                    S_packet[s_idx].alu_func = rs_table[s_idx].D_S_reg.alu_func;
+                    S_packet[s_idx].T = rs_table[s_idx].T;
+                    S_packet[s_idx].V1 = rs_table[s_idx].V1;
+                    S_packet[s_idx].V2 = rs_table[s_idx].V2;
+                    S_packet[s_idx].halt = rs_table[s_idx].D_S_reg.halt;
+                    S_packet[s_idx].valid = 1;
+                    rs_free[s_idx] = 1'b1;
                 end else begin
                     S_packet[s_idx] = 0;
-                    s_valid[s_idx] = 0;
+                    rs_free[s_idx] = 0;
                 end
             end
         end
     end
 
     // clears the RS on the next cycle (works because rest is comb)
-    always_ff @(posedge clock) begin
-        if (reset) begin
-            for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
-                rs_free[reset_idx] <= 0;
-        end else begin
-            for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
-                rs_free[rs_free_idx] <= s_valid[rs_free_idx];
-        end
-    end
+    // always_ff @(posedge clock) begin
+    //     if (reset) begin
+    //         for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
+    //             rs_free[reset_idx] <= 0;
+    //     end else if (en) begin
+    //         for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
+    //             rs_free[rs_free_idx] <= s_valid[rs_free_idx];
+    //     end
+    // end
 
 endmodule   // RS_VALUE
 
@@ -182,16 +180,13 @@ module rs_stage(
     input D_S_PACKET D_S_reg,
     input [`RS_SZ-1:0] FU_ready,
     input ROB_T       T,
-    input D_S_PACKET D_S_reg,
-    input [`RS_SZ-1:0] FU_ready,
-    input ROB_T       T,
     input MT_ENTRY    T1, T2,
     input [`XLEN-1:0] V1, V2,                  // uses MT_ENTRY.plus to mux val from regfile or ROB
 
-    output d_stall,              
+    output stall,              
     output [`RS_SZ-1:0] busy,           
     output S_X_PACKET [`RS_SZ-1:0] S_packet,
-    output RS_ENTRY [`RS_SZ-1:0]  rs_table
+    output RS_ENTRY [ `RS_SZ-1:0]  rs_table
 );
     logic [`RS_SZ-1:0] free_bus;
     
@@ -200,14 +195,13 @@ module rs_stage(
         // Inputs
         .clock(clock), .reset(reset), .en(en),
         .D_S_reg(D_S_reg),
-        .D_S_reg(D_S_reg),
         .rs_free(free_bus),
         .T(T), .MT_T1(T1), .MT_T2(T2),
         .V1(V1), .V2(V2),
         .cdb(cdb),
 
         // Outputs
-        .stall(d_stall),
+        .stall(stall),
         .rs_table(rs_table),
         .busy(busy)
     );
@@ -218,10 +212,8 @@ module rs_stage(
         .rs_table(rs_table),
         .rs_free(free_bus),
         .FU_ready(FU_ready),
-        .FU_ready(FU_ready),
 
         // Output
-        .S_packet(S_packet)
         .S_packet(S_packet)
     );
 
