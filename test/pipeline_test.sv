@@ -17,16 +17,16 @@
 
 // these link to the pipeline_print.c file in this directory, and are used below to print
 // detailed output to the pipeline_output_file, initialized by open_pipeline_output_file()
-import "DPI-C" function void open_pipeline_output_file(string file_name);
-import "DPI-C" function void print_header(string str);
-import "DPI-C" function void print_cycles();
-import "DPI-C" function void print_stage(string div, int inst, int npc, int valid_inst);
-import "DPI-C" function void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
-                                       int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
-import "DPI-C" function void print_membus(int proc2mem_command, int mem2proc_response,
-                                          int proc2mem_addr_hi, int proc2mem_addr_lo,
-                                          int proc2mem_data_hi, int proc2mem_data_lo);
-import "DPI-C" function void print_close();
+// import "DPI-C" function void open_pipeline_output_file(string file_name);
+// import "DPI-C" function void print_header(string str);
+// import "DPI-C" function void print_cycles();
+// import "DPI-C" function void print_stage(string div, int inst, int npc, int valid_inst);
+// import "DPI-C" function void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
+//                                        int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
+// import "DPI-C" function void print_membus(int proc2mem_command, int mem2proc_response,
+//                                           int proc2mem_addr_hi, int proc2mem_addr_lo,
+//                                           int proc2mem_data_hi, int proc2mem_data_lo);
+// import "DPI-C" function void print_close();
 
 
 module testbench;
@@ -63,22 +63,13 @@ module testbench;
     logic             pipeline_commit_wr_en;
     logic [`XLEN-1:0] pipeline_commit_NPC;
 
-    // logic [`XLEN-1:0] if_NPC_dbg;
-    // logic [31:0]      if_inst_dbg;
-    // logic             if_valid_dbg;
-    // logic [`XLEN-1:0] if_id_NPC_dbg;
-    // logic [31:0]      if_id_inst_dbg;
-    // logic             if_id_valid_dbg;
-    // logic [`XLEN-1:0] id_ex_NPC_dbg;
-    // logic [31:0]      id_ex_inst_dbg;
-    // logic             id_ex_valid_dbg;
-    // logic [`XLEN-1:0] ex_mem_NPC_dbg;
-    // logic [31:0]      ex_mem_inst_dbg;
-    // logic             ex_mem_valid_dbg;
-    // logic [`XLEN-1:0] mem_wb_NPC_dbg;
-    // logic [31:0]      mem_wb_inst_dbg;
-    // logic             mem_wb_valid_dbg;
+    logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg;
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg;
+    RS_ENTRY [`RS_SZ-1:0] rs_table_dbg;
+    X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
+    CDB cdb_dbg;
 
+    integer i, j, k, l, m, n, o;
 
     // Instantiate the Pipeline
     pipeline core (
@@ -102,23 +93,13 @@ module testbench;
         .pipeline_commit_wr_data  (pipeline_commit_wr_data),
         .pipeline_commit_wr_idx   (pipeline_commit_wr_idx),
         .pipeline_commit_wr_en    (pipeline_commit_wr_en),
-        .pipeline_commit_NPC      (pipeline_commit_NPC)
+        .pipeline_commit_NPC      (pipeline_commit_NPC),
 
-        // .if_NPC_dbg       (if_NPC_dbg),
-        // .if_inst_dbg      (if_inst_dbg),
-        // .if_valid_dbg     (if_valid_dbg),
-        // .if_id_NPC_dbg    (if_id_NPC_dbg),
-        // .if_id_inst_dbg   (if_id_inst_dbg),
-        // .if_id_valid_dbg  (if_id_valid_dbg),
-        // .id_ex_NPC_dbg    (id_ex_NPC_dbg),
-        // .id_ex_inst_dbg   (id_ex_inst_dbg),
-        // .id_ex_valid_dbg  (id_ex_valid_dbg),
-        // .ex_mem_NPC_dbg   (ex_mem_NPC_dbg),
-        // .ex_mem_inst_dbg  (ex_mem_inst_dbg),
-        // .ex_mem_valid_dbg (ex_mem_valid_dbg),
-        // .mem_wb_NPC_dbg   (mem_wb_NPC_dbg),
-        // .mem_wb_inst_dbg  (mem_wb_inst_dbg),
-        // .mem_wb_valid_dbg (mem_wb_valid_dbg)
+        .rob_table_out_dbg(rob_table_out_dbg),
+        .mt_table_out_dbg(mt_table_out_dbg),
+        .rs_table_dbg(rs_table_dbg),
+        .X_packets_dbg(X_packets_dbg),
+        .cdb_dbg(cdb_dbg)
     );
 
 

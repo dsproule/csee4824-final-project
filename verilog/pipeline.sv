@@ -30,7 +30,13 @@ module pipeline (
     output logic [4:0]       pipeline_commit_wr_idx,
     output logic [`XLEN-1:0] pipeline_commit_wr_data,
     output logic             pipeline_commit_wr_en,
-    output logic [`XLEN-1:0] pipeline_commit_NPC
+    output logic [`XLEN-1:0] pipeline_commit_NPC,
+
+    output logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg,
+    output logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg,
+    output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg,
+    output X_C_PACKET [`RS_SZ-1:0] X_packets_dbg,
+    output CDB cdb_dbg
 );
 
     //////////////////////////////////////////////////
@@ -82,6 +88,12 @@ module pipeline (
     logic             wb_regfile_en;
     logic [4:0]       wb_regfile_idx;
     logic [`XLEN-1:0] wb_regfile_data;
+
+    assign rob_table_out_dbg = rob_table_out;
+    assign mt_table_out_dbg  = mt_table_out;
+    assign rs_table_dbg      = rs_table;
+    assign cdb_dbg           = cdb;
+    assign X_packets_dbg      = X_packets;
 
     //////////////////////////////////////////////////
     //                                              //
