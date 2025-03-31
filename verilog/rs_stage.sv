@@ -111,7 +111,7 @@ endmodule   // RS_alloc
 
 // Issue stage (clocked)
 module RS_VALUE(
-    input clock, reset, en,
+    input clock, reset,
     input RS_ENTRY    [`RS_SZ-1:0] rs_table,
     input logic      [`RS_SZ-1:0] FU_ready,
 
@@ -132,7 +132,7 @@ module RS_VALUE(
                 s_valid[s_idx] = 1'b0;
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
-                if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx] & en) begin
+                if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx]) begin
                     S_packet[s_idx] = {
                         rs_table[s_idx].D_S_reg.inst,
                         rs_table[s_idx].D_S_reg.PC,
@@ -161,7 +161,7 @@ module RS_VALUE(
         if (reset) begin
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
                 rs_free[reset_idx] <= 0;
-        end else if (en) begin
+        end else begin
             for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
                 rs_free[rs_free_idx] <= s_valid[rs_free_idx];
         end
@@ -203,7 +203,7 @@ module rs_stage(
 
     RS_VALUE rs_value(
         // Input
-        .clock(clock), .reset(reset), .en(en),
+        .clock(clock), .reset(reset),
         .rs_table(rs_table),
         .rs_free(free_bus),
         .FU_ready(FU_ready),
