@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1743442319.222429466, "rt":2.33, "ut":0.38, "st":0.11}}
+{"vcselab":{"timestamp_begin":1743442321.582422435, "rt":0.73, "ut":0.14, "st":0.04}}
+{"link":{"timestamp_begin":1743442322.345346119, "rt":0.74, "ut":0.12, "st":0.05}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1743442318.723712425}
+{"VCS_COMP_START_TIME": 1743442318.723712425}
+{"VCS_COMP_END_TIME": 1743442323.630912949}
+{"VCS_USER_OPTIONS": "-sverilog +vc -Mupdate -line -full64 -kdb -lca -nc -debug_access+all+reverse +warn=noTFIPC +warn=noDEBUG_DEP +warn=noENUMASSIGN +define+CLOCK_PERIOD=350.0 test/pipeline_test.sv test/pipeline_print.c test/mem.sv verilog/pipeline.sv verilog/regfile.sv verilog/icache.sv verilog/d_stage.sv verilog/map_table.sv verilog/rs_stage.sv verilog/func_unit_2.sv verilog/func_unit_3.sv verilog/func_unit_0.sv verilog/func_unit_1.sv verilog/mult.sv verilog/mult_stage.sv verilog/rps4.sv verilog/rob.sv verilog/if_stage.sv -o simv"}
+{"vcs1": {"peak_mem": 551080}}
+{"vcselab": {"peak_mem": 262496}}

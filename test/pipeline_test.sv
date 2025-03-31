@@ -69,6 +69,8 @@ module testbench;
     X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
     CDB cdb_dbg;
 
+    logic [`XLEN-1:0] regfile_mirror [4:0];
+
     integer i, j, k, l, m, n, o;
 
     // Instantiate the Pipeline
@@ -102,7 +104,6 @@ module testbench;
         .cdb_dbg(cdb_dbg)
     );
 
-
     // Instantiate the Data Memory
     mem memory (
         // Inputs
@@ -125,6 +126,12 @@ module testbench;
     always begin
         #(`CLOCK_PERIOD/2.0);
         clock = ~clock;
+    end
+
+    always_ff @(posedge clock) begin
+        if (pipeline_commit_wr_en) begin
+            regfile_mirror[pipeline_commit_wr_idx] <= pipeline_commit_wr_data;
+        end
     end
 
 
