@@ -36,7 +36,8 @@ module pipeline (
     output logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg,
     output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg,
     output X_C_PACKET [`RS_SZ-1:0] X_packets_dbg,
-    output CDB cdb_dbg
+    output CDB cdb_dbg,
+    output logic [`RS_SZ-1:0] busy_dbg
 );
 
     //////////////////////////////////////////////////
@@ -93,7 +94,8 @@ module pipeline (
     assign mt_table_out_dbg  = mt_table_out;
     assign rs_table_dbg      = rs_table;
     assign cdb_dbg           = cdb;
-    assign X_packets_dbg      = X_packets;
+    assign X_packets_dbg     = X_packets;
+    assign busy_dbg          = busy;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -375,9 +377,9 @@ module pipeline (
                                       pipeline_control.halt           ? HALTED_ON_WFI :
                                       (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
 
-    assign pipeline_commit_wr_en   = retire;
-    assign pipeline_commit_wr_idx  = retire_r_wire;
-    assign pipeline_commit_wr_data = rob_write_data;
+    assign pipeline_commit_wr_en   = regfile_write_en;
+    assign pipeline_commit_wr_idx  = regfile_write_idx;
+    assign pipeline_commit_wr_data = regfile_write_data;
     // assign pipeline_commit_NPC     = mem_wb_reg.NPC;
 
 endmodule // pipeline
