@@ -345,16 +345,15 @@ module pipeline (
         cdb_idx = (cdb_valid[0]) ? 0 :
                   (cdb_valid[1]) ? 1 : 
                   (cdb_valid[2]) ? 2 : 3;
+        cdb.ppln_ctrl = X_C_regs[cdb_idx].ppln_ctrl;
         if(|cdb_valid) begin
             cdb.valid = `TRUE;
             cdb.T = X_C_regs[cdb_idx].T;
             cdb.V = X_C_regs[cdb_idx].result;
-            cdb.ppln_ctrl = `TRUE;
         end else begin
             cdb.valid = `FALSE;
             cdb.T = 0;
             cdb.V = 0;
-            cdb.ppln_ctrl = `TRUE;
         end
     end
 
