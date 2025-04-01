@@ -63,22 +63,20 @@ module testbench;
     logic             pipeline_commit_wr_en;
     logic [`XLEN-1:0] pipeline_commit_NPC;
 
-    // logic [`XLEN-1:0] if_NPC_dbg;
-    // logic [31:0]      if_inst_dbg;
-    // logic             if_valid_dbg;
-    // logic [`XLEN-1:0] if_id_NPC_dbg;
-    // logic [31:0]      if_id_inst_dbg;
-    // logic             if_id_valid_dbg;
-    // logic [`XLEN-1:0] id_ex_NPC_dbg;
-    // logic [31:0]      id_ex_inst_dbg;
-    // logic             id_ex_valid_dbg;
-    // logic [`XLEN-1:0] ex_mem_NPC_dbg;
-    // logic [31:0]      ex_mem_inst_dbg;
-    // logic             ex_mem_valid_dbg;
-    // logic [`XLEN-1:0] mem_wb_NPC_dbg;
-    // logic [31:0]      mem_wb_inst_dbg;
-    // logic             mem_wb_valid_dbg;
+    // debug outputs
+    logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg;
+    logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg;
+    RS_ENTRY [`RS_SZ-1:0] rs_table_dbg;
+    X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
+    logic [`RS_SZ-1:0] busy_dbg;
+    CDB cdb_dbg;
 
+    // logging
+    MT_ENTRY mt_table [31:0];
+    ROB_ENTRY rob_table [`ROB_SZ:1];
+    logic [`XLEN-1:0] regfile_mirror [4:0];
+
+    integer i, j, k, l, m, n, o;
 
     // Instantiate the Pipeline
     pipeline core (
@@ -102,25 +100,15 @@ module testbench;
         .pipeline_commit_wr_data  (pipeline_commit_wr_data),
         .pipeline_commit_wr_idx   (pipeline_commit_wr_idx),
         .pipeline_commit_wr_en    (pipeline_commit_wr_en),
-        .pipeline_commit_NPC      (pipeline_commit_NPC)
+        .pipeline_commit_NPC      (pipeline_commit_NPC),
 
-        // .if_NPC_dbg       (if_NPC_dbg),
-        // .if_inst_dbg      (if_inst_dbg),
-        // .if_valid_dbg     (if_valid_dbg),
-        // .if_id_NPC_dbg    (if_id_NPC_dbg),
-        // .if_id_inst_dbg   (if_id_inst_dbg),
-        // .if_id_valid_dbg  (if_id_valid_dbg),
-        // .id_ex_NPC_dbg    (id_ex_NPC_dbg),
-        // .id_ex_inst_dbg   (id_ex_inst_dbg),
-        // .id_ex_valid_dbg  (id_ex_valid_dbg),
-        // .ex_mem_NPC_dbg   (ex_mem_NPC_dbg),
-        // .ex_mem_inst_dbg  (ex_mem_inst_dbg),
-        // .ex_mem_valid_dbg (ex_mem_valid_dbg),
-        // .mem_wb_NPC_dbg   (mem_wb_NPC_dbg),
-        // .mem_wb_inst_dbg  (mem_wb_inst_dbg),
-        // .mem_wb_valid_dbg (mem_wb_valid_dbg)
+        .rob_table_out_dbg(rob_table_out_dbg),
+        .mt_table_out_dbg(mt_table_out_dbg),
+        .rs_table_dbg(rs_table_dbg),
+        .X_packets_dbg(X_packets_dbg),
+        .cdb_dbg(cdb_dbg),
+        .busy_dbg(busy_dbg)
     );
-
 
     // Instantiate the Data Memory
     mem memory (
@@ -146,6 +134,28 @@ module testbench;
         clock = ~clock;
     end
 
+    // Copies values to the regfile mirror
+    always_ff @(posedge clock) begin
+        if (pipeline_commit_wr_en) begin
+            regfile_mirror[pipeline_commit_wr_idx] <= pipeline_commit_wr_data;
+        end
+    end
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //               Print Tables                   //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    always_comb begin
+        for (int i = 0; i < 32; i++)
+            mt_table[i] = mt_table_out_dbg[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
+    end
+
+    always_comb begin
+        for (int i = 0; i < `ROB_SZ; i++)
+            rob_table[i+1] = rob_table_out_dbg[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
+    end
 
     // Task to display # of elapsed clock edges
     task show_clk_count;
@@ -159,6 +169,32 @@ module testbench;
         end
     endtask // task show_clk_count
 
+    //////////////////////////////////////////////////
+    //                                              //
+    //               Module print                   //
+    //                                              //
+    //////////////////////////////////////////////////
+
+    task print_mt;
+        $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        for(l = 1; l < 5; l=l+1)
+            $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
+        $display("------------------------------------------");
+    endtask // print_mt
+
+    task print_rs;
+        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        for(j = 0; j < `RS_SZ; j=j+1)
+            $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table_dbg[j].T, rs_table_dbg[j].T1, rs_table_dbg[j].T2, rs_table_dbg[j].V1, rs_table_dbg[j].V2, busy_dbg[j], rs_table_dbg[j].ready);
+        $display("------------------------------------------");
+    endtask // print_rs
+
+    task print_rob;
+        $display("\n(ROB_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        for(n = 1; n < 8; n=n+1)
+            $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
+        $display("------------------------------------------");
+    endtask // print_rob
 
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
@@ -180,6 +216,17 @@ module testbench;
             $display("@@@");
         end
     endtask // task show_mem_with_decimal
+
+    task dump_regfile;
+        for (logic [5:0] r_idx = 0; r_idx < 32; r_idx++)
+            $display("r%02d: %8h", r_idx, regfile_mirror[r_idx]);
+    endtask // task dump_regfile
+
+    //////////////////////////////////////////////////
+    //                                              //
+    //                Execution                     //
+    //                                              //
+    //////////////////////////////////////////////////
 
 
     initial begin
@@ -284,6 +331,8 @@ module testbench;
 
             // deal with any halting conditions
             if(pipeline_error_status != NO_ERROR || debug_counter > 50000000) begin
+                dump_regfile();
+
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
                 // 8Bytes per line, 16kB total

@@ -188,56 +188,56 @@ module decoder (
 
 endmodule // decoder
 
-module stage_id (
-    input IF_ID_PACKET if_id_reg,
+module d_stage (
+    input IF_ID_PACKET IF_ID_reg,
 
-    output D_S_PACKET D_S_packet
+    output D_S_PACKET D_packet
 );
 
     logic has_dest_reg, rd_mem, wr_mem;
     logic [`RS_SZ-1:0] rs_idx;   
 
     // Pass throughs (Used by the X stage if needed)
-    assign D_S_packet.inst = if_id_reg.inst;
-    assign D_S_packet.PC   = if_id_reg.PC;
-    assign D_S_packet.NPC  = if_id_reg.NPC;
+    assign D_packet.inst = IF_ID_reg.inst;
+    assign D_packet.PC   = IF_ID_reg.PC;
+    assign D_packet.NPC  = IF_ID_reg.NPC;
 
     // Register values for map table signals
-    assign D_S_packet.r = (has_dest_reg) ? if_id_reg.inst.r.rd : `ZERO_REG;
-    assign D_S_packet.r1 = if_id_reg.inst.r.rs1;
-    assign D_S_packet.r2 = if_id_reg.inst.r.rs2;
+    assign D_packet.r = (has_dest_reg) ? IF_ID_reg.inst.r.rd : `ZERO_REG;
+    assign D_packet.r1 = IF_ID_reg.inst.r.rs1;
+    assign D_packet.r2 = IF_ID_reg.inst.r.rs2;
 
-    assign D_S_packet.valid = if_id_reg.valid & ~D_S_packet.illegal;
+    assign D_packet.valid = IF_ID_reg.valid & ~D_packet.illegal;
 
     always_comb begin
         if (rd_mem)
-            ID_X_packet.rs_idx = NUM_FU_LOAD;   
+            D_packet.rs_idx = `NUM_FU_LOAD;   
         else if (wr_mem)
-            ID_X_packet.rs_idx = NUM_FU_STORE;
-        else if (alu_func == ALU_MUL    | alu_func == ALU_MULHSU |
-                 alu_func == ALU_MULHSU | alu_func == ALU_MULHU)
-            ID_X_packet.rs_idx = NUM_FU_MULT;
+            D_packet.rs_idx = `NUM_FU_STORE;
+        else if (D_packet.alu_func == ALU_MUL    | D_packet.alu_func == ALU_MULHSU |
+                 D_packet.alu_func == ALU_MULHSU | D_packet.alu_func == ALU_MULHU)
+            D_packet.rs_idx = `NUM_FU_MULT;
         else
-            ID_X_packet.rs_idx = NUM_FU_ALU;
+            D_packet.rs_idx = `NUM_FU_ALU;
     end
 
     decoder decoder_0 (
         // Inputs
-        .inst  (if_id_reg.inst),
-        .valid (if_id_reg.valid),
+        .inst  (IF_ID_reg.inst),
+        .valid (IF_ID_reg.valid),
 
         // Outputs
-        .opa_select    (D_S_packet.opa_select),
-        .opb_select    (D_S_packet.opb_select),
-        .alu_func      (D_S_packet.alu_func),
+        .opa_select    (D_packet.opa_select),
+        .opb_select    (D_packet.opb_select),
+        .alu_func      (D_packet.alu_func),
         .has_dest      (has_dest_reg),
         .rd_mem        (rd_mem),
         .wr_mem        (wr_mem),
-        .cond_branch   (D_S_packet.cond_branch),
-        .uncond_branch (D_S_packet.uncond_branch),
-        .csr_op        (D_S_packet.csr_op),
-        .halt          (D_S_packet.halt),
-        .illegal       (D_S_packet.illegal)
+        .cond_branch   (D_packet.cond_branch),
+        .uncond_branch (D_packet.uncond_branch),
+        .csr_op        (D_packet.csr_op),
+        .halt          (D_packet.halt),
+        .illegal       (D_packet.illegal)
     );
 
-endmodule // stage_id
+endmodule // d_stage

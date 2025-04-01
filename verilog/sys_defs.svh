@@ -24,7 +24,7 @@
 `define N 1
 
 // sizes
-`define ROB_SZ 20
+`define ROB_SZ 32
 `define RS_SZ 4
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
@@ -76,7 +76,7 @@
 // the project 3 processor has a massive boost in performance just from having no mem latency
 // see if you can beat it's CPI in project 4 even with a 100ns latency!
 // `define MEM_LATENCY_IN_CYCLES  0
-`define MEM_LATENCY_IN_CYCLES (100.0/`CLOCK_PERIOD+0.49999)
+`define MEM_LATENCY_IN_CYCLES (1000.0/`CLOCK_PERIOD+0.49999)
 // the 0.49999 is to force ceiling(100/period). The default behavior for
 // float to integer conversion is rounding to nearest
 
@@ -317,6 +317,18 @@ typedef struct packed {
 typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
 
 typedef struct packed {
+    logic flush;
+
+    logic valid;
+    logic illegal;
+    logic halt;
+    
+    logic is_branch;
+    logic is_store;
+} PPLN_CTRL;
+
+
+typedef struct packed {
     ROB_T T;
     ROB_T T1;
     ROB_T T2;
@@ -336,8 +348,11 @@ typedef struct packed {
 typedef struct packed {
     logic [4:0] r;
     logic [`XLEN-1:0] V;
-    logic ready;               // to commit to regfile
+    PPLN_CTRL ppln_ctrl;
+    
+    logic ready;
 } ROB_ENTRY;
+
 
 typedef struct packed {
     /* General pipeline*/
@@ -360,20 +375,23 @@ typedef struct packed {
     logic [`XLEN-1:0] V1;
     logic [`XLEN-1:0] V2;
 
+    logic halt;
     logic valid;                // the FU is allowed to use this val
 } S_X_PACKET;
 
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] result;
-    logic take_branch;
+    PPLN_CTRL ppln_ctrl;
     
     logic valid;
 } X_C_PACKET;
 
+
 typedef struct packed {
     ROB_T T;
     logic [`XLEN-1:0] V;
+    PPLN_CTRL ppln_ctrl;
 
     logic valid;
 } CDB;

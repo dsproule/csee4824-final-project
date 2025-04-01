@@ -65,26 +65,33 @@ endmodule // conditional_branch
 module func_unit_0 (
     input S_X_PACKET S_X_reg,
 
-    output X_C_PACKET X_C_packet
+    output X_C_PACKET X_packet
 );
+    logic [`XLEN-1:0] opa_mux_out, opb_mux_out;
+    PPLN_CTRL ppln_ctrl;
     logic take_conditional;
 
     // Pass-throughs
-    assign X_C_packet.T = S_X_reg.T;
-    assign X_C_packet.take_branch = (S_X_reg.cond_branch | S_X_reg.uncond_branch);
+    assign X_packet.T = S_X_reg.T;
+    assign X_packet.valid = S_X_reg.valid;
 
-    assign X_C_packet.valid = `TRUE;
+    // pipeline control
+    assign ppln_ctrl.flush = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+    assign ppln_ctrl.is_store = `FALSE;
+    assign ppln_ctrl.is_branch = S_X_reg.uncond_branch | S_X_reg.cond_branch;
 
-    // ultimate "take branch" signal:
-    // unconditional, or conditional and the condition is true
-    assign ex_packet.take_branch = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+    assign ppln_ctrl.valid = S_X_reg.valid;
+    assign ppln_ctrl.illegal = 0;
+    assign ppln_ctrl.halt = S_X_reg.halt;
+
+    assign X_packet.ppln_ctrl = ppln_ctrl;
 
         // ALU opA mux
     always_comb begin
-        case (id_ex_reg.opa_select)
+        case (S_X_reg.opa_select)
             OPA_IS_RS1:  opa_mux_out = S_X_reg.V1;
-            OPA_IS_NPC:  opa_mux_out = id_ex_reg.NPC;
-            OPA_IS_PC:   opa_mux_out = id_ex_reg.PC;
+            OPA_IS_NPC:  opa_mux_out = S_X_reg.NPC;
+            OPA_IS_PC:   opa_mux_out = S_X_reg.PC;
             OPA_IS_ZERO: opa_mux_out = 0;
             default:     opa_mux_out = `XLEN'hdeadface; // dead face
         endcase
@@ -92,13 +99,13 @@ module func_unit_0 (
 
     // ALU opB mux
     always_comb begin
-        case (id_ex_reg.opb_select)
+        case (S_X_reg.opb_select)
             OPB_IS_RS2:   opb_mux_out = S_X_reg.V2;
-            OPB_IS_I_IMM: opb_mux_out = `RV32_signext_Iimm(id_ex_reg.inst);
-            OPB_IS_S_IMM: opb_mux_out = `RV32_signext_Simm(id_ex_reg.inst);
-            OPB_IS_B_IMM: opb_mux_out = `RV32_signext_Bimm(id_ex_reg.inst);
-            OPB_IS_U_IMM: opb_mux_out = `RV32_signext_Uimm(id_ex_reg.inst);
-            OPB_IS_J_IMM: opb_mux_out = `RV32_signext_Jimm(id_ex_reg.inst);
+            OPB_IS_I_IMM: opb_mux_out = `RV32_signext_Iimm(S_X_reg.inst);
+            OPB_IS_S_IMM: opb_mux_out = `RV32_signext_Simm(S_X_reg.inst);
+            OPB_IS_B_IMM: opb_mux_out = `RV32_signext_Bimm(S_X_reg.inst);
+            OPB_IS_U_IMM: opb_mux_out = `RV32_signext_Uimm(S_X_reg.inst);
+            OPB_IS_J_IMM: opb_mux_out = `RV32_signext_Jimm(S_X_reg.inst);
             default:      opb_mux_out = `XLEN'hfacefeed; // face feed
         endcase
     end
@@ -111,7 +118,7 @@ module func_unit_0 (
         .func(S_X_reg.alu_func),
 
         // Output
-        .result(X_C_reg.result)
+        .result(X_packet.result)
     );
 
     // Instantiate the conditional branch module
