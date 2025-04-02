@@ -210,26 +210,30 @@ module pipeline (
 
     rs_stage rs_stage_inst (
         // Inputs
-        .clock(clock), .reset(reset), .en(D_S_reg.valid & ~rs_stall), 
+        .clock(clock), .reset(reset), .alloc_en(D_S_reg.valid), 
         .cdb(cdb), .D_S_reg(D_S_reg), 
         .FU_ready(FU_ready),
         .T(mt_T_wire), .T1(T1_wire), .T2(T2_wire), 
         .V1(V1_rs), .V2(V2_rs), 
 
         // Outputs           
-        .stall(rs_stall),
+        .rs_idx_full(rs_stall),
         .S_packet(S_packets), 
         .rs_table(rs_table_out), .busy(busy)
     );
 
-    // for FU_ready S_X
-    always_ff @(posedge clock) begin
-        for (fu_idx = 0; fu_idx < `RS_SZ; fu_idx++)
-            if (reset | gnt[fu_idx])
-                FU_ready[fu_idx] <= `TRUE;      // general FU wipe
-            else if (FU_ready[fu_idx] & S_packets[fu_idx].valid)
-                FU_ready[fu_idx] <= `FALSE;     // FU reserved by entry (issue)
-    end
+    assign FU_ready = 4'hF;
+    assign cdb.valid = `FALSE;
+    // always_ff @(posedge clock) begin
+    //     for (fu_idx = 0; fu_idx < `RS_SZ; fu_idx++)
+    //         if (reset) begin
+    //             FU_ready[fu_idx] <= `TRUE; // all FUs are available in the beginning
+    //         end else if (FU_ready[fu_idx] & S_packets[fu_idx].valid) begin
+    //             FU_ready[fu_idx] <= `FALSE; // FU is in used
+    //         end else if (gnt[fu_idx]) begin
+    //             FU_ready[fu_idx] <= `TRUE;
+    //         end
+    // end
     
 
     rob rob_inst (
@@ -268,16 +272,16 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    always_ff @(posedge clock) begin
-        for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
-            if (reset) begin
-                S_X_regs[S_idx] <= 0;            
-            end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
-                S_X_regs[S_idx] <= S_packets[S_idx];
-            end else begin
-                S_X_regs[S_idx] <= 0;
-            end
-    end
+    // always_ff @(posedge clock) begin
+    //     for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
+    //         if (reset) begin
+    //             S_X_regs[S_idx] <= 0;            
+    //         end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
+    //             S_X_regs[S_idx] <= S_packets[S_idx];
+    //         end else begin
+    //             S_X_regs[S_idx] <= 0;
+    //         end
+    // end
 
     //////////////////////////////////////////////////
     //                                              //
@@ -285,32 +289,32 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    func_unit_0 func_unit_00(
-        // Inputs
-        .S_X_reg(S_X_regs[0]), 
+    // func_unit_0 func_unit_00(
+    //     // Inputs
+    //     .S_X_reg(S_X_regs[0]), 
         
-        // Outputs
-        .X_packet(X_packets[0])
-    );
+    //     // Outputs
+    //     .X_packet(X_packets[0])
+    // );
 
-    func_unit_1 func_unit_01(
-        // Inputs
-        .clock(clock), .reset(reset), 
-        .S_X_reg(S_X_regs[1]), 
+    // func_unit_1 func_unit_01(
+    //     // Inputs
+    //     .clock(clock), .reset(reset), 
+    //     .S_X_reg(S_X_regs[1]), 
 
-        // Outputs    
-        .X_packet(X_packets[1])
-    );
+    //     // Outputs    
+    //     .X_packet(X_packets[1])
+    // );
 
-    // X_C regs
-    always_ff @(posedge clock) begin
-        for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
-            if (reset) begin
-                X_C_regs[X_idx] <= 0;
-            end else if (X_packets[X_idx].valid) begin
-                X_C_regs[X_idx] <= X_packets[X_idx];
-            end
-    end
+    // // X_C regs
+    // always_ff @(posedge clock) begin
+    //     for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
+    //         if (reset) begin
+    //             X_C_regs[X_idx] <= 0;
+    //         end else if (X_packets[X_idx].valid) begin
+    //             X_C_regs[X_idx] <= X_packets[X_idx];
+    //         end
+    // end
 
     //////////////////////////////////////////////////
     //                                              //
@@ -318,46 +322,46 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    always_comb begin
-        for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
-            if(X_packets[req_idx].valid === 1)
-                FU_req[req_idx] = 1;
-            else
-                FU_req[req_idx] = 0;
-    end
+    // always_comb begin
+    //     for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
+    //         if(X_packets[req_idx].valid === 1)
+    //             FU_req[req_idx] = 1;
+    //         else
+    //             FU_req[req_idx] = 0;
+    // end
 
-    always_ff @(posedge clock) begin
-        for (gnt_idx = 0; gnt_idx < `RS_SZ; gnt_idx++)
-            if (reset)
-                cdb_valid[gnt_idx] <= '0;
-            else
-                cdb_valid[gnt_idx] <= gnt[gnt_idx];
-    end
+    // always_ff @(posedge clock) begin
+    //     for (gnt_idx = 0; gnt_idx < `RS_SZ; gnt_idx++)
+    //         if (reset)
+    //             cdb_valid[gnt_idx] <= '0;
+    //         else
+    //             cdb_valid[gnt_idx] <= gnt[gnt_idx];
+    // end
 
-    // CDB stage
-    always_comb begin
-        cdb_idx = (cdb_valid[0]) ? 0 :
-                  (cdb_valid[1]) ? 1 : 
-                  (cdb_valid[2]) ? 2 : 3;
-        cdb.ppln_ctrl = X_C_regs[cdb_idx].ppln_ctrl;
-        if(|cdb_valid) begin
-            cdb.valid = `TRUE;
-            cdb.T = X_C_regs[cdb_idx].T;
-            cdb.V = X_C_regs[cdb_idx].result;
-        end else begin
-            cdb.valid = `FALSE;
-            cdb.T = 0;
-            cdb.V = 0;
-        end
-    end
+    // // CDB stage
+    // always_comb begin
+    //     cdb_idx = (cdb_valid[0]) ? 0 :
+    //               (cdb_valid[1]) ? 1 : 
+    //               (cdb_valid[2]) ? 2 : 3;
+    //     cdb.ppln_ctrl = X_C_regs[cdb_idx].ppln_ctrl;
+    //     if(|cdb_valid) begin
+    //         cdb.valid = `TRUE;
+    //         cdb.T = X_C_regs[cdb_idx].T;
+    //         cdb.V = X_C_regs[cdb_idx].result;
+    //     end else begin
+    //         cdb.valid = `FALSE;
+    //         cdb.T = 0;
+    //         cdb.V = 0;
+    //     end
+    // end
 
-    rps4 arb (
-        .clock(clock), .reset(reset), 
-        .req(FU_req), 
-        .en(1'b1), 
+    // rps4 arb (
+    //     .clock(clock), .reset(reset), 
+    //     .req(FU_req), 
+    //     .en(1'b1), 
         
-        .gnt(gnt), .count()
-    );
+    //     .gnt(gnt), .count()
+    // );
 
 
     //////////////////////////////////////////////////

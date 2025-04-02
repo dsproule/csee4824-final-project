@@ -157,28 +157,28 @@ module testbench;
     endtask // task show_clk_count
 
     task print_mt;
-        $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         for(l = 1; l < 5; l=l+1)
             $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
         $display("------------------------------------------");
     endtask // print_mt
 
     task print_rs;
-        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table_dbg[j].T, rs_table_dbg[j].T1, rs_table_dbg[j].T2, rs_table_dbg[j].V1, rs_table_dbg[j].V2, busy_dbg[j], rs_table_dbg[j].ready);
         $display("------------------------------------------");
     endtask // print_rs
 
     task print_rob;
-        $display("\n(ROB_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("\n(ROB_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         for(n = 1; n < 8; n=n+1)
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
         $display("------------------------------------------");
     endtask // print_rob
 
     task print_cdb;
-        $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
         $display("T:%4d\t  V:%4d", cdb_dbg.T, cdb_dbg.V);
         $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", {FU_ready_dbg[0], FU_ready_dbg[1]}, {FU_req_dbg[0], FU_req_dbg[1]}, {gnt_dbg[0], gnt_dbg[1]});
         $display("------------------------------------------");
@@ -226,10 +226,11 @@ module testbench;
 
             if (prog_start) begin
                 $display("====================================================================================");
+                $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
+                $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
                 $display("------------------------------------------");
-                $display("IF_ID_reg -- PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
-                $display("------------------------------------------");
-                $display("D_S_reg -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+                $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
+                $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
                         D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
                 $display("------------------------------------------");
                 print_rs;

@@ -27,7 +27,7 @@ module testbench;
     rs_stage rs_stage(
         .clock(clock),
         .reset(reset),
-        .en(en),
+        .alloc_en(en),
         .cdb(cdb),
         .D_S_reg(D_S_reg),
         .FU_ready(FU_ready),
@@ -37,7 +37,7 @@ module testbench;
         .V1(V1),
         .V2(V2),
 
-        .d_stall(d_stall),
+        .rs_idx_full(d_stall),
         .S_packet(S_pack),
         .rs_table(rs_table),
         .busy(busy)

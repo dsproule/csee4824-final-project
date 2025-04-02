@@ -10,7 +10,7 @@ module RS_ALLOC(
     input [`XLEN-1:0]         V1, V2,
     input CDB                 cdb,
 
-    output stall,
+    output rs_idx_full,
     output logic    [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
 );
@@ -24,40 +24,44 @@ module RS_ALLOC(
     logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx, rs_update_idx;
     logic [`RS_SZ-1:0] next_busy, rs_idx;
     RS_ENTRY next_re;
-    logic on;
+    logic next_re_valid;
 
     assign rs_idx = D_S_reg.rs_idx;
-    assign stall = (rs_free[rs_idx]) ? 0 : next_busy[rs_idx];
+    assign rs_idx_full = (rs_free[rs_idx]) ? 0 : next_busy[rs_idx];
 
     always_ff @(posedge clock) begin
         if (reset) begin
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
-                busy[reset_idx] <= `FALSE;
                 next_busy[reset_idx] <= `FALSE;
+                busy[reset_idx] <= `FALSE;
                 rs_table[reset_idx] <= 0;
             end
 
-            next_re <= 0;
+            next_re <= '0;
+            next_re_valid <= `FALSE;
             rs_update_idx <= 0;
         end else begin  
             // busy handling
+            busy[rs_update_idx] <= next_busy[rs_update_idx];
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
-                if ((rs_update_idx != busy_reset_idx) & (rs_free[busy_reset_idx])) begin
-                    busy[busy_reset_idx] <= `FALSE;
+                if (((rs_free_idx != rs_update_idx) | ~next_re_valid) & (rs_free[busy_reset_idx])) begin
                     next_busy[busy_reset_idx] <= `FALSE;
+                    busy[busy_reset_idx] <= `FALSE;
                 end
             
-            busy[rs_update_idx] <= next_busy[rs_update_idx];
-            rs_table[rs_update_idx] <= next_re;
+            if (next_re_valid) begin
+                rs_table[rs_update_idx] <= next_re;
+                next_re_valid <= `FALSE;
+            end
 
             // if RS entry is empty, allocate it
             if ((~busy[rs_idx] | rs_free[rs_idx]) & en) begin
                 next_busy[rs_idx] <= `TRUE;
-                // busy[rs_idx] <= `TRUE;
                 
                 // save values in next_re from decode stage (always saved for allocation)
                 next_re.T <= T;
                 next_re.D_S_reg <= D_S_reg;
+                next_re_valid <= `TRUE;
 
                 rs_update_idx <= rs_idx;
 
@@ -85,11 +89,14 @@ module RS_ALLOC(
                     next_re.ready[1] <= `FALSE;
                 end
                 
+            end else begin
+                next_re <= '0;
+                next_re_valid <= `FALSE;
             end
 
             // free a line that isn't about to be allocated (should be handled by above)
             for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
-                if ((rs_free_idx != rs_update_idx) & (rs_free[rs_free_idx]))
+                if (((rs_free_idx != rs_update_idx) | ~next_re_valid) & (rs_free[rs_free_idx]))
                     rs_table[rs_free_idx] <= 0;
 
             // if a CDB line came in 
@@ -151,6 +158,7 @@ module RS_VALUE(
                     S_packet[s_idx].V2 = rs_table[s_idx].V2;
                     S_packet[s_idx].halt = rs_table[s_idx].D_S_reg.halt;
                     S_packet[s_idx].valid = 1;
+                    
                     rs_free[s_idx] = 1'b1;
                 end else begin
                     S_packet[s_idx] = 0;
@@ -163,7 +171,7 @@ module RS_VALUE(
 endmodule   // RS_VALUE
 
 module rs_stage(
-    input clock, reset, en,
+    input clock, reset, alloc_en,
     input CDB cdb,
     input D_S_PACKET D_S_reg,
     input [`RS_SZ-1:0] FU_ready,
@@ -171,7 +179,7 @@ module rs_stage(
     input MT_ENTRY    T1, T2,
     input [`XLEN-1:0] V1, V2,                  // uses MT_ENTRY.plus to mux val from regfile or ROB
 
-    output stall,              
+    output rs_idx_full,              
     output [`RS_SZ-1:0] busy,           
     output S_X_PACKET [`RS_SZ-1:0] S_packet,
     output RS_ENTRY [ `RS_SZ-1:0]  rs_table
@@ -181,7 +189,7 @@ module rs_stage(
     // connect alloc with value with cdb
     RS_ALLOC rs_alloc(
         // Inputs
-        .clock(clock), .reset(reset), .en(en),
+        .clock(clock), .reset(reset), .en(alloc_en),
         .D_S_reg(D_S_reg),
         .rs_free(free_bus),
         .T(T), .MT_T1(T1), .MT_T2(T2),
@@ -189,7 +197,7 @@ module rs_stage(
         .cdb(cdb),
 
         // Outputs
-        .stall(stall),
+        .rs_idx_full(rs_idx_full),
         .rs_table(rs_table),
         .busy(busy)
     );
