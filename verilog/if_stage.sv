@@ -26,7 +26,8 @@ module if_stage (
     typedef enum logic [1:0] {NEW_ADDR, WAIT_FOR_TAG} IF_states;
     
     logic [`XLEN-1:0] PC_reg;
-    logic nextImem_tag;
+    logic [1:0]  mem2buf_command;
+    logic [3:0]  nextImem_tag;
     IF_states IF_state;
 
     // word-aligned mem
@@ -46,7 +47,7 @@ module if_stage (
             case (IF_state)
                 NEW_ADDR: begin
                     nextImem_tag <= Imem2proc_response;
-                    if (gnt) begin
+                    if (gnt & Imem2proc_response != 0) begin
                         mem_req <= `FALSE;
                         proc2Imem_command <= BUS_NONE;
                         IF_state <= WAIT_FOR_TAG;
