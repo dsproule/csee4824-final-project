@@ -51,6 +51,7 @@ module testbench;
     CDB cdb_dbg;
     IF_ID_PACKET IF_ID_reg_dbg;
     D_S_PACKET D_S_reg_dbg;
+    logic [`RS_SZ-1:0] FU_ready_dbg, FU_req_dbg, gnt_dbg;
 
     // logging
     MT_ENTRY mt_table [31:0];
@@ -90,7 +91,10 @@ module testbench;
         .cdb_dbg(cdb_dbg),
         .busy_dbg(busy_dbg),
         .IF_ID_reg_dbg(IF_ID_reg_dbg),
-        .D_S_reg_dbg(D_S_reg_dbg)
+        .D_S_reg_dbg(D_S_reg_dbg),
+        .FU_ready_dbg(FU_ready_dbg),
+        .FU_req_dbg(FU_req_dbg),
+        .gnt_dbg(gnt_dbg)
     );
 
     // Instantiate the Data Memory
@@ -152,12 +156,6 @@ module testbench;
         end
     endtask // task show_clk_count
 
-    //////////////////////////////////////////////////
-    //                                              //
-    //               Module print                   //
-    //                                              //
-    //////////////////////////////////////////////////
-
     task print_mt;
         $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
         for(l = 1; l < 5; l=l+1)
@@ -178,6 +176,13 @@ module testbench;
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
         $display("------------------------------------------");
     endtask // print_rob
+
+    task print_cdb;
+        $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("T:%4d\t  V:%4d", cdb_dbg.T, cdb_dbg.V);
+        $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", {FU_ready_dbg[0], FU_ready_dbg[1]}, {FU_req_dbg[0], FU_req_dbg[1]}, {gnt_dbg[0], gnt_dbg[1]});
+        $display("------------------------------------------");
+    endtask // print_cdb
 
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
@@ -211,12 +216,27 @@ module testbench;
     //                                              //
     //////////////////////////////////////////////////
 
+    // Shows modules
+    logic prog_start = 0;
     always @(posedge clock) begin
-        if (IF_ID_reg_dbg.valid & ~reset)
-            $display("IF_ID_reg -- PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst);
-        if (D_S_reg_dbg.valid)
-            $display("D_packet -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
-                    D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+        if (~reset) begin
+            // only start printing after first inst arrives
+            if (IF_ID_reg_dbg.valid)
+                prog_start <= 1;
+
+            if (prog_start) begin
+                $display("====================================================================================");
+                $display("------------------------------------------");
+                $display("IF_ID_reg -- PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
+                $display("------------------------------------------");
+                $display("D_S_reg -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+                        D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+                $display("------------------------------------------");
+                print_rs;
+                print_mt;
+                print_cdb;
+            end
+        end
     end
 
 
@@ -302,7 +322,7 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 5000000) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 50) begin
                 // dump_regfile();
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");

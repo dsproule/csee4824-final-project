@@ -27,7 +27,6 @@ module RS_ALLOC(
     logic on;
 
     assign rs_idx = D_S_reg.rs_idx;
-    // assign stall = busy[rs_idx];
     assign stall = (rs_free[rs_idx]) ? 0 : next_busy[rs_idx];
 
     always_ff @(posedge clock) begin
@@ -160,17 +159,6 @@ module RS_VALUE(
             end
         end
     end
-
-    // clears the RS on the next cycle (works because rest is comb)
-    // always_ff @(posedge clock) begin
-    //     if (reset) begin
-    //         for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++)
-    //             rs_free[reset_idx] <= 0;
-    //     end else if (en) begin
-    //         for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
-    //             rs_free[rs_free_idx] <= s_valid[rs_free_idx];
-    //     end
-    // end
 
 endmodule   // RS_VALUE
 
