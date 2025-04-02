@@ -42,16 +42,23 @@ module testbench;
     logic             pipeline_commit_wr_en;
     logic [`XLEN-1:0] pipeline_commit_NPC;
 
-    // debug outputs
+    // debug tables
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg;
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg;
     RS_ENTRY [`RS_SZ-1:0] rs_table_dbg;
-    X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
     logic [`RS_SZ-1:0] busy_dbg;
+
+    // Debug extra
     CDB cdb_dbg;
-    IF_ID_PACKET IF_ID_reg_dbg;
-    D_S_PACKET D_S_reg_dbg;
     logic [`RS_SZ-1:0] FU_ready_dbg, FU_req_dbg, gnt_dbg;
+    ROB_T rob_head_dbg, rob_tail_dbg, retire_T_wire_dbg;
+    PPLN_CTRL rob_pipeline_control_dbg;
+    
+    // Debug regs
+    D_S_PACKET              D_S_reg_dbg;
+    IF_ID_PACKET            IF_ID_reg_dbg;
+    X_C_PACKET [`RS_SZ-1:0] X_C_regs_dbg;
+    S_X_PACKET [`RS_SZ-1:0] S_X_regs_dbg;
 
     // logging
     MT_ENTRY mt_table [31:0];
@@ -87,14 +94,20 @@ module testbench;
         .rob_table_out_dbg(rob_table_out_dbg),
         .mt_table_out_dbg(mt_table_out_dbg),
         .rs_table_dbg(rs_table_dbg),
-        .X_packets_dbg(X_packets_dbg),
         .cdb_dbg(cdb_dbg),
         .busy_dbg(busy_dbg),
         .IF_ID_reg_dbg(IF_ID_reg_dbg),
         .D_S_reg_dbg(D_S_reg_dbg),
         .FU_ready_dbg(FU_ready_dbg),
         .FU_req_dbg(FU_req_dbg),
-        .gnt_dbg(gnt_dbg)
+        .gnt_dbg(gnt_dbg),
+        .S_X_regs_dbg(S_X_regs_dbg),
+        .X_C_regs_dbg(X_C_regs_dbg),
+        .rob_head_dbg(rob_head_dbg),
+        .rob_tail_dbg(rob_tail_dbg),
+        .rob_retire_dbg(rob_retire_dbg),
+        .rob_pipeline_control_dbg(rob_pipeline_control_dbg),
+        .retire_T_wire_dbg(retire_T_wire_dbg)
     );
 
     // Instantiate the Data Memory
@@ -171,16 +184,16 @@ module testbench;
     endtask // print_rs
 
     task print_rob;
-        $display("\n(ROB_TABLE)\ttime: %d\n------------------------------------------", clock_count);
+        $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
         for(n = 1; n < 8; n=n+1)
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
-        $display("------------------------------------------");
+        $display("\n(RETIRE) valid: %1b, ROB_T: %4d\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, clock_count);
     endtask // print_rob
 
     task print_cdb;
         $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
         $display("T:%4d\t  V:%4d", cdb_dbg.T, cdb_dbg.V);
-        $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", {FU_ready_dbg[0], FU_ready_dbg[1]}, {FU_req_dbg[0], FU_req_dbg[1]}, {gnt_dbg[0], gnt_dbg[1]});
+        $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
         $display("------------------------------------------");
     endtask // print_cdb
 
@@ -236,6 +249,12 @@ module testbench;
                 print_rs;
                 print_mt;
                 print_cdb;
+                print_rob;
+                $display("\n(S_X_reg_0)\ttime: %d\n------------------------------------------", clock_count);
+                $display("PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
+                    S_X_regs_dbg[0].PC, S_X_regs_dbg[0].inst, S_X_regs_dbg[0].T, S_X_regs_dbg[0].V1, S_X_regs_dbg[0].V2, S_X_regs_dbg[0].halt, S_X_regs_dbg[0].valid);
+                $display("\n(X_C_reg_0)\ttime: %d\n------------------------------------------", clock_count);
+                $display("T: %2h, result: %h, valid: %1h", X_C_regs_dbg[0].T, X_C_regs_dbg[0].result, X_C_regs_dbg[0].valid); 
             end
         end
     end
@@ -324,7 +343,7 @@ module testbench;
 
             // deal with any halting conditions
             if(pipeline_error_status != NO_ERROR || debug_counter > 50) begin
-                // dump_regfile();
+                dump_regfile();
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);

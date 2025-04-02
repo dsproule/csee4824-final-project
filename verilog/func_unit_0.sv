@@ -102,7 +102,6 @@ module func_unit_0 (
         case (S_X_reg.opb_select)
             OPB_IS_RS2:   opb_mux_out = S_X_reg.V2;
             OPB_IS_I_IMM: opb_mux_out = `RV32_signext_Iimm(S_X_reg.inst);
-            OPB_IS_S_IMM: opb_mux_out = `RV32_signext_Simm(S_X_reg.inst);
             OPB_IS_B_IMM: opb_mux_out = `RV32_signext_Bimm(S_X_reg.inst);
             OPB_IS_U_IMM: opb_mux_out = `RV32_signext_Uimm(S_X_reg.inst);
             OPB_IS_J_IMM: opb_mux_out = `RV32_signext_Jimm(S_X_reg.inst);

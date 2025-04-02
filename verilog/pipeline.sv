@@ -32,15 +32,24 @@ module pipeline (
     output logic             pipeline_commit_wr_en,
     output logic [`XLEN-1:0] pipeline_commit_NPC,
 
+    // Debug outputs
     output logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg,
     output logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg,
     output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg,
-    output X_C_PACKET [`RS_SZ-1:0] X_packets_dbg,
-    output CDB cdb_dbg,
-    output logic [`RS_SZ-1:0] busy_dbg,
+    
+    output X_C_PACKET [`RS_SZ-1:0] X_C_regs_dbg,
+    output S_X_PACKET [`RS_SZ-1:0] S_X_regs_dbg,
     output IF_ID_PACKET IF_ID_reg_dbg,
     output D_S_PACKET D_S_reg_dbg,
-    output [`RS_SZ-1:0] FU_ready_dbg, FU_req_dbg, gnt_dbg
+    output CDB cdb_dbg,
+
+    output logic [`RS_SZ-1:0] busy_dbg,
+    output [`RS_SZ-1:0] FU_ready_dbg, FU_req_dbg, gnt_dbg,
+
+    output ROB_T rob_head_dbg, rob_tail_dbg,
+    output logic rob_retire_dbg,
+    output PPLN_CTRL rob_pipeline_control_dbg,
+    output ROB_T retire_T_wire_dbg 
 );
 
     //////////////////////////////////////////////////
@@ -88,22 +97,36 @@ module pipeline (
 
     // Commit Stage
     logic [`RS_SZ:0] gnt_idx, cdb_idx;
-    logic [`RS_SZ-1:0] cdb_valid, gnt, FU_req, FU_ready;
+    logic [`RS_SZ-1:0] gnt, FU_req, FU_ready;
+    logic cdb_valid;
     CDB cdb;
 
     logic [4:0] retire_r_wire;
     ROB_T mt_T_wire, retire_T_wire;
-
+    ROB_T rob_head, rob_tail;
+    
+    ROB_T rob_head_dbg, rob_head_dbg;
 
     // debug outputs
-    assign IF_ID_reg_dbg    = IF_ID_reg;
-    assign D_S_reg_dbg      = D_S_reg;
-    assign mt_table_out_dbg = mt_table_out;
-    assign rs_table_dbg     = rs_table_out;
-    assign busy_dbg         = busy;
-    assign FU_ready_dbg     =  FU_ready;
-    assign FU_req_dbg       = FU_req;
-    assign gnt_dbg          = gnt;
+    assign IF_ID_reg_dbg     = IF_ID_reg;
+    assign D_S_reg_dbg       = D_S_reg;
+    assign mt_table_out_dbg  = mt_table_out;
+    assign rs_table_dbg      = rs_table_out;
+    assign busy_dbg          = busy;
+    assign FU_ready_dbg      = FU_ready;
+    assign FU_req_dbg        = FU_req;
+    assign gnt_dbg           = gnt;
+    assign S_X_regs_dbg      = S_X_regs;
+    assign X_C_regs_dbg      = X_C_regs;
+    assign cdb_dbg           = cdb;
+    assign rob_table_out_dbg = rob_table_out;
+    assign rob_head_dbg      = rob_head;
+    assign rob_tail_dbg      = rob_tail;
+    
+    assign rob_retire_dbg    = retire; 
+    assign retire_T_wire_dbg = retire_T_wire;
+
+    assign rob_pipeline_control_dbg = pipeline_control;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -222,20 +245,17 @@ module pipeline (
         .rs_table(rs_table_out), .busy(busy)
     );
 
-    assign FU_ready = 4'hF;
-    assign cdb.valid = `FALSE;
-    // always_ff @(posedge clock) begin
-    //     for (fu_idx = 0; fu_idx < `RS_SZ; fu_idx++)
-    //         if (reset) begin
-    //             FU_ready[fu_idx] <= `TRUE; // all FUs are available in the beginning
-    //         end else if (FU_ready[fu_idx] & S_packets[fu_idx].valid) begin
-    //             FU_ready[fu_idx] <= `FALSE; // FU is in used
-    //         end else if (gnt[fu_idx]) begin
-    //             FU_ready[fu_idx] <= `TRUE;
-    //         end
-    // end
+    always_ff @(posedge clock) begin
+        for (fu_idx = 0; fu_idx < `RS_SZ; fu_idx++)
+            if (reset) begin
+                FU_ready[fu_idx] <= `TRUE; // all FUs are available in the beginning
+            end else if (FU_ready[fu_idx] & S_packets[fu_idx].valid) begin
+                FU_ready[fu_idx] <= `FALSE; // FU is in used
+            end else if (gnt[fu_idx]) begin
+                FU_ready[fu_idx] <= `TRUE;
+            end
+    end
     
-
     rob rob_inst (
         // Inputs
         .clock(clock), .reset(reset),
@@ -248,7 +268,8 @@ module pipeline (
         .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), 
         .retire(retire), .regfile_write_idx_out(retire_r_wire), 
         .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
-        .V1(V1_rob), .V2(V2_rob)
+        .V1(V1_rob), .V2(V2_rob),
+        .head(rob_head), .tail(rob_tail)
     );
 
     assign regfile_write_en   = retire & (~pipeline_control.is_store & ~pipeline_control.is_branch);
@@ -272,16 +293,16 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    // always_ff @(posedge clock) begin
-    //     for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
-    //         if (reset) begin
-    //             S_X_regs[S_idx] <= 0;            
-    //         end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
-    //             S_X_regs[S_idx] <= S_packets[S_idx];
-    //         end else begin
-    //             S_X_regs[S_idx] <= 0;
-    //         end
-    // end
+    always_ff @(posedge clock) begin
+        for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
+            if (reset) begin
+                S_X_regs[S_idx] <= 0;            
+            end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
+                S_X_regs[S_idx] <= S_packets[S_idx];
+            end else begin
+                S_X_regs[S_idx] <= 0;
+            end
+    end
 
     //////////////////////////////////////////////////
     //                                              //
@@ -289,32 +310,32 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    // func_unit_0 func_unit_00(
-    //     // Inputs
-    //     .S_X_reg(S_X_regs[0]), 
+    func_unit_0 func_unit_00(
+        // Inputs
+        .S_X_reg(S_X_regs[0]), 
         
-    //     // Outputs
-    //     .X_packet(X_packets[0])
-    // );
+        // Outputs
+        .X_packet(X_packets[0])
+    );
 
-    // func_unit_1 func_unit_01(
-    //     // Inputs
-    //     .clock(clock), .reset(reset), 
-    //     .S_X_reg(S_X_regs[1]), 
+    func_unit_1 func_unit_01(
+        // Inputs
+        .clock(clock), .reset(reset), 
+        .S_X_reg(S_X_regs[1]), 
 
-    //     // Outputs    
-    //     .X_packet(X_packets[1])
-    // );
+        // Outputs    
+        .X_packet(X_packets[1])
+    );
 
-    // // X_C regs
-    // always_ff @(posedge clock) begin
-    //     for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
-    //         if (reset) begin
-    //             X_C_regs[X_idx] <= 0;
-    //         end else if (X_packets[X_idx].valid) begin
-    //             X_C_regs[X_idx] <= X_packets[X_idx];
-    //         end
-    // end
+    // X_C regs
+    always_ff @(posedge clock) begin
+        for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
+            if (reset | gnt[X_idx]) begin
+                X_C_regs[X_idx] <= '0;
+            end else if (X_packets[X_idx].valid) begin
+                X_C_regs[X_idx] <= X_packets[X_idx];
+            end
+    end
 
     //////////////////////////////////////////////////
     //                                              //
@@ -322,47 +343,40 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    // always_comb begin
-    //     for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
-    //         if(X_packets[req_idx].valid === 1)
-    //             FU_req[req_idx] = 1;
-    //         else
-    //             FU_req[req_idx] = 0;
-    // end
+    // FU requests CDB based on completion of valid input
+    always_comb begin
+        for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
+            FU_req[req_idx] = X_C_regs[req_idx].valid;
+    end
 
-    // always_ff @(posedge clock) begin
-    //     for (gnt_idx = 0; gnt_idx < `RS_SZ; gnt_idx++)
-    //         if (reset)
-    //             cdb_valid[gnt_idx] <= '0;
-    //         else
-    //             cdb_valid[gnt_idx] <= gnt[gnt_idx];
-    // end
-
-    // // CDB stage
-    // always_comb begin
-    //     cdb_idx = (cdb_valid[0]) ? 0 :
-    //               (cdb_valid[1]) ? 1 : 
-    //               (cdb_valid[2]) ? 2 : 3;
-    //     cdb.ppln_ctrl = X_C_regs[cdb_idx].ppln_ctrl;
-    //     if(|cdb_valid) begin
-    //         cdb.valid = `TRUE;
-    //         cdb.T = X_C_regs[cdb_idx].T;
-    //         cdb.V = X_C_regs[cdb_idx].result;
-    //     end else begin
-    //         cdb.valid = `FALSE;
-    //         cdb.T = 0;
-    //         cdb.V = 0;
-    //     end
-    // end
-
-    // rps4 arb (
-    //     .clock(clock), .reset(reset), 
-    //     .req(FU_req), 
-    //     .en(1'b1), 
+    // CDB stage
+    assign cdb_valid = (gnt != 4'h0);
+    always_comb begin
+        // turn the arbiter signal to idx
+        cdb_idx = (gnt[0]) ? 0 :
+                  (gnt[1]) ? 1 : 
+                  (gnt[2]) ? 2 : 3;
         
-    //     .gnt(gnt), .count()
-    // );
+        // pass values along
+        if (cdb_valid) begin
+            cdb.T = X_C_regs[cdb_idx].T;
+            cdb.V = X_C_regs[cdb_idx].result;
+        end else begin
+            cdb.T = '0;
+            cdb.V = '0;
+        end
 
+        cdb.ppln_ctrl = X_C_regs[cdb_idx].ppln_ctrl;
+        cdb.valid = cdb_valid;
+    end
+
+    rps4 arb (
+        .clock(clock), .reset(reset), 
+        .req(FU_req), 
+        .en(1'b1), 
+        
+        .gnt(gnt), .count()
+    );
 
     //////////////////////////////////////////////////
     //                                              //
@@ -370,18 +384,12 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    // assign pipeline_completed_insts = {3'b0, pipeline_control.valid};    // commit one valid instruction
-    // assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
-    //                                   pipeline_control.halt           ? HALTED_ON_WFI :
-    //                                   (mem2proc_response==4'h0 & proc2mem_command != BUS_NONE) ? LOAD_ACCESS_FAULT : 
-    //                                                                     NO_ERROR;
-
-    assign pipeline_completed_insts = {3'b0, D_S_reg.valid};    // commit one valid instruction
-    // assign pipeline_error_status    =  (D_S_reg.halt) ? HALTED_ON_WFI : NO_ERROR;
-    assign pipeline_error_status       =  NO_ERROR;
-    // assign pipeline_commit_wr_en   = regfile_write_en;
-    // assign pipeline_commit_wr_idx  = regfile_write_idx;
-    // assign pipeline_commit_wr_data = regfile_write_data;
-    // assign pipeline_commit_NPC     = mem_wb_reg.NPC;
+    assign pipeline_completed_insts = {3'b0, retire};    // commit one valid instruction
+    assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
+                                      pipeline_control.halt           ? HALTED_ON_WFI :
+                                      (mem2proc_response==4'h0 & proc2mem_command != BUS_NONE) ? LOAD_ACCESS_FAULT : NO_ERROR;
+    assign pipeline_commit_wr_en   = regfile_write_en;
+    assign pipeline_commit_wr_idx  = regfile_write_idx;
+    assign pipeline_commit_wr_data = regfile_write_data;
 
 endmodule // pipeline

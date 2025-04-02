@@ -13,7 +13,8 @@ module rob(
     output logic full, empty, retire,
     output logic [4:0] regfile_write_idx_out, 
     output logic [`XLEN-1:0] V1, V2, regfile_write_data,
-    output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out
+    output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out,
+    output ROB_T head, tail
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
 
@@ -38,7 +39,6 @@ module rob(
                         tail=head=1, but big_tail[MSB] == 1 and big_head[MSB] == 0)
     */
 
-    ROB_T head, tail; 
     logic wraparound;
 
     // logic [PTR_WIDTH:0] big_head, big_tail;
