@@ -38,7 +38,8 @@ module pipeline (
     output X_C_PACKET [`RS_SZ-1:0] X_packets_dbg,
     output CDB cdb_dbg,
     output logic [`RS_SZ-1:0] busy_dbg,
-    output IF_ID_PACKET IF_ID_reg_dbg
+    output IF_ID_PACKET IF_ID_reg_dbg,
+    output D_S_PACKET D_S_reg_dbg
 );
 
     //////////////////////////////////////////////////
@@ -46,58 +47,18 @@ module pipeline (
     //                Pipeline Wires                //
     //                                              //
     //////////////////////////////////////////////////
-
-    // Pipeline register enables
-    logic if_id_enable, id_ex_enable, ex_mem_enable, mem_wb_enable;
-
-    // Wires from IF-Stage and IF/ID Pipeline Register
-    logic Imem2proc_valid;
-    logic [3:0] nextImem_tag;
-    logic [`XLEN-1:0] proc2Imem_addr, lastImem_addr, new_addr;
-    logic [63:0] Imem2proc_data;
-    IF_ID_PACKET IF_packet, IF_ID_reg;
     
-    // Wires from OoO RS/ROB/MT section
-    logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
-    logic [$bits(MT_ENTRY)*32-1:0] mt_table_out;
-    RS_ENTRY [`RS_SZ-1:0] rs_table;
-    
-    logic              rs_stall, rob_full, rob_empty, retire, regfile_write_en;
-    logic [4:0]        retire_r_wire, regfile_write_idx;
-    ROB_T              T_wire, retire_T_wire;
-    MT_ENTRY           T1_wire, T2_wire;
-    logic [`RS_SZ-1:0] FU_ready, busy;
-    logic [`XLEN-1:0]  V1_rs, V2_rs, V1_rob, V2_rob, V1_regfile, V2_regfile;
-    logic [`XLEN-1:0]  regfile_write_data, rob_write_data;
-    logic [`RS_SZ:0]   X_idx, S_idx, req_idx, fu_idx;
-    D_S_PACKET         D_packet, D_S_reg;
-    S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_regs;
+    // IF_ID Stages
+    logic take_branch;
+    IF_ID_PACKET IF_ID_reg, IF_packet;
+    D_S_PACKET D_S_reg, D_packet;
+    logic [1:0] proc2Dmem_command, proc2Imem_command, proc2mem_command;
+    logic [`XLEN-1:0] proc2Imem_addr, proc2Dmem_addr, proc2mem_addr;
+    logic [`XLEN-1:0] branch_target;
 
-    // Wires from X stage
-    CDB cdb;
-    PPLN_CTRL pipeline_control;
-    X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_regs;
-    logic [`RS_SZ-1:0] cdb_valid, gnt, FU_req;
-    logic [`RS_SZ:0]   cdb_idx, gnt_idx;
-
-    // Outputs from MEM-Stage to memory
-    logic [`XLEN-1:0] proc2Dmem_addr;
-    logic [`XLEN-1:0] proc2Dmem_data;
-    logic [1:0]       proc2Dmem_command, proc2Imem_command;
-    MEM_SIZE          proc2Dmem_size;
-
-    // Outputs from WB-Stage (These loop back to the register file in ID)
-    logic             wb_regfile_en;
-    logic [4:0]       wb_regfile_idx;
-    logic [`XLEN-1:0] wb_regfile_data;
-
-    assign rob_table_out_dbg = rob_table_out;
-    assign mt_table_out_dbg  = mt_table_out;
-    assign rs_table_dbg      = rs_table;
-    assign cdb_dbg           = cdb;
-    assign X_packets_dbg     = X_packets;
-    assign busy_dbg          = busy;
-    assign IF_ID_reg_dbg     = IF_ID_reg;
+    // debug outputs
+    assign IF_ID_reg_dbg = IF_ID_reg;
+    assign D_S_reg_dbg   = D_S_reg;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -105,28 +66,24 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    // these signals go to and from the processor and memory
-    // we give precedence to the mem stage over instruction fetch
-    // note that there is no latency in project 3
-    // but there will be a 100ns latency in project 4
+    assign proc2Dmem_command = BUS_NONE;
+    assign Dmem_req = (proc2Dmem_command != BUS_NONE);
 
     always_comb begin
-        if (reset) begin
-            proc2Dmem_command = BUS_NONE;
-        end else if (proc2Dmem_command != BUS_NONE) begin // read or write DATA from memory
-            proc2mem_command = proc2Dmem_command;
+        if (Dmem_req) begin
             proc2mem_addr    = proc2Dmem_addr;
+            proc2mem_command = proc2Dmem_command;
 `ifndef CACHE_MODE
             proc2mem_size    = proc2Dmem_size;  // size is never DOUBLE in project 3
 `endif
-        end else begin                          // read an INSTRUCTION from memory
-            proc2mem_command = proc2Imem_command;
+        end else begin
             proc2mem_addr    = proc2Imem_addr;
+            proc2mem_command = proc2Imem_command;
 `ifndef CACHE_MODE
-            proc2mem_size    = DOUBLE;          // instructions load a full memory line (64 bits)
+            proc2mem_size    = DOUBLE;  // size is never DOUBLE in project 3
 `endif
         end
-        proc2mem_data = {32'b0, proc2Dmem_data};
+        // proc2mem_data = {32'b0, proc2Dmem_data};
     end
 
     //////////////////////////////////////////////////
@@ -135,48 +92,27 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    if_stage if_stage_0(
-        // Inputs
-        .clock (clock),
-        .reset (reset),
-        .if_valid       (Imem2proc_valid),
-        .take_branch    (),                 // ignore because this scares me for now
-        .branch_target  (),                 // check above comment
-        .Imem2proc_data (Imem2proc_data),
+    assign take_branch   = `FALSE;        // for now
+    assign branch_target = '0;            // for now
 
-        // Outputs
-        .if_packet      (IF_packet),
-        .proc2Imem_addr (proc2Imem_addr)
+    if_stage if_stage_0(
+        .clock(clock), .reset(reset), .gnt(~Dmem_req),
+        .take_branch(take_branch),
+        .branch_target(branch_target),
+        .Imem2proc_data(mem2proc_data),
+        .Imem2proc_response(mem2proc_response), .Imem2proc_tag(mem2proc_tag),
+
+        .mem_req(Imem_req),
+        .IF_packet(IF_packet),
+        .proc2Imem_command(proc2Imem_command),
+        .proc2Imem_addr(proc2Imem_addr)
     );
 
-    // when response comes back in turn on the if_stage
-    assign Imem2proc_valid = (mem2proc_tag == nextImem_tag) & (nextImem_tag != '0);
-
     always_ff @(posedge clock) begin
-        new_addr <= (lastImem_addr != IF_ID_reg.NPC) & ~reset & IF_ID_reg.valid;
-
         if (reset) begin
-            lastImem_addr <= `XLEN'hFFFFFFFF;
-
-            IF_ID_reg.inst  <= `NOP;
-            IF_ID_reg.valid <= `TRUE;
-            IF_ID_reg.NPC   <= 'h4;
-            IF_ID_reg.PC    <= 0;
+            IF_ID_reg <= '0;
         end else begin
-            // makes the last_addr trail the PC
-            lastImem_addr <= IF_ID_reg.PC;
-
-            // we can pass '0 because we only check valid in next stage
             IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
-        end
-    end
-
-    always_comb begin
-        if (new_addr) begin
-            proc2Imem_command = BUS_LOAD;
-            nextImem_tag      = mem2proc_response;
-        end else begin
-            proc2Imem_command = BUS_NONE;
         end
     end
 
@@ -203,187 +139,23 @@ module pipeline (
         end
     end
 
-    map_table map_table_inst (
-        // Inputs
-        .clock(clock), .reset(reset), 
-        .en(D_S_reg.valid & ~rs_stall), 
-        .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2), 
-        .retire_r(retire_r_wire), 
-        .cdb(cdb), .T(T_wire), .retire_T(retire_T_wire), 
-        
-        // Outputs
-        .T1(T1_wire), .T2(T2_wire), 
-        .mt_table_out(mt_table_out)
-    );
-
-    assign V1_rs = (T1_wire.plus == 1) ? V1_rob : V1_regfile;
-    assign V2_rs = (T2_wire.plus == 1) ? V2_rob : V2_regfile;
-
-    rs_stage rs_stage_inst (
-        // Inputs
-        .clock(clock), .reset(reset), .en(D_S_reg.valid & ~rs_stall), 
-        .cdb(cdb), .D_S_reg(D_S_reg), 
-        .FU_ready(FU_ready),
-        .T(T_wire), .T1(T1_wire), .T2(T2_wire), 
-        .V1(V1_rs), .V2(V2_rs), 
-
-        // Outputs           
-        .stall(rs_stall),
-        .S_packet(S_packets), 
-        .rs_table(rs_table), .busy(busy)
-    );
-
-    // for FU_ready S_X
-    always_ff @(posedge clock) begin
-        for (fu_idx = 0; fu_idx < `RS_SZ; fu_idx++)
-            if (reset | gnt[fu_idx])
-                FU_ready[fu_idx] <= `TRUE;      // general FU wipe
-            else if (FU_ready[fu_idx] & S_packets[fu_idx].valid)
-                FU_ready[fu_idx] <= `FALSE;     // FU reserved by entry (issue)
-    end
-
-    rob rob_inst (
-        // Inputs
-        .clock(clock), .reset(reset),
-        .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T),
-        .cdb(cdb),
-        .dispatch_valid(D_S_reg.valid & ~rs_stall), 
-        .T(T_wire), .retire_T_out(retire_T_wire), 
-
-        // Outputs
-        .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), 
-        .retire(retire), .regfile_write_idx_out(retire_r_wire), 
-        .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
-        .V1(V1_rob), .V2(V2_rob)
-    );
-
-    assign regfile_write_en   = retire;
-    assign regfile_write_data = rob_write_data;
-    assign regfile_write_idx  = retire_r_wire;
-
-    regfile regfile_inst (
-        // Inputs
-        .clock(clock), 
-        .read_idx_1(D_S_reg.r1), .read_idx_2(D_S_reg.r2), 
-        .write_idx(regfile_write_idx),
-        .write_en(regfile_write_en), .write_data(regfile_write_data),
-
-        // Outputs
-        .read_out_1(V1_regfile), .read_out_2(V2_regfile)
-    );
-
-    //////////////////////////////////////////////////
-    //                                              //
-    //                    S/X Regs                  //
-    //                                              //
-    //////////////////////////////////////////////////
-
-    always_ff @(posedge clock) begin
-        for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
-            if (reset) begin
-                S_X_regs[S_idx] <= 0;            
-            end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
-                S_X_regs[S_idx] <= S_packets[S_idx];
-            end else begin
-                S_X_regs[S_idx] <= 0;
-            end
-    end
-
-    //////////////////////////////////////////////////
-    //                                              //
-    //                    X_Stage                   //
-    //                                              //
-    //////////////////////////////////////////////////
-
-    func_unit_0 func_unit_00(
-        // Inputs
-        .S_X_reg(S_X_regs[0]), 
-        
-        // Outputs
-        .X_packet(X_packets[0])
-    );
-
-    func_unit_1 func_unit_01(
-        // Inputs
-        .clock(clock), .reset(reset), 
-        .S_X_reg(S_X_regs[1]), 
-
-        // Outputs    
-        .X_packet(X_packets[1])
-    );
-
-    // X_C regs
-    always_ff @(posedge clock) begin
-        for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
-            if (reset) begin
-                X_C_regs[X_idx] <= 0;
-            end else if (X_packets[X_idx].valid) begin
-                X_C_regs[X_idx] <= X_packets[X_idx];
-            end
-    end
-
-    //////////////////////////////////////////////////
-    //                                              //
-    //               Commit stage                   //
-    //                                              //
-    //////////////////////////////////////////////////
-
-    always_comb begin
-        for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
-            if(X_packets[req_idx].valid === 1)
-                FU_req[req_idx] = 1;
-            else
-                FU_req[req_idx] = 0;
-    end
-
-    always_ff @(posedge clock) begin
-        for (gnt_idx = 0; gnt_idx < `RS_SZ; gnt_idx++)
-            if (reset)
-                cdb_valid[gnt_idx] <= '0;
-            else
-                cdb_valid[gnt_idx] <= gnt[gnt_idx];
-    end
-
-    // CDB stage
-    always_comb begin
-        cdb_idx = (cdb_valid[0]) ? 0 :
-                  (cdb_valid[1]) ? 1 : 
-                  (cdb_valid[2]) ? 2 : 3;
-        cdb.ppln_ctrl = X_C_regs[cdb_idx].ppln_ctrl;
-        if(|cdb_valid) begin
-            cdb.valid = `TRUE;
-            cdb.T = X_C_regs[cdb_idx].T;
-            cdb.V = X_C_regs[cdb_idx].result;
-        end else begin
-            cdb.valid = `FALSE;
-            cdb.T = 0;
-            cdb.V = 0;
-        end
-    end
-
-    rps4 arb (
-        .clock(clock), .reset(reset), 
-        .req(FU_req), 
-        .en(1'b1), 
-        
-        .gnt(gnt), .count()
-    );
-
     //////////////////////////////////////////////////
     //                                              //
     //               Pipeline Outputs               //
     //                                              //
     //////////////////////////////////////////////////
 
-    assign pipeline_completed_insts = {3'b0, pipeline_control.valid};    // commit one valid instruction
-    assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
-                                      pipeline_control.halt           ? HALTED_ON_WFI :
-                                      (mem2proc_response==4'h0 & proc2mem_command != BUS_NONE) ? LOAD_ACCESS_FAULT : 
-                                                                        NO_ERROR;
+    // assign pipeline_completed_insts = {3'b0, pipeline_control.valid};    // commit one valid instruction
+    // assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
+    //                                   pipeline_control.halt           ? HALTED_ON_WFI :
+    //                                   (mem2proc_response==4'h0 & proc2mem_command != BUS_NONE) ? LOAD_ACCESS_FAULT : 
+    //                                                                     NO_ERROR;
 
-    assign pipeline_commit_wr_en   = regfile_write_en;
-    assign pipeline_commit_wr_idx  = regfile_write_idx;
-    assign pipeline_commit_wr_data = regfile_write_data;
+    assign pipeline_completed_insts = {3'b0, D_S_reg.valid};    // commit one valid instruction
+    assign pipeline_error_status    =  (D_S_reg.halt) ? HALTED_ON_WFI : NO_ERROR;
+    // assign pipeline_commit_wr_en   = regfile_write_en;
+    // assign pipeline_commit_wr_idx  = regfile_write_idx;
+    // assign pipeline_commit_wr_data = regfile_write_data;
     // assign pipeline_commit_NPC     = mem_wb_reg.NPC;
 
 endmodule // pipeline

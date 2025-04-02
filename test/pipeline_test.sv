@@ -8,27 +8,6 @@
 
 `include "verilog/sys_defs.svh"
 
-// P4 TODO: Add your own debugging framework. Basic printing of data structures
-//          is an absolute necessity for the project. You can use C functions
-//          like in test/pipeline_print.c or just do everything in verilog.
-//          Be careful about running out of space on CAEN printing lots of state
-//          for longer programs (alexnet, outer_product, etc.)
-
-
-// these link to the pipeline_print.c file in this directory, and are used below to print
-// detailed output to the pipeline_output_file, initialized by open_pipeline_output_file()
-// import "DPI-C" function void open_pipeline_output_file(string file_name);
-// import "DPI-C" function void print_header(string str);
-// import "DPI-C" function void print_cycles();
-// import "DPI-C" function void print_stage(string div, int inst, int npc, int valid_inst);
-// import "DPI-C" function void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
-//                                        int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
-// import "DPI-C" function void print_membus(int proc2mem_command, int mem2proc_response,
-//                                           int proc2mem_addr_hi, int proc2mem_addr_lo,
-//                                           int proc2mem_data_hi, int proc2mem_data_lo);
-// import "DPI-C" function void print_close();
-
-
 module testbench;
     // used to parameterize which files are used for memory and writeback/pipeline outputs
     // "./simv" uses program.mem, writeback.out, and pipeline.out
@@ -71,6 +50,7 @@ module testbench;
     logic [`RS_SZ-1:0] busy_dbg;
     CDB cdb_dbg;
     IF_ID_PACKET IF_ID_reg_dbg;
+    D_S_PACKET D_S_reg_dbg;
 
     // logging
     MT_ENTRY mt_table [31:0];
@@ -109,7 +89,8 @@ module testbench;
         .X_packets_dbg(X_packets_dbg),
         .cdb_dbg(cdb_dbg),
         .busy_dbg(busy_dbg),
-        .IF_ID_reg_dbg(IF_ID_reg_dbg)
+        .IF_ID_reg_dbg(IF_ID_reg_dbg),
+        .D_S_reg_dbg(D_S_reg_dbg)
     );
 
     // Instantiate the Data Memory
@@ -230,14 +211,17 @@ module testbench;
     //                                              //
     //////////////////////////////////////////////////
 
+    always @(posedge clock) begin
+        if (IF_ID_reg_dbg.valid & ~reset)
+            $display("IF_ID_reg -- PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst);
+        if (D_S_reg_dbg.valid)
+            $display("D_packet -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+                    D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+    end
+
+
 
     initial begin
-        //$dumpvars;
-
-        // P4 NOTE: You must keep memory loading here the same for the autograder
-        //          Other things can be tampered with somewhat
-        //          Definitely feel free to add new output files
-
         // set paramterized strings, see comment at start of module
         if ($value$plusargs("MEMORY=%s", program_memory_file)) begin
             $display("Loading memory file: %s", program_memory_file);
@@ -298,7 +282,6 @@ module testbench;
         end
     end
 
-
     always @(negedge clock) begin
         if(reset) begin
             $display("@@\n@@  %t : System STILL at reset, can't show anything\n@@",
@@ -306,20 +289,6 @@ module testbench;
             debug_counter <= 0;
         end else begin
             #2;
-
-            // print the pipeline debug outputs via c code to the pipeline output file
-            // print_cycles();
-            // print_stage(" ", if_inst_dbg,     if_NPC_dbg    [31:0], {31'b0,if_valid_dbg});
-            // print_stage("|", if_id_inst_dbg,  if_id_NPC_dbg [31:0], {31'b0,if_id_valid_dbg});
-            // print_stage("|", id_ex_inst_dbg,  id_ex_NPC_dbg [31:0], {31'b0,id_ex_valid_dbg});
-            // print_stage("|", ex_mem_inst_dbg, ex_mem_NPC_dbg[31:0], {31'b0,ex_mem_valid_dbg});
-            // print_stage("|", mem_wb_inst_dbg, mem_wb_NPC_dbg[31:0], {31'b0,mem_wb_valid_dbg});
-            // print_reg(32'b0, pipeline_commit_wr_data[31:0],
-            //     {27'b0,pipeline_commit_wr_idx}, {31'b0,pipeline_commit_wr_en});
-            // print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
-            //     32'b0, proc2mem_addr[31:0],
-            //     proc2mem_data[63:32], proc2mem_data[31:0]);
-            $display("IF_ID_reg -- PC: %0h, INST: %0h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst);
 
             // print register write information to the writeback output file
             if (pipeline_completed_insts > 0) begin
@@ -333,8 +302,8 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 50000000) begin
-                dump_regfile();
+            if(pipeline_error_status != NO_ERROR || debug_counter > 5000000) begin
+                // dump_regfile();
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);

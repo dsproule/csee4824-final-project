@@ -23,7 +23,7 @@ module if_stage (
     output logic [`XLEN-1:0] proc2Imem_addr
 );
 
-    typedef enum logic {NEW_ADDR, WAIT_FOR_TAG} IF_states;
+    typedef enum logic [1:0] {NEW_ADDR, WAIT_FOR_TAG} IF_states;
     
     logic [`XLEN-1:0] PC_reg;
     logic nextImem_tag;

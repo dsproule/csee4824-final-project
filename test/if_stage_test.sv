@@ -112,7 +112,7 @@ module testbench;
     if_stage if_stage_0(
         .clock(clock), .reset(reset), .gnt(~Dmem_req),
         .take_branch(take_branch),
-        .branch_target(branch_target),
+        .branch_target(),
         .Imem2proc_data(mem2proc_data),
         .Imem2proc_response(mem2proc_response), .Imem2proc_tag(mem2proc_tag),
 
@@ -155,7 +155,6 @@ module testbench;
         if (D_S_reg.valid)
             $display("D_packet -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
                     D_S_reg.inst, D_S_reg.PC, D_S_reg.NPC, D_S_reg.r, D_S_reg.r1, D_S_reg.r2, D_S_reg.opa_select, D_S_reg.opb_select, D_S_reg.cond_branch,D_S_reg.uncond_branch,D_S_reg.alu_func, D_S_reg.rs_idx, D_S_reg.halt, D_S_reg.illegal, D_S_reg.csr_op, D_S_reg.valid);
-            
     end
 
     initial begin
@@ -178,6 +177,8 @@ module testbench;
         @(negedge clock);
         show_mem_with_decimal(0, 12);
         reset = 1;
+        @(negedge clock);
+        @(negedge clock);
         @(negedge clock);
         reset = 0;
         branch_target = 32'h4;
