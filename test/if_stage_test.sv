@@ -26,24 +26,38 @@ module testbench;
         end
     endtask // task show_mem_with_decimal
 
-    logic Imem2proc_valid;
     IF_ID_PACKET IF_ID_reg, IF_packet;
     D_S_PACKET D_S_reg, D_packet;
-    logic [`XLEN-1:0] proc2Imem_addr, proc2Icache_addr, proc2mem_addr, proc2Dmem_addr;
-    logic [63:0] mem2proc_data, Icache2proc_data;
-    logic [1:0] proc2Imem_command, proc2Dmem_command, proc2mem_command;
-    logic [3:0] mem2proc_response, mem2proc_tag;
-    logic [31:0] proc2Dmem_data_lsb, proc2Dmem_data_msb;
+    logic [63:0] proc2mem_data;
+    logic [63:0] mem2proc_data;
+    logic [3:0] mem2proc_tag;
+    logic [3:0] mem2proc_response;
+    logic [1:0] proc2Dmem_command, proc2Imem_command, proc2mem_command;
+    logic [`XLEN-1:0] proc2Imem_addr, proc2Dmem_addr, proc2mem_addr;
+    logic take_branch;
+    logic [`XLEN-1:0] branch_target;
+
+    task store_mem;
+        input [`XLEN-1:0] addr;
+        input [63:0] data;
+
+        proc2Dmem_addr = addr;
+        proc2mem_data = data;
+        proc2Dmem_command = BUS_STORE;
+        @(negedge clock);
+        proc2Dmem_addr = data + 4;
+        @(negedge clock);
+        proc2Dmem_command = BUS_NONE;
+    endtask;
 
     // new signals
-    logic [`XLEN-1:0] lastImem_addr;
     logic [3:0] nextImem_tag;
-    logic new_addr;
+    logic new_addr, Imem_req, Dmem_req;
 
     mem memory(
         .clk(clock),
         .proc2mem_addr(proc2mem_addr),
-        .proc2mem_data({proc2Dmem_data_msb, proc2Dmem_data_lsb}),
+        .proc2mem_data(proc2mem_data),
         .proc2mem_command(proc2mem_command),
 
         .mem2proc_response(mem2proc_response),        // will need to change when Dmem gets introduced
@@ -82,58 +96,39 @@ module testbench;
 
     /* Module start */
 
+    assign Dmem_req = (proc2Dmem_command != BUS_NONE);
+
     always_comb begin
-        if (proc2Dmem_command == BUS_NONE) begin
-            proc2mem_addr    = proc2Imem_addr;
-            proc2mem_command = proc2Imem_command;
-        end else begin
+        if (Dmem_req) begin
             proc2mem_addr    = proc2Dmem_addr;
             proc2mem_command = proc2Dmem_command;
+        end else begin
+            proc2mem_addr    = proc2Imem_addr;
+            proc2mem_command = proc2Imem_command;
         end
     end
+
 
     if_stage if_stage_0(
-        // Inputs
-        .clock (clock),
-        .reset (reset),
-        .if_valid       (Imem2proc_valid),
-        .take_branch    (),                 // ignore because this scares me for now
-        .branch_target  (),                 // check above comment
-        .Imem2proc_data (mem2proc_data),
+        .clock(clock), .reset(reset), .gnt(~Dmem_req),
+        .take_branch(take_branch),
+        .branch_target(branch_target),
+        .Imem2proc_data(mem2proc_data),
+        .Imem2proc_response(mem2proc_response), .Imem2proc_tag(mem2proc_tag),
 
-        // Outputs
-        .if_packet      (IF_packet),
-        .proc2Imem_addr (proc2Imem_addr)
+        .mem_req(mem_req),
+        .IF_packet(IF_packet),
+        .proc2Imem_command(proc2Imem_command),
+        .proc2Imem_addr(proc2Imem_addr)
     );
 
-    // makes the last_addr trail the PC
-    always_ff @(posedge clock) begin
-        new_addr <= (lastImem_addr != IF_ID_reg.NPC) & ~reset & IF_ID_reg.valid;
-
-        if (reset) begin
-            lastImem_addr <= `XLEN'hFFFFFFFF;
-
-            IF_ID_reg.inst  <= `NOP;
-            IF_ID_reg.valid <= `TRUE;
-            IF_ID_reg.NPC   <= 'h0;
-            IF_ID_reg.PC    <= 0;
-        end else begin
-            lastImem_addr <= IF_ID_reg.PC;
-
-            // if (IF_packet.valid)
-            IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
-        end
-    end
-
     // when response comes back in turn on the if_stage
-    assign Imem2proc_valid = (mem2proc_tag == nextImem_tag) & (nextImem_tag != '0);
 
-    always_comb begin
-        if (new_addr) begin
-            proc2Imem_command = BUS_LOAD;
-            nextImem_tag     = mem2proc_response;
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            IF_ID_reg <= '0;
         end else begin
-            proc2Imem_command = BUS_NONE;
+            IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
         end
     end
 
@@ -142,23 +137,24 @@ module testbench;
 
         .D_packet(D_packet)
     );
+    
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            D_S_reg <= '0;
+        end else begin
+            D_S_reg <= (D_packet.valid) ? D_packet : '0;
+        end
+    end
 
-    // always_ff @(posedge clock) begin
-    //     if (reset) begin
-    //         D_S_reg <= '0;
-    //     end else begin
-    //         D_S_reg <= (D_packet.valid) ? D_packet : '0;
-    //     end
-    // end
 
     /* Module end */
 
     always @(posedge clock) begin
-        if (IF_ID_reg.inst != 0) begin
-            $display("IF_ID_reg -- PC: %0h, INST: %0h", IF_ID_reg.PC, IF_ID_reg.inst);
+        if (IF_ID_reg.valid & ~reset)
+            $display("IF_ID_reg -- PC: %2h, INST: %8h", IF_ID_reg.PC, IF_ID_reg.inst);
+        if (D_S_reg.valid)
             $display("D_packet -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
-                    D_packet.inst, D_packet.PC, D_packet.NPC, D_packet.r, D_packet.r1, D_packet.r2, D_packet.opa_select, D_packet.opb_select, D_packet.cond_branch,D_packet.uncond_branch,D_packet.alu_func, D_packet.rs_idx, D_packet.halt, D_packet.illegal, D_packet.csr_op, D_packet.valid);
-        end
+                    D_S_reg.inst, D_S_reg.PC, D_S_reg.NPC, D_S_reg.r, D_S_reg.r1, D_S_reg.r2, D_S_reg.opa_select, D_S_reg.opb_select, D_S_reg.cond_branch,D_S_reg.uncond_branch,D_S_reg.alu_func, D_S_reg.rs_idx, D_S_reg.halt, D_S_reg.illegal, D_S_reg.csr_op, D_S_reg.valid);
             
     end
 
@@ -166,29 +162,17 @@ module testbench;
         clock = 0;
         // $monitor("PC: %0h, INST: %0h", IF_ID_reg.PC, IF_ID_reg.inst);
         reset = 1;
+        take_branch = 0;
 
         @(negedge clock);
         reset = 0;
         @(negedge clock);
 
-        // Load data to pull from
-        proc2Dmem_addr = `XLEN'h0;
-        proc2Dmem_data_lsb = 32'h00100093;
-        proc2Dmem_data_msb = 32'h00200113;
-        proc2Dmem_command = BUS_STORE;
-        @(negedge clock);
-        proc2Dmem_addr = `XLEN'd4;
-        proc2Dmem_command = BUS_STORE;          // no idea why but this needs to be here to load properly
-        @(negedge clock);
-        proc2Dmem_addr = `XLEN'd8;
-        proc2Dmem_data_lsb = 32'h00210233;
-        proc2Dmem_data_msb = 32'h002081b3;
-        proc2Dmem_command = BUS_STORE;
-        @(negedge clock);
-        proc2Dmem_command = BUS_NONE;
-        @(negedge clock);
-        @(negedge clock);
-        @(negedge clock);
+        store_mem(`XLEN'h0,  64'h0020011300100093);
+        store_mem(`XLEN'h8,  64'h002081b300210233);
+        store_mem(`XLEN'h10, 64'h0081011310412023);
+        store_mem(`XLEN'h18, 64'h0103229300130313);
+        
         @(negedge clock);
         @(negedge clock);
         @(negedge clock);
@@ -196,10 +180,17 @@ module testbench;
         reset = 1;
         @(negedge clock);
         reset = 0;
+        branch_target = 32'h4;
 
         // magic should start happening now
         @(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);
         @(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);
+        take_branch = 1;
+        @(negedge clock);
+        @(negedge clock);
+        take_branch = 0;
+        @(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);@(negedge clock);
+
 
         $finish;
     end

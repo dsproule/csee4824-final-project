@@ -70,6 +70,7 @@ module testbench;
     X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
     logic [`RS_SZ-1:0] busy_dbg;
     CDB cdb_dbg;
+    IF_ID_PACKET IF_ID_reg_dbg;
 
     // logging
     MT_ENTRY mt_table [31:0];
@@ -107,7 +108,8 @@ module testbench;
         .rs_table_dbg(rs_table_dbg),
         .X_packets_dbg(X_packets_dbg),
         .cdb_dbg(cdb_dbg),
-        .busy_dbg(busy_dbg)
+        .busy_dbg(busy_dbg),
+        .IF_ID_reg_dbg(IF_ID_reg_dbg)
     );
 
     // Instantiate the Data Memory
@@ -317,6 +319,7 @@ module testbench;
             // print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
             //     32'b0, proc2mem_addr[31:0],
             //     proc2mem_data[63:32], proc2mem_data[31:0]);
+            $display("IF_ID_reg -- PC: %0h, INST: %0h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst);
 
             // print register write information to the writeback output file
             if (pipeline_completed_insts > 0) begin

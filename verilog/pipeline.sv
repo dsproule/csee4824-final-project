@@ -17,7 +17,7 @@ module pipeline (
     input [63:0] mem2proc_data,     // Data coming back from memory
     input [3:0]  mem2proc_tag,      // Tag from memory about current reply
 
-    output logic [1:0]       proc2mem_command, proc2Imem_command, // Command sent to memory
+    output logic [1:0]       proc2mem_command, // Command sent to memory
     output logic [`XLEN-1:0] proc2mem_addr,    // Address sent to memory
     output logic [63:0]      proc2mem_data,    // Data sent to memory
 `ifndef CACHE_MODE // no longer sending size to memory
@@ -37,7 +37,8 @@ module pipeline (
     output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg,
     output X_C_PACKET [`RS_SZ-1:0] X_packets_dbg,
     output CDB cdb_dbg,
-    output logic [`RS_SZ-1:0] busy_dbg
+    output logic [`RS_SZ-1:0] busy_dbg,
+    output IF_ID_PACKET IF_ID_reg_dbg
 );
 
     //////////////////////////////////////////////////
@@ -82,7 +83,7 @@ module pipeline (
     // Outputs from MEM-Stage to memory
     logic [`XLEN-1:0] proc2Dmem_addr;
     logic [`XLEN-1:0] proc2Dmem_data;
-    logic [1:0]       proc2Dmem_command;
+    logic [1:0]       proc2Dmem_command, proc2Imem_command;
     MEM_SIZE          proc2Dmem_size;
 
     // Outputs from WB-Stage (These loop back to the register file in ID)
@@ -96,6 +97,7 @@ module pipeline (
     assign cdb_dbg           = cdb;
     assign X_packets_dbg     = X_packets;
     assign busy_dbg          = busy;
+    assign IF_ID_reg_dbg     = IF_ID_reg;
 
     //////////////////////////////////////////////////
     //                                              //
@@ -109,7 +111,9 @@ module pipeline (
     // but there will be a 100ns latency in project 4
 
     always_comb begin
-        if (proc2Dmem_command != BUS_NONE) begin // read or write DATA from memory
+        if (reset) begin
+            proc2Dmem_command = BUS_NONE;
+        end else if (proc2Dmem_command != BUS_NONE) begin // read or write DATA from memory
             proc2mem_command = proc2Dmem_command;
             proc2mem_addr    = proc2Dmem_addr;
 `ifndef CACHE_MODE
@@ -156,7 +160,7 @@ module pipeline (
 
             IF_ID_reg.inst  <= `NOP;
             IF_ID_reg.valid <= `TRUE;
-            IF_ID_reg.NPC   <= 'h0;
+            IF_ID_reg.NPC   <= 'h4;
             IF_ID_reg.PC    <= 0;
         end else begin
             // makes the last_addr trail the PC
@@ -374,7 +378,8 @@ module pipeline (
     assign pipeline_completed_insts = {3'b0, pipeline_control.valid};    // commit one valid instruction
     assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
                                       pipeline_control.halt           ? HALTED_ON_WFI :
-                                      (mem2proc_response==4'h0) ? LOAD_ACCESS_FAULT : NO_ERROR;
+                                      (mem2proc_response==4'h0 & proc2mem_command != BUS_NONE) ? LOAD_ACCESS_FAULT : 
+                                                                        NO_ERROR;
 
     assign pipeline_commit_wr_en   = regfile_write_en;
     assign pipeline_commit_wr_idx  = regfile_write_idx;
