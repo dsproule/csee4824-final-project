@@ -356,7 +356,7 @@ typedef struct packed {
 
 typedef struct packed {
     /* General pipeline*/
-
+    
     INST inst;
     logic [`XLEN-1:0] PC;
     logic [`XLEN-1:0] NPC; // PC + 4

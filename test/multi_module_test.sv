@@ -34,7 +34,7 @@ module testbench;
     // Reservation Station Signals
     RS_ENTRY [ `RS_SZ-1:0] rs_table;
     logic [`RS_SZ-1:0] busy;    // functional unit in used -> busy
-    logic d_stall;              // If that functional unit is occupied -> stall
+    logic rs_stall;              // If that functional unit is occupied -> stall
     
     // Map Table
     MT_ENTRY mt_table [31:0];
@@ -61,7 +61,6 @@ module testbench;
 
     // FU
     S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_reg; // from RS to FU
-    logic [`RS_SZ:0] S_idx;
 
     // Outputs from FU to Commit
     X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_reg;
@@ -77,7 +76,7 @@ module testbench;
     logic [7:0] clock_count;
     logic [5:0] error_count;
 
-    map_table map_table_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid & ~d_stall), .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2), .retire_r(retire_r_wire), 
+    map_table map_table_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid & ~rs_stall), .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2), .retire_r(retire_r_wire), 
                               .cdb(cdb), .T(T_wire), .retire_T(retire_T_wire), .T1(T1_wire), .T2(T2_wire), .mt_table_out(mt_table_out));
 
     always_comb begin
@@ -87,12 +86,12 @@ module testbench;
         end
     end
 
-    rs_stage rs_stage_inst (.clock(clock), .reset(reset), .en(D_S_reg.valid & ~d_stall), .cdb(cdb), .D_S_reg(D_S_reg), .FU_ready(FU_ready),
-                            .T(T_wire), .T1(T1_wire), .T2(T2_wire), .V1(V1_rs), .V2(V2_rs), .d_stall(d_stall),
+    rs_stage rs_stage_inst (.clock(clock), .reset(reset), .alloc_en(D_S_reg.valid), .cdb(cdb), .D_S_reg(D_S_reg), .FU_ready(FU_ready),
+                            .T(T_wire), .T1(T1_wire), .T2(T2_wire), .V1(V1_rs), .V2(V2_rs), .rs_idx_full(rs_stall),
                             .S_packet(S_packets), .rs_table(rs_table), .busy(busy));
 
     rob rob_inst (.clock(clock), .reset(reset), .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T), .cdb(cdb),
-                  .dispatch_valid(D_S_reg.valid & ~d_stall), .T(T_wire), .retire_T_out(retire_T_wire), 
+                  .dispatch_valid(D_S_reg.valid & ~rs_stall), .T(T_wire), .retire_T_out(retire_T_wire), 
                   .ppln_ctrl(), .full(full), .empty(empty), .retire(retire), .regfile_write_idx_out(retire_r_wire), 
                   .V1(V1_rob), .V2(V2_rob), .regfile_write_data(rob_write_data),.rob_table_out(rob_table_out));
 
@@ -154,10 +153,10 @@ module testbench;
 
     task compare_stall;
         input stall;
-        if(d_stall != stall) begin
+        if(rs_stall != stall) begin
             error_count = error_count + 1;
             $display("@@@Failed at time: %d\t", clock_count - 6);
-            $display("@@@stall error: d_stall: %b", d_stall);
+            $display("@@@stall error: rs_stall: %b", rs_stall);
             // $finish;
         end
     endtask
