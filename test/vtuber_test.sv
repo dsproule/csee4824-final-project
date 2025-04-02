@@ -38,7 +38,7 @@ module testbench;
     logic [3:0]       mem2proc_tag;
 
     RS_ENTRY [`RS_SZ-1:0] rs_table_dbg;
-    X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
+    //X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
     CDB cdb_dbg;
     logic [`RS_SZ-1:0] busy_dbg;
 
@@ -111,7 +111,7 @@ module testbench;
         // .mem_wb_valid_dbg (mem_wb_valid_dbg)
 
         .rs_table_dbg   (rs_table_dbg),
-        .X_packets_dbg  (X_packets_dbg),
+        //.X_packets_dbg  (X_packets_dbg),
         .cdb_dbg        (cdb_dbg),
         .busy_dbg       (busy_dbg)
     );
@@ -172,7 +172,7 @@ module testbench;
             0,  // MEM
             0,  // MEM/WB
             0,  // WB
-            4   // Miscellaneous
+            3   // Miscellaneous
         );
 
         // Pulse the reset signal
