@@ -345,26 +345,37 @@ module testbench;
         // $display("vcompleted 1:%h",   pipeline_completed_insts);
         // $display("vpipe_err 1:%h",    pipeline_error_status);
         // Show CDB state
+        // === VTuber-compatible Reservation Station Debug ===
+        $display("vRS_alloc_idx 1:%h", rs_idx_dbg);
+
+        // CDB state
         $display("vCDB_valid 1:%h", cdb_dbg.valid);
         $display("vCDB_T 2:%h", cdb_dbg.T);
         $display("vCDB_V 4:%h", cdb_dbg.V);
 
-        // For busy bits, show them as a single value
+        // Busy vector
         $display("vRS_busy 2:%h", busy_dbg);
 
+        // Flattened RS table debug (must be a single line each!)
+        $write("vRS_T 2:");
+        for (int i = 0; i < `RS_SZ; i++) $write("%h", rs_table_dbg[i].T);
+        $display("");
 
-        // Show key info for busy entries
-        for(int i = 0; i < `RS_SZ; i++) begin
-        if(busy_dbg[i]) begin
-            $display("vRS%0d_T 2:%h", i, rs_table_dbg[i].T);
-            $display("vRS%0d_T1 2:%h", i, rs_table_dbg[i].T1);
-            $display("vRS%0d_T2 2:%h", i, rs_table_dbg[i].T2);
-            $display("vRS%0d_rdy 1:%h", i, rs_table_dbg[i].ready);
-        end
-        end
+        $write("vRS_T1 2:");
+        for (int i = 0; i < `RS_SZ; i++) $write("%h", rs_table_dbg[i].T1);
+        $display("");
 
-        // must come last
+        $write("vRS_T2 2:");
+        for (int i = 0; i < `RS_SZ; i++) $write("%h", rs_table_dbg[i].T2);
+        $display("");
+
+        $write("vRS_ready 1:");
+        for (int i = 0; i < `RS_SZ; i++) $write("%b", rs_table_dbg[i].ready);
+        $display("");
+
+        // Must come last for VTuber to render this cycle
         $display("break");
+
 
         // This is a blocking call to allow the debugger to control when we
         // advance the simulation

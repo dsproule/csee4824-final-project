@@ -26,7 +26,19 @@ module RS_ALLOC(
     RS_ENTRY next_re;
     logic next_re_valid;
 
-    assign rs_idx = D_S_reg.rs_idx;
+    //assign rs_idx = D_S_reg.rs_idx;
+    // First-free RS index
+    always_comb begin
+        rs_idx = 0;
+        for (int i = 0; i < `RS_SZ; i++) begin
+            if (!busy[i]) begin
+                rs_idx = i;
+                break;
+            end
+        end
+    end
+
+
     assign rs_idx_full = (rs_free[rs_idx]) ? 0 : next_busy[rs_idx];
 
     always_ff @(posedge clock) begin

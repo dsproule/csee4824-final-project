@@ -24,6 +24,73 @@
 #define NUM_REG_GROUPS  4
 #define REG_SIZE_IN_HEX 8
 
+WINDOW *rs_win; // New window for RS Table
+
+char **rs_log = NULL;
+int rs_log_len = 0;
+int rs_log_idx = 0;
+
+void setup_rs_table_window() {
+    rs_win = newwin(15, COLS - 2, LINES - 15, 1);
+    wbkgd(rs_win, COLOR_PAIR(5));
+    wattron(rs_win, COLOR_PAIR(5));
+    box(rs_win, 0, 0);
+    mvwprintw(rs_win, 0, (COLS / 2) - 6, "RESERVATION STATION");
+    wrefresh(rs_win);
+}
+
+void display_rs_entry(const char *line) {
+    werase(rs_win);
+    box(rs_win, 0, 0);
+    mvwprintw(rs_win, 0, (COLS / 2) - 6, "RESERVATION STATION");
+
+    if (line) {
+        char *token = strtok((char *)line, "|");
+        int row = 1;
+        while (token) {
+            mvwprintw(rs_win, row++, 2, "%s", token);
+            token = strtok(NULL, "|");
+        }
+    }
+    wrefresh(rs_win);
+}
+
+void load_rs_log(const char *filename) {
+    FILE *fp = fopen(filename, "r");
+    if (!fp) return;
+
+    rs_log = (char **)malloc(sizeof(char *) * NUM_HISTORY);
+    char line[1024];
+    while (fgets(line, sizeof(line), fp)) {
+        rs_log[rs_log_len] = strdup(line);
+        rs_log_len++;
+        if (rs_log_len >= NUM_HISTORY) break;
+    }
+    fclose(fp);
+}
+
+void update_rs_log_ui() {
+    if (rs_log && rs_log_len > 0) {
+        char *line = strdup(rs_log[rs_log_idx]);
+        display_rs_entry(line);
+        free(line);
+    }
+}
+
+void rs_table_event_loop() {
+    int ch;
+    update_rs_log_ui();
+    while ((ch = getch()) != 'q') {
+        if (ch == 'n') {
+            rs_log_idx = (rs_log_idx + 1) % rs_log_len;
+        } else if (ch == 'b') {
+            rs_log_idx = (rs_log_idx - 1 + rs_log_len) % rs_log_len;
+        }
+        update_rs_log_ui();
+    }
+}
+
+
 // random variables/stuff
 int fd[2], writepipe[2], readpipe[2];
 int stdout_save;
@@ -213,13 +280,13 @@ void setup_gui(FILE *fp) {
     initscr();
     if (has_colors()) {
         start_color();
-        init_pair(1,COLOR_CYAN,COLOR_BLACK);    // shell background
+        init_pair(1,COLOR_CYAN,COLOR_BLACK);
         init_pair(2,COLOR_YELLOW,COLOR_RED);
         init_pair(3,COLOR_RED,COLOR_BLACK);
-        init_pair(4,COLOR_YELLOW,COLOR_BLUE);   // title window
-        init_pair(5,COLOR_YELLOW,COLOR_BLACK);  // register/signal windows
+        init_pair(4,COLOR_YELLOW,COLOR_BLUE);
+        init_pair(5,COLOR_YELLOW,COLOR_BLACK);
         init_pair(6,COLOR_RED,COLOR_BLACK);
-        init_pair(7,COLOR_MAGENTA,COLOR_BLACK); // pipeline window
+        init_pair(7,COLOR_MAGENTA,COLOR_BLACK);
         init_pair(8,COLOR_BLUE, COLOR_BLACK);
     }
     curs_set(0);
@@ -347,6 +414,10 @@ void setup_gui(FILE *fp) {
     mvwaddstr(vtuber_win, 6, 4, "   \\_/    |_|  \\___/|____/|_____|_| \\_\\");
     wrefresh(vtuber_win);
 
+    setup_rs_table_window();
+    load_rs_log("rs.log");
+    update_rs_log_ui();
+
     refresh();
 }
 
@@ -405,16 +476,24 @@ void parsedata(int history_num_in) {
 
     // Handle updating the ARF window
     int num_size = REG_SIZE_IN_HEX;
+    char hexstr[REG_SIZE_IN_HEX + 1];
     for (i=0; i < NUM_ARF; i++) {
-        if (strncmp(arf_contents[history_num_in]+i*num_size,
-                arf_contents[old_history_num_in]+i*num_size,num_size))
+        for (int j = 0; j < REG_SIZE_IN_HEX; j++) {
+            char c = arf_contents[history_num_in][i*num_size + j];
+            hexstr[j] = isprint(c) ? c : '.'; // replace unprintable chars
+        }
+        hexstr[REG_SIZE_IN_HEX] = '\0';
+
+        if (strncmp(arf_contents[history_num_in] + i*num_size,
+                    arf_contents[old_history_num_in] + i*num_size,
+                    num_size))
             wattron(arf_win, A_REVERSE);
         else
             wattroff(arf_win, A_REVERSE);
-        mvwaddnstr(arf_win,i+1,6,arf_contents[history_num_in]+i*num_size,num_size);
+
+        mvwprintw(arf_win,i+1,6,"%s", hexstr);
     }
     wrefresh(arf_win);
-
 
     // Handle updating the IF window
     for (i=0;i<num_if_regs;i++) {
