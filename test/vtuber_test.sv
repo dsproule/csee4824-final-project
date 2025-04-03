@@ -346,7 +346,7 @@ module testbench;
         // $display("vpipe_err 1:%h",    pipeline_error_status);
         // Show CDB state
         // === VTuber-compatible Reservation Station Debug ===
-        $display("vRS_alloc_idx 1:%h", rs_idx_dbg);
+        //$display("vRS_alloc_idx 1:%h", rs_idx_dbg);
 
         // CDB state
         $display("vCDB_valid 1:%h", cdb_dbg.valid);
