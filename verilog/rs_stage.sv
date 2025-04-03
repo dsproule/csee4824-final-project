@@ -13,6 +13,8 @@ module RS_ALLOC(
     output rs_idx_full,
     output logic    [`RS_SZ-1:0] busy,
     output RS_ENTRY [`RS_SZ-1:0] rs_table
+    //output logic [$clog2(`RS_SZ)-1:0] rs_idx_dbg,
+
 );
     /* 
      * Handles just the Dispatch. Passes values to 
