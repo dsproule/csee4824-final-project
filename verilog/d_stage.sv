@@ -194,7 +194,7 @@ module d_stage (
     output D_S_PACKET D_packet
 );
 
-    logic has_dest_reg, rd_mem, wr_mem;
+    logic has_dest, rd_mem, wr_mem;
     logic [`RS_SZ-1:0] rs_idx;   
 
     // Pass throughs (Used by the X stage if needed)
@@ -203,9 +203,10 @@ module d_stage (
     assign D_packet.NPC  = IF_ID_reg.NPC;
 
     // Register values for map table signals
-    assign D_packet.r = (has_dest_reg) ? IF_ID_reg.inst.r.rd : `ZERO_REG;
+    assign D_packet.r = (has_dest) ? IF_ID_reg.inst.r.rd : `ZERO_REG;
     assign D_packet.r1 = IF_ID_reg.inst.r.rs1;
     assign D_packet.r2 = (D_packet.opb_select != OPB_IS_RS2) ? '0 : IF_ID_reg.inst.r.rs2;
+    assign D_packet.has_dest = has_dest;
 
     assign D_packet.valid = IF_ID_reg.valid & ~D_packet.illegal;
 
@@ -231,7 +232,7 @@ module d_stage (
         .opa_select    (D_packet.opa_select),
         .opb_select    (D_packet.opb_select),
         .alu_func      (D_packet.alu_func),
-        .has_dest      (has_dest_reg),
+        .has_dest      (has_dest),
         .rd_mem        (rd_mem),
         .wr_mem        (wr_mem),
         .cond_branch   (D_packet.cond_branch),

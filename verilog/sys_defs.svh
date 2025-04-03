@@ -241,6 +241,8 @@ typedef enum logic [3:0] {
     OPB_IS_J_IMM  = 4'h5
 } ALU_OPB_SELECT;
 
+typedef enum logic [1:0] {NEW_ADDR, WAIT_FOR_TAG, WAIT_FOR_ADDR} mem_proc_states;
+
 // ALU function code input
 // probably want to leave these alone
 typedef enum logic [4:0] {
@@ -305,6 +307,7 @@ typedef struct packed {
     ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
     
     logic [`RS_SZ-1:0] rs_idx;   
+    logic has_dest;
 
     logic       halt;          // Is this a halt?
     logic       illegal;       // Is this instruction illegal?
@@ -319,7 +322,6 @@ typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
 typedef struct packed {
     logic flush;
 
-    logic valid;
     logic illegal;
     logic halt;
     

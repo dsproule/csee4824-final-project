@@ -21,14 +21,11 @@ module if_stage (
     output IF_ID_PACKET IF_packet,
     output logic [1:0]  proc2Imem_command,
     output logic [`XLEN-1:0] proc2Imem_addr
-);
-
-    typedef enum logic [1:0] {NEW_ADDR, WAIT_FOR_TAG} IF_states;
-    
+);  
     logic [`XLEN-1:0] PC_reg;
     logic [1:0]  mem2buf_command;
     logic [3:0]  nextImem_tag;
-    IF_states IF_state;
+    mem_proc_states IF_state;
 
     // word-aligned mem
     assign proc2Imem_addr = {PC_reg[`XLEN-1:3], 3'b0};
@@ -69,6 +66,7 @@ module if_stage (
                         IF_state <= NEW_ADDR;
                     end
                 end
+                default: ;
             endcase
         end
     end    
