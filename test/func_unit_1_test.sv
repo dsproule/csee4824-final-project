@@ -21,7 +21,7 @@ module testbench;
         S_X_reg.alu_func = alu_func;
         target = targ;
         @(negedge clock);
-        S_X_reg.valid = `FALSE;
+        //S_X_reg.valid = `FALSE;
         forever begin : wait_loop
             @(posedge clock);
             if (done) begin
@@ -35,7 +35,7 @@ module testbench;
     assign correct = (done == 1 && target == X_packet.result);
 
     initial begin
-        forever begin : clcok_gen
+        forever begin : clock_gen
             #5 clock = ~clock;
             if (clock == 1)
                 cycles = cycles + 1;

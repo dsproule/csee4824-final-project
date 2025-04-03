@@ -9,6 +9,7 @@ module func_unit_1(
     PPLN_CTRL ppln_ctrl;
     logic [1:0] signs;
     logic [63:0] mult_result;
+    logic start;
 
     assign X_packet.T = (X_packet.valid) ? S_X_reg.T : '0;
     
@@ -32,7 +33,7 @@ module func_unit_1(
         .clock(clock), .reset(reset),
         .mcand({32'b0, S_X_reg.V1}), .mplier({32'b0, S_X_reg.V2}),
         .signs(signs),               //  [1] -> s_mplier, [0] -> s_mcand
-        .start(S_X_reg.valid),
+        .start(start),
 
         .product(mult_result),
         .done(X_packet.valid)
@@ -45,6 +46,17 @@ module func_unit_1(
             ALU_MULHSU: X_packet.result = mult_result[2*`XLEN-1:`XLEN];
             ALU_MULHU:  X_packet.result = mult_result[2*`XLEN-1:`XLEN];
         endcase
+    end
+
+    logic can_start;
+    //assign start = (S_X_reg.valid && can_start);
+
+    always_ff @(posedge clock) begin
+        can_start <= 1;
+        if (S_X_reg.valid) can_start <= 0;
+        if (X_packet.valid) can_start <= 1;
+        
+        start <= (S_X_reg.valid && can_start);
     end
 
 endmodule
