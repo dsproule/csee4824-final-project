@@ -19,13 +19,13 @@ module testbench;
         S_X_reg.V2 = V2;
         S_X_reg.valid = `TRUE;
         S_X_reg.alu_func = alu_func;
+        target = targ;
         @(negedge clock);
         S_X_reg.valid = `FALSE;
         forever begin : wait_loop
-            @(posedge done);
-            @(negedge clock);
+            @(posedge clock);
             if (done) begin
-                $display("%0d x %0d = %0d", $signed(V1), $signed(V2), $signed(targ));
+                $display("%0d x %0d = %0d", $signed(V1), $signed(V2), $signed(X_packet.result));
                 disable wait_until_done_no_reset;
             end
         end
@@ -70,7 +70,7 @@ module testbench;
         reset = 0;
         // signed tests 
         wait_until_done_no_reset(32'd2, 32'd2, 32'd4, ALU_MUL);
-        wait_until_done_no_reset(32'd3, 32'd2, 32'd15, ALU_MUL);
+        wait_until_done_no_reset(32'd3, 32'd5, 32'd15, ALU_MUL);
         wait_until_done_no_reset(32'd0, 32'd2, 32'd0, ALU_MUL);
         wait_until_done_no_reset(32'd44589, 32'd345, 32'd15383205, ALU_MUL);
         wait_until_done_no_reset(-32'd1, 32'd2, -32'd2, ALU_MUL);

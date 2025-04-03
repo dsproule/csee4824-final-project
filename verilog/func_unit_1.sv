@@ -24,11 +24,10 @@ module func_unit_1(
     assign X_packet.ppln_ctrl = ppln_ctrl;
 
     // pass to mult signed vector
-    assign signs = {
-            S_X_reg.alu_func == ALU_MULHU, 
-            (S_X_reg.alu_func == ALU_MUL) | (S_X_reg.alu_func == ALU_MULH)
-        };
+    assign signs = ((S_X_reg.alu_func == ALU_MUL) | (S_X_reg.alu_func == ALU_MULH)) ? 2'b11:
+                    (S_X_reg.alu_func == ALU_MULHSU) ? 2'b10 : 2'b00;
 
+    
     mult mult_1(
         .clock(clock), .reset(reset),
         .mcand({32'b0, S_X_reg.V1}), .mplier({32'b0, S_X_reg.V2}),

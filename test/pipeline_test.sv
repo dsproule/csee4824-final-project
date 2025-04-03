@@ -198,6 +198,28 @@ module testbench;
         $display("------------------------------------------");
     endtask // print_cdb
 
+    task print_xc;
+        $display("\n(X_C_Regs)\ttime: %d\n------------------------------------------", clock_count);
+        for(j = 0; j < `RS_SZ; j=j+1)
+            $display("index: %4d T: %2h, result: %h, valid: %1h", j,  X_C_regs_dbg[j].T, X_C_regs_dbg[j].result, X_C_regs_dbg[j].valid);
+        $display("------------------------------------------");
+    endtask
+
+    task print_x_pkt;
+        $display("\n(X_Packet)\ttime: %d\n------------------------------------------", clock_count);
+        for(j = 0; j < `RS_SZ; j=j+1)
+            $display("index: %4d T: %2h, result: %h, valid: %1h", j,  core.X_packets[j].T, core.X_packets[j].result, core.X_packets[j].valid);
+        $display("------------------------------------------");
+    endtask
+
+    task print_sx;
+    $display("\n(S_X_Regs)\ttime: %d\n------------------------------------------", clock_count);
+        for(p = 0; p <`RS_SZ; p++)
+            $display("index: %4d PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
+                        p, S_X_regs_dbg[p].PC, S_X_regs_dbg[p].inst, S_X_regs_dbg[p].T, S_X_regs_dbg[p].V1, S_X_regs_dbg[p].V2, S_X_regs_dbg[p].halt, S_X_regs_dbg[p].valid);
+        $display("------------------------------------------");
+    endtask
+
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
         input [31:0] start_addr;
@@ -251,14 +273,10 @@ module testbench;
                 print_mt;
                 print_cdb;
                 print_rob;
-                dump_regfile;
-                for (p = 0; p < `RS_SZ; p++) begin
-                    $display("\n(S_X_reg_%0d)\ttime: %d\n------------------------------------------", p, clock_count);
-                    $display("PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
-                        S_X_regs_dbg[p].PC, S_X_regs_dbg[p].inst, S_X_regs_dbg[p].T, S_X_regs_dbg[p].V1, S_X_regs_dbg[p].V2, S_X_regs_dbg[p].halt, S_X_regs_dbg[p].valid);
-                    $display("\n(X_C_reg_%0d)\ttime: %d\n------------------------------------------", p, clock_count);
-                    $display("T: %2h, result: %h, valid: %1h", X_C_regs_dbg[p].T, X_C_regs_dbg[p].result, X_C_regs_dbg[p].valid); 
-                end
+                //dump_regfile;
+                print_sx;
+                print_x_pkt;
+                print_xc;
             end
         end
     end
