@@ -205,11 +205,12 @@ module d_stage (
     // Register values for map table signals
     assign D_packet.r = (has_dest_reg) ? IF_ID_reg.inst.r.rd : `ZERO_REG;
     assign D_packet.r1 = IF_ID_reg.inst.r.rs1;
-    assign D_packet.r2 = IF_ID_reg.inst.r.rs2;
+    assign D_packet.r2 = (D_packet.opb_select != OPB_IS_RS2) ? '0 : IF_ID_reg.inst.r.rs2;
 
     assign D_packet.valid = IF_ID_reg.valid & ~D_packet.illegal;
 
     always_comb begin
+        // FU assignment
         if (rd_mem)
             D_packet.rs_idx = `NUM_FU_LOAD;   
         else if (wr_mem)

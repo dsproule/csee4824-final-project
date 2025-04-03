@@ -8,27 +8,6 @@
 
 `include "verilog/sys_defs.svh"
 
-// P4 TODO: Add your own debugging framework. Basic printing of data structures
-//          is an absolute necessity for the project. You can use C functions
-//          like in test/pipeline_print.c or just do everything in verilog.
-//          Be careful about running out of space on CAEN printing lots of state
-//          for longer programs (alexnet, outer_product, etc.)
-
-
-// these link to the pipeline_print.c file in this directory, and are used below to print
-// detailed output to the pipeline_output_file, initialized by open_pipeline_output_file()
-// import "DPI-C" function void open_pipeline_output_file(string file_name);
-// import "DPI-C" function void print_header(string str);
-// import "DPI-C" function void print_cycles();
-// import "DPI-C" function void print_stage(string div, int inst, int npc, int valid_inst);
-// import "DPI-C" function void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
-//                                        int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
-// import "DPI-C" function void print_membus(int proc2mem_command, int mem2proc_response,
-//                                           int proc2mem_addr_hi, int proc2mem_addr_lo,
-//                                           int proc2mem_data_hi, int proc2mem_data_lo);
-// import "DPI-C" function void print_close();
-
-
 module testbench;
     // used to parameterize which files are used for memory and writeback/pipeline outputs
     // "./simv" uses program.mem, writeback.out, and pipeline.out
@@ -63,13 +42,23 @@ module testbench;
     logic             pipeline_commit_wr_en;
     logic [`XLEN-1:0] pipeline_commit_NPC;
 
-    // debug outputs
+    // debug tables
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg;
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg;
     RS_ENTRY [`RS_SZ-1:0] rs_table_dbg;
-    X_C_PACKET [`RS_SZ-1:0] X_packets_dbg;
     logic [`RS_SZ-1:0] busy_dbg;
+
+    // Debug extra
     CDB cdb_dbg;
+    logic [`RS_SZ-1:0] FU_ready_dbg, FU_req_dbg, gnt_dbg;
+    ROB_T rob_head_dbg, rob_tail_dbg, retire_T_wire_dbg;
+    PPLN_CTRL rob_pipeline_control_dbg;
+    
+    // Debug regs
+    D_S_PACKET              D_S_reg_dbg;
+    IF_ID_PACKET            IF_ID_reg_dbg;
+    X_C_PACKET [`RS_SZ-1:0] X_C_regs_dbg;
+    S_X_PACKET [`RS_SZ-1:0] S_X_regs_dbg;
 
     // logging
     MT_ENTRY mt_table [31:0];
@@ -105,9 +94,20 @@ module testbench;
         .rob_table_out_dbg(rob_table_out_dbg),
         .mt_table_out_dbg(mt_table_out_dbg),
         .rs_table_dbg(rs_table_dbg),
-        .X_packets_dbg(X_packets_dbg),
         .cdb_dbg(cdb_dbg),
-        .busy_dbg(busy_dbg)
+        .busy_dbg(busy_dbg),
+        .IF_ID_reg_dbg(IF_ID_reg_dbg),
+        .D_S_reg_dbg(D_S_reg_dbg),
+        .FU_ready_dbg(FU_ready_dbg),
+        .FU_req_dbg(FU_req_dbg),
+        .gnt_dbg(gnt_dbg),
+        .S_X_regs_dbg(S_X_regs_dbg),
+        .X_C_regs_dbg(X_C_regs_dbg),
+        .rob_head_dbg(rob_head_dbg),
+        .rob_tail_dbg(rob_tail_dbg),
+        .rob_retire_dbg(rob_retire_dbg),
+        .rob_pipeline_control_dbg(rob_pipeline_control_dbg),
+        .retire_T_wire_dbg(retire_T_wire_dbg)
     );
 
     // Instantiate the Data Memory
@@ -169,32 +169,33 @@ module testbench;
         end
     endtask // task show_clk_count
 
-    //////////////////////////////////////////////////
-    //                                              //
-    //               Module print                   //
-    //                                              //
-    //////////////////////////////////////////////////
-
     task print_mt;
-        $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         for(l = 1; l < 5; l=l+1)
             $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
         $display("------------------------------------------");
     endtask // print_mt
 
     task print_rs;
-        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table_dbg[j].T, rs_table_dbg[j].T1, rs_table_dbg[j].T2, rs_table_dbg[j].V1, rs_table_dbg[j].V2, busy_dbg[j], rs_table_dbg[j].ready);
         $display("------------------------------------------");
     endtask // print_rs
 
     task print_rob;
-        $display("\n(ROB_TABLE)\ttime: %d\n------------------------------------------", clock_count - 6);
+        $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
         for(n = 1; n < 8; n=n+1)
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
-        $display("------------------------------------------");
+        $display("\n(RETIRE) valid: %1b, ROB_T: %4d\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, clock_count);
     endtask // print_rob
+
+    task print_cdb;
+        $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
+        $display("T:%4d\t  V:%4d", cdb_dbg.T, cdb_dbg.V);
+        $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
+        $display("------------------------------------------");
+    endtask // print_cdb
 
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
@@ -228,14 +229,39 @@ module testbench;
     //                                              //
     //////////////////////////////////////////////////
 
+    // Shows modules
+    logic prog_start = 0;
+    always @(posedge clock) begin
+        if (~reset) begin
+            // only start printing after first inst arrives
+            if (IF_ID_reg_dbg.valid)
+                prog_start <= 1;
+
+            if (prog_start) begin
+                $display("====================================================================================");
+                $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
+                $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
+                $display("------------------------------------------");
+                $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
+                $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+                        D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+                $display("------------------------------------------");
+                print_rs;
+                print_mt;
+                print_cdb;
+                print_rob;
+                $display("\n(S_X_reg_0)\ttime: %d\n------------------------------------------", clock_count);
+                $display("PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
+                    S_X_regs_dbg[0].PC, S_X_regs_dbg[0].inst, S_X_regs_dbg[0].T, S_X_regs_dbg[0].V1, S_X_regs_dbg[0].V2, S_X_regs_dbg[0].halt, S_X_regs_dbg[0].valid);
+                $display("\n(X_C_reg_0)\ttime: %d\n------------------------------------------", clock_count);
+                $display("T: %2h, result: %h, valid: %1h", X_C_regs_dbg[0].T, X_C_regs_dbg[0].result, X_C_regs_dbg[0].valid); 
+            end
+        end
+    end
+
+
 
     initial begin
-        //$dumpvars;
-
-        // P4 NOTE: You must keep memory loading here the same for the autograder
-        //          Other things can be tampered with somewhat
-        //          Definitely feel free to add new output files
-
         // set paramterized strings, see comment at start of module
         if ($value$plusargs("MEMORY=%s", program_memory_file)) begin
             $display("Loading memory file: %s", program_memory_file);
@@ -296,7 +322,6 @@ module testbench;
         end
     end
 
-
     always @(negedge clock) begin
         if(reset) begin
             $display("@@\n@@  %t : System STILL at reset, can't show anything\n@@",
@@ -304,19 +329,6 @@ module testbench;
             debug_counter <= 0;
         end else begin
             #2;
-
-            // print the pipeline debug outputs via c code to the pipeline output file
-            // print_cycles();
-            // print_stage(" ", if_inst_dbg,     if_NPC_dbg    [31:0], {31'b0,if_valid_dbg});
-            // print_stage("|", if_id_inst_dbg,  if_id_NPC_dbg [31:0], {31'b0,if_id_valid_dbg});
-            // print_stage("|", id_ex_inst_dbg,  id_ex_NPC_dbg [31:0], {31'b0,id_ex_valid_dbg});
-            // print_stage("|", ex_mem_inst_dbg, ex_mem_NPC_dbg[31:0], {31'b0,ex_mem_valid_dbg});
-            // print_stage("|", mem_wb_inst_dbg, mem_wb_NPC_dbg[31:0], {31'b0,mem_wb_valid_dbg});
-            // print_reg(32'b0, pipeline_commit_wr_data[31:0],
-            //     {27'b0,pipeline_commit_wr_idx}, {31'b0,pipeline_commit_wr_en});
-            // print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
-            //     32'b0, proc2mem_addr[31:0],
-            //     proc2mem_data[63:32], proc2mem_data[31:0]);
 
             // print register write information to the writeback output file
             if (pipeline_completed_insts > 0) begin
@@ -330,7 +342,7 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 50000000) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 50) begin
                 dump_regfile();
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
