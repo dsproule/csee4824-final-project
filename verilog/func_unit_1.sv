@@ -10,7 +10,7 @@ module func_unit_1(
     logic [1:0] signs;
     logic [63:0] mult_result;
 
-    assign X_packet.T = S_X_reg.T;
+    assign X_packet.T = (X_packet.valid) ? S_X_reg.T : '0;
     
     // pipeline control
     assign ppln_ctrl.flush = `FALSE;

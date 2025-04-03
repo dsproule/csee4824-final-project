@@ -65,7 +65,7 @@ module testbench;
     ROB_ENTRY rob_table [`ROB_SZ:1];
     logic [`XLEN-1:0] regfile_mirror [4:0];
 
-    integer i, j, k, l, m, n, o;
+    integer i, j, k, l, m, n, o, p;
 
     // Instantiate the Pipeline
     pipeline core (
@@ -252,11 +252,13 @@ module testbench;
                 print_cdb;
                 print_rob;
                 dump_regfile;
-                $display("\n(S_X_reg_0)\ttime: %d\n------------------------------------------", clock_count);
-                $display("PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
-                    S_X_regs_dbg[0].PC, S_X_regs_dbg[0].inst, S_X_regs_dbg[0].T, S_X_regs_dbg[0].V1, S_X_regs_dbg[0].V2, S_X_regs_dbg[0].halt, S_X_regs_dbg[0].valid);
-                $display("\n(X_C_reg_0)\ttime: %d\n------------------------------------------", clock_count);
-                $display("T: %2h, result: %h, valid: %1h", X_C_regs_dbg[0].T, X_C_regs_dbg[0].result, X_C_regs_dbg[0].valid); 
+                for (p = 0; p < `RS_SZ; p++) begin
+                    $display("\n(S_X_reg_%0d)\ttime: %d\n------------------------------------------", p, clock_count);
+                    $display("PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
+                        S_X_regs_dbg[p].PC, S_X_regs_dbg[p].inst, S_X_regs_dbg[p].T, S_X_regs_dbg[p].V1, S_X_regs_dbg[p].V2, S_X_regs_dbg[p].halt, S_X_regs_dbg[p].valid);
+                    $display("\n(X_C_reg_%0d)\ttime: %d\n------------------------------------------", p, clock_count);
+                    $display("T: %2h, result: %h, valid: %1h", X_C_regs_dbg[p].T, X_C_regs_dbg[p].result, X_C_regs_dbg[p].valid); 
+                end
             end
         end
     end

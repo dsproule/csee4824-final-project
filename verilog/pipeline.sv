@@ -293,12 +293,10 @@ module pipeline (
 
     always_ff @(posedge clock) begin
         for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
-            if (reset) begin
+            if (reset | gnt[S_idx]) begin
                 S_X_regs[S_idx] <= 0;            
             end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
                 S_X_regs[S_idx] <= S_packets[S_idx];
-            end else begin
-                S_X_regs[S_idx] <= 0;
             end
     end
 
