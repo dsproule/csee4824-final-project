@@ -5,8 +5,8 @@ module func_unit_3(
     input S_X_PACKET S_X_reg,
 
     output mem_store,
-    output [`XLEN-1:0] proc2Dmem_addr,
-    output [`XLEN-1:0] proc2Dmem_data,
+    output logic [`XLEN-1:0] proc2Dmem_addr,
+    output logic [`XLEN-1:0] proc2Dmem_data,
     output X_C_PACKET X_packet
 );
 
@@ -26,8 +26,8 @@ module func_unit_3(
                 `FALSE,     // illegal
                 `FALSE,     // halt
                 `FALSE,     // is_branch
-                `TRUE,      // is_store
-            }
+                `TRUE      // is_store
+            };
             X_packet.valid = Dmem_gnt;
         end
     end
@@ -43,7 +43,7 @@ module func_unit_3(
 
             case (mem_state)
                 NEW_ADDR: mem_state <= (Dmem_gnt) ? WAIT_FOR_ADDR : mem_state;
-                WAIT_FOR_ADDR: mem_state <= (S_X_reg.valid & new_store) <= NEW_ADDR : mem_state;
+                WAIT_FOR_ADDR: mem_state <= (S_X_reg.valid & new_store) ? NEW_ADDR : mem_state;
                 default: ; 
             endcase
         end

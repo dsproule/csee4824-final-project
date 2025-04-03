@@ -171,6 +171,7 @@ module testbench;
 
     task print_mt;
         $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
+        $display("T1:%4d       T2:%4d", core.T1_wire, core.T2_wire);
         for(l = 1; l < 5; l=l+1)
             $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
         $display("------------------------------------------");
@@ -250,6 +251,7 @@ module testbench;
                 print_mt;
                 print_cdb;
                 print_rob;
+                dump_regfile;
                 $display("\n(S_X_reg_0)\ttime: %d\n------------------------------------------", clock_count);
                 $display("PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
                     S_X_regs_dbg[0].PC, S_X_regs_dbg[0].inst, S_X_regs_dbg[0].T, S_X_regs_dbg[0].V1, S_X_regs_dbg[0].V2, S_X_regs_dbg[0].halt, S_X_regs_dbg[0].valid);

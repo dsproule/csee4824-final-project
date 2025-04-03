@@ -80,7 +80,6 @@ module func_unit_0 (
     assign ppln_ctrl.is_store = `FALSE;
     assign ppln_ctrl.is_branch = S_X_reg.uncond_branch | S_X_reg.cond_branch;
 
-    assign ppln_ctrl.valid = S_X_reg.valid;
     assign ppln_ctrl.illegal = 0;
     assign ppln_ctrl.halt = S_X_reg.halt;
 

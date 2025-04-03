@@ -43,8 +43,7 @@ module map_table (
             if (en & has_dest) begin
                 mt_table[r] <= (r != 0) ? {T, `FALSE} : 0;
             end
-            
-            // clears a tag if its not being reassigned
+
             if (retire_entry) begin
                 mt_table[retire_r].T <= 0;
                 mt_table[retire_r].plus <= 0;

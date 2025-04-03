@@ -51,8 +51,8 @@ module rob(
     // assign T = tail; //value that gets sent to RS
 
     // if value isn't in regfiles yet, ok if invalid because map table will MUX values from regfile. 
-    assign V1 = rob_table[T1].V;
-    assign V2 = rob_table[T2].V;
+    assign V1 = (cdb.valid && cdb.T == T1) ? cdb.V : rob_table[T1].V;
+    assign V2 = (cdb.valid && cdb.T == T2) ? cdb.V : rob_table[T2].V;
 
     always_comb begin
         for (int i = 0; i < `ROB_SZ; i++) begin

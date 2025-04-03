@@ -104,8 +104,6 @@ module pipeline (
     logic [4:0] retire_r_wire;
     ROB_T mt_T_wire, retire_T_wire;
     ROB_T rob_head, rob_tail;
-    
-    ROB_T rob_head_dbg, rob_head_dbg;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -217,7 +215,7 @@ module pipeline (
 
     map_table map_table_inst (
         // Inputs
-        .clock(clock), .reset(reset), 
+        .clock(clock), .reset(reset), .has_dest(D_S_reg.has_dest),
         .en(D_S_reg.valid & ~rs_stall), 
         .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2), 
         .retire_r(retire_r_wire), 
