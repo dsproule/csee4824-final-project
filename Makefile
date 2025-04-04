@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 
 
 MODULE = pipeline
 
@@ -219,8 +219,9 @@ DEPS = $(1).simv $(1).cov synth/$(1).vg
 
 MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
 $(call DEPS,func_unit_1): $(MULT_DEPS)
-MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
-$(call DEPS,func_unit_1): $(MULT_DEPS)
+
+MEM_DEPS = test/mem.sv
+$(call DEPS,func_unit_3): $(MEM_DEPS)
 
 # No dependencies for the rob (TODO: add any you create)
 ROB_DEPS =

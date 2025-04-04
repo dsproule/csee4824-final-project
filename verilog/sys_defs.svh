@@ -241,7 +241,7 @@ typedef enum logic [3:0] {
     OPB_IS_J_IMM  = 4'h5
 } ALU_OPB_SELECT;
 
-typedef enum logic [1:0] {NEW_ADDR, WAIT_FOR_TAG, WAIT_FOR_ADDR} mem_proc_states;
+typedef enum logic [1:0] {MEM_NEW_ADDR, MEM_WAIT_FOR_TAG, MEM_WAIT_FOR_ADDR, MEM_NONE} mem_proc_states;
 
 // ALU function code input
 // probably want to leave these alone

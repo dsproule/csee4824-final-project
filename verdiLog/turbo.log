@@ -1,0 +1,9 @@
+Command Line: /tools/synopsys/verdi/verdi/U-2023.03-SP2-1/platform/LINUXAMD64/bin/Novas -i -simflow -simBin ./func_unit_3.simv -simOpt  
+uname(Linux cadpc05 4.18.0-553.44.1.el8_10.x86_64 #1 SMP Wed Mar 5 10:48:41 EST 2025 x86_64)
+type= DS_SCOPE element= 1 field= 1
+VERILOG testbench
+VERILOG memory
+-----
+second field= DebussyLib
+third field= mem
+au time 145.408825 5.555946 1.761685 delta 257667072 257667072 total 848228352 848228352

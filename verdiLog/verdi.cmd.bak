@@ -1,0 +1,26 @@
+simSetSimulator "-vcssv" -exec "./func_unit_3.simv" -args " " -uvmDebug on
+debImport "-i" "-simflow" "-dbdir" "./func_unit_3.simv.daidir"
+srcTBInvokeSim
+verdiSetActWin -dock widgetDock_<Member>
+srcHBSelect "testbench.memory" -win $_nTrace1
+verdiSetActWin -dock widgetDock_<Inst._Tree>
+srcHBSelect "testbench.memory" -win $_nTrace1
+srcHBSelect "testbench.memory" -win $_nTrace1
+wvCreateWindow
+srcHBAddObjectToWave -clipboard
+wvDrop -win $_nWave3
+verdiSetActWin -win $_nWave3
+srcTBRunSim
+wvZoomOut -win $_nWave3
+wvZoomOut -win $_nWave3
+wvZoomOut -win $_nWave3
+wvZoomOut -win $_nWave3
+wvZoomOut -win $_nWave3
+wvSetCursor -win $_nWave3 4321.699545 -snap {("memory" 5)}
+wvSelectSignal -win $_nWave3 {( "memory" 5 )} 
+wvSelectSignal -win $_nWave3 {( "memory" 7 )} 
+wvSetCursor -win $_nWave3 7138.088012 -snap {("memory" 4)}
+wvSetCursor -win $_nWave3 6895.295903 -snap {("memory" 4)}
+wvSelectSignal -win $_nWave3 {( "memory" 4 )} 
+verdiSetActWin -dock widgetDock_<Inst._Tree>
+debExit
