@@ -11,7 +11,7 @@
 `include "verilog/sys_defs.svh"
 
 module if_stage (
-    input             clock, reset, gnt,
+    input             clock, reset, Imem_gnt,
     input             take_branch,
     input [`XLEN-1:0] branch_target,
     input [63:0]      Imem2proc_data,
@@ -44,7 +44,7 @@ module if_stage (
             case (IF_state)
                 MEM_NEW_ADDR: begin
                     nextImem_tag <= Imem2proc_response;
-                    if (gnt & Imem2proc_response != 0) begin
+                    if (Imem_gnt & Imem2proc_response != 0) begin
                         mem_req <= `FALSE;
                         proc2Imem_command <= BUS_NONE;
                         IF_state <= MEM_WAIT_FOR_TAG;

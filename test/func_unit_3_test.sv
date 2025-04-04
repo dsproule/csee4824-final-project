@@ -113,6 +113,12 @@ module testbench;
         S_X_reg.valid = `TRUE;
 
         repeat (8) @(negedge clock);
+	S_X_reg.V1 = `XLEN'h8;
+	S_X_reg.V2 = `XLEN'hdead;
+	store_retired = `TRUE;
+        @(negedge clock);
+
+        repeat (8) @(negedge clock);
 
         show_mem_with_decimal(0, 12);
 

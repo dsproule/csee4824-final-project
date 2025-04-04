@@ -16,7 +16,7 @@ module func_unit_3(
     mem_proc_states mem_state;
 
     assign proc2Dmem_data = S_X_reg.V2;
-    assign proc2Dmem_addr = S_X_reg.V1 + `RV32_signext_Simm(S_X_reg.inst);
+    assign proc2Dmem_addr = S_X_reg.V1 + S_X_reg.mem_offset;
 
     always_comb begin
         if (Dmem_gnt) begin
@@ -35,23 +35,6 @@ module func_unit_3(
             X_packet = '0;
 
     end
-
-    /*
-        The module will first transition to MEM_WAIT_FOR_ADDR. 
-        
-        MEM_WAIT_FOR_ADDR:
-        when S_X_reg.valid = 1:
-            transitions to MEM_NEW_ADDR
-            sets mem_store_pend = 1
-        MEM_NEW_ADDR:
-        when Dmem_gnt = 1:
-            mem_store_pend = 0
-            transition to MEM_NONE
-        MEM_NONE:
-        when store_retired:
-            Transition to MEM_WAIT_FOR_ADDR
-        
-    */
 
     // state machine enforces one memory load 
     always_ff @(posedge clock) begin

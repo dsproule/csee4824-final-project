@@ -210,6 +210,9 @@ module d_stage (
 
     assign D_packet.valid = IF_ID_reg.valid & ~D_packet.illegal;
 
+    assign D_packet.mem_offset = (rd_mem) ? `RV32_signext_Iimm(id_ex_reg.inst) : 
+	    			 (wr_mem) ? `RV32_signext_Simm(id_ex_reg.inst) : '0;
+
     always_comb begin
         // FU assignment
         if (rd_mem)
