@@ -145,7 +145,7 @@ module RS_VALUE(
     /* 
      *  Reads values from rs_table that has the dispatch and passes them to the s_x_regs when
      *  they are valid to begin computing.
-     */
+     */ 
 
     logic [`RS_SZ-1:0] s_idx, reset_idx, rs_free_idx;
 
@@ -198,7 +198,8 @@ module rs_stage(
     output S_X_PACKET [`RS_SZ-1:0] S_packet,
     output RS_ENTRY [ `RS_SZ-1:0]  rs_table
 );
-    logic [`RS_SZ-1:0] free_bus;
+    //logic [`RS_SZ-1:0] free_bus;
+    wire [`RS_SZ-1:0] free_bus;
     
     // connect alloc with value with cdb
     RS_ALLOC rs_alloc(
@@ -222,7 +223,8 @@ module rs_stage(
         .rs_table(rs_table),
         .rs_free(free_bus),
         .FU_ready(FU_ready),
-
+        
+        .s_valid(),         // If not used
         // Output
         .S_packet(S_packet)
     );

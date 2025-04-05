@@ -946,6 +946,7 @@ extern "C" void initcurses(int if_regs, int if_id_regs, int id_regs, int id_ex_r
             misc_contents[i]    = (char**) malloc(num_misc_regs*sizeof(char*));
         }
         setup_gui(fp);
+        
 
         // Main loop for retrieving data and taking commands from user
         char quit_flag = 0;
@@ -956,15 +957,42 @@ extern "C" void initcurses(int if_regs, int if_id_regs, int id_regs, int id_ex_r
         char cycle_flag = 0;
         char done_received = 0;
         memset(readbuffer,'\0',sizeof(readbuffer));
+        char blockBuffer[4096];  // large buffer to hold the RS block
         while (!quit_flag) {
-            if (!done_received) {
-                fgets(readbuffer, sizeof(readbuffer), fp);
-                ready_val = processinput();
+            if (!done_received && fgets(readbuffer, sizeof(readbuffer), fp) != NULL) {
+                // Check if the line marks the beginning of an RS table block
+                if (strncmp(readbuffer, "BEGIN_RS_TABLE", 14) == 0) {
+                    // Clear the block buffer
+                    blockBuffer[0] = '\0';
+                    // Read lines until we see the end marker
+                    while (fgets(readbuffer, sizeof(readbuffer), fp) != NULL) {
+                        if (strncmp(readbuffer, "END_RS_TABLE", 12) == 0) {
+                            break;
+                        }
+                        // Append this line (including its newline) to the block buffer
+                        strcat(blockBuffer, readbuffer);
+                    }
+                    // Now, blockBuffer contains the entire RS table block.
+                    // Save it in the log (or process it directly).
+                    rs_log[rs_log_len] = strdup(blockBuffer);
+                    rs_log_len++;
+                    // Immediately update the RS window using your existing function.
+                    update_rs_log_ui();
+                    // Continue to the next iteration of the loop.
+                    continue;
+                } else {
+                    // For non-RS block lines, process as before.
+                    ready_val = processinput();
+                }
             }
-            if (strcmp(readbuffer,"DONE") == 0) {
+        
+            // Check for DONE marker from simulation output.
+            if (strcmp(readbuffer, "DONE") == 0) {
                 done_received = 1;
                 done_time = history_num - 1;
             }
+            
+
             if (ready_val == 1 || done_received == 1) {
                 if (echo_data == 0 && done_received == 1) {
                     running = 0;

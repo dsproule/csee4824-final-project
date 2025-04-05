@@ -50,6 +50,12 @@ module pipeline (
     output logic rob_retire_dbg,
     output PPLN_CTRL rob_pipeline_control_dbg,
     output ROB_T retire_T_wire_dbg 
+
+    `ifdef TESTBENCH
+        RS_ENTRY_IF.producer if_rs,
+    `endif
+
+
 );
 
     //////////////////////////////////////////////////
@@ -127,6 +133,19 @@ module pipeline (
     assign retire_T_wire_dbg = retire_T_wire;
 
     assign rob_pipeline_control_dbg = pipeline_control;
+
+    `ifdef TESTBENCH
+        always_comb begin
+            if_rs.T     = rs_table_out[0].T;
+            if_rs.T1    = rs_table_out[0].T1;
+            if_rs.T2    = rs_table_out[0].T2;
+            if_rs.V1    = rs_table_out[0].V1;
+            if_rs.V2    = rs_table_out[0].V2;
+            if_rs.busy  = busy[0];
+            if_rs.ready = rs_table_out[0].ready;
+        end
+    `endif
+
 
     //////////////////////////////////////////////////
     //                                              //
@@ -243,6 +262,10 @@ module pipeline (
         .rs_idx_full(rs_stall),
         .S_packet(S_packets), 
         .rs_table(rs_table_out), .busy(busy)
+
+        `ifdef TESTBENCH
+            , .if_rs(if_rs)
+        `endif
     );
 
     always_ff @(posedge clock) begin
