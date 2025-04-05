@@ -145,22 +145,22 @@ module RS_VALUE(
         end else begin
             for (s_idx = 0; s_idx < `RS_SZ; s_idx++) begin
                 if ((rs_table[s_idx].ready == 2'b11) & FU_ready[s_idx]) begin
-                    S_packet[s_idx].inst = rs_table[s_idx].D_S_reg.inst;
-                    S_packet[s_idx].PC = rs_table[s_idx].D_S_reg.PC;
-                    S_packet[s_idx].NPC = rs_table[s_idx].D_S_reg.NPC;
-                    S_packet[s_idx].cond_branch = rs_table[s_idx].D_S_reg.cond_branch;
+                    S_packet[s_idx].inst          = rs_table[s_idx].D_S_reg.inst;
+                    S_packet[s_idx].PC            = rs_table[s_idx].D_S_reg.PC;
+                    S_packet[s_idx].NPC           = rs_table[s_idx].D_S_reg.NPC;
+                    S_packet[s_idx].cond_branch   = rs_table[s_idx].D_S_reg.cond_branch;
                     S_packet[s_idx].uncond_branch = rs_table[s_idx].D_S_reg.uncond_branch;
-                    S_packet[s_idx].opa_select = rs_table[s_idx].D_S_reg.opa_select;
-                    S_packet[s_idx].opb_select = rs_table[s_idx].D_S_reg.opb_select;
-                    S_packet[s_idx].alu_func = rs_table[s_idx].D_S_reg.alu_func;
-                    S_packet[s_idx].T = rs_table[s_idx].T;
-                    S_packet[s_idx].V1 = rs_table[s_idx].V1;
-                    S_packet[s_idx].V2 = rs_table[s_idx].V2;
-                    S_packet[s_idx].halt = rs_table[s_idx].D_S_reg.halt;
-                    S_packet[s_idx].valid = 1;
-		    S_packet[s_idx].mem_offset = rs_table[s_idx].D_S_reg.mem_offset;
-		    S_packet.[s_idx].rd_unsigned = rs_table[s_idx].D_S_reg.rd_unsigned;
-		    S_packet.[s_idx].mem_size = rs_table[s_idx].D_S_reg.mem_size;
+                    S_packet[s_idx].opa_select    = rs_table[s_idx].D_S_reg.opa_select;
+                    S_packet[s_idx].opb_select    = rs_table[s_idx].D_S_reg.opb_select;
+                    S_packet[s_idx].alu_func      = rs_table[s_idx].D_S_reg.alu_func;
+                    S_packet[s_idx].T             = rs_table[s_idx].T;
+                    S_packet[s_idx].V1            = rs_table[s_idx].V1;
+                    S_packet[s_idx].V2            = rs_table[s_idx].V2;
+                    S_packet[s_idx].halt          = rs_table[s_idx].D_S_reg.halt;
+                    S_packet[s_idx].mem_offset    = rs_table[s_idx].D_S_reg.mem_offset;
+                    S_packet[s_idx].rd_unsigned   = rs_table[s_idx].D_S_reg.rd_unsigned;
+                    S_packet[s_idx].mem_size      = rs_table[s_idx].D_S_reg.mem_size;
+                    S_packet[s_idx].valid         = `TRUE;
                     
                     rs_free[s_idx] = 1'b1;
                 end else begin

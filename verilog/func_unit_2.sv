@@ -45,6 +45,7 @@ module func_unit_2(
         if (reset) begin
             nextImem_tag <= '0;
             mem_state <= MEM_WAIT_FOR_ADDR;
+            mem_load_pend <= `FALSE;
         end else begin
             case (mem_state)
                 MEM_WAIT_FOR_ADDR: 
