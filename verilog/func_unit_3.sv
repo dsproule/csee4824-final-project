@@ -3,7 +3,7 @@
 module func_unit_3(
     input clock, reset, 
     input Dmem_gnt,                 // signal that the memory was listening to this module
-    input store_retired,            // the current mem_store has been 
+    input retired,            // the current mem_store has been 
     input S_X_PACKET S_X_reg,
 
     output logic mem_store_pend,          // the module is attempting to store a value
@@ -53,7 +53,7 @@ module func_unit_3(
                         mem_state <= MEM_NONE;
                     end
                 MEM_NONE:
-                    if (store_retired) 
+                    if (retired) 
                         mem_state <= MEM_WAIT_FOR_ADDR;
             endcase
         end

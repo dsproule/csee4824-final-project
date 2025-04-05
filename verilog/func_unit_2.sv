@@ -2,7 +2,7 @@
 
 module func_unit_2(
     input clock, reset, Dmem_gnt,
-    input load_retired,
+    input retired,
     input [3:0]  mem2proc_response, mem2proc_tag,
     input [`XLEN-1:0] Dmem2proc_data,
     input S_X_PACKET S_X_reg,
@@ -43,38 +43,39 @@ module func_unit_2(
 
     always_ff @(posedge clock) begin
         if (reset) begin
-	    nextImem_tag <= '0;
+            nextImem_tag <= '0;
             mem_state <= MEM_WAIT_FOR_ADDR;
         end else begin
-		case (mem_state)
-		    MEM_WAIT_FOR_ADDR: 
-			if (S_X_reg.valid) begin
-			    mem_load_pend <= `TRUE;
-			    mem_state <= MEM_NEW_ADDR;
-			end
-		    MEM_NEW_ADDR: begin
-			nextImem_tag <= mem2proc_respone;
-			if (Dmem_gnt & (nextImem_tag != 0)) begin
-			    mem_load_pend <= `FALSE;
-			    mem_state <= MEM_WAIT_FOR_TAG;
-			end
-		    end
-		    MEM_WAIT_FOR_TAG: begin
-			if (mem2proc_tag == nextImem_tag) begin
-			    X_packet.T = S_X_reg.T;
-			    X_packet.result = read_data;
-			    X_packet.ppln_ctrl <= '0;
-			    X_packet.valid = `TRUE;
+            case (mem_state)
+                MEM_WAIT_FOR_ADDR: 
+                    if (S_X_reg.valid) begin
+                        mem_load_pend <= `TRUE;
+                        mem_state <= MEM_NEW_ADDR;
+                    end
+                MEM_NEW_ADDR: begin
+                nextImem_tag <= mem2proc_response;
+                    if (Dmem_gnt & (nextImem_tag != 0)) begin
+                        mem_load_pend <= `FALSE;
+                        mem_state <= MEM_WAIT_FOR_TAG;
+                    end
+                end
+                MEM_WAIT_FOR_TAG: begin
+                    if (mem2proc_tag == nextImem_tag) begin
+                        X_packet.T = S_X_reg.T;
+                        X_packet.result = read_data;
+                        X_packet.ppln_ctrl <= '0;
+                        X_packet.valid = `TRUE;
 
-			    nextImem_tag <= '0;
-			    mem_state <= MEM_NONE;
-			end
-		    end
-		    MEM_NONE:
-			X_packet <= 0';
-			if (store_retired) 
-			    mem_state <= MEM_WAIT_FOR_ADDR;
-		endcase
+                        nextImem_tag <= '0;
+                        mem_state <= MEM_NONE;
+                    end
+                end
+                MEM_NONE: begin
+                    X_packet <= '0;
+                    if (retired) 
+                        mem_state <= MEM_WAIT_FOR_ADDR;
+                end
+            endcase
         end
     end    
 

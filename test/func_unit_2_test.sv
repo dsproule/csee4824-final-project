@@ -4,6 +4,7 @@
 
 module testbench;
     logic clock, reset;
+    MEM_SIZE proc2mem_size;
 
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
@@ -24,7 +25,7 @@ module testbench;
                 end
             $display("@@@");
         end
-    endtask; // task show_mem_with_decimal
+    endtask // task show_mem_with_decimal
 
     logic [`XLEN-1:0] proc2mem_addr;
     logic [63:0]      proc2mem_data, mem2proc_data;
@@ -37,7 +38,7 @@ module testbench;
     logic [`XLEN-1:0] proc2Dmem_addr;
     logic [1:0] proc2Dmem_command;
     S_X_PACKET S_X_reg;
-    logic mem_store_pend, Dmem_gnt, store_retired;
+    logic mem_load_pend, Dmem_gnt, load_retired;
 
 
     mem memory(
@@ -46,7 +47,7 @@ module testbench;
         .proc2mem_data(proc2mem_data),
         .proc2mem_command(proc2mem_command),
     `ifndef CACHE_MODE
-        .proc2mem_size(WORD), // BYTE, HALF, WORD or DOUBLE
+        .proc2mem_size(proc2mem_size), // BYTE, HALF, WORD or DOUBLE
     `endif
 
         .mem2proc_response(mem2proc_response),
@@ -61,52 +62,62 @@ module testbench;
     /* Module start */
 
     always_comb begin
-        if (mem_store_pend) begin
-            proc2mem_command = BUS_STORE;
+        if (mem_load_pend) begin
+            proc2mem_command = BUS_LOAD;
             proc2mem_addr = proc2Dmem_addr;
         end else begin
-            proc2mem_addr = '0;
+            proc2mem_addr = `XLEN'bx;
             proc2mem_command = BUS_NONE;
-
         end
         proc2mem_data = {32'b0, proc2Dmem_data};
     end
 
-    func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset), 
-        .Dmem_gnt(Dmem_gnt), .retired(store_retired), 
-        .S_X_reg(S_X_reg),
+    func_unit_2 func_unit_02 (
+            .clock(clock), .reset(reset), .Dmem_gnt(Dmem_gnt),
+            .retired(load_retired),
+            .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
+            .Dmem2proc_data(mem2proc_data[`XLEN-1:0]),
+            .S_X_reg(S_X_reg),
 
-        .mem_store_pend(mem_store_pend),
-        .proc2Dmem_addr(proc2Dmem_addr),
-        .proc2Dmem_data(proc2Dmem_data),
-        .X_packet(X_packet)
+            .mem_load_pend(mem_load_pend),
+    `ifndef CACHE_MODE
+            .proc2mem_size(proc2mem_size),
+    `endif
+            .proc2Dmem_addr(proc2Dmem_addr),
+            .X_packet(X_packet)
     );
 
     /* Module end */
+    always_ff @(posedge clock) begin
+        if (X_packet.valid)
+            $display("\n@@ @@ Loaded data from mem: %0d\n", X_packet.result);
+    end
 
     initial begin
         clock = 0;
         reset = 1;
-        S_X_reg = '0;
-        store_retired = `FALSE;
-        Dmem_gnt = `TRUE;
+        Dmem_gnt = 1;
+        load_retired = 0;
         @(negedge clock);
+        memory.unified_memory[0] = 64'hdeadface;
+        memory.unified_memory[1] = 64'hfffeeada;
+
+        repeat (3) @(negedge clock);
         reset = 0;
-        S_X_reg.V1 = `XLEN'h0;
-        S_X_reg.mem_offset = 32'h0;            // has offset of 4 embedded in here
-        S_X_reg.V2 = `XLEN'hcdeadf;
-        S_X_reg.T = 3;
+        S_X_reg.mem_offset = 0;
+        S_X_reg.mem_size = WORD;
+        S_X_reg.V1 = 0;             // addr
         S_X_reg.valid = `TRUE;
-
         repeat (8) @(negedge clock);
-        S_X_reg.V1 = `XLEN'h8;
-        S_X_reg.V2 = `XLEN'hdead;
-        store_retired = `TRUE;
+        S_X_reg.valid = `FALSE;
+        load_retired = `TRUE;
         @(negedge clock);
-
+        load_retired = `FALSE;
+        S_X_reg.V1 = 8;
+        S_X_reg.valid = `TRUE;
         repeat (8) @(negedge clock);
 
+        
         show_mem_with_decimal(0, 12);
 
         $finish;

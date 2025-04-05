@@ -2,7 +2,7 @@ Magic 271485
 Revision Verdi_U-2023.03-SP2-1
 
 ; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
-viewPort 0 25 982 268 183 114
+viewPort 0 25 767 298 100 65
 
 ; File list:
 ; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
@@ -16,8 +16,8 @@ signalSpacing 5
 
 ; windowTimeUnit is used for zoom, cursor & marker
 ; waveform viewport range
-zoom 0.000000 16000.000000
-cursor 31500.000000
+zoom 0.000000 757.500000
+cursor 350.000000
 marker 0.000000
 
 ; user define markers
@@ -25,7 +25,7 @@ marker 0.000000
 ; visible top row signal index
 top 1
 ; marker line index
-markerPos 7
+markerPos 8
 
 ; event list
 ; addEvent event_name event_expression
@@ -45,15 +45,16 @@ COMPLEX_EVENT_END
 curSTATUS ByChange
 
 
-addGroup "memory"
+addGroup "mult_1"
 activeDirFile "" "/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/inter.fsdb"
-addSignal -h 15 /testbench/memory/clk
-addSignal -h 15 -UNSIGNED -HEX /testbench/memory/proc2mem_addr[31:0]
-addSignal -h 15 -UNSIGNED -HEX /testbench/memory/proc2mem_data[63:0]
-addSignal -h 15 -UNSIGNED -HEX /testbench/memory/proc2mem_command[1:0]
-addSignal -h 15 -UNSIGNED -HEX /testbench/memory/mem2proc_response[3:0]
-addSignal -h 15 -UNSIGNED -HEX /testbench/memory/mem2proc_data[63:0]
-addSignal -h 15 -UNSIGNED -HEX /testbench/memory/mem2proc_tag[3:0]
+addSignal -h 15 /testbench/FU_1/mult_1/clock
+addSignal -h 15 /testbench/FU_1/mult_1/reset
+addSignal -h 15 -UNSIGNED -HEX /testbench/FU_1/mult_1/mcand[63:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/FU_1/mult_1/mplier[63:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/FU_1/mult_1/signs[1:0]
+addSignal -h 15 /testbench/FU_1/mult_1/start
+addSignal -h 15 -UNSIGNED -HEX /testbench/FU_1/mult_1/product[63:0]
+addSignal -h 15 /testbench/FU_1/mult_1/done
 addGroup "G2"
 
 ; getSignalForm Scope Hierarchy Status
