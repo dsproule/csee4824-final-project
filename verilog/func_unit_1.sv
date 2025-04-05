@@ -39,15 +39,6 @@ module func_unit_1(
         .done(X_packet.valid)
     );
 
-    always_ff @(posedge clock) begin
-        if (reset | retired) begin
-            new_op <= `TRUE;
-        end else begin
-            if (S_X_reg.valid)
-                new_op <= `FALSE;
-        end
-    end
-
     always_comb begin
         case (S_X_reg.alu_func)
             ALU_MUL:    X_packet.result = mult_result[`XLEN-1:0];
