@@ -159,6 +159,8 @@ module RS_VALUE(
                     S_packet[s_idx].halt = rs_table[s_idx].D_S_reg.halt;
                     S_packet[s_idx].valid = 1;
 		    S_packet[s_idx].mem_offset = rs_table[s_idx].D_S_reg.mem_offset;
+		    S_packet.[s_idx].rd_unsigned = rs_table[s_idx].D_S_reg.rd_unsigned;
+		    S_packet.[s_idx].mem_size = rs_table[s_idx].D_S_reg.mem_size;
                     
                     rs_free[s_idx] = 1'b1;
                 end else begin

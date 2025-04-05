@@ -23,7 +23,6 @@ module if_stage (
     output logic [`XLEN-1:0] proc2Imem_addr
 );  
     logic [`XLEN-1:0] PC_reg;
-    logic [1:0]  mem2buf_command;
     logic [3:0]  nextImem_tag;
     mem_proc_states IF_state;
 

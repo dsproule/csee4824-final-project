@@ -307,7 +307,11 @@ typedef struct packed {
     ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
     
     logic [`RS_SZ-1:0] rs_idx;   
+
     logic [`XLEN-1:0] mem_offset;
+    logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
+    MEM_SIZE          mem_size;
+
     logic has_dest;
 
     logic       halt;          // Is this a halt?
@@ -371,7 +375,10 @@ typedef struct packed {
     ALU_OPB_SELECT opb_select;
 
     ALU_FUNC alu_func;
+    
     logic [`XLEN-1:0] mem_offset;
+    logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
+    MEM_SIZE          mem_size;
     
     /* P6-microarchitecture specific */
 

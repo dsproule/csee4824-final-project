@@ -1,5 +1,4 @@
 `include "verilog/sys_defs.svh"
-`include "verilog/ISA.svh"
 
 module func_unit_3(
     input clock, reset, 
