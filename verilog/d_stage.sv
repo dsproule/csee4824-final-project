@@ -208,6 +208,12 @@ module d_stage (
     assign D_packet.r2 = (D_packet.opb_select != OPB_IS_RS2) ? '0 : IF_ID_reg.inst.r.rs2;
     assign D_packet.has_dest = has_dest;
 
+    // mem details
+    assign D_packet.mem_offset = (rd_mem) ? `RV32_signext_Iimm(IF_ID_reg.inst) : 
+	    			 (wr_mem) ? `RV32_signext_Simm(IF_ID_reg.inst) : '0;
+    assign D_packet.rd_unsigned  = IF_ID_reg.inst.r.funct3[2]; // 1 if unsigned, 0 if signed
+    assign D_packet.mem_size     = MEM_SIZE'(IF_ID_reg.inst.r.funct3[1:0]);
+    
     assign D_packet.valid = IF_ID_reg.valid & ~D_packet.illegal;
 
     always_comb begin

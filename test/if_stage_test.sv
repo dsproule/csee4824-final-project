@@ -110,7 +110,7 @@ module testbench;
 
 
     if_stage if_stage_0(
-        .clock(clock), .reset(reset), .gnt(~Dmem_req),
+        .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req),
         .take_branch(take_branch),
         .branch_target(),
         .Imem2proc_data(mem2proc_data),

@@ -11,7 +11,7 @@
 `include "verilog/sys_defs.svh"
 
 module if_stage (
-    input             clock, reset, gnt,
+    input             clock, reset, Imem_gnt,
     input             take_branch,
     input [`XLEN-1:0] branch_target,
     input [63:0]      Imem2proc_data,
@@ -23,7 +23,6 @@ module if_stage (
     output logic [`XLEN-1:0] proc2Imem_addr
 );  
     logic [`XLEN-1:0] PC_reg;
-    logic [1:0]  mem2buf_command;
     logic [3:0]  nextImem_tag;
     mem_proc_states IF_state;
 
@@ -36,21 +35,21 @@ module if_stage (
             PC_reg <= (take_branch) ? branch_target : `XLEN'h0;
             proc2Imem_command <= BUS_LOAD;
             mem_req <= `TRUE;
-            IF_state <= NEW_ADDR;
+            IF_state <= MEM_NEW_ADDR;
         end else begin
             IF_packet.inst <= `NOP;
             IF_packet.valid <= `FALSE;
 
             case (IF_state)
-                NEW_ADDR: begin
+                MEM_NEW_ADDR: begin
                     nextImem_tag <= Imem2proc_response;
-                    if (gnt & Imem2proc_response != 0) begin
+                    if (Imem_gnt & Imem2proc_response != 0) begin
                         mem_req <= `FALSE;
                         proc2Imem_command <= BUS_NONE;
-                        IF_state <= WAIT_FOR_TAG;
+                        IF_state <= MEM_WAIT_FOR_TAG;
                     end
                 end
-                WAIT_FOR_TAG: begin
+                MEM_WAIT_FOR_TAG: begin
                     if (Imem2proc_tag == nextImem_tag) begin
                         IF_packet <= {
                                 (PC_reg[2]) ? Imem2proc_data[63:32] : Imem2proc_data[31:0], 
@@ -63,7 +62,7 @@ module if_stage (
                         PC_reg <= PC_reg + 4;
                         mem_req <= `TRUE;
                         proc2Imem_command <= BUS_LOAD;
-                        IF_state <= NEW_ADDR;
+                        IF_state <= MEM_NEW_ADDR;
                     end
                 end
                 default: ;

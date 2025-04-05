@@ -241,7 +241,7 @@ typedef enum logic [3:0] {
     OPB_IS_J_IMM  = 4'h5
 } ALU_OPB_SELECT;
 
-typedef enum logic [1:0] {NEW_ADDR, WAIT_FOR_TAG, WAIT_FOR_ADDR} mem_proc_states;
+typedef enum logic [1:0] {MEM_NEW_ADDR, MEM_WAIT_FOR_TAG, MEM_WAIT_FOR_ADDR, MEM_NONE} mem_proc_states;
 
 // ALU function code input
 // probably want to leave these alone
@@ -307,6 +307,11 @@ typedef struct packed {
     ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
     
     logic [`RS_SZ-1:0] rs_idx;   
+
+    logic [`XLEN-1:0] mem_offset;
+    logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
+    MEM_SIZE          mem_size;
+
     logic has_dest;
 
     logic       halt;          // Is this a halt?
@@ -370,6 +375,10 @@ typedef struct packed {
     ALU_OPB_SELECT opb_select;
 
     ALU_FUNC alu_func;
+    
+    logic [`XLEN-1:0] mem_offset;
+    logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
+    MEM_SIZE          mem_size;
     
     /* P6-microarchitecture specific */
 

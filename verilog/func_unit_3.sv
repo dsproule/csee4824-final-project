@@ -1,22 +1,23 @@
 `include "verilog/sys_defs.svh"
 
 module func_unit_3(
-    input clock, reset, Dmem_gnt, store_retired, 
+    input clock, reset, 
+    input Dmem_gnt,                 // signal that the memory was listening to this module
+    input retired,            // the current mem_store has been 
     input S_X_PACKET S_X_reg,
 
-    output mem_store,
-    output logic [`XLEN-1:0] proc2Dmem_addr,
-    output logic [`XLEN-1:0] proc2Dmem_data,
+    output logic mem_store_pend,          // the module is attempting to store a value
+    output [`XLEN-1:0] proc2Dmem_addr,
+    output [`XLEN-1:0] proc2Dmem_data,
     output X_C_PACKET X_packet
 );
 
     mem_proc_states mem_state;
-    logic new_store;
+
+    assign proc2Dmem_data = S_X_reg.V2;
+    assign proc2Dmem_addr = S_X_reg.V1 + S_X_reg.mem_offset;
 
     always_comb begin
-        proc2Dmem_data = S_X_reg.V2;
-        proc2Dmem_data = S_X_reg.V1 + `RV32_signext_Simm(S_X_reg.inst);
-
         if (Dmem_gnt) begin
             X_packet.T = S_X_reg.T;
             X_packet.result = '0;
@@ -29,22 +30,31 @@ module func_unit_3(
                 `TRUE      // is_store
             };
             X_packet.valid = Dmem_gnt;
-        end
+        end else
+            X_packet = '0;
+
     end
 
     // state machine enforces one memory load 
     always_ff @(posedge clock) begin
         if (reset) begin
-            new_store <= `TRUE;
-            mem_state <= WAIT_FOR_ADDR;
+            mem_store_pend <= `FALSE;
+            mem_state <= MEM_WAIT_FOR_ADDR;
         end else begin
-            if (store_retired)
-                new_store <= `TRUE;
-
             case (mem_state)
-                NEW_ADDR: mem_state <= (Dmem_gnt) ? WAIT_FOR_ADDR : mem_state;
-                WAIT_FOR_ADDR: mem_state <= (S_X_reg.valid & new_store) ? NEW_ADDR : mem_state;
-                default: ; 
+                MEM_WAIT_FOR_ADDR:
+                    if (S_X_reg.valid) begin
+                        mem_store_pend <= `TRUE;
+                        mem_state <= MEM_NEW_ADDR;
+                    end
+                MEM_NEW_ADDR:
+                    if (Dmem_gnt) begin
+                        mem_store_pend <= `FALSE;
+                        mem_state <= MEM_NONE;
+                    end
+                MEM_NONE:
+                    if (retired) 
+                        mem_state <= MEM_WAIT_FOR_ADDR;
             endcase
         end
     end

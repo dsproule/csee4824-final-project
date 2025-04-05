@@ -66,7 +66,7 @@ module pipeline (
     IF_ID_PACKET IF_ID_reg, IF_packet;
     D_S_PACKET D_S_reg, D_packet;
     logic [1:0] proc2Dmem_command, proc2Imem_command;
-    logic [`XLEN-1:0] proc2Imem_addr, proc2Dmem_addr;
+    logic [`XLEN-1:0] proc2Imem_addr;
     logic [`XLEN-1:0] branch_target;
 
     // Map table outputs
@@ -83,6 +83,12 @@ module pipeline (
     logic [`RS_SZ:0] fu_idx, S_idx, X_idx, req_idx;    
     S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_regs;
     X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_regs;
+    logic [`XLEN-1:0] proc2Dmem_data;
+    logic [`XLEN-1:0] proc2DmemWr_addr, proc2DmemRd_addr;
+    MEM_SIZE proc2Dmem_size;
+    logic [`XLEN-1:0] proc2Dmem_addr [1:0];
+    logic [1:0] Dmem_gnt;
+    logic wr_mem, rd_mem;
 
     // ROB outputs
     PPLN_CTRL pipeline_control;
@@ -132,15 +138,23 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign proc2Dmem_command = BUS_NONE;
-    assign Dmem_req = (proc2Dmem_command != BUS_NONE);
+    assign Dmem_req = (wr_mem | rd_mem);
+
+    // for all memory vectors, ind0 -> wr and ind1 -> rd
 
     always_comb begin
+        Dmem_gnt = 2'b00;
+
         if (Dmem_req) begin
-            proc2mem_addr    = proc2Dmem_addr;
-            proc2mem_command = proc2Dmem_command;
+            if (wr_mem) begin
+                proc2mem_addr    = proc2Dmem_addr[0];
+                proc2mem_command = BUS_STORE;
+            end else begin
+                proc2mem_addr    = proc2Dmem_addr[1];
+                proc2mem_command = BUS_LOAD;
+            end
 `ifndef CACHE_MODE
-            proc2mem_size    = proc2Dmem_size;  // size is never DOUBLE in project 3
+            proc2mem_size    = proc2Dmem_size;  // probably need to be adjusted later
 `endif
         end else begin
             proc2mem_addr    = proc2Imem_addr;
@@ -149,7 +163,7 @@ module pipeline (
             proc2mem_size    = DOUBLE;  // size is never DOUBLE in project 3
 `endif
         end
-        // proc2mem_data = {32'b0, proc2Dmem_data};
+        proc2mem_data = {32'b0, proc2Dmem_data};
     end
 
     //////////////////////////////////////////////////
@@ -162,7 +176,7 @@ module pipeline (
     assign branch_target = '0;            // for now
 
     if_stage if_stage_0(
-        .clock(clock), .reset(reset), .gnt(~Dmem_req),
+        .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req),
         .take_branch(take_branch),
         .branch_target(branch_target),
         .Imem2proc_data(mem2proc_data),
@@ -293,9 +307,9 @@ module pipeline (
 
     always_ff @(posedge clock) begin
         for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
-            if (reset | gnt[S_idx]) begin
+            if (reset | (gnt[S_idx] & ~S_packets[S_idx].valid)) begin
                 S_X_regs[S_idx] <= 0;            
-            end else if (FU_ready[S_idx] & S_packets[S_idx].valid) begin
+            end else if (S_packets[S_idx].valid) begin
                 S_X_regs[S_idx] <= S_packets[S_idx];
             end
     end
@@ -317,10 +331,38 @@ module pipeline (
     func_unit_1 func_unit_01(
         // Inputs
         .clock(clock), .reset(reset), 
+        .retired(gnt[1]),
         .S_X_reg(S_X_regs[1]), 
 
         // Outputs    
         .X_packet(X_packets[1])
+    );
+
+    func_unit_2 func_unit_02 (
+            .clock(clock), .reset(reset), .Dmem_gnt(Dmem_gnt[1]),
+            .retired(gnt[2]),
+            .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
+            .Dmem2proc_data(mem2proc_data[`XLEN-1:0]),
+            .S_X_reg(S_X_regs[2]),
+
+            .mem_load_pend(rd_mem),
+    `ifndef CACHE_MODE
+            .proc2mem_size(proc2Dmem_size),
+    `endif
+            .proc2Dmem_addr(proc2Dmem_addr[1]),
+            .X_packet(X_packets[2])
+    );
+
+    func_unit_3 func_unit_03 (
+        .clock(clock), .reset(reset), 
+        .Dmem_gnt(Dmem_gnt[0]),              // signal that the memory was listening to this module
+        .retired(gnt[3]),                 // the current mem_store has been 
+        .S_X_reg(S_X_regs[3]),
+
+        .mem_store_pend(wr_mem),          // the module is attempting to store a value
+        .proc2Dmem_addr(proc2Dmem_addr[0]),
+        .proc2Dmem_data(proc2Dmem_data),
+        .X_packet(X_packets[3])
     );
 
     // X_C regs

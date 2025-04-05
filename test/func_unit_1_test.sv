@@ -4,7 +4,7 @@
 
 module testbench;
 
-    logic clock, reset, done, correct;
+    logic clock, reset, done, correct, retired;
     logic [63:0] value, cycles;
     logic [31:0] result, target;
 
@@ -17,6 +17,7 @@ module testbench;
         @(negedge clock);
         S_X_reg.V1 = V1;
         S_X_reg.V2 = V2;
+        target = targ;
         S_X_reg.valid = `TRUE;
         S_X_reg.alu_func = alu_func;
         target = targ;
@@ -32,7 +33,7 @@ module testbench;
     endtask
 
     assign done = X_packet.valid;
-    assign correct = (done == 1 && target == X_packet.result);
+    assign correct = ((done == 1) & (target == X_packet.result));
 
     initial begin
         forever begin : clock_gen
@@ -52,7 +53,7 @@ module testbench;
     end
     
     func_unit_1 FU_1(
-        .clock(clock), .reset(reset),
+        .clock(clock), .reset(reset), .retired(retired),
         .S_X_reg(S_X_reg),
 
         .X_packet(X_packet)
@@ -70,15 +71,37 @@ module testbench;
         reset = 0;
         // signed tests 
         wait_until_done_no_reset(32'd2, 32'd2, 32'd4, ALU_MUL);
+        retired = 1;
+        @(negedge clock);
+        retired = 0;
         wait_until_done_no_reset(32'd3, 32'd5, 32'd15, ALU_MUL);
+        retired = 1;
+        @(negedge clock);
+        retired = 0;
         wait_until_done_no_reset(32'd0, 32'd2, 32'd0, ALU_MUL);
+        retired = 1;
+        @(negedge clock);
+        retired = 0;
         wait_until_done_no_reset(32'd44589, 32'd345, 32'd15383205, ALU_MUL);
+        retired = 1;
+        @(negedge clock);
+        retired = 0;
         wait_until_done_no_reset(-32'd1, 32'd2, -32'd2, ALU_MUL);
+        retired = 1;
+        @(negedge clock);
+        retired = 0;
 
         // Could check other ALU modes for thoroughness but fine as is
-        wait_until_done_no_reset(32'd2, 32'd2, 32'd0, ALU_MULHSU);
+        wait_until_done_no_reset(32'd2, 32'd2, 32'd0, ALU_MULHSU);      // will look crazy because upper 32 bits taken (0)
+        retired = 1;
+        @(negedge clock);
+        retired = 0;
         wait_until_done_no_reset(32'd4454589, 32'd355545, 32'd368, ALU_MULHSU);
-        
+
+        retired = 1;
+        @(negedge clock);
+        retired = 0;
+
         $display("\n@@@ Passed\n");
         $finish;
     end

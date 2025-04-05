@@ -1,7 +1,7 @@
 `include "verilog/sys_defs.svh"
 
 module func_unit_1(
-    input clock, reset,
+    input clock, reset, retired,
     input S_X_PACKET S_X_reg,
 
     output X_C_PACKET X_packet
@@ -11,7 +11,7 @@ module func_unit_1(
     logic [63:0] mult_result;
     logic start;
 
-    assign X_packet.T = (X_packet.valid) ? S_X_reg.T : '0;
+    assign X_packet.T = S_X_reg.T;
     
     // pipeline control
     assign ppln_ctrl.flush = `FALSE;
@@ -38,6 +38,15 @@ module func_unit_1(
         .product(mult_result),
         .done(X_packet.valid)
     );
+
+    always_ff @(posedge clock) begin
+        if (reset | retired) begin
+            new_op <= `TRUE;
+        end else begin
+            if (S_X_reg.valid)
+                new_op <= `FALSE;
+        end
+    end
 
     always_comb begin
         case (S_X_reg.alu_func)
