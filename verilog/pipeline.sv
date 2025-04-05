@@ -84,7 +84,6 @@ module pipeline (
     S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_regs;
     X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_regs;
     logic [`XLEN-1:0] proc2Dmem_data;
-    logic [`XLEN-1:0] proc2DmemWr_addr, proc2DmemRd_addr;
     MEM_SIZE proc2Dmem_size;
     logic [`XLEN-1:0] proc2Dmem_addr [1:0];
     logic [1:0] Dmem_gnt;
@@ -149,9 +148,11 @@ module pipeline (
             if (wr_mem) begin
                 proc2mem_addr    = proc2Dmem_addr[0];
                 proc2mem_command = BUS_STORE;
+                Dmem_gnt = 2'b01;
             end else begin
                 proc2mem_addr    = proc2Dmem_addr[1];
                 proc2mem_command = BUS_LOAD;
+                Dmem_gnt = 2'b10;
             end
 `ifndef CACHE_MODE
             proc2mem_size    = proc2Dmem_size;  // probably need to be adjusted later

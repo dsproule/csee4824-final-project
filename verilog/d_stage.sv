@@ -205,7 +205,7 @@ module d_stage (
     // Register values for map table signals
     assign D_packet.r = (has_dest) ? IF_ID_reg.inst.r.rd : `ZERO_REG;
     assign D_packet.r1 = IF_ID_reg.inst.r.rs1;
-    assign D_packet.r2 = (D_packet.opb_select != OPB_IS_RS2) ? '0 : IF_ID_reg.inst.r.rs2;
+    assign D_packet.r2 = IF_ID_reg.inst.r.rs2;
     assign D_packet.has_dest = has_dest;
 
     // mem details
