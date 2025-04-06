@@ -165,8 +165,8 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign take_branch   = '0;
-    assign branch_target = '0;
+    assign take_branch   = pipeline_control.flush;
+    assign branch_target = rob_write_data;
     assign IF_stall = 0;
 
     if_stage if_stage_0(

@@ -22,13 +22,8 @@ module func_unit_3(
             X_packet.T = S_X_reg.T;
             X_packet.result = '0;
             
-            X_packet.ppln_ctrl = {
-                `FALSE,     // flush
-                `FALSE,     // illegal
-                `FALSE,     // halt
-                `FALSE,     // is_branch
-                `TRUE      // is_store
-            };
+            X_packet.ppln_ctrl = '0;
+            X_packet.ppln_ctrl.is_store = `TRUE;
             X_packet.valid = Dmem_gnt;
         end else
             X_packet = '0;

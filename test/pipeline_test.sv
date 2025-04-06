@@ -180,7 +180,7 @@ module testbench;
         $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
         for(n = 1; n < 8; n=n+1)
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
-        $display("\n(RETIRE) valid: %1b, ROB_T: %4d\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, clock_count);
+        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0d\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
     endtask // print_rob
 
     task print_cdb;
@@ -269,7 +269,7 @@ module testbench;
                 print_rob;
                 // dump_regfile;
                 print_sx;
-                print_x_pkt;
+                // print_x_pkt;
                 print_xc;
             end
         end
@@ -357,7 +357,7 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 50) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 100) begin
                 print_regs;
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
