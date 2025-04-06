@@ -63,9 +63,8 @@ module testbench;
     // logging
     MT_ENTRY mt_table [31:0];
     ROB_ENTRY rob_table [`ROB_SZ:1];
-    logic [`XLEN-1:0] regfile_mirror [4:0];
 
-    integer i, j, k, l, m, n, o, p;
+    integer i, j, k, l, m, n, o, p, q;
 
     // Instantiate the Pipeline
     pipeline core (
@@ -133,13 +132,6 @@ module testbench;
         #(`CLOCK_PERIOD/2.0);
         clock = ~clock;
     end
-
-    // Copies values to the regfile mirror
-    // always_ff @(posedge clock) begin
-    //     if (pipeline_commit_wr_en) begin
-    //         regfile_mirror[pipeline_commit_wr_idx] <= pipeline_commit_wr_data;
-    //     end
-    // end
 
     //////////////////////////////////////////////////
     //                                              //
@@ -213,10 +205,17 @@ module testbench;
     endtask
 
     task print_sx;
-    $display("\n(S_X_Regs)\ttime: %d\n------------------------------------------", clock_count);
+        $display("\n(S_X_Regs)\ttime: %d\n------------------------------------------", clock_count);
         for(p = 0; p <`RS_SZ; p++)
             $display("index: %4d PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
                         p, S_X_regs_dbg[p].PC, S_X_regs_dbg[p].inst, S_X_regs_dbg[p].T, S_X_regs_dbg[p].V1, S_X_regs_dbg[p].V2, S_X_regs_dbg[p].halt, S_X_regs_dbg[p].valid);
+        $display("------------------------------------------");
+    endtask
+
+    task print_regs;
+        $display("\n(Regs)\ttime: %d\n------------------------------------------", clock_count);
+        for(q = 0; q < 32; q++)
+            $display("r[%2d]: %8h", q, core.regfile_inst.registers[q]);
         $display("------------------------------------------");
     endtask
 
@@ -240,11 +239,6 @@ module testbench;
             $display("@@@");
         end
     endtask // task show_mem_with_decimal
-
-    task dump_regfile;
-        for (logic [5:0] r_idx = 0; r_idx < 32; r_idx++)
-            $display("r%02d: %8h", r_idx, regfile_mirror[r_idx]);
-    endtask // task dump_regfile
 
     //////////////////////////////////////////////////
     //                                              //
@@ -331,12 +325,6 @@ module testbench;
         // print_header("removed for line length");
     end
 
-    always_comb begin
-        if(pipeline_commit_wr_en)
-            regfile_mirror[pipeline_commit_wr_idx] = pipeline_commit_wr_data;
-    end
-
-
     // Count the number of posedges and number of instructions completed
     // till simulation ends
     always @(posedge clock) begin
@@ -370,7 +358,7 @@ module testbench;
 
             // deal with any halting conditions
             if(pipeline_error_status != NO_ERROR || debug_counter > 500) begin
-                // dump_regfile();
+                print_regs;
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
@@ -393,7 +381,7 @@ module testbench;
                 show_clk_count;
                 // print_close(); // close the pipe_print output file
                 $fclose(wb_fileno);
-                #100 dump_regfile();
+                #100;
                 $finish;
             end
             debug_counter <= debug_counter + 1;

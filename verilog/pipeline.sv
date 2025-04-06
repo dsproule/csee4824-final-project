@@ -273,6 +273,7 @@ module pipeline (
         // Inputs
         .clock(clock), .reset(reset),
         .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T),
+        .NPC(D_S_reg.PC),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
         .T(mt_T_wire), .retire_T_out(retire_T_wire), 
@@ -282,10 +283,11 @@ module pipeline (
         .retire(retire), .regfile_write_idx_out(retire_r_wire), 
         .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
         .V1(V1_rob), .V2(V2_rob),
-        .head(rob_head), .tail(rob_tail)
+        .head(rob_head), .tail(rob_tail),
+        .commit_NPC(pipeline_commit_NPC)
     );
 
-    assign regfile_write_en   = retire & (~pipeline_control.is_store & ~pipeline_control.is_branch);
+    assign regfile_write_en   = retire & (~pipeline_control.is_store & ~pipeline_control.is_branch) & ~pipeline_control.halt;
     assign regfile_write_data = rob_write_data;
     assign regfile_write_idx  = retire_r_wire;
 
@@ -429,6 +431,6 @@ module pipeline (
                                       (mem2proc_response==4'h0 & proc2mem_command != BUS_NONE) ? LOAD_ACCESS_FAULT : NO_ERROR;
     assign pipeline_commit_wr_en   = regfile_write_en;
     assign pipeline_commit_wr_idx  = regfile_write_idx;
-    assign pipeline_commit_wr_data = regfile_write_data;
+    assign pipeline_commit_wr_data = regfile_write_data; 
 
 endmodule // pipeline

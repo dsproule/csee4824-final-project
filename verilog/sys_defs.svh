@@ -308,17 +308,17 @@ typedef struct packed {
     
     logic [`RS_SZ-1:0] rs_idx;   
 
+    logic rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
+    MEM_SIZE mem_size;
     logic [`XLEN-1:0] mem_offset;
-    logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
-    MEM_SIZE          mem_size;
 
     logic has_dest;
 
-    logic       halt;          // Is this a halt?
-    logic       illegal;       // Is this instruction illegal?
-    logic       csr_op;        // Is this a CSR operation? (we use this to get return code)
+    logic halt;    // Is this a halt?
+    logic illegal; // Is this instruction illegal?
+    logic csr_op;  // Is this a CSR operation? (we use this to get return code)
     
-    logic       valid;
+    logic valid;
 
 } D_S_PACKET;
 
@@ -356,6 +356,7 @@ typedef struct packed {
     logic [4:0] r;
     logic [`XLEN-1:0] V;
     PPLN_CTRL ppln_ctrl;
+    logic [`XLEN-1:0] NPC;
     
     logic ready;
 } ROB_ENTRY;

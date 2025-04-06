@@ -7,6 +7,7 @@ module rob(
     input ROB_T T1, T2,
     input CDB cdb,
     input dispatch_valid,
+    input logic [`XLEN-1:0] NPC,                // used for wb
 
     output ROB_T T, retire_T_out,
     output PPLN_CTRL ppln_ctrl,
@@ -14,7 +15,8 @@ module rob(
     output logic [4:0] regfile_write_idx_out, 
     output logic [`XLEN-1:0] V1, V2, regfile_write_data,
     output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out,
-    output ROB_T head, tail
+    output ROB_T head, tail,
+    output logic [`XLEN-1:0] commit_NPC
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
 
@@ -25,6 +27,8 @@ module rob(
 
     assign retire_T_out = (retire) ? retire_T : 0;
     assign regfile_write_idx_out = (retire) ? regfile_write_idx : 0;
+
+    assign commit_NPC = rob_table[head].NPC;
 
     /* ONLY WORKS IF SIZE IS POWER OF TWO, BUT MORE EFFICIENT AND SIMPLER LOGIC FOR CONTROL BITS/MULTIPLE ISSUES WHEN WE SUPERSCALAR
 
@@ -96,6 +100,7 @@ module rob(
                 //$display("Dispatching: ROB[%d] with Dest Reg %d", tail, r);  // Debug print
                 rob_table[tail] <= 0;
                 rob_table[tail].r <= r;
+                rob_table[tail].NPC <= NPC;
                 tail <= (tail == `ROB_SZ) ? 1 : (tail + 1);
                 wraparound <= (tail == `ROB_SZ) ? ~wraparound : wraparound; // change here
                 // T <= tail; // change here
