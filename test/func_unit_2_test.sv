@@ -46,9 +46,6 @@ module testbench;
         .proc2mem_addr(proc2mem_addr),
         .proc2mem_data(proc2mem_data),
         .proc2mem_command(proc2mem_command),
-    `ifndef CACHE_MODE
-        .proc2mem_size(proc2mem_size), // BYTE, HALF, WORD or DOUBLE
-    `endif
 
         .mem2proc_response(mem2proc_response),
         .mem2proc_data(mem2proc_data),
@@ -80,9 +77,6 @@ module testbench;
             .S_X_reg(S_X_reg),
 
             .mem_load_pend(mem_load_pend),
-    `ifndef CACHE_MODE
-            .proc2mem_size(proc2mem_size),
-    `endif
             .proc2Dmem_addr(proc2Dmem_addr),
             .X_packet(X_packet)
     );

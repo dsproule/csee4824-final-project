@@ -20,9 +20,7 @@ module pipeline (
     output logic [1:0]       proc2mem_command, // Command sent to memory
     output logic [`XLEN-1:0] proc2mem_addr,    // Address sent to memory
     output logic [63:0]      proc2mem_data,    // Data sent to memory
-`ifndef CACHE_MODE // no longer sending size to memory
     output MEM_SIZE          proc2mem_size,    // Data size sent to memory
-`endif
 
     // Note: these are assigned at the very bottom of the module
     output logic [3:0]       pipeline_completed_insts,
@@ -59,7 +57,7 @@ module pipeline (
     //////////////////////////////////////////////////
     
     // Enable signals
-    logic IF_enable, D_enable;
+    logic IF_enable, D_enable, IF_stall;
 
     // IF_ID Stages
     logic take_branch;
@@ -154,15 +152,9 @@ module pipeline (
                 proc2mem_command = BUS_LOAD;
                 Dmem_gnt = 2'b10;
             end
-`ifndef CACHE_MODE
-            proc2mem_size    = proc2Dmem_size;  // probably need to be adjusted later
-`endif
         end else begin
             proc2mem_addr    = proc2Imem_addr;
             proc2mem_command = proc2Imem_command;
-`ifndef CACHE_MODE
-            proc2mem_size    = DOUBLE;  // size is never DOUBLE in project 3
-`endif
         end
         proc2mem_data = {32'b0, proc2Dmem_data};
     end
@@ -173,11 +165,12 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign take_branch   = `FALSE;        // for now
-    assign branch_target = '0;            // for now
+    assign take_branch   = '0;
+    assign branch_target = '0;
+    assign IF_stall = 0;
 
     if_stage if_stage_0(
-        .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req),
+        .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req & ~rs_stall),
         .take_branch(take_branch),
         .branch_target(branch_target),
         .Imem2proc_data(mem2proc_data),
@@ -189,9 +182,9 @@ module pipeline (
         .proc2Imem_addr(proc2Imem_addr)
     );
 
-    assign IF_enable = 1'b1;
+    assign IF_enable = 1'b1 & ~rs_stall;
     always_ff @(posedge clock) begin
-        if (reset) begin
+        if (reset | take_branch) begin
             IF_ID_reg <= '0;
         end else if (IF_enable) begin
             IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
@@ -212,9 +205,9 @@ module pipeline (
         .D_packet(D_packet)
     );
 
-    assign D_enable = 1'b1;
+    assign D_enable = 1'b1 & ~rs_stall;         // if rs_stalls, means inst was not processed
     always_ff @(posedge clock) begin
-        if (reset) begin
+        if (reset | take_branch) begin
             D_S_reg <= '0;
         // separated because may need a signal to stall
         end else if (D_enable) begin
@@ -230,7 +223,7 @@ module pipeline (
 
     map_table map_table_inst (
         // Inputs
-        .clock(clock), .reset(reset), .has_dest(D_S_reg.has_dest),
+        .clock(clock), .reset(reset | take_branch), .has_dest(D_S_reg.has_dest),
         .en(D_S_reg.valid & ~rs_stall), 
         .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2), 
         .retire_r(retire_r_wire), 
@@ -246,7 +239,7 @@ module pipeline (
 
     rs_stage rs_stage_inst (
         // Inputs
-        .clock(clock), .reset(reset), .alloc_en(D_S_reg.valid), 
+        .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid), 
         .cdb(cdb), .D_S_reg(D_S_reg), 
         .FU_ready(FU_ready),
         .T(mt_T_wire), .T1(T1_wire), .T2(T2_wire), 
@@ -260,7 +253,7 @@ module pipeline (
 
     always_ff @(posedge clock) begin
         for (fu_idx = 0; fu_idx < `RS_SZ; fu_idx++)
-            if (reset) begin
+            if (reset | take_branch) begin
                 FU_ready[fu_idx] <= `TRUE; // all FUs are available in the beginning
             end else if (FU_ready[fu_idx] & S_packets[fu_idx].valid) begin
                 FU_ready[fu_idx] <= `FALSE; // FU is in used
@@ -271,7 +264,7 @@ module pipeline (
     
     rob rob_inst (
         // Inputs
-        .clock(clock), .reset(reset),
+        .clock(clock), .reset(reset | take_branch),
         .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T),
         .NPC(D_S_reg.PC),
         .cdb(cdb),
@@ -333,7 +326,7 @@ module pipeline (
 
     func_unit_1 func_unit_01(
         // Inputs
-        .clock(clock), .reset(reset), 
+        .clock(clock), .reset(reset | take_branch), 
         .retired(gnt[1]),
         .S_X_reg(S_X_regs[1]), 
 
@@ -342,27 +335,24 @@ module pipeline (
     );
 
     func_unit_2 func_unit_02 (
-            .clock(clock), .reset(reset), .Dmem_gnt(Dmem_gnt[1]),
+            .clock(clock), .reset(reset | take_branch), .Dmem_gnt(Dmem_gnt[1]),
             .retired(gnt[2]),
             .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
             .Dmem2proc_data(mem2proc_data[`XLEN-1:0]),
             .S_X_reg(S_X_regs[2]),
 
             .mem_load_pend(rd_mem),
-    `ifndef CACHE_MODE
-            .proc2mem_size(proc2Dmem_size),
-    `endif
             .proc2Dmem_addr(proc2Dmem_addr[1]),
             .X_packet(X_packets[2])
     );
 
     func_unit_3 func_unit_03 (
-        .clock(clock), .reset(reset), 
+        .clock(clock), .reset(reset | take_branch), 
         .Dmem_gnt(Dmem_gnt[0]),              // signal that the memory was listening to this module
-        .retired(gnt[3]),                 // the current mem_store has been 
+        .retired(gnt[3]),                    // the current mem_store has been 
         .S_X_reg(S_X_regs[3]),
 
-        .mem_store_pend(wr_mem),          // the module is attempting to store a value
+        .mem_store_pend(wr_mem),             // the module is attempting to store a value
         .proc2Dmem_addr(proc2Dmem_addr[0]),
         .proc2Dmem_data(proc2Dmem_data),
         .X_packet(X_packets[3])
@@ -412,7 +402,7 @@ module pipeline (
     end
 
     rps4 arb (
-        .clock(clock), .reset(reset), 
+        .clock(clock), .reset(reset | take_branch), 
         .req(FU_req), 
         .en(1'b1), 
         

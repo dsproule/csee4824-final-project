@@ -357,7 +357,7 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 500) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 50) begin
                 print_regs;
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");

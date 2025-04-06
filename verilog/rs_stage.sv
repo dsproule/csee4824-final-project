@@ -22,16 +22,17 @@ module RS_ALLOC(
      */
 
     logic [$clog2(`RS_SZ):0] reset_idx, cdb_idx, rs_free_idx, busy_reset_idx, rs_update_idx;
-    logic [`RS_SZ-1:0] rs_idx;
+    logic [`RS_SZ-1:0] next_busy, rs_idx;
     RS_ENTRY next_re;
     logic next_re_valid;
 
     assign rs_idx = D_S_reg.rs_idx;
-    assign rs_idx_full = (rs_free[rs_idx]) ? 0 : busy[rs_idx];
+    assign rs_idx_full = (rs_free[rs_idx]) ? 0 : next_busy[rs_idx];
 
     always_ff @(posedge clock) begin
         if (reset) begin
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
+                next_busy[reset_idx] <= `FALSE;
                 busy[reset_idx] <= `FALSE;
                 rs_table[reset_idx] <= 0;
             end
@@ -41,10 +42,11 @@ module RS_ALLOC(
             rs_update_idx <= 0;
         end else begin  
             // busy handling
+            busy[rs_update_idx] <= next_busy[rs_update_idx];
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
                 if (((busy_reset_idx != rs_update_idx) | ~next_re_valid) & (rs_free[busy_reset_idx])) begin
+                    next_busy[busy_reset_idx] <= `FALSE;
                     busy[busy_reset_idx] <= `FALSE;
-
                 end
             
             if (next_re_valid) begin
@@ -54,7 +56,7 @@ module RS_ALLOC(
 
             // if RS entry is empty, allocate it
             if ((~busy[rs_idx] | rs_free[rs_idx]) & en) begin
-                busy[rs_idx] <= `TRUE;
+                next_busy[rs_idx] <= `TRUE;
                 
                 // save values in next_re from decode stage (always saved for allocation)
                 next_re.T <= T;
