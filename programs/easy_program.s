@@ -12,4 +12,6 @@ addi x3, x0, 800
 lw   x5, 0(x3)
 mul  x4, x2, x2
 mul  x8, x4, x2
+sw   x1, 800(x0)
+lw   x5, 800(x0)
 wfi

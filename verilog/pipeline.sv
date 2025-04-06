@@ -237,6 +237,9 @@ module pipeline (
     assign V1_rs = (T1_wire.plus == 1) ? V1_rob : V1_regfile;
     assign V2_rs = (T2_wire.plus == 1) ? V2_rob : V2_regfile;
 
+    logic rs_idx_full;
+    // assign rs_stall = rs_idx_full;
+    assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid), 
@@ -246,7 +249,7 @@ module pipeline (
         .V1(V1_rs), .V2(V2_rs), 
 
         // Outputs           
-        .rs_idx_full(rs_stall),
+        .rs_idx_full(rs_idx_full),
         .S_packet(S_packets), 
         .rs_table(rs_table_out), .busy(busy)
     );
@@ -418,7 +421,7 @@ module pipeline (
     assign pipeline_completed_insts = {3'b0, retire};    // commit one valid instruction
     assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
                                       pipeline_control.halt           ? HALTED_ON_WFI :
-                                      (mem2proc_response==4'h0 & proc2mem_command != BUS_NONE) ? LOAD_ACCESS_FAULT : NO_ERROR;
+                                      (mem2proc_response==4'h0 & (proc2mem_command != BUS_NONE)) ? LOAD_ACCESS_FAULT : NO_ERROR;
     assign pipeline_commit_wr_en   = regfile_write_en;
     assign pipeline_commit_wr_idx  = regfile_write_idx;
     assign pipeline_commit_wr_data = regfile_write_data; 

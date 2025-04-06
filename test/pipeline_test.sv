@@ -264,13 +264,13 @@ module testbench;
                         D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
                 $display("------------------------------------------");
                 print_rs;
-                print_mt;
-                print_cdb;
-                print_rob;
+                // print_mt;
+                // print_cdb;
+                // print_rob;
                 // dump_regfile;
-                print_sx;
+                // print_sx;
                 // print_x_pkt;
-                print_xc;
+                // print_xc;
             end
         end
     end
@@ -357,7 +357,7 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 100) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 500000) begin
                 print_regs;
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");

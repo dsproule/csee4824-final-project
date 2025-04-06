@@ -57,6 +57,7 @@ module RS_ALLOC(
             // if RS entry is empty, allocate it
             if ((~busy[rs_idx] | rs_free[rs_idx]) & en) begin
                 next_busy[rs_idx] <= `TRUE;
+                busy[rs_idx] <= `TRUE;
                 
                 // save values in next_re from decode stage (always saved for allocation)
                 next_re.T <= T;
