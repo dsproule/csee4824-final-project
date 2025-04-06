@@ -135,11 +135,11 @@ module testbench;
     end
 
     // Copies values to the regfile mirror
-    always_ff @(posedge clock) begin
-        if (pipeline_commit_wr_en) begin
-            regfile_mirror[pipeline_commit_wr_idx] <= pipeline_commit_wr_data;
-        end
-    end
+    // always_ff @(posedge clock) begin
+    //     if (pipeline_commit_wr_en) begin
+    //         regfile_mirror[pipeline_commit_wr_idx] <= pipeline_commit_wr_data;
+    //     end
+    // end
 
     //////////////////////////////////////////////////
     //                                              //
@@ -273,7 +273,7 @@ module testbench;
                 print_mt;
                 print_cdb;
                 print_rob;
-                //dump_regfile;
+                // dump_regfile;
                 print_sx;
                 print_x_pkt;
                 print_xc;
@@ -331,6 +331,11 @@ module testbench;
         // print_header("removed for line length");
     end
 
+    always_comb begin
+        if(pipeline_commit_wr_en)
+            regfile_mirror[pipeline_commit_wr_idx] = pipeline_commit_wr_data;
+    end
+
 
     // Count the number of posedges and number of instructions completed
     // till simulation ends
@@ -364,8 +369,8 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 50) begin
-                dump_regfile();
+            if(pipeline_error_status != NO_ERROR || debug_counter > 500) begin
+                // dump_regfile();
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
@@ -388,7 +393,8 @@ module testbench;
                 show_clk_count;
                 // print_close(); // close the pipe_print output file
                 $fclose(wb_fileno);
-                #100 $finish;
+                #100 dump_regfile();
+                $finish;
             end
             debug_counter <= debug_counter + 1;
         end // if(reset)

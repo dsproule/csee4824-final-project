@@ -6,12 +6,9 @@
  */
 
 addi x1, x0, 1
+sw   x1, 800(x0)
 addi x2, x0, 2
 addi x3, x0, 800
 mul  x4, x2, x2
-sw   x2, 0(x3)
-nop
-nop
-nop
 lw  x5, 0(x3)
 wfi

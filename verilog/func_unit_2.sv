@@ -18,10 +18,11 @@ module func_unit_2(
     logic [3:0]  nextImem_tag;
     mem_proc_states mem_state;
 
-    // word-aligned mem
+    // should be word-aligned. If a value is invalid proc_resp will be 0
     assign proc2Dmem_addr = S_X_reg.V1 + S_X_reg.mem_offset;
     assign proc2mem_size = S_X_reg.mem_size;
     
+    // directly from p3
     always_comb begin
         read_data = Dmem2proc_data;
         if (S_X_reg.rd_unsigned) begin
@@ -41,6 +42,7 @@ module func_unit_2(
         end
     end
 
+    // state machine to handle loads
     always_ff @(posedge clock) begin
         if (reset) begin
             nextImem_tag <= '0;
@@ -49,18 +51,21 @@ module func_unit_2(
         end else begin
             case (mem_state)
                 MEM_WAIT_FOR_ADDR: 
+                    // waits here for a mem req to hit S_X_reg
                     if (S_X_reg.valid) begin
                         mem_load_pend <= `TRUE;
                         mem_state <= MEM_NEW_ADDR;
                     end
                 MEM_NEW_ADDR: begin
-                nextImem_tag <= mem2proc_response;
-                    if (Dmem_gnt & (nextImem_tag != 0)) begin
-                        mem_load_pend <= `FALSE;
-                        mem_state <= MEM_WAIT_FOR_TAG;
-                    end
+                    // saves every  seen tag and when we know the tag corresp to current req, move to next state
+                    nextImem_tag <= mem2proc_response;
+                        if (Dmem_gnt & (nextImem_tag != 0)) begin
+                            mem_load_pend <= `FALSE;
+                            mem_state <= MEM_WAIT_FOR_TAG;
+                        end
                 end
                 MEM_WAIT_FOR_TAG: begin
+                    // if the memory is responding to us, save it and wait to be retired
                     if (mem2proc_tag == nextImem_tag) begin
                         X_packet.T = S_X_reg.T;
                         X_packet.result = read_data;
