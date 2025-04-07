@@ -34,7 +34,7 @@ module RS_ALLOC(
             for (reset_idx = 0; reset_idx < `RS_SZ; reset_idx++) begin
                 next_busy[reset_idx] <= `FALSE;
                 busy[reset_idx] <= `FALSE;
-                rs_table[reset_idx] <= 0;
+                rs_table[reset_idx] <= '0;
             end
 
             next_re <= '0;

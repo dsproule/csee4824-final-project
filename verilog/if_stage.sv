@@ -26,8 +26,9 @@ module if_stage (
     logic [3:0]  nextImem_tag;
     mem_proc_states IF_state;
 
-    logic [31:0] if_data;
-    logic mem_req_done;
+    // logic [31:0] if_data;
+    IF_ID_PACKET nextIF_packet;
+    // logic mem_req_done;
 
     // word-aligned mem
     assign proc2Imem_addr = {PC_reg[`XLEN-1:3], 3'b0};
@@ -54,38 +55,25 @@ module if_stage (
                 end
                 MEM_WAIT_FOR_TAG: begin
                     if (Imem2proc_tag == nextImem_tag) begin //TODO mem request granted and stall at same time
-                        if_data <= (PC_reg[2]) ? Imem2proc_data[63:32] : Imem2proc_data[31:0];
-                        IF_packet <= {
+                        // if_data <= (PC_reg[2]) ? Imem2proc_data[63:32] : Imem2proc_data[31:0];
+                        nextIF_packet <= {
                                 (PC_reg[2]) ? Imem2proc_data[63:32] : Imem2proc_data[31:0], 
                                 PC_reg,
                                 PC_reg + 4,
                                 `TRUE
                             };
-                        
-
-                        // request for new memory
-                        if (!stall) begin
-                            PC_reg <= PC_reg + 4;
-                            mem_req <= `TRUE;
-                            proc2Imem_command <= BUS_LOAD;
-                            IF_state <= MEM_NEW_ADDR;
-                        end else mem_req_done <= 1'b1;
- 
+                        IF_state <= MEM_WAIT_FOR_ADDR;
                     end
-                    if (mem_req_done & !stall) begin // infinite loops here, need PCreg to stall or more_mult dies
-                        IF_packet <= {
-                                if_data, //last viable mem load
-                                PC_reg,
-                                PC_reg + 4,
-                                `TRUE
-                            };
+                end
+                MEM_WAIT_FOR_ADDR: begin
+                    // if stall reset ourselves to MEM_NEW_ADDR and put nextIF_packet
+                    if (~stall) begin
                         PC_reg <= PC_reg + 4;
                         mem_req <= `TRUE;
                         proc2Imem_command <= BUS_LOAD;
                         IF_state <= MEM_NEW_ADDR;
-                        mem_req_done <= 1'b0; 
+                        IF_packet <= nextIF_packet;
                     end
-                    
                 end
                 default: ;
             endcase
