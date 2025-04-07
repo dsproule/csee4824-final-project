@@ -54,8 +54,7 @@ module if_stage (
                     end
                 end
                 MEM_WAIT_FOR_TAG: begin
-                    if (Imem2proc_tag == nextImem_tag) begin //TODO mem request granted and stall at same time
-                        // if_data <= (PC_reg[2]) ? Imem2proc_data[63:32] : Imem2proc_data[31:0];
+                    if (Imem2proc_tag == nextImem_tag) begin 
                         nextIF_packet <= {
                                 (PC_reg[2]) ? Imem2proc_data[63:32] : Imem2proc_data[31:0], 
                                 PC_reg,
