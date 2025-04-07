@@ -6,14 +6,13 @@
  */
 
 addi x1, x0, 2
-mul x2, x1, x1
-mul x3, x2, x1 
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
+
+mul x6, x1, x1 
+mul x7, x6, x1 
+mul x8, x7, x1 
+mul x9, x8, x1 
+mul x10, x9, x1 
+mul x11, x10, x1 
+mul x12, x11, x1 
+mul x13, x12, x1 
 wfi

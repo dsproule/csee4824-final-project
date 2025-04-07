@@ -170,7 +170,7 @@ module pipeline (
     assign IF_stall = 0;
 
     if_stage if_stage_0(
-        .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req & ~rs_stall),
+        .clock(clock), .reset(reset), .stall(rs_stall), .Imem_gnt(~Dmem_req & ~rs_stall),
         .take_branch(take_branch),
         .branch_target(branch_target),
         .Imem2proc_data(mem2proc_data),
