@@ -1,0 +1,63 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Mar  5 11:37 2025
+Loading memory file: programs/ppl_test.mem
+Using writeback output file: output/ppl_test.wb
+Using pipeline output file: output/ppl_test.ppln
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  6000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  9000 : System STILL at reset, can't show anything
+@@
+@@                 11500  Deasserting System reset......
+@@
+@@
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 00a5a02300a5a023 : 46619443352412195
+@@@ mem[    8] = 0010009300a5a023 : 4504230998417443
+@@@ mem[   16] = 00a5a02300200113 : 46619443343655187
+@@@ mem[   24] = 0030019300a5a023 : 13512529764786211
+@@@ mem[   32] = 0050029300400213 : 22520828524495379
+@@@ mem[   40] = 0060031300000013 : 27024977903484947
+@@@ mem[   48] = 0050011300000c63 : 22519179252862051
+@@@ mem[   56] = 0070021300600193 : 31527478025519507
+@@@ mem[   64] = 0090031300800293 : 40535776793985683
+@@@ mem[   72] = 002383b3002083b3 : 9996429009388467
+@@@ mem[   80] = 0040041300238393 : 18018878162699155
+@@@ mem[   88] = 0044041300000013 : 19144778067214355
+@@@ mem[   96] = 0044849300500493 : 19286065316627603
+@@@ mem[  104] = 00100093000015b7 : 4504230987568567
+@@@ mem[  112] = 00a5a02300a00513 : 46619443352044819
+@@@ mem[  120] = 401484b30005a483 : 4617461422295983235
+@@@ mem[  128] = 1050007300c00613 : 1175439996677522963
+@@@
+@@@
+@@                 23000 : System halted
+@@
+@@@ System halted on memory error
+@@@
+@@
+@@  5 cycles / 0 instrs = inf CPI
+@@
+@@  12.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 296.
+$finish at simulation time               123000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 123000 ps
+CPU Time:      0.330 seconds;       Data structure size:   0.1Mb
+Wed Mar  5 11:37:31 2025
