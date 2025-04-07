@@ -24,12 +24,11 @@
 #define NUM_REG_GROUPS  4
 #define REG_SIZE_IN_HEX 8
 
-WINDOW *rs_win; // New window for RS Table
-
+//WINDOW *rs_win; // New window for RS Table
 char **rs_log = NULL;
 int rs_log_len = 0;
 int rs_log_idx = 0;
-
+/*
 void setup_rs_table_window() {
     rs_win = newwin(15, COLS - 2, LINES - 15, 1);
     wbkgd(rs_win, COLOR_PAIR(5));
@@ -89,6 +88,7 @@ void rs_table_event_loop() {
         update_rs_log_ui();
     }
 }
+*/
 
 
 // random variables/stuff
@@ -344,6 +344,23 @@ void setup_gui(FILE *fp) {
     wattroff(pipe_win,A_UNDERLINE);
     wrefresh(pipe_win);
 
+    // === WINDOWS USED BASED ON initcurses() ===
+
+    if_win = create_newwin((num_if_regs + 2), 23, 8, 0, 5);
+    mvwprintw(if_win, 0, 10, "IF");
+    wrefresh(if_win);
+
+    // RS: 28 signals
+    id_ex_win = create_newwin((num_id_ex_regs + 2), 32, 8, 23, 5);
+    mvwprintw(id_ex_win, 0, 12, "RS");
+    wrefresh(id_ex_win);
+
+    // CDB: 3 signals
+    mem_wb_win = create_newwin((num_mem_wb_regs + 2), 38, 8, 55, 5);
+    mvwprintw(mem_wb_win, 0, 12, "CDB");
+    wrefresh(mem_wb_win);
+    /*
+
     // instantiate window to visualize IF stage (including IF/ID)
     if_win = create_newwin((num_if_regs+2),30,8,0,5);
     mvwprintw(if_win,0,10,"IF STAGE");
@@ -389,6 +406,7 @@ void setup_gui(FILE *fp) {
     wb_win = create_newwin((num_wb_regs+2),30,LINES-7-(num_wb_regs+2),90,5);
     mvwprintw(wb_win,0,10,"WB STAGE");
     wrefresh(wb_win);
+    */
 
     // instantiate an instructional window to help out the user some
     instr_win = create_newwin(7,30,LINES-7,0,5);
@@ -414,9 +432,9 @@ void setup_gui(FILE *fp) {
     mvwaddstr(vtuber_win, 6, 4, "   \\_/    |_|  \\___/|____/|_____|_| \\_\\");
     wrefresh(vtuber_win);
 
-    setup_rs_table_window();
-    load_rs_log("rs.log");
-    update_rs_log_ui();
+    //setup_rs_table_window();
+    //load_rs_log("rs.log");
+    //update_rs_log_ui();
 
     refresh();
 }
@@ -977,7 +995,7 @@ extern "C" void initcurses(int if_regs, int if_id_regs, int id_regs, int id_ex_r
                     rs_log[rs_log_len] = strdup(blockBuffer);
                     rs_log_len++;
                     // Immediately update the RS window using your existing function.
-                    update_rs_log_ui();
+                    //update_rs_log_ui();
                     // Continue to the next iteration of the loop.
                     continue;
                 } else {

@@ -10,7 +10,7 @@
 `include "verilog/sys_defs.svh"
 
 extern void initcurses(int,int,int,int,int,int,int,int,int,int);
-extern void flushpipe();
+extern void flushpipe();    
 extern void waitforresponse();
 extern void initmem();
 extern int get_instr_at_pc(int);
@@ -166,17 +166,19 @@ module testbench;
         // *Note that after this, all stdout output goes to visual debugger*
         // each argument is number of registers/signals for the group
         initcurses(
-            0,  // IF
-            0,  // IF/ID
-            0, // ID
-            0, // ID/EX
-            0,  // EX
-            0, // EX/MEM
-            0,  // MEM
-            0,  // MEM/WB
-            0,  // WB
-            45    // Miscellaneous
+            3,   // IF (gIF: PC, inst, valid)
+            0,   // IB
+            0,   // DP
+            28,  // RS (vRS0–3: T, T1, T2, V1, V2, rdy, bsy)
+            0,   // MT
+            0,   // ROB
+            0,   // EX
+            3,   // CDB (vCDB_valid, vCDB_T, vCDB_V)
+            0,   // GLOBAL
+            0    // MISC
         );
+
+
 
         // Pulse the reset signal
         reset = 1'b1;
@@ -222,7 +224,6 @@ module testbench;
     // This block is where we dump all of the signals that we care about to
     // the visual debugger.  Notice this happens at *every* clock edge.
     always @(clock) begin
-        $display("vDEBUG_hello_at_time_%0t", $time);
         #2;
 
         // Dump clock and time onto stdout
@@ -353,48 +354,65 @@ module testbench;
         // === VTuber-compatible Reservation Station Debug ===
         //$display("vRS_alloc_idx 1:%h", rs_idx_dbg);
 
-        $display("gIF: PC=%h, inst=%h, valid=%b", pipeline_0.IF_ID_reg_dbg.NPC, pipeline_0.IF_ID_reg_dbg.inst, pipeline_0.IF_ID_reg_dbg.valid);
+        $display("fPC 8:%h", pipeline_0.IF_ID_reg_dbg.NPC);
+        $display("finst 8:%h", pipeline_0.IF_ID_reg_dbg.inst);
+        $display("fvalid 1:%b", pipeline_0.IF_ID_reg_dbg.valid);
+
 
         //$display("D: inst=%h, valid=%b", D_packet.inst, D_packet.valid);
 
 
-        $display("vCDB_valid 1:%h", cdb_dbg.valid);
-        $display("vCDB_T 2:%h", cdb_dbg.T);
-        $display("vCDB_V 4:%h", cdb_dbg.V);
+        $display("jCDB_valid 1:%h", cdb_dbg.valid);
+        $display("jCDB_T 2:%h", cdb_dbg.T);
+        $display("jCDB_V 4:%h", cdb_dbg.V);
+
+/*
+        $display("vV1_rob 8:%h", pipeline_0.V1_rob);
+        $display("vV2_rob 8:%h", pipeline_0.V2_rob);
+        $display("vT1_wire 2:%h", pipeline_0.T1_wire.T);
+        $display("vT2_wire 2:%h", pipeline_0.T2_wire.T);
+        $display("vT1_plus 1:%b", pipeline_0.T1_wire.plus);
+        $display("vT2_plus 1:%b", pipeline_0.T2_wire.plus);
+*/
 
         // --- RS ENTRY DEBUG OUTPUT (VTuber Format) ---
-        $display("vRS0_T  4:%h", pipeline_0.rs_table_dbg[0].T);
-        $display("vRS0_T1 4:%h", pipeline_0.rs_table_dbg[0].T1);
-        $display("vRS0_T2 4:%h", pipeline_0.rs_table_dbg[0].T2);
-        $display("vRS0_V1 8:%h", pipeline_0.rs_table_dbg[0].V1);
-        $display("vRS0_V2 8:%h", pipeline_0.rs_table_dbg[0].V2);
-        $display("vRS0_rdy 1:%b", pipeline_0.rs_table_dbg[0].ready);
-        $display("vRS0_bsy 1:%b", pipeline_0.busy_dbg[0]);
+        // RS Entry 0
+        $display("hRS0_T  4:%h", pipeline_0.rs_table_dbg[0].T);
+        $display("hRS0_T1 4:%h", pipeline_0.rs_table_dbg[0].T1);
+        $display("hRS0_T2 4:%h", pipeline_0.rs_table_dbg[0].T2);
+        $display("hRS0_V1 8:%h", pipeline_0.rs_table_dbg[0].V1);
+        $display("hRS0_V2 8:%h", pipeline_0.rs_table_dbg[0].V2);
+        $display("hRS0_rdy 1:%b", pipeline_0.rs_table_dbg[0].ready);
+        $display("hRS0_bsy 1:%b", pipeline_0.busy_dbg[0]);
 
-        $display("vRS1_T  4:%h", pipeline_0.rs_table_dbg[1].T);
-        $display("vRS1_T1 4:%h", pipeline_0.rs_table_dbg[1].T1);
-        $display("vRS1_T2 4:%h", pipeline_0.rs_table_dbg[1].T2);
-        $display("vRS1_V1 8:%h", pipeline_0.rs_table_dbg[1].V1);
-        $display("vRS1_V2 8:%h", pipeline_0.rs_table_dbg[1].V2);
-        $display("vRS1_rdy 1:%b", pipeline_0.rs_table_dbg[1].ready);
-        $display("vRS1_bsy 1:%b", pipeline_0.busy_dbg[1]);
+        // RS Entry 1
+        $display("hRS1_T  4:%h", pipeline_0.rs_table_dbg[1].T);
+        $display("hRS1_T1 4:%h", pipeline_0.rs_table_dbg[1].T1);
+        $display("hRS1_T2 4:%h", pipeline_0.rs_table_dbg[1].T2);
+        $display("hRS1_V1 8:%h", pipeline_0.rs_table_dbg[1].V1);
+        $display("hRS1_V2 8:%h", pipeline_0.rs_table_dbg[1].V2);
+        $display("hRS1_rdy 1:%b", pipeline_0.rs_table_dbg[1].ready);
+        $display("hRS1_bsy 1:%b", pipeline_0.busy_dbg[1]);
 
-        $display("vRS2_T  4:%h", pipeline_0.rs_table_dbg[2].T);
-        $display("vRS2_T1 4:%h", pipeline_0.rs_table_dbg[2].T1);
-        $display("vRS2_T2 4:%h", pipeline_0.rs_table_dbg[2].T2);
-        $display("vRS2_V1 8:%h", pipeline_0.rs_table_dbg[2].V1);
-        $display("vRS2_V2 8:%h", pipeline_0.rs_table_dbg[2].V2);
-        $display("vRS2_rdy 1:%b", pipeline_0.rs_table_dbg[2].ready);
-        $display("vRS2_bsy 1:%b", pipeline_0.busy_dbg[2]);
+        // RS Entry 2
+        $display("hRS2_T  4:%h", pipeline_0.rs_table_dbg[2].T);
+        $display("hRS2_T1 4:%h", pipeline_0.rs_table_dbg[2].T1);
+        $display("hRS2_T2 4:%h", pipeline_0.rs_table_dbg[2].T2);
+        $display("hRS2_V1 8:%h", pipeline_0.rs_table_dbg[2].V1);
+        $display("hRS2_V2 8:%h", pipeline_0.rs_table_dbg[2].V2);
+        $display("hRS2_rdy 1:%b", pipeline_0.rs_table_dbg[2].ready);
+        $display("hRS2_bsy 1:%b", pipeline_0.busy_dbg[2]);
 
-        $display("vRS3_T  4:%h", pipeline_0.rs_table_dbg[3].T);
-        $display("vRS3_T1 4:%h", pipeline_0.rs_table_dbg[3].T1);
-        $display("vRS3_T2 4:%h", pipeline_0.rs_table_dbg[3].T2);
-        $display("vRS3_V1 8:%h", pipeline_0.rs_table_dbg[3].V1);
-        $display("vRS3_V2 8:%h", pipeline_0.rs_table_dbg[3].V2);
-        $display("vRS3_rdy 1:%b", pipeline_0.rs_table_dbg[3].ready);
-        $display("vRS3_bsy 1:%b", pipeline_0.busy_dbg[3]);
+        // RS Entry 3
+        $display("hRS3_T  4:%h", pipeline_0.rs_table_dbg[3].T);
+        $display("hRS3_T1 4:%h", pipeline_0.rs_table_dbg[3].T1);
+        $display("hRS3_T2 4:%h", pipeline_0.rs_table_dbg[3].T2);
+        $display("hRS3_V1 8:%h", pipeline_0.rs_table_dbg[3].V1);
+        $display("hRS3_V2 8:%h", pipeline_0.rs_table_dbg[3].V2);
+        $display("hRS3_rdy 1:%b", pipeline_0.rs_table_dbg[3].ready);
+        $display("hRS3_bsy 1:%b", pipeline_0.busy_dbg[3]);
 
+/*
         $display("vRS4_T  4:%h", pipeline_0.rs_table_dbg[4].T);
         $display("vRS4_T1 4:%h", pipeline_0.rs_table_dbg[4].T1);
         $display("vRS4_T2 4:%h", pipeline_0.rs_table_dbg[4].T2);
@@ -410,7 +428,7 @@ module testbench;
         $display("vRS5_V2 8:%h", pipeline_0.rs_table_dbg[5].V2);
         $display("vRS5_rdy 1:%b", pipeline_0.rs_table_dbg[5].ready);
         $display("vRS5_bsy 1:%b", pipeline_0.busy_dbg[5]);
-
+*/
 
         // Must come last for VTuber to render this cycle
         $display("break");
