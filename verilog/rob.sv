@@ -101,8 +101,8 @@ module rob(
                 rob_table[tail] <= 0;
                 rob_table[tail].r <= r;
                 rob_table[tail].NPC <= NPC;
-                tail <= (tail == `ROB_SZ) ? 1 : (tail + 1);
-                wraparound <= (tail == `ROB_SZ) ? ~wraparound : wraparound; // change here
+                tail <= (tail == `ROB_SZ - 1) ? 1 : (tail + 1);
+                wraparound <= (tail == `ROB_SZ - 1) ? ~wraparound : wraparound; // change here
                 // T <= tail; // change here
             end
 
@@ -116,8 +116,8 @@ module rob(
                 rob_table[head] <= 0;
 
                 retire_T <= head;
-                head <= (head == `ROB_SZ) ? 1 : head + 1; // change here
-                wraparound <= (tail == `ROB_SZ) ? ~wraparound : wraparound; // change here
+                head <= (head == `ROB_SZ - 1) ? 1 : head + 1; // change here
+                wraparound <= (tail == `ROB_SZ - 1) ? ~wraparound : wraparound; // change here
 
                 if (rob_table[head].ppln_ctrl.flush) begin //FLUSH
                     for (int i = 1; i <= `ROB_SZ; i++) begin

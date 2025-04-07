@@ -263,12 +263,12 @@ module testbench;
                 $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
                         D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
                 $display("------------------------------------------");
-                print_rs;
-                print_mt;
+                // print_rs;
+                // print_mt;
                 // print_cdb;
                 // print_rob;
                 // dump_regfile;
-                print_sx;
+                // print_sx;
                 // print_x_pkt;
                 // print_xc;
             end
