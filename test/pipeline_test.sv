@@ -288,7 +288,7 @@ module testbench;
                 // print_rob;
                 // print_regs;
                 // print_sx;
-                // print_mem;
+                print_mem;
                 // print_xc;
                 
                 // print_x_pkt;
