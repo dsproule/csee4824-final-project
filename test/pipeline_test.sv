@@ -161,6 +161,24 @@ module testbench;
         end
     endtask // task show_clk_count
 
+    task print_if;
+        if (IF_ID_reg_dbg.valid) begin
+            $display("====================================================================================");
+            $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
+            $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
+            $display("------------------------------------------");
+        end
+    endtask
+
+    task print_ds;
+        if (D_S_reg_dbg.valid) begin
+            $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
+            $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+                    D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+            $display("------------------------------------------");
+        end
+    endtask
+
     task print_mt;
         $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         $display("T1:%4d       T2:%4d", core.T1_wire, core.T2_wire);
@@ -180,12 +198,12 @@ module testbench;
         $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
         for(n = 1; n < 8; n=n+1)
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
-        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0d\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
+        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
     endtask // print_rob
 
     task print_cdb;
         $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T:%4d\t  V:%4d", cdb_dbg.T, cdb_dbg.V);
+        $display("T:%4h\t  V:%4h", cdb_dbg.T, cdb_dbg.V);
         $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
         $display("------------------------------------------");
     endtask // print_cdb
@@ -216,6 +234,13 @@ module testbench;
         $display("\n(Regs)\ttime: %d\n------------------------------------------", clock_count);
         for(q = 0; q < 32; q++)
             $display("r[%2d]: %8h", q, core.regfile_inst.registers[q]);
+        $display("------------------------------------------");
+    endtask
+
+    task print_mem;
+        $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
+        $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
+        $display("Dmem_gnt: %2b, take_branch: %1b", core.Dmem_gnt, core.take_branch);
         $display("------------------------------------------");
     endtask
 
@@ -255,22 +280,18 @@ module testbench;
                 prog_start <= 1;
 
             if (prog_start) begin
-                // $display("====================================================================================");
-                // $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
-                // $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
-                // $display("------------------------------------------");
-                // $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
-                // $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
-                //         D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
-                // $display("------------------------------------------");
-                print_rs;
-                print_mt;
-                print_cdb;
-                print_rob;
-                // dump_regfile;
-                print_sx;
-                // print_x_pkt;
+                // print_if;
+                // print_ds;
+                // print_rs;
+                // print_mt;
+                // print_cdb;
+                // print_rob;
+                // print_regs;
+                // print_sx;
+                print_mem;
                 // print_xc;
+                
+                // print_x_pkt;
             end
         end
     end
@@ -362,6 +383,9 @@ module testbench;
             // deal with any halting conditions
             if(pipeline_error_status != NO_ERROR || debug_counter > 500000) begin
                 print_regs;
+                print_sx;
+                print_mem;
+                print_xc;
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);

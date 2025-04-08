@@ -2,7 +2,7 @@ Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detec
 Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
-Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Feb 24 15:42 2025
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr  7 14:17 2025
 Loading memory file: programs/quicksort.mem
 Using writeback output file: output/quicksort.wb
 Using pipeline output file: output/quicksort.ppln
@@ -1357,19 +1357,23 @@ Using pipeline output file: output/quicksort.ppln
 @@@
 @@@ mem[65528] = 0000009000000000 : 618475290624
 @@@
-@@            1432073000 : System halted
+@@             486911000 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
-@@  477355 cycles / 95470 instrs = 5.000052 CPI
+@@  162301 cycles / 95470 instrs = 1.700021 CPI
 @@
-@@  1432062.00 ns total time to execute
+@@  486900.00 ns total time to execute
 @@
 
+"test/mem.sv", 124: testbench.memory.unnamed$$_0.unnamed$$_2: started at 486969000ps failed at 486969000ps
+	Offending '(proc2mem_addr[1:0] == 2'b0)'
+"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 486999000ps failed at 486999000ps
+	Offending '(proc2mem_addr[1:0] == 2'b0)'
 $finish called from file "test/pipeline_test.sv", line 296.
-$finish at simulation time           1432173000
+$finish at simulation time            487011000
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 1432173000 ps
-CPU Time:      2.140 seconds;       Data structure size:   0.1Mb
-Mon Feb 24 15:42:32 2025
+Time: 487011000 ps
+CPU Time:      1.360 seconds;       Data structure size:   0.1Mb
+Mon Apr  7 14:17:09 2025

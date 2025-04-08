@@ -61,18 +61,19 @@ module func_unit_2(
                 MEM_NEW_ADDR: begin
                     // saves every  seen tag and when we know the tag corresp to current req, move to next state
                     nextImem_tag <= mem2proc_response;
-                        if (Dmem_gnt & (nextImem_tag != 0)) begin
-                            mem_load_pend <= `FALSE;
-                            mem_state <= MEM_WAIT_FOR_TAG;
-                        end
+                    if (Dmem_gnt & (nextImem_tag != 0)) begin
+                        mem_load_pend <= `FALSE;
+                        mem_state <= MEM_WAIT_FOR_TAG;
+                    end
                 end
                 MEM_WAIT_FOR_TAG: begin
                     // if the memory is responding to us, save it and wait to be retired
                     if (mem2proc_tag == nextImem_tag) begin
-                        X_packet.T = S_X_reg.T;
-                        X_packet.result = read_data;
+                        X_packet.T         <= S_X_reg.T;
+                        X_packet.result    <= read_data;
                         X_packet.ppln_ctrl <= '0;
-                        X_packet.valid = `TRUE;
+                        X_packet.ppln_ctrl.has_dest <= `TRUE;
+                        X_packet.valid     <= `TRUE;
 
                         nextImem_tag <= '0;
                         mem_state <= MEM_NONE;

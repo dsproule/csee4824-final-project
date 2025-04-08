@@ -166,7 +166,7 @@ module pipeline (
     //////////////////////////////////////////////////
 
     assign take_branch   = pipeline_control.flush;
-    assign branch_target = rob_write_data;
+    assign branch_target = pipeline_control.branch_addr; 
     assign IF_stall = 0;
 
     if_stage if_stage_0(
@@ -269,7 +269,7 @@ module pipeline (
         // Inputs
         .clock(clock), .reset(reset | take_branch),
         .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T),
-        .NPC(D_S_reg.PC),
+        .NPC(D_S_reg.NPC),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
         .T(mt_T_wire), .retire_T_out(retire_T_wire), 
@@ -283,7 +283,7 @@ module pipeline (
         .commit_NPC(pipeline_commit_NPC)
     );
 
-    assign regfile_write_en   = retire & (~pipeline_control.is_store & ~pipeline_control.is_branch) & ~pipeline_control.halt;
+    assign regfile_write_en   = retire & (pipeline_control.has_dest) & ~pipeline_control.halt;
     assign regfile_write_data = rob_write_data;
     assign regfile_write_idx  = retire_r_wire;
 
@@ -366,8 +366,10 @@ module pipeline (
         for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
             if (reset | gnt[X_idx]) begin
                 X_C_regs[X_idx] <= '0;
+                FU_req[X_idx]   <= `FALSE;
             end else if (X_packets[X_idx].valid) begin
                 X_C_regs[X_idx] <= X_packets[X_idx];
+                FU_req[X_idx]   <= `TRUE;
             end
     end
 
@@ -376,12 +378,6 @@ module pipeline (
     //               Commit stage                   //
     //                                              //
     //////////////////////////////////////////////////
-
-    // FU requests CDB based on completion of valid input
-    always_comb begin
-        for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
-            FU_req[req_idx] = X_C_regs[req_idx].valid;
-    end
 
     // CDB stage
     assign cdb_valid = (gnt != 4'h0);
@@ -421,7 +417,7 @@ module pipeline (
     assign pipeline_completed_insts = {3'b0, retire};    // commit one valid instruction
     assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
                                       pipeline_control.halt           ? HALTED_ON_WFI :
-                                      (mem2proc_response==4'h0 & (proc2mem_command != BUS_NONE)) ? LOAD_ACCESS_FAULT : NO_ERROR;
+                                      (mem2proc_response==4'h0 & (proc2mem_command == BUS_LOAD)) ? LOAD_ACCESS_FAULT : NO_ERROR;
     assign pipeline_commit_wr_en   = regfile_write_en;
     assign pipeline_commit_wr_idx  = regfile_write_idx;
     assign pipeline_commit_wr_data = regfile_write_data; 

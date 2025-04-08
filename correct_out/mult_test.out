@@ -3,9 +3,9 @@ Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETEC
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
 Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr  7 14:16 2025
-Loading memory file: programs/evens.mem
-Using writeback output file: output/evens.wb
-Using pipeline output file: output/evens.ppln
+Loading memory file: programs/mult_test.mem
+Using writeback output file: output/mult_test.wb
+Using pipeline output file: output/mult_test.ppln
 @@
 @@
 @@                     0  Asserting System reset......
@@ -26,34 +26,23 @@ Using pipeline output file: output/evens.ppln
 @@
 @@@ Unified Memory contents hex on left, decimal on right: 
 @@@
-@@@ mem[    0] = 0000123700000193 : 20027432501651
-@@@ mem[    8] = 000f96630011ff93 : 4387476597768083
-@@@ mem[   16] = 0082021300322023 : 36594027603304483
-@@@ mem[   24] = 0101a11300118193 : 72516171992236435
-@@@ mem[   32] = 10500073fe0114e3 : 1175440000926422243
-@@@
-@@@ mem[ 4104] = 0000000000000002 : 2
-@@@ mem[ 4112] = 0000000000000004 : 4
-@@@ mem[ 4120] = 0000000000000006 : 6
-@@@ mem[ 4128] = 0000000000000008 : 8
-@@@ mem[ 4136] = 000000000000000a : 10
-@@@ mem[ 4144] = 000000000000000c : 12
-@@@ mem[ 4152] = 000000000000000e : 14
+@@@ mem[    0] = 0210813300300093 : 148760843749687443
+@@@ mem[    8] = 0000000010500073 : 273678451
 @@@
 @@@
-@@                548000 : System halted
+@@                 29000 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
-@@  180 cycles / 98 instrs = 1.836735 CPI
+@@  7 cycles / 2 instrs = 3.500000 CPI
 @@
-@@  537.00 ns total time to execute
+@@  18.00 ns total time to execute
 @@
 
 $finish called from file "test/pipeline_test.sv", line 296.
-$finish at simulation time               648000
+$finish at simulation time               129000
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 648000 ps
+Time: 129000 ps
 CPU Time:      0.170 seconds;       Data structure size:   0.1Mb
-Mon Apr  7 14:16:47 2025
+Mon Apr  7 14:16:46 2025
