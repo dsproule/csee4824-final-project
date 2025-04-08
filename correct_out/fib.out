@@ -2,7 +2,7 @@ Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detec
 Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
-Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Feb 24 15:41 2025
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr  7 14:16 2025
 Loading memory file: programs/fib.mem
 Using writeback output file: output/fib.wb
 Using pipeline output file: output/fib.ppln
@@ -55,19 +55,19 @@ Using pipeline output file: output/fib.ppln
 @@@ mem[ 4216] = 00000000000003db : 987
 @@@
 @@@
-@@               2258000 : System halted
+@@                683000 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
-@@  750 cycles / 149 instrs = 5.033557 CPI
+@@  225 cycles / 149 instrs = 1.510067 CPI
 @@
-@@  2247.00 ns total time to execute
+@@  672.00 ns total time to execute
 @@
 
 $finish called from file "test/pipeline_test.sv", line 296.
-$finish at simulation time              2358000
+$finish at simulation time               783000
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 2358000 ps
-CPU Time:      0.150 seconds;       Data structure size:   0.1Mb
-Mon Feb 24 15:41:54 2025
+Time: 783000 ps
+CPU Time:      0.170 seconds;       Data structure size:   0.1Mb
+Mon Apr  7 14:16:55 2025

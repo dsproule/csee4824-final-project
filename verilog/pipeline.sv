@@ -421,7 +421,7 @@ module pipeline (
     assign pipeline_completed_insts = {3'b0, retire};    // commit one valid instruction
     assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
                                       pipeline_control.halt           ? HALTED_ON_WFI :
-                                      (mem2proc_response==4'h0 & (proc2mem_command != BUS_NONE)) ? LOAD_ACCESS_FAULT : NO_ERROR;
+                                      (mem2proc_response==4'h0 & (proc2mem_command == BUS_LOAD)) ? LOAD_ACCESS_FAULT : NO_ERROR;
     assign pipeline_commit_wr_en   = regfile_write_en;
     assign pipeline_commit_wr_idx  = regfile_write_idx;
     assign pipeline_commit_wr_data = regfile_write_data; 

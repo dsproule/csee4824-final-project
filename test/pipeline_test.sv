@@ -161,6 +161,24 @@ module testbench;
         end
     endtask // task show_clk_count
 
+    task print_if;
+        if (IF_ID_reg_dbg.valid) begin
+            $display("====================================================================================");
+            $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
+            $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
+            $display("------------------------------------------");
+        end
+    endtask
+
+    task print_ds;
+        if (D_S_reg_dbg.valid) begin
+            $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
+            $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+                    D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+            $display("------------------------------------------");
+        end
+    endtask
+
     task print_mt;
         $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         $display("T1:%4d       T2:%4d", core.T1_wire, core.T2_wire);
@@ -219,6 +237,13 @@ module testbench;
         $display("------------------------------------------");
     endtask
 
+    task print_mem;
+        $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
+        $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
+        $display("Dmem_gnt: %2b, take_branch: %1b", core.Dmem_gnt, core.take_branch);
+        $display("------------------------------------------");
+    endtask
+
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
         input [31:0] start_addr;
@@ -255,22 +280,18 @@ module testbench;
                 prog_start <= 1;
 
             if (prog_start) begin
-                // $display("====================================================================================");
-                // $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
-                // $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
-                // $display("------------------------------------------");
-                // $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
-                // $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
-                //         D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
-                // $display("------------------------------------------");
-                // print_rs;
+                print_if;
+                // print_ds;
+                print_rs;
                 // print_mt;
-                // print_cdb;
+                print_cdb;
                 // print_rob;
-                // dump_regfile;
-                // print_sx;
+                // print_regs;
+                print_sx;
+                print_mem;
+                print_xc;
+                
                 // print_x_pkt;
-                // print_xc;
             end
         end
     end
@@ -362,6 +383,9 @@ module testbench;
             // deal with any halting conditions
             if(pipeline_error_status != NO_ERROR || debug_counter > 500000) begin
                 print_regs;
+                print_sx;
+                print_mem;
+                print_xc;
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
