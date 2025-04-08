@@ -198,12 +198,12 @@ module testbench;
         $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
         for(n = 1; n < 8; n=n+1)
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
-        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0d\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
+        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
     endtask // print_rob
 
     task print_cdb;
         $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T:%4d\t  V:%4d", cdb_dbg.T, cdb_dbg.V);
+        $display("T:%4h\t  V:%4h", cdb_dbg.T, cdb_dbg.V);
         $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
         $display("------------------------------------------");
     endtask // print_cdb
@@ -281,11 +281,11 @@ module testbench;
 
             if (prog_start) begin
                 print_if;
-                // print_ds;
+                print_ds;
                 print_rs;
                 // print_mt;
                 print_cdb;
-                // print_rob;
+                print_rob;
                 // print_regs;
                 print_sx;
                 print_mem;

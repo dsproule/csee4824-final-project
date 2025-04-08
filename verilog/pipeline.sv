@@ -166,7 +166,7 @@ module pipeline (
     //////////////////////////////////////////////////
 
     assign take_branch   = pipeline_control.flush;
-    assign branch_target = rob_write_data;
+    assign branch_target = rob_write_data; 
     assign IF_stall = 0;
 
     if_stage if_stage_0(
@@ -269,7 +269,7 @@ module pipeline (
         // Inputs
         .clock(clock), .reset(reset | take_branch),
         .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T),
-        .NPC(D_S_reg.PC),
+        .NPC(D_S_reg.NPC),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
         .T(mt_T_wire), .retire_T_out(retire_T_wire), 
@@ -366,8 +366,10 @@ module pipeline (
         for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
             if (reset | gnt[X_idx]) begin
                 X_C_regs[X_idx] <= '0;
+                FU_req[X_idx]   <= `FALSE;
             end else if (X_packets[X_idx].valid) begin
                 X_C_regs[X_idx] <= X_packets[X_idx];
+                FU_req[X_idx]   <= `TRUE;
             end
     end
 
@@ -378,10 +380,10 @@ module pipeline (
     //////////////////////////////////////////////////
 
     // FU requests CDB based on completion of valid input
-    always_comb begin
-        for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
-            FU_req[req_idx] = X_C_regs[req_idx].valid;
-    end
+    // always_comb begin
+    //     for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
+    //         FU_req[req_idx] = X_C_regs[req_idx].valid;
+    // end
 
     // CDB stage
     assign cdb_valid = (gnt != 4'h0);
