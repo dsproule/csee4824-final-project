@@ -238,10 +238,12 @@ module testbench;
     endtask
 
     task print_mem;
-        $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
-        $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
-        $display("Dmem_gnt: %2b, take_branch: %1b", core.Dmem_gnt, core.take_branch);
-        $display("------------------------------------------");
+        if (proc2mem_command != BUS_NONE) begin
+            $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
+            $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
+            $display("Dmem_gnt: %2b, take_branch: %1b", core.Dmem_gnt, core.take_branch);
+            $display("------------------------------------------");
+        end
     endtask
 
     // Show contents of a range of Unified Memory, in both hex and decimal
@@ -282,9 +284,9 @@ module testbench;
             if (prog_start) begin
                 // print_if;
                 // print_ds;
-                // print_rs;
+                print_rs;
                 // print_mt;
-                // print_cdb;
+                print_cdb;
                 // print_rob;
                 // print_regs;
                 // print_sx;

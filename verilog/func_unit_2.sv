@@ -4,7 +4,7 @@ module func_unit_2(
     input clock, reset, Dmem_gnt,
     input retired,
     input [3:0]  mem2proc_response, mem2proc_tag,
-    input [`XLEN-1:0] Dmem2proc_data,
+    input [63:0] Dmem2proc_data,
     input S_X_PACKET S_X_reg,
 
     output logic mem_load_pend,         // the module is attempting to load a value
@@ -15,32 +15,43 @@ module func_unit_2(
     output X_C_PACKET X_packet
 );
     logic [`XLEN-1:0] read_data;
-    logic [`XLEN-1:0] proc2Dmem_addr_raw;
+    logic [`XLEN-1:0] proc2Dmem_addr_calc, mem_shift, mem_off_adj;
     logic [3:0]  nextImem_tag;
     mem_proc_states mem_state;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
-    assign proc2Dmem_addr_raw = S_X_reg.V1 + S_X_reg.mem_offset;
-    assign proc2Dmem_addr = {proc2Dmem_addr_raw[`XLEN-1:3], 3'b0};
+    assign proc2Dmem_addr_calc = S_X_reg.V1 + S_X_reg.mem_offset;
+    assign proc2Dmem_addr = {proc2Dmem_addr_calc[`XLEN-1:3], 3'b0};
+
     assign proc2mem_size = S_X_reg.mem_size;
-    
-    // directly from p3
+    assign mem_off_adj   = S_X_reg.mem_offset[2:0];
+
+    // we have to shift values based on what we want to keep in scope
     always_comb begin
-        read_data = Dmem2proc_data;
+        if (S_X_reg.mem_size == BYTE) 
+            mem_shift = mem_off_adj << 3;       // x 8 = bits to shift by (byte)
+        else if (S_X_reg.mem_size == HALF)
+            mem_shift = mem_off_adj << 4;       // TODO: make sure this part works
+        else if ((S_X_reg.mem_size == WORD) & (mem_off_adj >= 4))
+            mem_shift = `XLEN;                  // shift by word if offset is large enough
+        else
+            mem_shift = '0;
+    end
+    
+    always_comb begin
+        read_data = Dmem2proc_data >> mem_shift;
         if (S_X_reg.rd_unsigned) begin
             // unsigned: zero-extend the data
-            if (S_X_reg.mem_size == BYTE) begin
+            if (S_X_reg.mem_size == BYTE)
                 read_data[`XLEN-1:8] = 0;
-            end else if (S_X_reg.mem_size == HALF) begin
+            else if (S_X_reg.mem_size == HALF)
                 read_data[`XLEN-1:16] = 0;
-            end
         end else begin
             // signed: sign-extend the data
-            if (S_X_reg.mem_size[1:0] == BYTE) begin
-                read_data[`XLEN-1:8] = {(`XLEN-8){Dmem2proc_data[7]}};
-            end else if (S_X_reg.mem_size == HALF) begin
-                read_data[`XLEN-1:16] = {(`XLEN-16){Dmem2proc_data[15]}};
-            end
+            if (S_X_reg.mem_size[1:0] == BYTE)
+                read_data[`XLEN-1:8] = {(`XLEN-8){Dmem2proc_data[7 + mem_off_adj]}};
+            else if (S_X_reg.mem_size == HALF)
+                read_data[`XLEN-1:16] = {(`XLEN-16){Dmem2proc_data[15 + mem_off_adj]}};
         end
     end
 

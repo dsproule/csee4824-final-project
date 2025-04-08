@@ -269,7 +269,7 @@ module pipeline (
         // Inputs
         .clock(clock), .reset(reset | take_branch),
         .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T),
-        .NPC(D_S_reg.NPC),
+        .NPC(D_S_reg.PC),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
         .T(mt_T_wire), .retire_T_out(retire_T_wire), 
@@ -341,7 +341,7 @@ module pipeline (
             .clock(clock), .reset(reset | take_branch), .Dmem_gnt(Dmem_gnt[1]),
             .retired(gnt[2]),
             .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
-            .Dmem2proc_data(mem2proc_data[`XLEN-1:0]),
+            .Dmem2proc_data(mem2proc_data),
             .S_X_reg(S_X_regs[2]),
 
             .mem_load_pend(rd_mem),

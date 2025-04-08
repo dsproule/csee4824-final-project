@@ -52,7 +52,7 @@
 `define TRUE  1'h1
 
 // data length
-`define XLEN 64
+`define XLEN 32
 
 // the zero register
 // In RISC-V, any read of this register returns zero and any writes are thrown away
