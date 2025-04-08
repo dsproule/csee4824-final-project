@@ -17,6 +17,7 @@ module func_unit_1(
     assign ppln_ctrl.flush = `FALSE;
     assign ppln_ctrl.is_store = `FALSE;
     assign ppln_ctrl.is_branch = `FALSE;
+    assign ppln_ctrl.has_dest = `TRUE;
 
     // assign ppln_ctrl.valid = S_X_reg.valid;
     assign ppln_ctrl.illegal = 0;

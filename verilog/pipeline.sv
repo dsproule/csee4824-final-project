@@ -166,7 +166,7 @@ module pipeline (
     //////////////////////////////////////////////////
 
     assign take_branch   = pipeline_control.flush;
-    assign branch_target = rob_write_data; 
+    assign branch_target = pipeline_control.branch_addr; 
     assign IF_stall = 0;
 
     if_stage if_stage_0(
@@ -283,7 +283,7 @@ module pipeline (
         .commit_NPC(pipeline_commit_NPC)
     );
 
-    assign regfile_write_en   = retire & (~pipeline_control.is_store & ~pipeline_control.is_branch) & ~pipeline_control.halt;
+    assign regfile_write_en   = retire & (pipeline_control.has_dest) & ~pipeline_control.halt;
     assign regfile_write_data = rob_write_data;
     assign regfile_write_idx  = retire_r_wire;
 
@@ -378,12 +378,6 @@ module pipeline (
     //               Commit stage                   //
     //                                              //
     //////////////////////////////////////////////////
-
-    // FU requests CDB based on completion of valid input
-    // always_comb begin
-    //     for(req_idx = 0; req_idx <`RS_SZ; req_idx++)
-    //         FU_req[req_idx] = X_C_regs[req_idx].valid;
-    // end
 
     // CDB stage
     assign cdb_valid = (gnt != 4'h0);

@@ -67,19 +67,22 @@ module func_unit_0 (
 
     output X_C_PACKET X_packet
 );
-    logic [`XLEN-1:0] opa_mux_out, opb_mux_out;
+    logic [`XLEN-1:0] opa_mux_out, opb_mux_out, alu_result;
     PPLN_CTRL ppln_ctrl;
     logic take_conditional;
 
     // Pass-throughs
     assign X_packet.T = S_X_reg.T;
     assign X_packet.valid = S_X_reg.valid;
+    assign X_packet.result = (S_X_reg.uncond_branch) ? S_X_reg.NPC : alu_result;
 
     // pipeline control
-    assign ppln_ctrl.flush = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+    assign ppln_ctrl.flush       = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+    assign ppln_ctrl.is_branch   = S_X_reg.uncond_branch | S_X_reg.cond_branch;
+    assign ppln_ctrl.branch_addr = alu_result;
+    assign ppln_ctrl.has_dest    = S_X_reg.has_dest;
+    
     assign ppln_ctrl.is_store = `FALSE;
-    assign ppln_ctrl.is_branch = S_X_reg.uncond_branch | S_X_reg.cond_branch;
-
     assign ppln_ctrl.illegal = 0;
     assign ppln_ctrl.halt = S_X_reg.halt;
 
@@ -116,7 +119,7 @@ module func_unit_0 (
         .func(S_X_reg.alu_func),
 
         // Output
-        .result(X_packet.result)
+        .result(alu_result)
     );
 
     // Instantiate the conditional branch module

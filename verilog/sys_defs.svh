@@ -332,6 +332,9 @@ typedef struct packed {
     
     logic is_branch;
     logic is_store;
+    logic has_dest;
+
+    logic [`XLEN-1:0] branch_addr;
 } PPLN_CTRL;
 
 
@@ -371,6 +374,7 @@ typedef struct packed {
 
     logic cond_branch;
     logic uncond_branch;
+    logic has_dest;
 
     ALU_OPA_SELECT opa_select;
     ALU_OPB_SELECT opb_select;
