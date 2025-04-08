@@ -15,11 +15,13 @@ module func_unit_2(
     output X_C_PACKET X_packet
 );
     logic [`XLEN-1:0] read_data;
+    logic [`XLEN-1:0] proc2Dmem_addr_raw;
     logic [3:0]  nextImem_tag;
     mem_proc_states mem_state;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
-    assign proc2Dmem_addr = S_X_reg.V1 + S_X_reg.mem_offset;
+    assign proc2Dmem_addr_raw = S_X_reg.V1 + S_X_reg.mem_offset;
+    assign proc2Dmem_addr = {proc2Dmem_addr_raw[`XLEN-1:3], 3'b0};
     assign proc2mem_size = S_X_reg.mem_size;
     
     // directly from p3

@@ -13,9 +13,11 @@ module func_unit_3(
 );
 
     mem_proc_states mem_state;
+    logic [`XLEN-1:0] proc2Dmem_addr_raw;
 
     assign proc2Dmem_data = S_X_reg.V2;
-    assign proc2Dmem_addr = S_X_reg.V1 + S_X_reg.mem_offset;
+    assign proc2Dmem_addr_raw = S_X_reg.V1 + S_X_reg.mem_offset;
+    assign proc2Dmem_addr = {proc2Dmem_addr_raw[`XLEN-1:3], 3'b0};
 
     always_comb begin
         if (Dmem_gnt) begin
