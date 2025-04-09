@@ -1,13 +1,33 @@
-li x1, 124352342
-li x2, 5674234326
-li x3, 234234234
-li x10, 100
+addi x1, x0, 347
+li x2, 33546786
+mul x3, x1, x2
+addi x4, x0, 1000
+addi x8, x0, 1008
 
-sw x2, 0(x10)
-sw x3, 8(x10)
-# 000000005235f1d6
+sw x2, 0(x4)
+sw x2, 0(x8)
 
-lb x4, 3(x10)
-lw x6, 8(x10)
-lw x6, 8(x10)
+# no offset
+lb x5, 0(x4)
+lh x6, 0(x4)
+lw x7, 0(x4)
+
+# slight offset but not enough to cause shift
+lh x6, 1(x4)
+lw x7, 3(x4)
+
+# offset to shift to next one
+lb x5, 1(x4)
+lh x6, 2(x4)
+lw x7, 4(x4)
+
+# slight offset past next offset (no change from above)
+lh x6, 3(x4)
+lw x7, 6(x4)
+
+# offset to next addr
+lb x5, 8(x4)
+lh x6, 8(x4)
+lw x7, 8(x4)
+
 wfi
