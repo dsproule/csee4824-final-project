@@ -21,9 +21,9 @@ module func_unit_3(
     logic [`XLEN-1:0] rawDmem_addr;
     logic [3:0]       nextDmem_tag, line_offset;
     logic [5:0]       shift, size_offset;
-    logic [63:0]      Dmem_data;
+    logic [63:0]      rawDmem_data, Dmem_data;
     mem_proc_states   fetchDmem_state, storeDmem_state;
-    logic             fetchDmem_valid;
+    logic             fetchDmem_valid, store_pend, load_pend;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
     assign rawDmem_addr   = S_X_reg.V1 + S_X_reg.mem_offset;
@@ -34,14 +34,14 @@ module func_unit_3(
         if (reset) begin
             nextDmem_tag    <= '0;
             fetchDmem_state <= MEM_WAIT_FOR_ADDR;
-            mem_store_pend  <= `FALSE;
+            load_pend  <= `FALSE;
         end else begin
             case (fetchDmem_state)
                 MEM_WAIT_FOR_ADDR: begin
                     fetchDmem_valid <= `FALSE;
                     // waits here for a mem req to hit S_X_reg
                     if (S_X_reg.valid) begin
-                        mem_store_pend    <= `TRUE;
+                        load_pend    <= `TRUE;
                         fetchDmem_state   <= MEM_NEW_ADDR;
                         proc2Dmem_command <= BUS_LOAD;
                     end
@@ -50,7 +50,7 @@ module func_unit_3(
                     // saves every  seen tag and when we know the tag corresp to current req, move to next state
                     nextDmem_tag <= mem2proc_response;
                     if (Dmem_gnt & (nextDmem_tag != 0)) begin
-                        mem_store_pend <= `FALSE;
+                        load_pend <= `FALSE;
                         fetchDmem_state <= MEM_WAIT_FOR_TAG;
                         proc2Dmem_command <= BUS_NONE;
                     end
@@ -59,7 +59,7 @@ module func_unit_3(
                     // if the memory is responding to us, save it and wait to be retired
                     if (mem2proc_tag == nextDmem_tag) begin
                         // triggers the next state machine
-                        Dmem_data <= Dmem2proc_data;
+                        rawDmem_data <= Dmem2proc_data;
                         fetchDmem_valid <= `TRUE;
 
                         nextDmem_tag <= '0;
@@ -75,23 +75,42 @@ module func_unit_3(
     end    
 
     always_comb begin
-        // offsets for data placement
-        if (S_X_reg.mem_size == BYTE) begin
-            shift = (line_offset) << 3;
-            size_offset = 7;
-        end else if (S_X_reg.mem_size == HALF) begin
-            shift = (line_offset >> 1) << 4;
-            size_offset = 15;
-        end else if (S_X_reg.mem_size == WORD) begin
-            shift = (line_offset[2] << 2) << 3;
-            size_offset = 31;
-        end else begin
-            shift = '0;
-            size_offset = '0;
-        end
-
-        // apply the shift TODO: make pretty
-        Dmem_data[shift + size_offset : shift] = S_X_reg.V2 & (64'hFFFFFFFFFFFFFFFF >> (64 - shift));
+        Dmem_data = rawDmem_data;
+        case (S_X_reg.mem_size)
+            BYTE: begin
+                shift = (line_offset) << 3;
+                case (shift)
+                    0: Dmem_data[7:0] = S_X_reg.V2[7:0];
+                    8: Dmem_data[15:8] = S_X_reg.V2[7:0];
+                    16: Dmem_data[23:16] = S_X_reg.V2[7:0];
+                    24: Dmem_data[31:24] = S_X_reg.V2[7:0];
+                    32: Dmem_data[39:32] = S_X_reg.V2[7:0];
+                    40: Dmem_data[47:40] = S_X_reg.V2[7:0];
+                    48: Dmem_data[55:48] = S_X_reg.V2[7:0];
+                    56: Dmem_data[63:56] = S_X_reg.V2[7:0];
+                endcase
+            end
+            HALF: begin
+                shift = (line_offset >> 1) << 4;
+                case (shift)
+                    0: Dmem_data[15:0] = S_X_reg.V2[15:0];
+                    16: Dmem_data[31:16] = S_X_reg.V2[15:0];
+                    32: Dmem_data[47:32] = S_X_reg.V2[15:0];
+                    48: Dmem_data[63:48] = S_X_reg.V2[15:0];
+                endcase
+            end
+            WORD: begin
+                shift = (line_offset[2] << 2) << 3;
+                case (shift)
+                    0: Dmem_data[31:0] = S_X_reg.V2[31:0];
+                    32: Dmem_data[63:32] = S_X_reg.V2[31:0];
+                endcase
+            end
+            default: begin
+                shift = '0;
+                size_offset = '0;
+            end
+        endcase
 
         // handling X_C_reg
         if (Dmem_gnt) begin
@@ -106,22 +125,23 @@ module func_unit_3(
     end
 
     assign proc2Dmem_data = Dmem_data;
+    assign mem_store_pend = load_pend | store_pend;
 
     // state machine enforces one memory load 
     always_ff @(posedge clock) begin
         if (reset) begin
-            mem_store_pend <= `FALSE;
+            store_pend <= `FALSE;
             storeDmem_state <= MEM_WAIT_FOR_ADDR;
         end else begin
             case (storeDmem_state)
                 MEM_WAIT_FOR_ADDR:
                     if (fetchDmem_valid) begin
-                        mem_store_pend <= `TRUE;
+                        store_pend <= `TRUE;
                         storeDmem_state <= MEM_NEW_ADDR;
                     end
                 MEM_NEW_ADDR:
                     if (Dmem_gnt) begin
-                        mem_store_pend <= `FALSE;
+                        store_pend <= `FALSE;
                         storeDmem_state <= MEM_NONE;
                     end
                 MEM_NONE:
