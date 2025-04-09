@@ -283,14 +283,14 @@ module testbench;
 
             if (prog_start) begin
                 // print_if;
-                print_ds;
-                print_rs;
-                print_mt;
-                print_cdb;
-                print_rob;
+                // print_ds;
+                // print_rs;
+                // print_mt;
+                // print_cdb;
+                // print_rob;
                 // print_regs;
                 // print_sx;
-                print_mem;
+                // print_mem;
                 // print_xc;
                 
                 // print_x_pkt;
@@ -384,10 +384,10 @@ module testbench;
 
             // deal with any halting conditions
             if(pipeline_error_status != NO_ERROR || debug_counter > 500000) begin
-                print_regs;
-                print_sx;
-                print_mem;
-                print_xc;
+                // print_regs;
+                // print_sx;
+                // print_mem;
+                // print_xc;
 
                 $display("@@@ Unified Memory contents hex on left, decimal on right: ");
                 show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);

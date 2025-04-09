@@ -145,7 +145,7 @@ module pipeline (
         if (Dmem_req) begin
             if (wr_mem) begin
                 proc2mem_addr    = proc2Dmem_addr[0];
-                proc2mem_command = BUS_STORE;
+                proc2mem_command = proc2Dmem_command;
                 Dmem_gnt = 2'b01;
             end else begin
                 proc2mem_addr    = proc2Dmem_addr[1];
@@ -153,10 +153,10 @@ module pipeline (
                 Dmem_gnt = 2'b10;
             end
         end else begin
-            proc2mem_addr    = proc2Imem_addr;
-            proc2mem_command = proc2Imem_command;
+            proc2mem_addr        = proc2Imem_addr;
+            proc2mem_command     = proc2Imem_command;
         end
-        proc2mem_data = {32'b0, proc2Dmem_data};
+        proc2mem_data = proc2Dmem_data;
     end
 
     //////////////////////////////////////////////////
@@ -338,25 +338,28 @@ module pipeline (
     );
 
     func_unit_2 func_unit_02 (
-            .clock(clock), .reset(reset | take_branch), .Dmem_gnt(Dmem_gnt[1]),
-            .retired(gnt[2]),
-            .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
-            .Dmem2proc_data(mem2proc_data),
-            .S_X_reg(S_X_regs[2]),
+        .clock(clock), .reset(reset | take_branch), .Dmem_gnt(Dmem_gnt[1]),
+        .retired(gnt[2]),
+        .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
+        .Dmem2proc_data(mem2proc_data),
+        .S_X_reg(S_X_regs[2]),
 
-            .mem_load_pend(rd_mem),
-            .proc2Dmem_addr(proc2Dmem_addr[1]),
-            .X_packet(X_packets[2])
+        .mem_load_pend(rd_mem),
+        .proc2Dmem_addr(proc2Dmem_addr[1]),
+        .X_packet(X_packets[2])
     );
 
     func_unit_3 func_unit_03 (
         .clock(clock), .reset(reset | take_branch), 
         .Dmem_gnt(Dmem_gnt[0]),              // signal that the memory was listening to this module
         .retired(gnt[3]),                    // the current mem_store has been 
+        .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
+        .Dmem2proc_data(mem2proc_data),
         .S_X_reg(S_X_regs[3]),
 
         .mem_store_pend(wr_mem),             // the module is attempting to store a value
         .proc2Dmem_addr(proc2Dmem_addr[0]),
+        .proc2Dmem_command(proc2Dmem_command),
         .proc2Dmem_data(proc2Dmem_data),
         .X_packet(X_packets[3])
     );
@@ -417,7 +420,7 @@ module pipeline (
     assign pipeline_completed_insts = {3'b0, retire};    // commit one valid instruction
     assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
                                       pipeline_control.halt           ? HALTED_ON_WFI :
-                                      (mem2proc_response==4'h0 & (proc2mem_command == BUS_LOAD)) ? LOAD_ACCESS_FAULT : NO_ERROR;
+                                      (mem2proc_response==4'h0 & (proc2mem_command != BUS_NONE)) ? LOAD_ACCESS_FAULT : NO_ERROR;
     assign pipeline_commit_wr_en   = regfile_write_en;
     assign pipeline_commit_wr_idx  = regfile_write_idx;
     assign pipeline_commit_wr_data = regfile_write_data; 

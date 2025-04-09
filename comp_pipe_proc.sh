@@ -7,6 +7,7 @@ echo_color() {
 	if [ -t 0 ]; then tput sgr0; fi
 }
 
+
 wrong=0
 tested=0
 # hashmap

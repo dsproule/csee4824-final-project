@@ -14,7 +14,7 @@ module func_unit_2(
     logic [`XLEN-1:0] rawDmem_addr, shifted_result;
     logic [5:0]       shift;
     logic [63:0]      Dmem_data;
-    logic [3:0]       nextImem_tag, line_offset;
+    logic [3:0]       nextDmem_tag, line_offset;
     mem_proc_states   mem_state;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
@@ -48,7 +48,7 @@ module func_unit_2(
     always_ff @(posedge clock) begin
         if (reset) begin
             X_packet      <= '0;
-            nextImem_tag  <= '0;
+            nextDmem_tag  <= '0;
             mem_state     <= MEM_WAIT_FOR_ADDR;
             mem_load_pend <= `FALSE;
         end else begin
@@ -61,22 +61,22 @@ module func_unit_2(
                     end
                 MEM_NEW_ADDR: begin
                     // saves every  seen tag and when we know the tag corresp to current req, move to next state
-                    nextImem_tag <= mem2proc_response;
-                    if (Dmem_gnt & (nextImem_tag != 0)) begin
+                    nextDmem_tag <= mem2proc_response;
+                    if (Dmem_gnt & (nextDmem_tag != 0)) begin
                         mem_load_pend <= `FALSE;
                         mem_state <= MEM_WAIT_FOR_TAG;
                     end
                 end
                 MEM_WAIT_FOR_TAG: begin
                     // if the memory is responding to us, save it and wait to be retired
-                    if (mem2proc_tag == nextImem_tag) begin
+                    if (mem2proc_tag == nextDmem_tag) begin
                         X_packet.T         <= S_X_reg.T;
                         X_packet.result    <= shifted_result;
                         X_packet.ppln_ctrl <= '0;
                         X_packet.ppln_ctrl.has_dest <= `TRUE;
                         X_packet.valid     <= `TRUE;
 
-                        nextImem_tag <= '0;
+                        nextDmem_tag <= '0;
                         mem_state <= MEM_NONE;
                     end
                 end
