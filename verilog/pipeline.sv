@@ -105,7 +105,7 @@ module pipeline (
     CDB cdb;
 
     logic [4:0] retire_r_wire;
-    ROB_T mt_T_wire, retire_T_wire;
+    ROB_T rob_T_wire, retire_T_wire;
     ROB_T rob_head, rob_tail;
 
     // debug outputs
@@ -227,7 +227,7 @@ module pipeline (
         .en(D_S_reg.valid & ~rs_stall), 
         .r(D_S_reg.r), .r1(D_S_reg.r1), .r2(D_S_reg.r2), 
         .retire_r(retire_r_wire), 
-        .cdb(cdb), .T(mt_T_wire), .retire_T(retire_T_wire), 
+        .cdb(cdb), .T(rob_T_wire), .retire_T(retire_T_wire), 
         
         // Outputs
         .T1(T1_wire), .T2(T2_wire), 
@@ -242,10 +242,10 @@ module pipeline (
     assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
     rs_stage rs_stage_inst (
         // Inputs
-        .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid), 
+        .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
         .cdb(cdb), .D_S_reg(D_S_reg), 
         .FU_ready(FU_ready),
-        .T(mt_T_wire), .T1(T1_wire), .T2(T2_wire), 
+        .T(rob_T_wire), .T1(T1_wire), .T2(T2_wire), 
         .V1(V1_rs), .V2(V2_rs), 
 
         // Outputs           
@@ -272,9 +272,9 @@ module pipeline (
         .NPC(D_S_reg.NPC),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
-        .T(mt_T_wire), .retire_T_out(retire_T_wire), 
-
+        
         // Outputs
+        .T(rob_T_wire), .retire_T_out(retire_T_wire), 
         .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), 
         .retire(retire), .regfile_write_idx_out(retire_r_wire), 
         .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
@@ -341,7 +341,7 @@ module pipeline (
             .clock(clock), .reset(reset | take_branch), .Dmem_gnt(Dmem_gnt[1]),
             .retired(gnt[2]),
             .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
-            .Dmem2proc_data(mem2proc_data[`XLEN-1:0]),
+            .Dmem2proc_data(mem2proc_data),
             .S_X_reg(S_X_regs[2]),
 
             .mem_load_pend(rd_mem),

@@ -182,13 +182,13 @@ module testbench;
     task print_mt;
         $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
         $display("T1:%4d       T2:%4d", core.T1_wire, core.T2_wire);
-        for(l = 1; l < 32; l=l+1)
+        for(l = 1; l < 20; l=l+1)
             $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
         $display("------------------------------------------");
     endtask // print_mt
 
     task print_rs;
-        $display("\n(RS_TABLE)\ttime: %d\n------------------------------------------", clock_count);
+        $display("\n(RS_TABLE)\tstall: %1b time: %d\n------------------------------------------", core.rs_stall, clock_count);
         for(j = 0; j < `RS_SZ; j=j+1)
             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table_dbg[j].T, rs_table_dbg[j].T1, rs_table_dbg[j].T2, $signed(rs_table_dbg[j].V1), $signed(rs_table_dbg[j].V2), busy_dbg[j], rs_table_dbg[j].ready);
         $display("------------------------------------------");
@@ -196,7 +196,7 @@ module testbench;
 
     task print_rob;
         $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
-        for(n = 1; n < 8; n=n+1)
+        for(n = 1; n < 15; n=n+1)
             $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
         $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
     endtask // print_rob
@@ -281,11 +281,11 @@ module testbench;
 
             if (prog_start) begin
                 // print_if;
-                // print_ds;
-                // print_rs;
-                // print_mt;
-                // print_cdb;
-                // print_rob;
+                print_ds;
+                print_rs;
+                print_mt;
+                print_cdb;
+                print_rob;
                 // print_regs;
                 // print_sx;
                 print_mem;

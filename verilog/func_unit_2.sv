@@ -4,41 +4,39 @@ module func_unit_2(
     input clock, reset, Dmem_gnt,
     input retired,
     input [3:0]  mem2proc_response, mem2proc_tag,
-    input [`XLEN-1:0] Dmem2proc_data,
+    input [63:0] Dmem2proc_data,
     input S_X_PACKET S_X_reg,
 
-    output logic mem_load_pend,         // the module is attempting to load a value
-`ifndef CACHE_MODE // no longer sending size to memory
-    output MEM_SIZE          proc2mem_size,    // Data size sent to memory
-`endif
+    output logic mem_load_pend,
     output [`XLEN-1:0] proc2Dmem_addr,
     output X_C_PACKET X_packet
 );
     logic [`XLEN-1:0] read_data;
+    logic [`XLEN-1:0] Dmem_addr_raw;
     logic [3:0]  nextImem_tag;
     mem_proc_states mem_state;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
-    assign proc2Dmem_addr = S_X_reg.V1 + S_X_reg.mem_offset;
-    assign proc2mem_size = S_X_reg.mem_size;
-    
-    // directly from p3
+    assign Dmem_addr_raw  = S_X_reg.V1 + S_X_reg.mem_offset;
+    assign proc2Dmem_addr = {Dmem_addr_raw[`XLEN-1:3], 3'b0};
+
     always_comb begin
-        read_data = Dmem2proc_data;
+        read_data = '0;
         if (S_X_reg.rd_unsigned) begin
-            // unsigned: zero-extend the data
-            if (S_X_reg.mem_size == BYTE) begin
-                read_data[`XLEN-1:8] = 0;
-            end else if (S_X_reg.mem_size == HALF) begin
-                read_data[`XLEN-1:16] = 0;
-            end
+            if (S_X_reg.mem_size == BYTE)
+                read_data[7:0] = Dmem2proc_data[7:0];
+            else if (S_X_reg.mem_size == HALF)
+                read_data[15:0] = Dmem2proc_data[15:0];
+            else
+                read_data = Dmem2proc_data[`XLEN-1:0];
         end else begin
-            // signed: sign-extend the data
-            if (S_X_reg.mem_size[1:0] == BYTE) begin
-                read_data[`XLEN-1:8] = {(`XLEN-8){Dmem2proc_data[7]}};
-            end else if (S_X_reg.mem_size == HALF) begin
-                read_data[`XLEN-1:16] = {(`XLEN-16){Dmem2proc_data[15]}};
-            end
+            if (S_X_reg.mem_size == BYTE)
+                read_data = {{(`XLEN-8){Dmem2proc_data[7]}}, Dmem2proc_data[7:0]};
+            else if (S_X_reg.mem_size == HALF)
+                read_data = {{(`XLEN-16){Dmem2proc_data[15]}}, Dmem2proc_data[15:0]};
+            else
+                read_data = Dmem2proc_data[`XLEN-1:0];
+
         end
     end
 

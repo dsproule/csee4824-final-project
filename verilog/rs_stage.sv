@@ -27,7 +27,7 @@ module RS_ALLOC(
     logic next_re_valid;
 
     assign rs_idx = D_S_reg.rs_idx;
-    assign rs_idx_full = (rs_free[rs_idx]) ? 0 : next_busy[rs_idx];
+    assign rs_idx_full = (rs_free[rs_idx]) ? 0 : busy[rs_idx];
 
     always_ff @(posedge clock) begin
         if (reset) begin
