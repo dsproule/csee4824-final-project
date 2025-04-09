@@ -10,7 +10,7 @@ module func_unit_3(
 
     output logic mem_store_pend,          // the module is attempting to store a value
     output [`XLEN-1:0] proc2Dmem_addr,
-    output [`XLEN-1:0] proc2Dmem_data,
+    output [63:0] proc2Dmem_data, // CHANGE: 64 bits
     output logic [1:0] proc2Dmem_command,
     output X_C_PACKET X_packet
 );
@@ -23,7 +23,7 @@ module func_unit_3(
     logic [5:0]       shift, size_offset;
     logic [63:0]      rawDmem_data, Dmem_data;
     mem_proc_states   fetchDmem_state, storeDmem_state;
-    logic             fetchDmem_valid, store_pend, load_pend;
+    logic             fetchDmem_valid, store_pend, load_pend, store_valid;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
     assign rawDmem_addr   = S_X_reg.V1 + S_X_reg.mem_offset;
@@ -67,8 +67,12 @@ module func_unit_3(
                     end
                 end
                 MEM_NONE: begin
-                    if (retired)
+                    fetchDmem_valid <= `FALSE;
+                    proc2Dmem_command <= BUS_STORE;
+                    if (retired) begin
                         fetchDmem_state <= MEM_WAIT_FOR_ADDR;
+                        proc2Dmem_command <= BUS_NONE;
+                    end
                 end
             endcase
         end
@@ -113,15 +117,15 @@ module func_unit_3(
         endcase
 
         // handling X_C_reg
-        if (Dmem_gnt) begin
-            X_packet.T = S_X_reg.T;
-            X_packet.result = '0;
+        // if (Dmem_gnt) begin
+        //     X_packet.T = S_X_reg.T;
+        //     X_packet.result = '0;
             
-            X_packet.ppln_ctrl = '0;
-            X_packet.ppln_ctrl.is_store = `TRUE;
-            X_packet.valid = Dmem_gnt & fetchDmem_valid;
-        end else
-            X_packet = '0;
+        //     X_packet.ppln_ctrl = '0;
+        //     X_packet.ppln_ctrl.is_store = `TRUE;
+        //     X_packet.valid = store_valid;
+        // end else
+        //     X_packet = '0;
     end
 
     assign proc2Dmem_data = Dmem_data;
@@ -132,6 +136,8 @@ module func_unit_3(
         if (reset) begin
             store_pend <= `FALSE;
             storeDmem_state <= MEM_WAIT_FOR_ADDR;
+            store_valid <= `FALSE;
+            X_packet <= 0;
         end else begin
             case (storeDmem_state)
                 MEM_WAIT_FOR_ADDR:
@@ -143,10 +149,19 @@ module func_unit_3(
                     if (Dmem_gnt) begin
                         store_pend <= `FALSE;
                         storeDmem_state <= MEM_NONE;
+                        store_valid <= `TRUE;
+                        X_packet.T <= S_X_reg.T;
+                        X_packet.result <= '0;
+                        
+                        X_packet.ppln_ctrl <= '0;
+                        X_packet.ppln_ctrl.is_store <= `TRUE;
+                        X_packet.valid <= `TRUE;
                     end
-                MEM_NONE:
+                MEM_NONE: begin
+                    X_packet <= 0;
                     if (retired) 
                         storeDmem_state <= MEM_WAIT_FOR_ADDR;
+                end
             endcase
         end
     end

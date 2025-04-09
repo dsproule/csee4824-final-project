@@ -81,7 +81,7 @@ module pipeline (
     logic [`RS_SZ:0] fu_idx, S_idx, X_idx, req_idx;    
     S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_regs;
     X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_regs;
-    logic [`XLEN-1:0] proc2Dmem_data;
+    logic [63:0] proc2Dmem_data;
     MEM_SIZE proc2Dmem_size;
     logic [`XLEN-1:0] proc2Dmem_addr [1:0];
     logic [1:0] Dmem_gnt;

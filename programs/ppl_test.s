@@ -6,7 +6,16 @@
 
        
     # structural hazards
-    sw	 x10, 4(x11)
-    sw	 x10, 0(x11)
-    sw	 x10, 0(x11)
+    addi x11, x0, 2
+    addi x10, x0, 10
+    sw	 x10, 8(x11)
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
     wfi

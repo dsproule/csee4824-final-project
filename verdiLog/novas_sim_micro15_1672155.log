@@ -1,0 +1,107 @@
+Invoking simulator...
+Verdi>./simv +MEMORY=programs/ppl_test.mem +WRITEBACK=/dev/null +PIPELINE=/dev/null +UVM_VERDI_TRACE=UVM_AWARE +fsdb+gate=off -ucli2Proc -ucli
+*Verdi* Loading libsscore_vcs202303.so
+FSDB Dumper for VCS, Release Verdi_U-2023.03-SP2-1, Linux x86_64/64bit, 10/11/2023
+(C) 1996 - 2023 by Synopsys, Inc.
+*Verdi* : Create FSDB file '/workdir/yd2770_csee4824/p4.fsdb'
+*Verdi* : Flush all FSDB Files at 000 ps.
+*Verdi* : Enable RPC Server(1680683)
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr  9 16:58 2025
+xterm-256color is Not a valid terminal...
+Verdi>fsdbDumpvars 0 "testbench.core.func_unit_03.clock"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.reset"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.Dmem_gnt"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.retired"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.mem2proc_response"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.mem2proc_tag"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.Dmem2proc_data"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.S_X_reg"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.mem_store_pend"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.proc2Dmem_addr"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.proc2Dmem_data"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.proc2Dmem_command"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.X_packet"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.rawDmem_addr"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.line_offset"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.nextDmem_tag"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.shift"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.size_offset"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.Dmem_data"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.rawDmem_data"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.fetchDmem_state"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.storeDmem_state"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.fetchDmem_valid"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.load_pend"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.store_pend"  +all +trace_process;fsdbDumpvars 0 "testbench.core.func_unit_03.store_valid"  +all +trace_process
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.clock).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.reset).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.Dmem_gnt).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.retired).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.mem2proc_response).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.mem2proc_tag).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.Dmem2proc_data).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.S_X_reg).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.mem_store_pend).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.proc2Dmem_addr).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.proc2Dmem_data).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.proc2Dmem_command).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.X_packet).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.rawDmem_addr).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.line_offset).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.nextDmem_tag).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.shift).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.size_offset).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.Dmem_data).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.rawDmem_data).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.fetchDmem_state).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.storeDmem_state).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.fetchDmem_valid).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.load_pend).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.store_pend).
+*Verdi* : Dumping the signal (testbench.core.func_unit_03.store_valid).
+*Verdi* : Flush all FSDB Files at 000 ps.
+Verdi>fsdbDumpvars 0 "testbench.memory.clk"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.proc2mem_addr"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.proc2mem_data"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.proc2mem_command"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.mem2proc_response"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.mem2proc_data"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.mem2proc_tag"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.next_mem2proc_data"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.next_mem2proc_response"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.next_mem2proc_tag"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.unified_memory"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.loaded_data"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.cycles_left"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.waiting_for_bus"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.acquire_tag"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.bus_filled"  +all +trace_process;fsdbDumpvars 0 "testbench.memory.valid_address"  +all +trace_process
+*Verdi* : Dumping the signal (testbench.memory.clk).
+*Verdi* : Dumping the signal (testbench.memory.proc2mem_addr).
+*Verdi* : Dumping the signal (testbench.memory.proc2mem_data).
+*Verdi* : Dumping the signal (testbench.memory.proc2mem_command).
+*Verdi* : Dumping the signal (testbench.memory.mem2proc_response).
+*Verdi* : Dumping the signal (testbench.memory.mem2proc_data).
+*Verdi* : Dumping the signal (testbench.memory.mem2proc_tag).
+*Verdi* : Dumping the signal (testbench.memory.next_mem2proc_data).
+*Verdi* : Dumping the signal (testbench.memory.next_mem2proc_response).
+*Verdi* : Dumping the signal (testbench.memory.next_mem2proc_tag).
+*Verdi* : Dumping the signal (testbench.memory.unified_memory).
+*Verdi* : Dumping the signal (testbench.memory.loaded_data).
+*Verdi* : Dumping the signal (testbench.memory.cycles_left).
+*Verdi* : Dumping the signal (testbench.memory.waiting_for_bus).
+*Verdi* : Dumping the signal (testbench.memory.acquire_tag).
+*Verdi* : Dumping the signal (testbench.memory.bus_filled).
+*Verdi* : Dumping the signal (testbench.memory.valid_address).
+*Verdi* : Flush all FSDB Files at 000 ps.
+Verdi>config keepfuture on
+on
+Verdi>run
+Loading memory file: programs/ppl_test.mem
+Using writeback output file: /dev/null
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3500 : System STILL at reset, can't show anything
+@@
+@@
+@@                  7000 : System STILL at reset, can't show anything
+@@
+@@
+@@                 10500 : System STILL at reset, can't show anything
+@@
+@@                 12260  Deasserting System reset......
+@@
+@@
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 00a0051300200593 : 45041575438321043
+@@@ mem[    8] = 0000001300a5a223 : 81615233571
+@@@ mem[   16] = 0000001300000013 : 81604378643
+@@@ mem[   24] = 0000001300000013 : 81604378643
+@@@ mem[   32] = 0000001300000013 : 81604378643
+@@@ mem[   40] = 0000001300000013 : 81604378643
+@@@ mem[   48] = 0000000010500073 : 273678451
+@@@
+@@@
+@@                269520 : System halted
+@@
+@@@ System halted on WFI instruction
+@@@
+@@
+@@  74 cycles / 12 instrs = 6.166667 CPI
+@@
+@@  25550.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 414.
+$finish at simulation time               270520
+Simulation complete, time is 27052000 ps.
+pipeline_test.sv, 414 :                 $finish;
