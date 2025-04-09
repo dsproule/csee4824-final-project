@@ -206,7 +206,7 @@ module d_stage (
     assign D_packet.r = (has_dest) ? IF_ID_reg.inst.r.rd : `ZERO_REG;
     assign D_packet.r1 = IF_ID_reg.inst.r.rs1;
     assign D_packet.r2 = IF_ID_reg.inst.r.rs2;
-    assign D_packet.has_dest = has_dest;
+    assign D_packet.has_dest = (IF_ID_reg.inst.r.rd == 0) ? `FALSE : has_dest;
 
     // mem details
     assign D_packet.mem_offset = (rd_mem) ? `RV32_signext_Iimm(IF_ID_reg.inst) : 

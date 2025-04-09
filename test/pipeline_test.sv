@@ -278,8 +278,9 @@ module testbench;
     always @(posedge clock) begin
         if (~reset) begin
             // only start printing after first inst arrives
-            if (IF_ID_reg_dbg.valid)
+            if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'h300))
                 prog_start <= 1;
+
 
             if (prog_start) begin
                 // print_if;
