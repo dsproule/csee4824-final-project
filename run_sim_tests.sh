@@ -51,7 +51,11 @@ for source_file in "${sources[@]}"; do
 
     #echo "Comparing writeback output for $program"
     #diff -y --suppress-common-lines correct_out/"$program".wb output/"$program".wb
-    status1=0 #$?
+    diff -y --suppress-common-lines \
+  <(grep 'REG\[' correct_out/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') \
+  <(grep 'REG\[' output/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}')
+
+    status1=$?
 
     echo -e "\nComparing memory output for $program"
     diff -y --suppress-common-lines <(grep '@@@ mem' correct_out/"$program".out) <(grep '@@@ mem' output/"$program".out)
