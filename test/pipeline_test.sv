@@ -195,9 +195,9 @@ module testbench;
     endtask // print_rs
 
     task print_rob;
-        $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
-        for(n = 1; n < 15; n=n+1)
-            $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
+        $display("\n(ROB_TABLE) h: %2d, t: %2d empty: %1h full: %1h \ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, core.rob_empty, core.rob_full, clock_count);
+        for(n = 1; n < 10; n=n+1)
+            $display("index: %4d   r:%4d   NPC:%4d    V:%4d    ready:%1b", n, rob_table[n].r, rob_table[n].NPC, rob_table[n].V, rob_table[n].ready);
         $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
     endtask // print_rob
 
@@ -279,6 +279,7 @@ module testbench;
         if (~reset) begin
             // only start printing after first inst arrives
             if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'h300))
+            // if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'h10))
                 prog_start <= 1;
 
 
@@ -296,6 +297,7 @@ module testbench;
                 
                 // print_x_pkt;
             end
+
         end
     end
 

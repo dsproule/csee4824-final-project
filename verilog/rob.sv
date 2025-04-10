@@ -43,15 +43,15 @@ module rob(
                         tail=head=1, but big_tail[MSB] == 1 and big_head[MSB] == 0)
     */
 
-    logic wraparound;
+    logic head_wrap, tail_wrap;
 
     // logic [PTR_WIDTH:0] big_head, big_tail;
     // assign head = big_head[PTR_WIDTH-1:0];
     // assign tail = big_tail[PTR_WIDTH-1:0];
 
     //outputs // change here
-    assign full = (head == tail) && wraparound;
-    assign empty = (head == tail) && !wraparound;
+    assign full = (head == tail) && (head_wrap != tail_wrap);
+    assign empty = (head == tail) && (head_wrap == tail_wrap);
     // assign T = tail; //value that gets sent to RS
 
     // if value isn't in regfiles yet, ok if invalid because map table will MUX values from regfile. 
@@ -84,7 +84,8 @@ module rob(
             regfile_write_idx <= 0;
             regfile_write_data <= 0;
             ppln_ctrl <= 0;
-            wraparound <= 0; // change here
+            head_wrap <= 0; // change here
+            tail_wrap <= 0;
 
         end else begin
             // load in cdb value into rob# and mark as Complete (C) --> deals with all types of instructions
@@ -102,8 +103,7 @@ module rob(
                 rob_table[tail].r <= r;
                 rob_table[tail].NPC <= NPC;
                 tail <= (tail == `ROB_SZ - 1) ? 1 : (tail + 1);
-                wraparound <= (tail == `ROB_SZ - 1) ? ~wraparound : wraparound; // change here
-                // T <= tail; // change here
+                tail_wrap <= (tail == `ROB_SZ - 1) ? ~tail_wrap : tail_wrap; // change here
             end
 
             // commit --> retire head/free rob entry [x], write to regfile [x], clear maptable entry if valid, fkush after this if needed
@@ -117,7 +117,7 @@ module rob(
 
                 retire_T <= head;
                 head <= (head == `ROB_SZ - 1) ? 1 : head + 1; // change here
-                wraparound <= (tail == `ROB_SZ - 1) ? ~wraparound : wraparound; // change here
+                head_wrap <= (head == `ROB_SZ - 1) ? ~head_wrap : head_wrap; // change here
 
                 if (rob_table[head].ppln_ctrl.flush) begin //FLUSH
                     for (int i = 1; i <= `ROB_SZ; i++) begin
