@@ -23,7 +23,7 @@ module func_unit_3(
     logic [5:0]       shift, size_offset;
     logic [63:0]      rawDmem_data, Dmem_data;
     mem_proc_states   fetchDmem_state, storeDmem_state;
-    logic             fetchDmem_valid, store_pend, load_pend, store_valid;
+    logic             fetchDmem_valid;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
     assign rawDmem_addr   = S_X_reg.V1 + S_X_reg.mem_offset;
@@ -34,14 +34,14 @@ module func_unit_3(
         if (reset) begin
             nextDmem_tag    <= '0;
             fetchDmem_state <= MEM_WAIT_FOR_ADDR;
-            load_pend  <= `FALSE;
+            mem_store_pend <= `FALSE;
         end else begin
             case (fetchDmem_state)
                 MEM_WAIT_FOR_ADDR: begin
                     fetchDmem_valid <= `FALSE;
                     // waits here for a mem req to hit S_X_reg
                     if (S_X_reg.valid) begin
-                        load_pend    <= `TRUE;
+                        mem_store_pend  <= `TRUE;
                         fetchDmem_state   <= MEM_NEW_ADDR;
                         proc2Dmem_command <= BUS_LOAD;
                     end
@@ -50,7 +50,6 @@ module func_unit_3(
                     // saves every  seen tag and when we know the tag corresp to current req, move to next state
                     nextDmem_tag <= mem2proc_response;
                     if (Dmem_gnt & (nextDmem_tag != 0)) begin
-                        load_pend <= `FALSE;
                         fetchDmem_state <= MEM_WAIT_FOR_TAG;
                         proc2Dmem_command <= BUS_NONE;
                     end
@@ -69,9 +68,11 @@ module func_unit_3(
                 MEM_NONE: begin
                     fetchDmem_valid <= `FALSE;
                     proc2Dmem_command <= BUS_STORE;
+                    
                     if (retired) begin
                         fetchDmem_state <= MEM_WAIT_FOR_ADDR;
                         proc2Dmem_command <= BUS_NONE;
+                        mem_store_pend <= `FALSE;
                     end
                 end
             endcase
@@ -115,41 +116,24 @@ module func_unit_3(
                 size_offset = '0;
             end
         endcase
-
-        // handling X_C_reg
-        // if (Dmem_gnt) begin
-        //     X_packet.T = S_X_reg.T;
-        //     X_packet.result = '0;
-            
-        //     X_packet.ppln_ctrl = '0;
-        //     X_packet.ppln_ctrl.is_store = `TRUE;
-        //     X_packet.valid = store_valid;
-        // end else
-        //     X_packet = '0;
     end
 
     assign proc2Dmem_data = Dmem_data;
-    assign mem_store_pend = load_pend | store_pend;
 
     // state machine enforces one memory load 
     always_ff @(posedge clock) begin
         if (reset) begin
-            store_pend <= `FALSE;
             storeDmem_state <= MEM_WAIT_FOR_ADDR;
-            store_valid <= `FALSE;
             X_packet <= 0;
         end else begin
             case (storeDmem_state)
                 MEM_WAIT_FOR_ADDR:
                     if (fetchDmem_valid) begin
-                        store_pend <= `TRUE;
                         storeDmem_state <= MEM_NEW_ADDR;
                     end
                 MEM_NEW_ADDR:
                     if (Dmem_gnt) begin
-                        store_pend <= `FALSE;
                         storeDmem_state <= MEM_NONE;
-                        store_valid <= `TRUE;
                         X_packet.T <= S_X_reg.T;
                         X_packet.result <= '0;
                         
