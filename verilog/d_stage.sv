@@ -223,7 +223,7 @@ module d_stage (
         else if (wr_mem)
             D_packet.rs_idx = `NUM_FU_STORE;
         else if (D_packet.alu_func == ALU_MUL    | D_packet.alu_func == ALU_MULHSU |
-                 D_packet.alu_func == ALU_MULHSU | D_packet.alu_func == ALU_MULHU)
+                 D_packet.alu_func == ALU_MULH | D_packet.alu_func == ALU_MULHU)
             D_packet.rs_idx = `NUM_FU_MULT;
         else
             D_packet.rs_idx = `NUM_FU_ALU;

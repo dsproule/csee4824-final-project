@@ -67,9 +67,9 @@ module RS_ALLOC(
                 rs_update_idx <= rs_idx;
 
                 // checks if we can put just the value in or if we need the tag for t1
-                if (MT_T1 == 0 | MT_T1.plus) begin
+                if (MT_T1 == 0 | MT_T1.plus | (cdb.T == MT_T1.T && cdb.valid)) begin
                     // value exists somewhere
-                    next_re.V1 <= V1;
+                    next_re.V1 <= (cdb.T == MT_T1.T && cdb.valid) ? cdb.V : V1;
                     next_re.T1 <= 0;
                     next_re.ready[0] <= `TRUE;
                 end else begin
@@ -79,9 +79,9 @@ module RS_ALLOC(
                 end
 
                 // change these to LD/ST in pipeline. Like this for the tbs
-                if (MT_T2 == 0 | MT_T2.plus) begin
+                if (MT_T2 == 0 | MT_T2.plus | (cdb.T == MT_T2.T && cdb.valid)) begin
                     // value exists somewhere
-                    next_re.V2 <= V2;
+                    next_re.V2 <= (cdb.T == MT_T2.T && cdb.valid) ? cdb.V : V2;
                     next_re.T2 <= 0;
                     next_re.ready[1] <= `TRUE;
                 end else begin
