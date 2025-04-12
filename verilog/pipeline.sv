@@ -90,7 +90,7 @@ module pipeline (
     // ROB outputs
     PPLN_CTRL pipeline_control;
     logic rob_full, rob_empty, retire;
-    logic [`XLEN-1:0] V1_rob, V2_rob, rob_write_data;
+    logic [`XLEN-1:0] V1_rob, V2_rob, rob_write_data, V1_rob_final, V2_rob_final;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
 
     // Regfile inputs/outputs
@@ -234,8 +234,10 @@ module pipeline (
         .mt_table_out(mt_table_out)
     );
 
-    assign V1_rs = (T1_wire.plus == 1) ? V1_rob : V1_regfile;
-    assign V2_rs = (T2_wire.plus == 1) ? V2_rob : V2_regfile;
+    assign V1_rob_final = (retire && (retire_T_wire == T1_wire.T)) ? rob_write_data : V1_rob;
+    assign V2_rob_final = (retire && (retire_T_wire == T2_wire.T)) ? rob_write_data : V2_rob;
+    assign V1_rs = (T1_wire.plus == 1) ? V1_rob_final : V1_regfile;
+    assign V2_rs = (T2_wire.plus == 1) ? V2_rob_final : V2_regfile;
 
     logic rs_idx_full;
     // assign rs_stall = rs_idx_full;
