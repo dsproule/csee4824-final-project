@@ -359,7 +359,7 @@ typedef struct packed {
     logic [4:0] r;
     logic [`XLEN-1:0] V;
     PPLN_CTRL ppln_ctrl;
-    logic [`XLEN-1:0] NPC;
+    logic [`XLEN-1:0] NPC; //hex
     
     logic ready;
 } ROB_ENTRY;

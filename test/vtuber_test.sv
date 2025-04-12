@@ -42,7 +42,8 @@ module testbench;
     logic [`RS_SZ-1:0] busy_dbg;
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg;
-    ROB_T rob_head_dbg, rob_tail_dbg;
+    ROB_T rob_head_dbg, rob_tail_dbg, retire_T_wire_dbg;
+    PPLN_CTRL rob_pipeline_control_dbg;
 
 `ifndef CACHE_MODE
     MEM_SIZE          proc2mem_size;
@@ -59,6 +60,8 @@ module testbench;
     // logic [`XLEN-1:0] if_NPC_dbg;
     // logic [31:0]      if_inst_dbg;
     // logic             if_valid_dbg;
+
+    
 
 
     // Instantiate the Pipeline
@@ -93,8 +96,10 @@ module testbench;
         .mt_table_out_dbg   (mt_table_out_dbg),
         .rob_table_out_dbg  (rob_table_out_dbg),
         .rob_head_dbg (rob_head_dbg),
-        .rob_tail_dbg (rob_tail_dbg)
-
+        .rob_tail_dbg (rob_tail_dbg),
+        .rob_retire_dbg(rob_retire_dbg),
+        .rob_pipeline_control_dbg(rob_pipeline_control_dbg),
+        .retire_T_wire_dbg(retire_T_wire_dbg)
     );
 
 
@@ -147,8 +152,8 @@ module testbench;
             0,  // IF
             `RS_SZ,  // Reservation Station
             3,  // CDB
-            16, // Map Table
-            18  // ROB
+            32, // Map Table
+            `ROB_SZ  // ROB
         );
 
         // Pulse the reset signal
@@ -208,15 +213,15 @@ module testbench;
         // end
         // $display("");
 
-        // Dump instructions and their validity for each stage
-        $write("p");
-        $write("%h%h%h%h%h%h%h%h%h%h ",
-               if_inst_dbg,      if_valid_dbg,
-               if_id_inst_dbg,   if_id_valid_dbg,
-               id_ex_inst_dbg,   id_ex_valid_dbg,
-               ex_mem_inst_dbg,  ex_mem_valid_dbg,
-               mem_wb_inst_dbg,  mem_wb_valid_dbg);
-        $display("");
+        // // Dump instructions and their validity for each stage
+        // $write("p");
+        // $write("%h%h%h%h%h%h%h%h%h%h ",
+        //        if_inst_dbg,      if_valid_dbg,
+        //        if_id_inst_dbg,   if_id_valid_dbg,
+        //        id_ex_inst_dbg,   id_ex_valid_dbg,
+        //        ex_mem_inst_dbg,  ex_mem_valid_dbg,
+        //        mem_wb_inst_dbg,  mem_wb_valid_dbg);
+        // $display("");
 
         // Dump interesting register/signal contents onto stdout
         // format is "<reg group prefix><name> <width in hex chars>:<data>"
@@ -237,15 +242,23 @@ module testbench;
         $display("ohead %h", rob_head_dbg);
         $display("otail %h", rob_tail_dbg);
         
-        for (int i = 0; i < `ROB_SZ; i++) begin
-            $display("oROB[%0d] %h", i, rob_table_out_dbg[i*$bits(ROB_ENTRY) +: $bits(ROB_ENTRY)]);
+        for (int i = 1; i < `ROB_SZ; i++) begin
+            ROB_ENTRY entry;
+            entry = rob_table_out_dbg[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
+            // $display("oROB_entry:%0d idx:%4d   r:%4d   V:%4d   retire:%1b   retire_T:%4d   flush:%1b   write_data:%8h",
+            //                 i, i, entry.r, entry.V, rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, pipeline_0.rob_write_data);
+            $display("oROB_entry:%0d idx:%4d   r:%4d   V:%4d", i, i, entry.r, entry.V);
+                    
         end
+
 
         // Map - Table 'Mt'
-        for (int i = 0; i < 32; i++) begin
-            $display("tMT_out_dbg %h", i, mt_table_out_dbg[i*$bits(MT_ENTRY) +: $bits(MT_ENTRY)]);
-        end
 
+        for (int i = 0; i < 32; i++) begin
+            MT_ENTRY entry;
+            entry = mt_table_out_dbg[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
+            $display("tMT_entry %0d T:%4d plus:%1d", i, entry.T, entry.plus);
+        end
 
         // CDB - prefix 'b'
         // Show CDB state
@@ -261,10 +274,10 @@ module testbench;
         // Show key info for busy entries
         for (int i = 0; i < `RS_SZ; i++) begin
             if (busy_dbg[i]) begin
-                $display("rRS%0d_T 2:%h", i, rs_table_dbg[i].T);
-                $display("rRS%0d_T1 2:%h", i, rs_table_dbg[i].T1);
-                $display("rRS%0d_T2 2:%h", i, rs_table_dbg[i].T2);
-                $display("rRS%0d_ready 1:%h", i, rs_table_dbg[i].ready);
+                $display("rRS%0d_T 2:%02h", i, rs_table_dbg[i].T);
+                $display("rRS%0d_T1 2:%02h", i, rs_table_dbg[i].T1);
+                $display("rRS%0d_T2 2:%02h", i, rs_table_dbg[i].T2);
+                $display("rRS%0d_ready 1:%02h", i, rs_table_dbg[i].ready);
             end
         end
 
