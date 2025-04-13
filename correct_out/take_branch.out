@@ -1,0 +1,55 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Feb 28 09:42 2025
+Loading memory file: programs/take_branch.mem
+Using writeback output file: output/take_branch.wb
+Using pipeline output file: output/take_branch.ppln
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  6000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  9000 : System STILL at reset, can't show anything
+@@
+@@                 11500  Deasserting System reset......
+@@
+@@
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 0000000400400593 : 17184064915
+@@@ mem[    8] = 0005a6030005a503 : 1589906699035907
+@@@ mem[   16] = 0000001302c50863 : 81650845795
+@@@ mem[   24] = 0020009300100093 : 9007830615982227
+@@@ mem[   32] = 00a5a02300a5a023 : 46619443352412195
+@@@ mem[   40] = 0040021300300193 : 18016679140262291
+@@@ mem[   48] = 0000001300500213 : 81609622035
+@@@ mem[   56] = 1050007300600313 : 1175439996671230739
+@@@ mem[   64] = 10500073fff04513 : 1175440000958874899
+@@@
+@@@
+@@                113000 : System halted
+@@
+@@@ System halted on WFI instruction
+@@@
+@@
+@@  35 cycles / 6 instrs = 5.833333 CPI
+@@
+@@  102.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 296.
+$finish at simulation time               213000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 213000 ps
+CPU Time:      0.140 seconds;       Data structure size:   0.1Mb
+Fri Feb 28 09:42:28 2025

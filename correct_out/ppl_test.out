@@ -2,7 +2,7 @@ Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detec
 Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
-Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr 12 03:51 2025
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr 12 22:50 2025
 Loading memory file: programs/ppl_test.mem
 Using writeback output file: output/ppl_test.wb
 Using pipeline output file: output/ppl_test.ppln
@@ -24,32 +24,32 @@ Using pipeline output file: output/ppl_test.ppln
 @@                 11500  Deasserting System reset......
 @@
 @@
+"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 51000ps failed at 51000ps
+	Offending '(proc2mem_addr[1:0] == 2'b0)'
 @@@ Unified Memory contents hex on left, decimal on right: 
 @@@
-@@@ mem[    0] = 0000113700100313 : 18927921922835
-@@@ mem[    8] = 023301b300a00193 : 158472280209359251
-@@@ mem[   16] = 0000001300312023 : 81607598115
-@@@ mem[   24] = 1041202300012203 : 1171252712789058051
-@@@ mem[   32] = 0000000010500073 : 273678451
-@@@
-@@@ mem[ 4096] = 000000000000000a : 10
-@@@
-@@@ mem[ 4352] = 000000000000000a : 10
+@@@ mem[    0] = 00a0051300200593 : 45041575438321043
+@@@ mem[    8] = 000000130000000a : 81604378634
+@@@ mem[   16] = 0000001300000013 : 81604378643
+@@@ mem[   24] = 0000001300000013 : 81604378643
+@@@ mem[   32] = 0000001300000013 : 81604378643
+@@@ mem[   40] = 0000001300000013 : 81604378643
+@@@ mem[   48] = 0000000010500073 : 273678451
 @@@
 @@@
-@@                143000 : System halted
+@@                203000 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
-@@  45 cycles / 8 instrs = 5.625000 CPI
+@@  65 cycles / 12 instrs = 5.416667 CPI
 @@
-@@  132.00 ns total time to execute
+@@  192.00 ns total time to execute
 @@
 
 $finish called from file "test/pipeline_test.sv", line 296.
-$finish at simulation time               243000
+$finish at simulation time               303000
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 243000 ps
-CPU Time:      0.200 seconds;       Data structure size:   0.1Mb
-Sat Apr 12 03:51:08 2025
+Time: 303000 ps
+CPU Time:      0.280 seconds;       Data structure size:   0.1Mb
+Sat Apr 12 22:50:53 2025

@@ -5,7 +5,7 @@
 extern void exit();
 #endif
 
-#define N 99
+#define N 30
 
 void insertion(int arr[], int size){
     int min_idx, min;

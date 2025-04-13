@@ -2,7 +2,7 @@ Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detec
 Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
-Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr  9 22:20 2025
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr 12 22:50 2025
 Loading memory file: programs/store_tests.mem
 Using writeback output file: output/store_tests.wb
 Using pipeline output file: output/store_tests.ppln
@@ -24,15 +24,15 @@ Using pipeline output file: output/store_tests.ppln
 @@                 11500  Deasserting System reset......
 @@
 @@
-"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 60000ps failed at 60000ps
+"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 171000ps failed at 171000ps
 	Offending '(proc2mem_addr[1:0] == 2'b0)'
-"test/mem.sv", 138: testbench.memory.unnamed$$_0.unnamed$$_3: started at 63000ps failed at 63000ps
+"test/mem.sv", 138: testbench.memory.unnamed$$_0.unnamed$$_3: started at 186000ps failed at 186000ps
 	Offending '(proc2mem_addr[0] == 1'b0)'
-"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 96000ps failed at 96000ps
+"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 261000ps failed at 261000ps
 	Offending '(proc2mem_addr[1:0] == 2'b0)'
-"test/mem.sv", 138: testbench.memory.unnamed$$_0.unnamed$$_3: started at 99000ps failed at 99000ps
+"test/mem.sv", 138: testbench.memory.unnamed$$_0.unnamed$$_3: started at 276000ps failed at 276000ps
 	Offending '(proc2mem_addr[0] == 1'b0)'
-"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 252000ps failed at 252000ps
+"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 696000ps failed at 696000ps
 	Offending '(proc2mem_addr[1:0] == 2'b0)'
 @@@ Unified Memory contents hex on left, decimal on right: 
 @@@
@@ -70,19 +70,19 @@ Using pipeline output file: output/store_tests.ppln
 @@@ mem[ 1008] = 00000000e2220022 : 3793879074
 @@@
 @@@
-@@                257000 : System halted
+@@                713000 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
-@@  83 cycles / 46 instrs = 1.804348 CPI
+@@  235 cycles / 46 instrs = 5.108696 CPI
 @@
-@@  246.00 ns total time to execute
+@@  702.00 ns total time to execute
 @@
 
 $finish called from file "test/pipeline_test.sv", line 296.
-$finish at simulation time               357000
+$finish at simulation time               813000
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 357000 ps
+Time: 813000 ps
 CPU Time:      0.280 seconds;       Data structure size:   0.1Mb
-Wed Apr  9 22:20:40 2025
+Sat Apr 12 22:50:51 2025
