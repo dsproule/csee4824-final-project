@@ -1,6 +1,6 @@
 
 ================== SCOREBOARD ==================
-Test Run: Mon Apr 14 15:26:22 EDT 2025
+Test Run: Mon Apr 14 16:49:38 EDT 2025
 Program              | Status     | System Halt                   
 ---------------------------------------------------------------
 branch_test          | PASSED     | WFI instruction               
@@ -34,12 +34,12 @@ store_tests          | PASSED     | WFI instruction
 alexnet              | FAILED     | WFI instruction               
 backtrack            | PASSED     | WFI instruction               
 basic_malloc         | PASSED     | WFI instruction               
-bfs                  | FAILED     | WFI instruction               
+bfs                  | PASSED     | WFI instruction               
 c_test               | PASSED     | WFI instruction               
-dfs                  | FAILED     | unknown error code a (EXPECTED: WFI instruction)
+dfs                  | PASSED     | WFI instruction               
 dft                  | PASSED     | WFI instruction               
 fc_forward           | PASSED     | WFI instruction               
-graph                | FAILED     | unknown error code a (EXPECTED: WFI instruction)
+graph                | PASSED     | WFI instruction               
 insertionsort        | PASSED     | WFI instruction               
 link_list            | PASSED     | WFI instruction               
 malloc_test          | PASSED     | WFI instruction               
@@ -49,54 +49,54 @@ omegalul             | PASSED     | WFI instruction
 outer_product        | FAILED     | unknown error code a (EXPECTED: WFI instruction)
 priority_queue       | PASSED     | WFI instruction               
 quicksort            | PASSED     | WFI instruction               
-sort_search          | FAILED     | WFI instruction               
+sort_search          | PASSED     | WFI instruction               
 Program              | Status     | System Halt                   
 ---------------------------------------------------------------
-evens_long           | FAILED     | WFI instruction               
-load_tests           | FAILED     | WFI instruction               
-matrix_mult_rec      | FAILED     | WFI instruction               
-fc_forward           | FAILED     | WFI instruction               
-parallel             | FAILED     | WFI instruction               
-omegalul             | FAILED     | WFI instruction               
-graph                | FAILED     | WFI instruction               
-copy                 | FAILED     | WFI instruction               
-branch_test          | FAILED     | WFI instruction               
-basic_malloc         | FAILED     | WFI instruction               
-insertionsort        | FAILED     | WFI instruction               
-bfs                  | FAILED     | WFI instruction               
-btest2               | FAILED     | WFI instruction               
-ppln_test            | FAILED     | WFI instruction               
-backtrack            | FAILED     | WFI instruction               
-insertion            | FAILED     | WFI instruction               
-btest1               | FAILED     | WFI instruction               
-halt                 | FAILED     | WFI instruction               
-link_list            | FAILED     | WFI instruction               
-ppl_test             | FAILED     | WFI instruction               
-sort_search          | FAILED     | WFI instruction               
-priority_queue       | FAILED     | WFI instruction               
-store_tests          | FAILED     | WFI instruction               
-fib_long             | FAILED     | WFI instruction               
-quicksort            | FAILED     | WFI instruction               
-malloc_test          | FAILED     | WFI instruction               
-fib_rec              | FAILED     | WFI instruction               
-mult_test            | FAILED     | WFI instruction               
-fib                  | FAILED     | WFI instruction               
-c_test               | FAILED     | WFI instruction               
-no_hazard            | FAILED     | WFI instruction               
-dft                  | FAILED     | WFI instruction               
-dfs                  | FAILED     | WFI instruction               
-raw_program          | FAILED     | WFI instruction               
-if_stage_test        | FAILED     | WFI instruction               
-outer_product        | FAILED     | WFI instruction               
-evens                | FAILED     | WFI instruction               
-easy_program         | FAILED     | WFI instruction               
-more_mult            | FAILED     | WFI instruction               
-haha                 | FAILED     | WFI instruction               
-alexnet              | FAILED     | WFI instruction               
-saxpy                | FAILED     | WFI instruction               
-mult                 | FAILED     | WFI instruction               
-sampler              | FAILED     | WFI instruction               
-copy_long            | FAILED     | WFI instruction               
-mergesort            | FAILED     | WFI instruction               
-mult_no_lsq          | FAILED     | WFI instruction               
+evens_long           | PASSED     | WFI instruction               
+load_tests           | PASSED     | WFI instruction               
+matrix_mult_rec      | PASSED     | WFI instruction               
+fc_forward           | PASSED     | WFI instruction               
+parallel             | PASSED     | WFI instruction               
+omegalul             | PASSED     | WFI instruction               
+graph                | PASSED     | WFI instruction               
+copy                 | PASSED     | WFI instruction               
+branch_test          | PASSED     | WFI instruction               
+basic_malloc         | PASSED     | WFI instruction               
+insertionsort        | PASSED     | WFI instruction               
+bfs                  | PASSED     | WFI instruction               
+btest2               | PASSED     | WFI instruction               
+ppln_test            | PASSED     | WFI instruction               
+backtrack            | PASSED     | WFI instruction               
+insertion            | PASSED     | WFI instruction               
+btest1               | PASSED     | WFI instruction               
+halt                 | PASSED     | WFI instruction               
+link_list            | PASSED     | WFI instruction               
+ppl_test             | PASSED     | WFI instruction               
+sort_search          | PASSED     | WFI instruction               
+priority_queue       | PASSED     | WFI instruction               
+store_tests          | PASSED     | WFI instruction               
+fib_long             | PASSED     | WFI instruction               
+quicksort            | PASSED     | WFI instruction               
+malloc_test          | PASSED     | WFI instruction               
+fib_rec              | PASSED     | WFI instruction               
+mult_test            | PASSED     | WFI instruction               
+fib                  | PASSED     | WFI instruction               
+c_test               | PASSED     | WFI instruction               
+no_hazard            | PASSED     | WFI instruction               
+dft                  | PASSED     | WFI instruction               
+dfs                  | PASSED     | WFI instruction               
+raw_program          | PASSED     | WFI instruction               
+if_stage_test        | PASSED     | WFI instruction               
+outer_product        | PASSED     | WFI instruction               
+evens                | PASSED     | WFI instruction               
+easy_program         | PASSED     | WFI instruction               
+more_mult            | PASSED     | WFI instruction               
+haha                 | PASSED     | WFI instruction               
+alexnet              | PASSED     | WFI instruction               
+saxpy                | PASSED     | WFI instruction               
+mult                 | PASSED     | WFI instruction               
+sampler              | PASSED     | WFI instruction               
+copy_long            | PASSED     | WFI instruction               
+mergesort            | PASSED     | WFI instruction               
+mult_no_lsq          | PASSED     | WFI instruction               
 ===============================================================

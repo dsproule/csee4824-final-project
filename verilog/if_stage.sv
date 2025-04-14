@@ -40,6 +40,9 @@ module if_stage (
             proc2Imem_command <= BUS_LOAD;
             mem_req <= `TRUE;
             IF_state <= MEM_NEW_ADDR;
+            
+            IF_packet.inst <= `NOP;
+            IF_packet.valid <= `FALSE;
         end else begin
             IF_packet.inst <= `NOP;
             IF_packet.valid <= `FALSE;
