@@ -284,22 +284,22 @@ module testbench;
 
 
             if (prog_start) begin
-                print_if;
-                print_ds;
+                // print_if;
+                // print_ds;
                 // print_rs;
                 // print_mt;
                 // print_cdb;
-                print_rob;
+                // print_rob;
                 // print_regs;
                 // print_sx;
                 // print_mem;
                 // print_xc;
-                if (IF_ID_reg_dbg.PC == `XLEN'hef8) $display("mayday");
+                // if (IF_ID_reg_dbg.PC == `XLEN'hef8) $display("mayday");
                 
                 // print_x_pkt;
             end
-            if(clock_count > 200000)
-                $finish;
+            // if(clock_count > 200000)
+            //     $finish;
         end
     end
 
@@ -388,7 +388,7 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 500000) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 1500000) begin
                 // print_regs;
                 // print_sx;
                 // print_mem;

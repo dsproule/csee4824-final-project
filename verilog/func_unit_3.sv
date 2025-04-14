@@ -132,7 +132,7 @@ module func_unit_3(
                         storeDmem_state <= MEM_NEW_ADDR;
                     end
                 MEM_NEW_ADDR:
-                    if (Dmem_gnt) begin
+                    if (Dmem_gnt & (mem2proc_response != 0)) begin
                         storeDmem_state <= MEM_NONE;
                         X_packet.T <= S_X_reg.T;
                         X_packet.result <= '0;
