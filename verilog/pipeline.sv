@@ -167,7 +167,6 @@ module pipeline (
 
     assign take_branch   = pipeline_control.flush;
     assign branch_target = pipeline_control.branch_addr; 
-    assign IF_stall = 0;
 
     if_stage if_stage_0(
         .clock(clock), .reset(reset), .stall(rs_stall), .Imem_gnt(~Dmem_req & ~rs_stall),
@@ -388,9 +387,9 @@ module pipeline (
     assign cdb_valid = (gnt != 4'h0);
     always_comb begin
         // turn the arbiter signal to idx
-        cdb_idx = (gnt[0]) ? 0 :
-                  (gnt[1]) ? 1 : 
-                  (gnt[2]) ? 2 : 3;
+        for (gnt_idx = 0; gnt_idx < `RS_SZ; gnt_idx++)
+            if (gnt[gnt_idx])
+                cdb_idx = gnt_idx;
         
         // pass values along
         if (cdb_valid) begin

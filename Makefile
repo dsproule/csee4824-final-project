@@ -376,6 +376,7 @@ SOURCES = verilog/pipeline.sv \
           verilog/mult.sv \
           verilog/mult_stage.sv \
 		  verilog/rps4.sv \
+		  verilog/psel_gen.sv \
 		  verilog/rob.sv \
 		  verilog/if_stage.sv
 

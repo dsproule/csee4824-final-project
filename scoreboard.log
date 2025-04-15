@@ -1,9 +1,8 @@
 
 ================== SCOREBOARD ==================
-Test Run: Mon Apr 14 21:44:34 EDT 2025
+Test Run: Tue Apr 15 10:39:52 EDT 2025
 Program              | Status     | System Halt                   
 ---------------------------------------------------------------
-branch               | PASSED     | WFI instruction               
 branch_test          | PASSED     | WFI instruction               
 btest1               | PASSED     | WFI instruction               
 btest2               | PASSED     | WFI instruction               
@@ -62,7 +61,6 @@ omegalul             | PASSED     | WFI instruction
 graph                | PASSED     | WFI instruction               
 copy                 | PASSED     | WFI instruction               
 branch_test          | PASSED     | WFI instruction               
-branch               | PASSED     | WFI instruction               
 basic_malloc         | PASSED     | WFI instruction               
 insertionsort        | PASSED     | WFI instruction               
 bfs                  | PASSED     | WFI instruction               
