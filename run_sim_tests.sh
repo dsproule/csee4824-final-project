@@ -2,19 +2,11 @@
 
 echo "Comparing ground truth outputs to new processor"
 
-#cd ~/Documents/ComputerArchitectures/project3 || exit
-
 LOG_FILE="scoreboard.log"
 
-# Start the log file with a timestamp
-{
-    echo -e "\n================== SCOREBOARD =================="
-    echo "Test Run: $(date)"
-    printf "%-20s | %-10s | %-30s\n" "Program" "Status" "System Halt"
-    echo "---------------------------------------------------------------"
-} | tee "$LOG_FILE"
 
-# Check if program names are provided
+
+# Gather source programs
 if [[ $# -gt 0 ]]; then
     sources=()
     for program in "$@"; do
@@ -25,99 +17,101 @@ else
     sources=(programs/*.{s,c})
 fi
 
-declare -A scoreboard
+# Declare associative arrays
+declare -A scoreboard_reg
+declare -A scoreboard_mem
 declare -A halt_messages
+declare -A cpi_values
 
-# Loop through all source files
+# Process each source file
 for source_file in "${sources[@]}"; do
     [[ -f "$source_file" ]] || continue
-
-    if [[ "$source_file" == "programs/crt.s" ]]; then
-        continue
-    fi
+    [[ "$source_file" == "programs/crt.s" ]] && continue
 
     program=$(basename "$source_file" | cut -d '.' -f1)
     echo -e "\nRunning $program"
 
-    # Run with timeout to detect infinite loops (60s timeout)
     if ! timeout 360s make "$program.out"; then
         echo -e "\033[33m⚠️  Skipping $program (INFINITE LOOP DETECTED)\033[0m"
-        echo ""
-        scoreboard["$program"]="SKIPPED"
+        scoreboard_reg["$program"]="SKIPPED"
+        scoreboard_mem["$program"]="SKIPPED"
+        cpi_values["$program"]="N/A"
         halt_messages["$program"]="N/A"
-        printf "%-20s | %-10s | %-30s\n" "$program" "SKIPPED" "N/A" >> "$LOG_FILE"
         continue
     fi
 
-    #echo "Comparing writeback output for $program"
-    #diff -y --suppress-common-lines correct_out/"$program".wb output/"$program".wb
+    ### REG CHECK
     diff -y --suppress-common-lines \
-  <(grep 'REG\[' correct_out/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') \
-  <(grep 'REG\[' output/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}')
+      <(grep 'REG\[' correct_out/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') \
+      <(grep 'REG\[' output/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') > /dev/null
+    status_reg=$?
 
-    status1=$?
+    ### MEM CHECK
+    diff -y --suppress-common-lines \
+      <(grep '@@@ mem' correct_out/"$program".out) \
+      <(grep '@@@ mem' output/"$program".out) > /dev/null
+    status_mem=$?
 
-    echo -e "\nComparing memory output for $program"
-    diff -y --suppress-common-lines <(grep '@@@ mem' correct_out/"$program".out) <(grep '@@@ mem' output/"$program".out)
-    status2=$?
+    ### CPI EXTRACT
+    cpi=$(grep -oP '@@.*=\s*\K[0-9.]+(?=\s*CPI)' output/"$program".out)
+    cpi_values["$program"]="${cpi:-N/A}"
 
-    # Extract system halt message from both correct and output files
-    expected_halt_reason=$(grep '@@@ System halted' correct_out/"$program".out | sed 's/@@@ System halted on //')
-    actual_halt_reason=$(grep '@@@ System halted' output/"$program".out | sed 's/@@@ System halted on //')
+    ### SYSTEM HALT MESSAGE
+    expected_halt=$(grep '@@@ System halted' correct_out/"$program".out | sed 's/@@@ System halted on //')
+    actual_halt=$(grep '@@@ System halted' output/"$program".out | sed 's/@@@ System halted on //')
+    expected_halt=${expected_halt:-"Unknown"}
+    actual_halt=${actual_halt:-"Unknown"}
 
-    # If no halt message is found, set to "Unknown"
-    expected_halt_reason=${expected_halt_reason:-"Unknown"}
-    actual_halt_reason=${actual_halt_reason:-"Unknown"}
-
-    # Compare halt reasons (plain text for log file)
-    halt_message_log="$actual_halt_reason"
-    if [[ "$actual_halt_reason" != "$expected_halt_reason" ]]; then
-        halt_message_log="$actual_halt_reason (EXPECTED: $expected_halt_reason)"
-    fi
-
-    # Color the halt message for terminal output
-    if [[ "$actual_halt_reason" == "$expected_halt_reason" ]]; then
-        halt_messages["$program"]="\033[32m$actual_halt_reason\033[0m"  # Green if it matches
+    if [[ "$expected_halt" == "$actual_halt" ]]; then
+        halt_messages["$program"]="\033[32m$actual_halt\033[0m"
     else
-        halt_messages["$program"]="\033[31m$halt_message_log\033[0m"  # Red if different
+        halt_messages["$program"]="\033[31m$actual_halt (EXPECTED: $expected_halt)\033[0m"
     fi
 
-    # Store pass/fail status and print in real-time (no colors in log)
-    if [[ $status1 -eq 0 && $status2 -eq 0 ]]; then
-        echo -e "\033[32m✅ Passed! :)\033[0m"
-        echo ""
-        scoreboard["$program"]="\033[32mPASSED\033[0m"
-        status_log="PASSED"
+    ### REGISTER RESULT
+    if [[ $status_reg -eq 0 ]]; then
+        scoreboard_reg["$program"]="\033[32mPASS\033[0m"
     else
-        echo -e "\033[31m❌ Failed :(\033[0m"
-        echo ""
-        scoreboard["$program"]="\033[31mFAILED\033[0m"
-        status_log="FAILED"
+        scoreboard_reg["$program"]="\033[31mFAIL\033[0m"
     fi
 
-    # Log result without colors
-    printf "%-20s | %-10s | %-30s\n" "$program" "$status_log" "$halt_message_log" >> "$LOG_FILE"
+    ### MEMORY RESULT
+    if [[ $status_mem -eq 0 ]]; then
+        scoreboard_mem["$program"]="\033[32mPASS\033[0m"
+    else
+        scoreboard_mem["$program"]="\033[31mFAIL\033[0m"
+    fi
 done
 
-# Print scoreboard headers again for clarity in both terminal and log file
+# Start the log file with a timestamp
 {
-    printf "%-20s | %-10s | %-30s\n" "Program" "Status" "System Halt"
-    echo "---------------------------------------------------------------"
-} | tee -a "$LOG_FILE"
+    echo -e "\n================== SCOREBOARD =================="
+    echo "Test Run: $(date)"
+    printf "%-20s | %-10s | %-10s | %-10s | %-30s\n" "Program" "RegCheck" "MemCheck" "CPI" "System Halt"
+    echo "------------------------------------------------------------------------------------------"
+} | tee "$LOG_FILE"
 
-# Print scoreboard entries in terminal (with color) and log file (without color)
-for program in "${!scoreboard[@]}"; do
+for program in "${!scoreboard_reg[@]}"; do
+    # Terminal output with color
     printf "%-20s | " "$program"
-    echo -ne "${scoreboard[$program]}"
+    echo -ne "   ${scoreboard_reg[$program]}   "
     echo -n " | "
+    echo -ne "   ${scoreboard_mem[$program]}   "
+    echo -n " | "
+    printf "%-10s | " "${cpi_values[$program]}"
     echo -ne "${halt_messages[$program]}"
-    echo ""  # New line for formatting
+    echo ""
 
-    # Log without colors
-    printf "%-20s | %-10s | %-30s\n" "$program" "$status_log" "$halt_message_log" >> "$LOG_FILE"
+    # Strip ANSI codes for log file
+    reg_plain=$(echo -e "${scoreboard_reg[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
+    mem_plain=$(echo -e "${scoreboard_mem[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
+    halt_plain=$(echo -e "${halt_messages[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
+
+    # Log plain output aligned
+    printf "%-20s | %-10s | %-10s | %-10s | %-30s\n" \
+        "$program" "$reg_plain" "$mem_plain" "${cpi_values[$program]}" "$halt_plain" >> "$LOG_FILE"
 done
 
-# Print closing line to both terminal and log file
-echo "===============================================================" | tee -a "$LOG_FILE"
 
+echo "==========================================================================================" | tee -a "$LOG_FILE"
 echo "Scoreboard saved to $LOG_FILE"
