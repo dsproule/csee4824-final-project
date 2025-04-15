@@ -1,8 +1,9 @@
 
 ================== SCOREBOARD ==================
-Test Run: Mon Apr 14 16:49:38 EDT 2025
+Test Run: Mon Apr 14 21:44:34 EDT 2025
 Program              | Status     | System Halt                   
 ---------------------------------------------------------------
+branch               | PASSED     | WFI instruction               
 branch_test          | PASSED     | WFI instruction               
 btest1               | PASSED     | WFI instruction               
 btest2               | PASSED     | WFI instruction               
@@ -31,7 +32,7 @@ raw_program          | PASSED     | WFI instruction
 sampler              | PASSED     | WFI instruction               
 saxpy                | PASSED     | WFI instruction               
 store_tests          | PASSED     | WFI instruction               
-alexnet              | FAILED     | WFI instruction               
+alexnet              | PASSED     | WFI instruction               
 backtrack            | PASSED     | WFI instruction               
 basic_malloc         | PASSED     | WFI instruction               
 bfs                  | PASSED     | WFI instruction               
@@ -46,7 +47,7 @@ malloc_test          | PASSED     | WFI instruction
 matrix_mult_rec      | PASSED     | WFI instruction               
 mergesort            | PASSED     | WFI instruction               
 omegalul             | PASSED     | WFI instruction               
-outer_product        | FAILED     | unknown error code a (EXPECTED: WFI instruction)
+outer_product        | PASSED     | WFI instruction               
 priority_queue       | PASSED     | WFI instruction               
 quicksort            | PASSED     | WFI instruction               
 sort_search          | PASSED     | WFI instruction               
@@ -61,6 +62,7 @@ omegalul             | PASSED     | WFI instruction
 graph                | PASSED     | WFI instruction               
 copy                 | PASSED     | WFI instruction               
 branch_test          | PASSED     | WFI instruction               
+branch               | PASSED     | WFI instruction               
 basic_malloc         | PASSED     | WFI instruction               
 insertionsort        | PASSED     | WFI instruction               
 bfs                  | PASSED     | WFI instruction               

@@ -23,7 +23,7 @@ module testbench;
     logic [31:0] clock_count;
     logic [31:0] instr_count;
     int          wb_fileno;
-    logic [63:0] debug_counter; // counter used for infinite loops, forces termination
+    logic [80:0] debug_counter; // counter used for infinite loops, forces termination
 
     logic [1:0]       proc2mem_command;
     logic [`XLEN-1:0] proc2mem_addr;
@@ -278,7 +278,7 @@ module testbench;
     always @(posedge clock) begin
         if (~reset) begin
             // only start printing after first inst arrives
-            if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'hec8))
+            if (IF_ID_reg_dbg.valid & (clock_count > 110300))
             // if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'h10))
                 prog_start <= 1;
 
@@ -379,16 +379,17 @@ module testbench;
             // print register write information to the writeback output file
             if (pipeline_completed_insts > 0) begin
                 if(pipeline_commit_wr_en)
-                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
+                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x, T=%d",
                               pipeline_commit_NPC - 4,
                               pipeline_commit_wr_idx,
-                              pipeline_commit_wr_data);
+                              pipeline_commit_wr_data,
+                              clock_count);
                 else
                     $fdisplay(wb_fileno, "PC=%x, ---", pipeline_commit_NPC - 4);
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 1500000) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 15000000) begin
                 // print_regs;
                 // print_sx;
                 // print_mem;

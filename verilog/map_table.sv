@@ -40,9 +40,6 @@ module map_table (
             for (reset_idx = 0; reset_idx < 32; reset_idx++)
                 mt_table[reset_idx] <= 0;
         end else begin
-            if (en & has_dest) begin
-                mt_table[r] <= (r != 0) ? {T, `FALSE} : 0;
-            end
 
             if (retire_entry) begin
                 mt_table[retire_r].T <= 0;
@@ -57,6 +54,10 @@ module map_table (
                 if((cdb.T == mt_table[cdb_idx].T) & cdb.valid)
                     mt_table[cdb_idx].plus <= 1'b1;
                 // mt_table[cdb_idx].plus <= (cdb.T == mt_table[cdb_idx].T & cdb.valid);
+            end
+
+            if (en & has_dest) begin
+                mt_table[r] <= (r != 0) ? {T, `FALSE} : 0;
             end
         end
     end

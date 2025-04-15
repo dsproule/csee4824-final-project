@@ -18,7 +18,7 @@ module func_unit_2(
     mem_proc_states   mem_state;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
-    assign rawDmem_addr   = S_X_reg.V1 + S_X_reg.mem_offset;
+    assign rawDmem_addr   = $signed(S_X_reg.V1) + $signed(S_X_reg.mem_offset);
     assign proc2Dmem_addr = {rawDmem_addr[`XLEN-1:3], 3'b0};
     assign line_offset    = rawDmem_addr[2:0];
 
