@@ -48,12 +48,9 @@ module map_table (
 
             // enable signal included in cdb.valid?
             // checks whole map table and assigns plus if == cdb_tag (in theory only one)
-            // shouldn't write like this bcz the plus tag should stay more than one cycle
             for (cdb_idx = 0; cdb_idx < 32; cdb_idx++) begin
-                // if((cdb.T == cdb_idx) & cdb.valid)
                 if((cdb.T == mt_table[cdb_idx].T) & cdb.valid)
                     mt_table[cdb_idx].plus <= 1'b1;
-                // mt_table[cdb_idx].plus <= (cdb.T == mt_table[cdb_idx].T & cdb.valid);
             end
 
             if (en & has_dest) begin
