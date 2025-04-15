@@ -278,7 +278,7 @@ module testbench;
     always @(posedge clock) begin
         if (~reset) begin
             // only start printing after first inst arrives
-            if (IF_ID_reg_dbg.valid & (clock_count > 110300))
+            if (IF_ID_reg_dbg.valid)
             // if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'h10))
                 prog_start <= 1;
 

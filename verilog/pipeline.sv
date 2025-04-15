@@ -168,25 +168,47 @@ module pipeline (
     assign take_branch   = pipeline_control.flush;
     assign branch_target = pipeline_control.branch_addr; 
 
+    logic [`XLEN-1:0] proc2Icache_addr;
+    logic [63:0]      Icache_data_out;
+    logic Icache_valid_out;
+
+    icache icache_0 (
+        .clock(clock), .reset(reset),
+        .Imem2proc_response((Dmem_req) ? '0 : mem2proc_response), // Should be zero unless there is a response
+        .Imem2proc_data(mem2proc_data),
+        .Imem2proc_tag(mem2proc_tag),
+
+        // From fetch stage
+        .proc2Icache_addr(proc2Icache_addr),
+
+        // To memory
+        .proc2Imem_command(proc2Imem_command),
+        .proc2Imem_addr(proc2Imem_addr),
+
+        // To fetch stage
+        .Icache_data_out(Icache_data_out), // Data is mem[proc2Icache_addr]
+        .Icache_valid_out(Icache_valid_out) // When valid is high
+    );
+
     if_stage if_stage_0(
-        .clock(clock), .reset(reset), .stall(rs_stall), .Imem_gnt(~Dmem_req & ~rs_stall),
+        .clock(clock), .reset(reset), 
+        .if_valid(~Dmem_req & Icache_valid_out),
+        .pipe_stall(rs_stall),
         .take_branch(take_branch),
         .branch_target(branch_target),
-        .Imem2proc_data(mem2proc_data),
-        .Imem2proc_response(mem2proc_response), .Imem2proc_tag(mem2proc_tag),
+        .Imem2proc_data(Icache_data_out),
 
-        .mem_req(Imem_req),
-        .IF_packet(IF_packet),
-        .proc2Imem_command(proc2Imem_command),
-        .proc2Imem_addr(proc2Imem_addr)
+        
+        .if_packet(IF_packet),
+        .proc2Imem_addr(proc2Icache_addr)
     );
 
     assign IF_enable = 1'b1 & ~rs_stall;
     always_ff @(posedge clock) begin
         if (reset | take_branch) begin
             IF_ID_reg <= '0;
-        end else if (IF_enable) begin
-            IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
+        end else if (IF_enable & ~rs_stall) begin
+            IF_ID_reg <= IF_packet;
         end
     end
 

@@ -10,7 +10,7 @@
 
 `include "verilog/sys_defs.svh"
 
-module if_stage (
+module stage_if (
     input             clock,          // system clock
     input             reset,          // system reset
     input             pipe_stall,

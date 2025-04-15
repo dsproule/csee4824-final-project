@@ -1,0 +1,560 @@
+#######################################################################################
+# log primitive debug message of FSDB dumping                                         #
+# This is for R&D to analyze when there are issues happening when FSDB dump           #
+#######################################################################################
+ANF: vcsd_get_serial_mode_status('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_get_serial_mode_status')
+ANF: vcsd_enable_sva_success_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_enable_sva_success_callback')
+ANF: vcsd_disable_sva_success_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_disable_sva_success_callback')
+ANF: vcsd_get_power_scope_name('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_get_power_scope_name')
+ANF: vcsd_dump_var_vpdg('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_dump_var_vpdg')
+ANF: vcsd_begin_no_value_var_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_begin_no_value_var_info')
+ANF: vcsd_end_no_value_var_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_end_no_value_var_info')
+ANF: vcsd_remove_xprop_merge_mode_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vcsd_remove_xprop_merge_mode_callback')
+ANF: vhpi_get_cb_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhpi_get_cb_info')
+ANF: vhpi_free_handle('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhpi_free_handle')
+ANF: vhpi_fetch_vcsd_handle('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhpi_fetch_vcsd_handle')
+ANF: vhpi_fetch_vpi_handle('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhpi_fetch_vpi_handle')
+ANF: vhpi_has_verilog_parent('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhpi_has_verilog_parent')
+ANF: vhpi_is_verilog_scope('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhpi_is_verilog_scope')
+ANF: scsd_xprop_is_enabled('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_is_enabled')
+ANF: scsd_xprop_sig_is_promoted('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_sig_is_promoted')
+ANF: scsd_xprop_int_xvalue('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_int_xvalue')
+ANF: scsd_xprop_bool_xvalue('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_bool_xvalue')
+ANF: scsd_xprop_enum_xvalue('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_enum_xvalue')
+ANF: scsd_xprop_register_merge_mode_cb('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_register_merge_mode_cb')
+ANF: scsd_xprop_delete_merge_mode_cb('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_delete_merge_mode_cb')
+ANF: scsd_xprop_get_merge_mode('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_xprop_get_merge_mode')
+ANF: scsd_thread_get_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_thread_get_info')
+ANF: scsd_thread_vc_init('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_thread_vc_init')
+ANF: scsd_master_set_delta_sync_cbk('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_master_set_delta_sync_cbk')
+ANF: scsd_fgp_get_fsdb_cores('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_fgp_get_fsdb_cores')
+ANF: scsd_fgp_get_is_cpu_affinity_disabled('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: scsd_fgp_get_is_cpu_affinity_disabled')
+ANF: vdi_dt_get_vlog_variant_size_array_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vdi_dt_get_vlog_variant_size_array_info')
+ANF: vdi_flat_node_get_total_bit_size('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vdi_flat_node_get_total_bit_size')
+ANF: vhdi_dt_get_type('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_dt_get_type')
+ANF: vhdi_dt_get_key('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_dt_get_key')
+ANF: vhdi_dt_get_vhdl_enum_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_dt_get_vhdl_enum_info')
+ANF: vhdi_dt_get_vhdl_physical_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_dt_get_vhdl_physical_info')
+ANF: vhdi_dt_get_vhdl_array_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_dt_get_vhdl_array_info')
+ANF: vhdi_dt_get_vhdl_record_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_dt_get_vhdl_record_info')
+ANF: vhdi_dt_get_vhdl_integer_range_info('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_dt_get_vhdl_integer_range_info')
+ANF: vhdi_def_traverse_module('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_def_traverse_module')
+ANF: vhdi_def_traverse_scope('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_def_traverse_scope')
+ANF: vhdi_def_traverse_variable('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_def_traverse_variable')
+ANF: vhdi_def_get_module_id_by_vhpi('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_def_get_module_id_by_vhpi')
+ANF: vhdi_def_get_handle_by_module_id('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_def_get_handle_by_module_id')
+ANF: vhdi_def_get_variable_info_by_vhpi('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_def_get_variable_info_by_vhpi')
+ANF: vhdi_def_free('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_def_free')
+ANF: vhdi_ist_traverse_scope('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_traverse_scope')
+ANF: vhdi_ist_traverse_variable('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_traverse_variable')
+ANF: vhdi_ist_convert_by_vhpi('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_convert_by_vhpi')
+ANF: vhdi_ist_clone('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_clone')
+ANF: vhdi_ist_free('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_free')
+ANF: vhdi_ist_hash_key('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_hash_key')
+ANF: vhdi_ist_compare('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_compare')
+ANF: vhdi_ist_get_value_addr('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_get_value_addr')
+ANF: vhdi_set_scsd_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_set_scsd_callback')
+ANF: vhdi_cbk_set_force_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_cbk_set_force_callback')
+ANF: vhdi_trigger_init_force('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_trigger_init_force')
+ANF: vhdi_ist_check_scsd_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_check_scsd_callback')
+ANF: vhdi_ist_add_scsd_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_add_scsd_callback')
+ANF: vhdi_ist_remove_scsd_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_remove_scsd_callback')
+ANF: vhdi_ist_get_scsd_user_data('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_get_scsd_user_data')
+ANF: vhdi_add_time_change_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_add_time_change_callback')
+ANF: vhdi_get_real_value_by_value_addr('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_get_real_value_by_value_addr')
+ANF: vhdi_get_64_value_by_value_addr('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_get_64_value_by_value_addr')
+ANF: vhdi_xprop_inst_is_promoted('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_xprop_inst_is_promoted')
+ANF: vdi_ist_convert_by_vhdi('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vdi_ist_convert_by_vhdi')
+ANF: vhdi_ist_get_module_id('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_ist_get_module_id')
+ANF: vhdi_refine_foreign_scope_type('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_refine_foreign_scope_type')
+ANF: vhdi_flush_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_flush_callback')
+ANF: vhdi_set_orig_name('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_set_orig_name')
+ANF: vhdi_set_dump_pt('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_set_dump_pt')
+ANF: vhdi_set_int_subtype('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_set_int_subtype')
+ANF: vhdi_set_fixed_point('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_set_fixed_point')
+ANF: vhdi_get_fsdb_option('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_get_fsdb_option')
+ANF: vhdi_fgp_get_mode('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_fgp_get_mode')
+ANF: vhdi_node_register_composite_var('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_node_register_composite_var')
+ANF: vhdi_node_analysis('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_node_analysis')
+ANF: vhdi_node_id('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_node_id')
+ANF: vhdi_node_ist_check_scsd_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_node_ist_check_scsd_callback')
+ANF: vhdi_node_ist_add_scsd_callback('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_node_ist_add_scsd_callback')
+ANF: vhdi_node_ist_get_value_addr('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_node_ist_get_value_addr')
+ANF: vhdi_enc_def_traverse_module('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_enc_def_traverse_module')
+ANF: vhdi_enc_def_traverse_scope('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_enc_def_traverse_scope')
+ANF: vhdi_enc_def_traverse_variable('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_enc_def_traverse_variable')
+ANF: vhdi_enc_ist_traverse_scope('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_enc_ist_traverse_scope')
+ANF: vhdi_enc_ist_traverse_variable('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_enc_ist_traverse_variable')
+ANF: vhdi_enc_ist_get_module_id('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_enc_ist_get_module_id')
+ANF: vhdi_enc_def_get_handle_by_module_id('/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv: undefined symbol: vhdi_enc_def_get_handle_by_module_id')
+VCS compile option:
+ option[0]: /homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv
+ option[1]: +MEMORY=programs/fib.mem
+ option[2]: +WRITEBACK=/dev/null
+ option[3]: +PIPELINE=/dev/null
+ option[4]: +UVM_VERDI_TRACE=UVM_AWARE
+ option[5]: +fsdb+gate=off
+ option[6]: -ucli2Proc
+ option[7]: -ucli
+ option[8]: -l
+ option[9]: /homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/verdiLog/sim.log
+ option[10]: /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/bin/vcs1
+ option[11]: -Mcc=gcc
+ option[12]: -Mcplusplus=g++
+ option[13]: -Masflags=
+ option[14]: -Mcfl= -pipe -fPIC -O -I/tools/synopsys/vcs/U-2023.03-SP2-1/include 
+ option[15]: -Mxllcflags=
+ option[16]: -Mxcflags= -pipe -fPIC -I/tools/synopsys/vcs/U-2023.03-SP2-1/include
+ option[17]: -Mldflags= -rdynamic 
+ option[18]: -Mout=simv
+ option[19]: -Mamsrun=
+ option[20]: -Mvcsaceobjs=
+ option[21]: -Mobjects= /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvirsim.so /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libsnpsmalloc.so /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvfs.so 
+ option[22]: -Mexternalobj=
+ option[23]: -Msaverestoreobj=/tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/vcs_save_restore_new.o
+ option[24]: -Mcrt0=
+ option[25]: -Mcrtn=
+ option[26]: -Mcsrc=test/pipeline_print.c 
+ option[27]: -Mupdate
+ option[28]: -Msyslibs=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/share/PLI/VCS/LINUX64/pli.a -ldl 
+ option[29]: +vc
+ option[30]: -line
+ option[31]: -full64
+ option[32]: -kdb
+ option[33]: -Xufe=2steps
+ option[34]: -lca
+ option[35]: -nc
+ option[36]: -debug_access+all+reverse
+ option[37]: +vpi
+ option[38]: +vcsd1
+ option[39]: +itf+/tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/vcsdp_lite.tab
+ option[40]: +warn=noTFIPC
+ option[41]: +warn=noDEBUG_DEP
+ option[42]: +warn=noENUMASSIGN
+ option[43]: +define+CLOCK_PERIOD=350.0
+ option[44]: -o
+ option[45]: simv
+ option[46]: -picarchive
+ option[47]: -P
+ option[48]: /tools/synopsys/verdi/verdi/U-2023.03-SP2-1/share/PLI/VCS/LINUX64/verdi.tab
+ option[49]: -fsdb
+ option[50]: -sverilog
+ option[51]: -gen_obj
+ option[52]: test/pipeline_test.sv
+ option[53]: test/mem.sv
+ option[54]: verilog/pipeline.sv
+ option[55]: verilog/regfile.sv
+ option[56]: verilog/icache.sv
+ option[57]: verilog/d_stage.sv
+ option[58]: verilog/map_table.sv
+ option[59]: verilog/rs_stage.sv
+ option[60]: verilog/func_unit_2.sv
+ option[61]: verilog/func_unit_3.sv
+ option[62]: verilog/func_unit_0.sv
+ option[63]: verilog/func_unit_1.sv
+ option[64]: verilog/mult.sv
+ option[65]: verilog/mult_stage.sv
+ option[66]: verilog/rps4.sv
+ option[67]: verilog/psel_gen.sv
+ option[68]: verilog/rob.sv
+ option[69]: verilog/if_stage.sv
+ option[70]: -load
+ option[71]: /tools/synopsys/verdi/verdi/U-2023.03-SP2-1/share/PLI/VCS/LINUX64/libnovas.so:FSDBDumpCmd
+Chronologic Simulation VCS Release U-2023.03-SP2-1_Full64
+Linux 4.18.0-553.44.1.el8_10.x86_64 #1 SMP Wed Mar 5 10:48:41 EST 2025 x86_64
+CPU cores: 16
+Limit information:
+======================================
+cputime		unlimited
+filesize		unlimited
+datasize		unlimited
+stacksize		8195 kbytes
+coredumpsize		0 kbytes
+memoryuse		unlimited
+vmemoryuse		unlimited
+descriptors		262144
+memorylocked		64 kbytes
+maxproc		255242
+======================================
+(Special)Runtime environment variables:
+
+Runtime environment variables:
+LC_ALL=C
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+LD_LIBRARY_PATH=/tools/synopsys/photonicsolutions/2021.09-3/rsoft/bin :/homes/user/fac/tk3070/tmp/test/csee4824-project-3-main/tmp
+PULSE_CLIENTCONFIG=/user/stud/fall23/das2313/.nx/nxdevice/D-1003-122AD7ADD91E6A0534A78ABA419B6D59/audio/client.conf
+NXDIR=/usr/NX
+SYS_INST_DIR=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1
+MGLS_LICENSE_FILE=1720@bioeelincad.ee.columbia.edu
+SSH_CONNECTION=10.192.145.47 57595 128.59.64.195 22
+QUARTUS_ENV_SET=1
+XDG_MENU_PREFIX=gnome-
+PULSE_SERVER=/user/stud/fall23/das2313/.nx/nxdevice/D-1003-122AD7ADD91E6A0534A78ABA419B6D59/audio/native.socket
+LANG=C
+HISTCONTROL=ignoredups
+NX_CUPS_BIN=/usr/bin
+DISPLAY=:1003
+HOSTNAME=cadpc05
+VCS_STACK_EXEC=true
+OLDPWD=/homes/user/stud/fall23/das2313/csee4824
+COLORTERM=truecolor
+OPTO_LINK_BASE=/tools/synopsys/photonicsolutions/2021.09-3/optodesigner/bin
+PULSE_CONFIG=/user/stud/fall23/das2313/.nx/nxdevice/D-1003-122AD7ADD91E6A0534A78ABA419B6D59/audio/daemon.conf
+MAKE_TERMOUT=/dev/pts/3
+SNPSLMD_LICENSE_FILE=27000@bioeelincad.ee.columbia.edu
+USERNAME=das2313
+STDB=/user/stud/fall23/das2313/DB
+NX_SESSION_ID=122AD7ADD91E6A0534A78ABA419B6D59
+SSH_AUTH_SOCK=/run/user/34773/keyring/ssh
+MFLAGS=
+which_declare=declare -f
+XDG_SESSION_ID=30
+SYNOPSYS_ENV_SET=1
+NOVAS_SYNC_MOTIF_DISP=
+USER=das2313
+NX_SYSTEM=/usr/NX
+ANS_NODEPCHECK=1
+CADENCE_ENV_SET=1
+VCS_EXEC_DONE=1
+SYNOPSYS_LC_ROOT=/tools/synopsys/lc/U-2022.12-SP6
+WAYLAND_DISPLAY=no
+GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/f0fb1cab_3f8c_4903_a918_da9b60bfc84e
+CLOCK_PERIOD=350.0
+AWPROOTDIR=/tools/ansys/AnsysEM/AnsysEM24.2
+PULSE_SCRIPT=/user/stud/fall23/das2313/.nx/nxdevice/D-1003-122AD7ADD91E6A0534A78ABA419B6D59/audio/default.pa
+PWD=/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project
+SSH_ASKPASS=/usr/libexec/openssh/gnome-ssh-askpass
+HOME=/user/stud/fall23/das2313
+PULSE_RUNTIME_PATH=/run/user/34773/pulse
+NX_ROOT=/user/stud/fall23/das2313/.nx
+SSH_CLIENT=10.192.145.47 57595 22
+VCS_PATHMAP_PRELOAD_DONE=1
+XNLSPATH=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/etc/access/nls
+KRB5CCNAME=KCM:34773:54605
+MGC_HOME=/tools/mentor/aok_cal_2024.3_25.13
+XDG_DATA_DIRS=/user/stud/fall23/das2313/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
+QSYS_ROOTDIR=/tools/intel/intelFPGA/21.1/quartus/sopc_builder/bin
+ADS_ENV_SET=1
+CDSHOME=/tools/cadence/IC618.270
+MISC_ENV_SET=1
+ADS_LICENSE_FILE=8932@bioeelincad.ee.columbia.edu
+STROOT=/tools/synopsys/sentaurus/U-2022.12-SP2
+GJS_DEBUG_OUTPUT=stderr
+SPS_XFONT_PATH=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/XFont
+PHOTONICS_SOLUTIONS_ROOT=/tools/synopsys/photonicsolutions
+MAIL=/var/spool/mail/das2313
+CDS_LIC_FILE=5280@bioeelincad.ee.columbia.edu
+LD_NOVERSION=1
+QT_PLUGIN_PATH=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/platform/LINUXAMD64/lib/Qt/plugins
+SHELL=/bin/bash
+VTE_VERSION=5204
+TERM=xterm-256color
+MENTOR_ENV_SET=1
+ELF2HEX_HOME=/homes/user/fac/tk3070/tmp/elf2hex-build/bin
+QT_IM_MODULE=ibus
+XMODIFIERS=@im=none
+NX_RUNNER=/usr/NX/bin/nxrunner
+XDG_CURRENT_DESKTOP=GNOME
+GNOME_TERMINAL_SERVICE=:1.123
+MAKELEVEL=1
+VERDI_HOME=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1
+RSOFT_PROGRAMPATH=/tools/synopsys/photonicsolutions/2021.09-3/rsoft/bin
+SHLVL=3
+MAKE_TERMERR=/dev/pts/3
+ANSYSLMD_LICENSE_FILE=27005@bioeelincad.ee.columbia.edu
+SPS_FONT_PATH=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/font
+PHOTONICS_SOLUTIONS_VERSION=2021.09-3
+GDK_BACKEND=x11
+VERDI_ORIGNAL_LD_LIBRARY_PATH=/tools/synopsys/photonicsolutions/2021.09-3/rsoft/bin :/homes/user/fac/tk3070/tmp/test/csee4824-project-3-main/tmp
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+LOGNAME=das2313
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-wmWVfa6wtB,guid=8fe09e5e44b482de4c8f170d67df57f9
+SPS_RGB_PATH=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/etc/rgb
+XDG_RUNTIME_DIR=/run/user/34773
+XAUTHORITY=/user/stud/fall23/das2313/.Xauthority
+MALLOC_ARENA_MAX=1
+RISCV32_HOME=/homes/user/fac/tk3070/tmp/riscv-gcc/riscv-32/bin
+PATH=/tools/synopsys/photonicsolutions/2021.09-3/rsoft/bin:/tools/synopsys/photonicsolutions/2021.09-3/optodesigner/bin:/tools/synopsys/cscope64/P-2019.06/ai_bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/bin:/usr/bin:/usr/X11R6/bin:/tools/keysight/ADS2020/bin:/tools/cadence/IC618.270/bin:/tools/cadence/IC618.270/tools/dfII/bin:/tools/cadence/XCELIUM/21.09/bin:/tools/cadence/XCELIUM/21.09/tools.lnx86:/tools/cadence/XCELIUM/21.09/tools.lnx86/bin:/tools/cadence/INNOVUS/21.16/bin:/tools/cadence/INNOVUS/21.16/tools.lnx86:/tools/cadence/INNOVUS/21.16/tools.lnx86/bin:/tools/cadence/INCISIVE152/bin:/tools/cadence/INCISIVE152/tools.lnx86:/tools/cadence/INCISIVE152/tools.lnx86/bin:/tools/cadence/SPECTRE211.460/bin:/tools/cadence/SPECTRE211.460/tools.lnx86:/tools/cadence/SPECTRE211.460/tools.lnx86/bin:/tools/cadence/jasper_2024.06p002/bin:/tools/cadence/ASSURA/bin:/tools/cadence/ASSURA/tools.lnx86:/tools/cadence/ASSURA/tools.lnx86/bin:/tools/cadence/GENUS/21.16/bin:/tools/cadence/GENUS/21.16/tools.lnx86:/tools/cadence/GENUS/21.16/tools.lnx86/bin:/tools/cadence/QUANTUS/21.22/bin:/tools/cadence/QUANTUS/21.22/tools.lnx86:/tools/cadence/QUANTUS/21.22/tools.lnx86/bin:/tools/cadence/SSV/21.16/bin:/tools/cadence/SSV/21.16/tools.lnx86:/tools/cadence/SSV/21.16/tools.lnx86/bin:/tools/cadence/MODUS22.12/bin:/tools/cadence/MODUS22.12/tools.lnx86:/tools/cadence/MODUS22.12/tools.lnx86/bin:/tools/cadence/ULTRASIM/18.10.600/bin:/tools/cadence/ULTRASIM/18.10.600/tools.lnx86:/tools/cadence/ULTRASIM/18.10.600/tools.lnx86/bin:/tools/mentor/aok_cal_2024.3_25.13/bin:/tools/mentor/ModelSim/2024.2/modelsim_dlx/bin:/tools/mentor/questa_2022.3_1/linux_x86_64/bin:/tools/misc/espresso-logic/bin/:/tools/misc/CSEE4824/riscv-gcc/riscv-64/riscv/bin/:/tools/misc/CSEE4824/riscv-gcc/riscv-32/bin/:/tools/intel/intelFPGA/21.1/quartus/bin:/tools/intel/intelFPGA/20.1/embedded:/tools/intel/intelFPGA/21.1/quartus/sopc_builder/bin:/tools/synopsys/sentaurus/U-2022.12-SP2/bin:/tools/synopsys/syn/U-2022.12-SP7/bin:/tools/synopsys/pts/U-2022.12-SP7/bin:/tools/synopsys/primelib/T-2022.03-SP1/bin:/tools/synopsys/lc/U-2022.12-SP6/bin:/tools/synopsys/hspice/U-2023.03-SP2-2/hspice/bin:/tools/synopsys/vcs/U-2023.03-SP2-1/bin:/tools/synopsys/xa/P-2019.06/bin:/tools/synopsys/starrc/V-2023.12-SP5-1/bin:/user/stud/fall23/das2313/.local/bin:/user/stud/fall23/das2313/bin
+CALIBRE_HOME=/tools/mentor/aok_cal_2024.3_25.13
+VCS_HOME=/tools/synopsys/vcs/U-2023.03-SP2-1
+NX_TEMP=/tmp
+MAKEFLAGS=
+HISTSIZE=1000
+GJS_DEBUG_TOPICS=JS ERROR;JS LOG
+RSLM_SERVER=lightwave6.ee.columbia.edu:27020
+SYS_PROG_NAME=verdi
+HPEESOF_DIR=/tools/keysight/ADS2020
+NOVASHLPPATH=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/doc
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+NOVAS_LC_ALL=C
+SIMV_DAIDIR_PATH=/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/./simv.daidir
+NOVAS_SIGNAL_BASE_EXTRACTION=1
+SIGNAL_BASE_EXTRACTION=1
+NOVAS_VERDI_SVTB_BETA=1
+VERDI_SVTB_BETA=1
+NOVAS_VERDI_SVTB_ALPHA=1
+VERDI_SVTB_ALPHA=1
+NOVAS_VERDI_TB_HT=1
+VERDI_TB_HT=1
+NOVAS_WAVE_REDRAW_ALLVC=1
+WAVE_REDRAW_ALLVC=1
+NOVAS_TCL_LIBRARY=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/etc/access/tcl86_library
+TCL_LIBRARY=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/etc/access/tcl86_library
+XKEYSYMDB=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/etc/access/XKeysymDB2.1
+XLOCALEDIR=/tools/synopsys/verdi/verdi/U-2023.03-SP2-1/etc/access/locale
+NOVAS_SIGNAL_BASED_BA=0
+SIGNAL_BASED_BA=0
+SNPS_SIM_DEFAULT_GUI=verdi
+FSDB_FILE=/workdir/das2313_csee4824/p4.fsdb
+VCS_UCLI_STDIN_BLOCKING=1
+FSDB_VHDL_PROTECTED=1
+FSDB_RD_IR_ENABLE=1
+FSDB_SVA_STATUS=1
+VCS_STOP_SAFE=1
+DVE_SIM_SELECT_LOOP=on
+FLEXLM_BORROWFILE=/user/stud/fall23/das2313/.cadpc05-borrow.txt
+Runtime command line arguments:
+argv[0]=/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv
+argv[1]=+MEMORY=programs/fib.mem
+argv[2]=+WRITEBACK=/dev/null
+argv[3]=+PIPELINE=/dev/null
+argv[4]=+UVM_VERDI_TRACE=UVM_AWARE
+argv[5]=+fsdb+gate=off
+argv[6]=-ucli2Proc
+argv[7]=-ucli
+argv[8]=-l
+argv[9]=/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/verdiLog/sim.log
+327 profile - 100
+          CPU/Mem usage: 0.010 sys,  0.030 user,  301.12M mem
+328 Elapsed time:    0:00:01    Tue Apr 15 19:22:32 2025
+329 User CPU time used: 0 seconds
+330 System CPU time used: 0 seconds
+331 pliAppInit
+332 ndpGetenv(FSDB_FILE): /workdir/das2313_csee4824/p4.fsdb
+333 ndpGetenv(FSDB_SVA_STATUS): 1
+334 ndpGetenv(FSDB_VHDL_PROTECTED): 1
+335 [SC]Init: MemoryConsumed=0.00MB ElapsedTime=0hour 0min. 0sec.
+336 FSDB_GATE & FSDB_RTL is disabled.
+337 FSDB_ALIAS_ARRAY_ELEM is set to 4294967295.
+338 Enable Parallel Dumping.
+339 pliAppMiscSet: New Sim Round
+340 pliEntryInit
+341 LIBSSCORE=found /tools/synopsys/verdi/verdi/U-2023.03-SP2-1/share/PLI/lib/LINUXAMD64/libsscore_vcs202303.so through $NOVAS_HOME setting.
+342 FSDB Dumper for VCS, Release Verdi_U-2023.03-SP2-1, Linux x86_64/64bit, 10/11/2023
+343 (C) 1996 - 2023 by Synopsys, Inc.
+344 sps_tcl_fsdbDumpfile_main at 0
+345 argv[0]: /workdir/das2313_csee4824/p4.fsdb
+346 *Verdi* : Create FSDB file '/workdir/das2313_csee4824/p4.fsdb'
+347 [spi_vcs_vd_ppi_create_root]: no upf option
+348 compile option from '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/simv.daidir/vcs_rebuild'.
+349   "vcs '-sverilog' '+vc' '-Mupdate' '-line' '-full64' '-kdb' '-lca' '-nc' '-debug_access+all+reverse' '+warn=noTFIPC' '+warn=noDEBUG_DEP' '+warn=noENUMASSIGN' '+define+CLOCK_PERIOD=350.0' 'test/pipeline_test.sv' 'test/pipeline_print.c' 'test/mem.sv' 'verilog/pipeline.sv' 'verilog/regfile.sv' 'verilog/icache.sv' 'verilog/d_stage.sv' 'verilog/map_table.sv' 'verilog/rs_stage.sv' 'verilog/func_unit_2.sv' 'verilog/func_unit_3.sv' 'verilog/func_unit_0.sv' 'verilog/func_unit_1.sv' 'verilog/mult.sv' 'verilog/mult_stage.sv' 'verilog/rps4.sv' 'verilog/psel_gen.sv' 'verilog/rob.sv' 'verilog/if_stage.sv' '-o' 'simv' 2>&1"
+350 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+351 *Verdi* : Flush all FSDB Files at 000 ps.
+352 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+353 *Verdi* : Flush all FSDB Files at 000 ps.
+354 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+355 *Verdi* : Flush all FSDB Files at 000 ps.
+356 DVDI_is_vir_unload_enabled is enable
+357 FSDB_VCS_ENABLE_NATIVE_VC is enable
+358 sps_tcl_fsdbDumpvars_vd_main
+359 argv[0]: 1
+360 argv[1]: testbench.core.clock
+361 argv[2]: +all
+362 argv[3]: +trace_process
+363 *Verdi* : Dumping the signal (testbench.core.clock).
+364 pliAppHDL_DumpVarComplete traverse var: profile - 
+          CPU/Mem usage: 0.040 sys,  0.070 user,  415.64M mem
+                   incr: 0.000 sys,  0.000 user,  2.24M mem
+                   accu: 0.000 sys,  0.000 user,  2.24M mem
+              accu incr: 0.000 sys,  0.000 user,  2.24M mem
+
+          Count usage: 0 var,  2 idcode,  1 callback
+                 incr: 0 var,  2 idcode,  1 callback
+                 accu: 0 var,  2 idcode,  1 callback
+            accu incr: 0 var,  2 idcode,  1 callback
+365 Elapsed time:    0:00:24    Tue Apr 15 19:22:55 2025
+366 User CPU time used: 0 seconds
+367 System CPU time used: 0 seconds
+368 pliAppHDL_DumpVarComplete: profile - 
+          CPU/Mem usage: 0.040 sys,  0.070 user,  416.69M mem
+                   incr: 0.000 sys,  0.000 user,  1.05M mem
+                   accu: 0.000 sys,  0.000 user,  3.29M mem
+              accu incr: 0.000 sys,  0.000 user,  1.05M mem
+
+          Count usage: 0 var,  2 idcode,  1 callback
+                 incr: 0 var,  0 idcode,  0 callback
+                 accu: 0 var,  2 idcode,  1 callback
+            accu incr: 0 var,  0 idcode,  0 callback
+369 Elapsed time:    0:00:24    Tue Apr 15 19:22:55 2025
+370 User CPU time used: 0 seconds
+371 System CPU time used: 0 seconds
+372 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+373 *Verdi* : Flush all FSDB Files at 000 ps.
+374 sps_tcl_fsdbDumpvars_vd_main
+375 argv[0]: 1
+376 argv[1]: testbench.core.reset
+377 argv[2]: +all
+378 argv[3]: +trace_process
+379 *Verdi* : Dumping the signal (testbench.core.reset).
+380 pliAppHDL_DumpVarComplete traverse var: profile - 
+          CPU/Mem usage: 0.050 sys,  0.080 user,  418.59M mem
+                   incr: 0.000 sys,  0.000 user,  0.14M mem
+                   accu: 0.000 sys,  0.000 user,  0.14M mem
+              accu incr: 0.000 sys,  0.000 user,  0.14M mem
+
+          Count usage: 0 var,  3 idcode,  2 callback
+                 incr: 0 var,  1 idcode,  1 callback
+                 accu: 0 var,  1 idcode,  1 callback
+            accu incr: 0 var,  1 idcode,  1 callback
+381 Elapsed time:    0:00:27    Tue Apr 15 19:22:58 2025
+382 User CPU time used: 0 seconds
+383 System CPU time used: 0 seconds
+384 pliAppHDL_DumpVarComplete: profile - 
+          CPU/Mem usage: 0.050 sys,  0.080 user,  418.59M mem
+                   incr: 0.000 sys,  0.000 user,  0.00M mem
+                   accu: 0.000 sys,  0.000 user,  0.14M mem
+              accu incr: 0.000 sys,  0.000 user,  0.00M mem
+
+          Count usage: 0 var,  3 idcode,  2 callback
+                 incr: 0 var,  0 idcode,  0 callback
+                 accu: 0 var,  1 idcode,  1 callback
+            accu incr: 0 var,  0 idcode,  0 callback
+385 Elapsed time:    0:00:27    Tue Apr 15 19:22:58 2025
+386 User CPU time used: 0 seconds
+387 System CPU time used: 0 seconds
+388 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+389 *Verdi* : Flush all FSDB Files at 000 ps.
+390 sps_tcl_fsdbDumpvars_vd_main
+391 argv[0]: 1
+392 argv[1]: testbench.core.icache_0.Icache_data_out
+393 argv[2]: +all
+394 argv[3]: +trace_process
+395 *Verdi* : Dumping the signal (testbench.core.icache_0.Icache_data_out).
+396 pliAppHDL_DumpVarComplete traverse var: profile - 
+          CPU/Mem usage: 0.060 sys,  0.090 user,  419.64M mem
+                   incr: 0.000 sys,  0.000 user,  1.05M mem
+                   accu: 0.000 sys,  0.000 user,  1.05M mem
+              accu incr: 0.000 sys,  0.000 user,  1.05M mem
+
+          Count usage: 0 var,  4 idcode,  3 callback
+                 incr: 0 var,  1 idcode,  1 callback
+                 accu: 0 var,  1 idcode,  1 callback
+            accu incr: 0 var,  1 idcode,  1 callback
+397 Elapsed time:    0:00:41    Tue Apr 15 19:23:12 2025
+398 User CPU time used: 0 seconds
+399 System CPU time used: 0 seconds
+400 pliAppHDL_DumpVarComplete: profile - 
+          CPU/Mem usage: 0.060 sys,  0.090 user,  419.64M mem
+                   incr: 0.000 sys,  0.000 user,  0.00M mem
+                   accu: 0.000 sys,  0.000 user,  1.05M mem
+              accu incr: 0.000 sys,  0.000 user,  0.00M mem
+
+          Count usage: 0 var,  4 idcode,  3 callback
+                 incr: 0 var,  0 idcode,  0 callback
+                 accu: 0 var,  1 idcode,  1 callback
+            accu incr: 0 var,  0 idcode,  0 callback
+401 Elapsed time:    0:00:41    Tue Apr 15 19:23:12 2025
+402 User CPU time used: 0 seconds
+403 System CPU time used: 0 seconds
+404 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+405 *Verdi* : Flush all FSDB Files at 000 ps.
+406 sps_tcl_fsdbDumpvars_vd_main
+407 argv[0]: 1
+408 argv[1]: testbench.core.icache_0.Icache_valid_out
+409 argv[2]: +all
+410 argv[3]: +trace_process
+411 *Verdi* : Dumping the signal (testbench.core.icache_0.Icache_valid_out).
+412 pliAppHDL_DumpVarComplete traverse var: profile - 
+          CPU/Mem usage: 0.060 sys,  0.100 user,  419.64M mem
+                   incr: 0.000 sys,  0.000 user,  0.00M mem
+                   accu: 0.000 sys,  0.000 user,  0.00M mem
+              accu incr: 0.000 sys,  0.000 user,  0.00M mem
+
+          Count usage: 0 var,  5 idcode,  4 callback
+                 incr: 0 var,  1 idcode,  1 callback
+                 accu: 0 var,  1 idcode,  1 callback
+            accu incr: 0 var,  1 idcode,  1 callback
+413 Elapsed time:    0:00:47    Tue Apr 15 19:23:18 2025
+414 User CPU time used: 0 seconds
+415 System CPU time used: 0 seconds
+416 pliAppHDL_DumpVarComplete: profile - 
+          CPU/Mem usage: 0.060 sys,  0.100 user,  419.64M mem
+                   incr: 0.000 sys,  0.000 user,  0.00M mem
+                   accu: 0.000 sys,  0.000 user,  0.00M mem
+              accu incr: 0.000 sys,  0.000 user,  0.00M mem
+
+          Count usage: 0 var,  5 idcode,  4 callback
+                 incr: 0 var,  0 idcode,  0 callback
+                 accu: 0 var,  1 idcode,  1 callback
+            accu incr: 0 var,  0 idcode,  0 callback
+417 Elapsed time:    0:00:47    Tue Apr 15 19:23:18 2025
+418 User CPU time used: 0 seconds
+419 System CPU time used: 0 seconds
+420 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+421 *Verdi* : Flush all FSDB Files at 000 ps.
+422 sps_tcl_fsdbDumpvars_vd_main
+423 argv[0]: 1
+424 argv[1]: testbench.core.if_stage_0.nextIF_packet
+425 argv[2]: +all
+426 argv[3]: +trace_process
+427 *Verdi* : Dumping the signal (testbench.core.if_stage_0.nextIF_packet).
+428 pliAppHDL_DumpVarComplete traverse var: profile - 
+          CPU/Mem usage: 0.190 sys,  0.200 user,  419.91M mem
+                   incr: 0.000 sys,  0.000 user,  0.00M mem
+                   accu: 0.000 sys,  0.000 user,  0.00M mem
+              accu incr: 0.000 sys,  0.000 user,  0.00M mem
+
+          Count usage: 0 var,  43 idcode,  5 callback
+                 incr: 0 var,  38 idcode,  1 callback
+                 accu: 0 var,  38 idcode,  1 callback
+            accu incr: 0 var,  38 idcode,  1 callback
+429 Elapsed time:    0:01:20    Tue Apr 15 19:23:51 2025
+430 User CPU time used: 0 seconds
+431 System CPU time used: 0 seconds
+432 pliAppHDL_DumpVarComplete: profile - 
+          CPU/Mem usage: 0.190 sys,  0.200 user,  419.91M mem
+                   incr: 0.000 sys,  0.000 user,  0.00M mem
+                   accu: 0.000 sys,  0.000 user,  0.00M mem
+              accu incr: 0.000 sys,  0.000 user,  0.00M mem
+
+          Count usage: 0 var,  43 idcode,  5 callback
+                 incr: 0 var,  0 idcode,  0 callback
+                 accu: 0 var,  38 idcode,  1 callback
+            accu incr: 0 var,  0 idcode,  0 callback
+433 Elapsed time:    0:01:20    Tue Apr 15 19:23:51 2025
+434 User CPU time used: 0 seconds
+435 System CPU time used: 0 seconds
+436 sps_tcl_fsdbDumpflush_vd_main at 0 : N/A(0)
+437 *Verdi* : Flush all FSDB Files at 000 ps.
+438 sps_tcl_fsdbDumpflush_vd_main at 3518520 : N/A(0)
+439 *Verdi* : Flush all FSDB Files at 351,852,000 ps.
+440 End of simulation at 3518520
+441 Memory usage: 420.008 M
+442 Maximum resident set size: 122 MB
+443 Hard page faults: 8
+444 Soft page faults: 6197
+445 Elapsed time:    0:20:26    Tue Apr 15 19:42:57 2025
+446 User CPU time used: 0 seconds
+447 System CPU time used: 0 seconds
+448 Begin FSDB profile info:
+449 FSDB Writer : bc1(2798) bcn(5115) mtf/stf(0/9)
+FSDB Writer elapsed time : flush(0.042222) io wait(0.000000) theadpool wait(0.000000)
+FSDB Writer cpu time : MT Compression : 0
+450 End FSDB profile info
+451 FSDB closed. Name: /workdir/das2313_csee4824/p4.fsdb Size: 12008
+452 Parallel profile     - ProducerThread:1 ConsumerThread:1 Buffer:64MB
+453                      - BlockUsed:1 Acquire:0 BufferUsed:63195
+454                      - Flush:16 Expand:0 ProducerWait:0 ConsumerWait:0
+455                      - MainProducerTime:0.459542169 TotalConsumerTime:0.000000000
+456                      - ElapsedTime:1225.224204000
+457 Producer   0 profile - BlockUsed:3 Acquire:0 BufferUsed:63195
+458 Consumer   0 profile - Affinity:-1 CPUTime:0.000000000 LifeTime:0.000000000 (-nan%)
+459                      - BlockUsed:3 Acquire:0 BufferUsed:63195
+460 SimExit
+461 Elapsed time:    0:20:26    Tue Apr 15 19:42:57 2025
+462 User CPU time used: 0 seconds
+463 System CPU time used: 0 seconds
+464 Sim process exit

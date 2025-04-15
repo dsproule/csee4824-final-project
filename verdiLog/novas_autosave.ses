@@ -1,0 +1,97 @@
+@verdi rc file Version 1.0
+[General]
+saveDB = TRUE
+relativePath = FALSE
+saveSingleView = FALSE
+saveNWaveWinId = 
+VerdiVersion = Verdi_U-2023.03-SP2-1
+[KeyNote]
+Line1 = Automatic Backup 0
+Line2 = Save Open Database Information: Yes
+Line3 = Path Option: Absolute Paths
+Line4 = Windows Option: All Windows
+[OneSearch]
+isExisted = TRUE
+[TestBench]
+ConstrViewShow = 0
+InherViewShow = 0
+FSDBMsgShow = 0
+AnnotationShow = 0
+Console = TRUE
+powerDumped = 0
+[fusa]
+fdb_server = 
+fdb_proj = 
+fdb_campaign = 
+fdb_tool = 
+[hb]
+postSimFile = /workdir/das2313_csee4824/p4.fsdb
+syncTime = 43750
+viewport = 0 19 1471 737 0 0 209 898
+activeNode = "testbench.core.if_stage_0"
+activeScope = "testbench.core.if_stage_0"
+activeFile = "verilog/if_stage.sv"
+interactiveMode = False
+viewType = Source
+simulatorMode = False
+sourceBeginLine = 52
+baMode = False
+srcLineNum = True
+AutoWrap = True
+IdentifyFalseLogic = False
+syncSignal = False
+traceMode = Hierarchical
+showTraceInSchema = True
+paMode = False
+funcMode = False
+powerAwareAnnot = True
+safetyAwareAnnot = True
+amsAnnot = True
+DnDtraceCrossHierOnly = True
+leadingZero = False
+signalPane = False
+SourceVerticalScrollLines = 5
+Scope1 = "testbench.core.if_stage_0"
+Scope2 = "testbench"
+Scope3 = "testbench.core.icache_0"
+Scope4 = "testbench.core"
+multipleSelection = 1 12 2 0 0
+sdfCheckUndef = FALSE
+simFlow = FALSE
+[hb.design]
+importCmd = "-simflow" "-dbdir" "./simv.daidir" 
+invokeDir = /homes/user/stud/fall23/das2313/csee4824/csee4824-final-project
+[hb.sourceTab.1]
+scope = testbench.core.if_stage_0
+File = /homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/verilog/if_stage.sv
+Line = 53
+[nMemoryManager]
+WaveformFile = /workdir/das2313_csee4824/p4.fsdb
+UserActionNum = 0
+nMemWindowNum = 0
+[wave.0]
+viewPort = 0 25 972 298 188 98
+primaryWindow = TRUE
+SessionFile = /homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/verdiLog/novas_autosave.ses.wave.0
+displayGrid = FALSE
+hierarchicalName = FALSE
+snap = TRUE
+displayLeadingZeros = FALSE
+fixDelta = FALSE
+displayCursorMarker = FALSE
+autoUpdate = FALSE
+highlightGlitchs = FALSE
+waveformSyncCursorMarker = FALSE
+waveformSyncHorizontalRange = FALSE
+waveformSyncVerticalscroll = FALSE
+displayErrors = TRUE
+displayMsgSymbols = TRUE
+showMsgDescriptions = TRUE
+autoFit = FALSE
+displayDeltaY = FALSE
+centerCursor = FALSE
+fsaRegMask = TRUE
+fsaCoreMask = TRUE
+fsaSfsmMask = TRUE
+fsaEcrMask = TRUE
+tPropMask = TRUE
