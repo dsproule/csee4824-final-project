@@ -16,6 +16,8 @@ extern void initmem();
 extern int get_instr_at_pc(int);
 extern int not_valid_pc(int);
 
+int slot = 0;
+
 module testbench;
     // used to parameterize which file is loaded into memory
     // "./vis_simv" still just uses program.mem
@@ -43,6 +45,7 @@ module testbench;
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg;
     ROB_T rob_head_dbg, rob_tail_dbg, retire_T_wire_dbg;
+    IF_ID_PACKET            IF_ID_reg_dbg;
     PPLN_CTRL rob_pipeline_control_dbg;
 
 `ifndef CACHE_MODE
@@ -60,9 +63,6 @@ module testbench;
     // logic [`XLEN-1:0] if_NPC_dbg;
     // logic [31:0]      if_inst_dbg;
     // logic             if_valid_dbg;
-
-    
-
 
     // Instantiate the Pipeline
     pipeline pipeline_0 (
@@ -89,7 +89,7 @@ module testbench;
         // .if_NPC_dbg       (if_NPC_dbg),
         // .if_inst_dbg      (if_inst_dbg),
         // .if_valid_dbg     (if_valid_dbg),
-
+        .IF_ID_reg_dbg(IF_ID_reg_dbg),
         .rs_table_dbg   (rs_table_dbg),
         .cdb_dbg        (cdb_dbg),
         .busy_dbg       (busy_dbg),
@@ -149,7 +149,7 @@ module testbench;
         // Note that after this, all stdout output goes to visual debugger
         // each argument is number of registers/signals for the group
         initcurses( // count = 5
-            0,  // IF
+            2,  // IF
             `RS_SZ,  // Reservation Station
             3,  // CDB
             32, // Map Table
@@ -206,29 +206,12 @@ module testbench;
         $display("t%8.0f",$time);
         $display("z%h",reset);
 
-       // Dump register file contents
-        // $write("a");
-        // for(int i = 0; i < 32; i=i+1) begin
-        //     $write("%h", pipeline_0.stage_id_0.regfile_0.registers[i]);
-        // end
-        // $display("");
-
-        // // Dump instructions and their validity for each stage
-        // $write("p");
-        // $write("%h%h%h%h%h%h%h%h%h%h ",
-        //        if_inst_dbg,      if_valid_dbg,
-        //        if_id_inst_dbg,   if_id_valid_dbg,
-        //        id_ex_inst_dbg,   id_ex_valid_dbg,
-        //        ex_mem_inst_dbg,  ex_mem_valid_dbg,
-        //        mem_wb_inst_dbg,  mem_wb_valid_dbg);
-        // $display("");
-
         // Dump interesting register/signal contents onto stdout
         // format is "<reg group prefix><name> <width in hex chars>:<data>"
         // Current register groups (and prefixes) are:
         // f: IF  r: RS b: CDB o: ROB Mt: Map Table
 
-        // // IF signals (5) - prefix 'f'
+        // // // IF signals (5) - prefix 'f'
         // $display("fNPC 8:%h",         pipeline_0.if_packet.NPC);
         // $display("finst 8:%h",        pipeline_0.if_packet.inst);
         // $display("fImem_addr 8:%h",   pipeline_0.stage_if_0.proc2Imem_addr);
@@ -237,46 +220,51 @@ module testbench;
         // // haven't updated VTUBER to use rd_unsigned yet
         // $display("imem_size 1:%h",    {pipeline_0.ex_mem_reg.rd_unsigned, pipeline_0.ex_mem_reg.mem_size});
 
+        
+        // IF/ID packet (prefix 'f')
+        if (IF_ID_reg_dbg.valid) begin
+            $display("fPC 8:%h", IF_ID_reg_dbg.PC);
+            $display("finst 8:%h", IF_ID_reg_dbg.inst);
+        end
 
         // ROB - prefix 'o'
         $display("ohead %h", rob_head_dbg);
         $display("otail %h", rob_tail_dbg);
-        
+        $display("oretire %h", rob_retire_dbg);
+        //entries
         for (int i = 1; i < `ROB_SZ; i++) begin
             ROB_ENTRY entry;
             entry = rob_table_out_dbg[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
-            // $display("oROB_entry:%0d idx:%4d   r:%4d   V:%4d   retire:%1b   retire_T:%4d   flush:%1b   write_data:%8h",
-            //                 i, i, entry.r, entry.V, rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, pipeline_0.rob_write_data);
-            $display("oROB_entry:%0d idx:%4d   r:%4d   V:%4d", i, i, entry.r, entry.V);
+            $display("oROB_entry:%0d %4d->   r:%4d   V:%4d", i, i, entry.r, entry.V);
                     
         end
-
+        //ROB_T: %4d, flush: %0d branch_addr???
 
         // Map - Table 'Mt'
-
         for (int i = 0; i < 32; i++) begin
             MT_ENTRY entry;
             entry = mt_table_out_dbg[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
             $display("tMT_entry %0d T:%4d plus:%1d", i, entry.T, entry.plus);
         end
+        //"T1:%4d       T2:%4d", core.T1_wire, core.T2_wire)??
 
         // CDB - prefix 'b'
         // Show CDB state
-        $display("bCDB_valid :%h", cdb_dbg.valid);
-        $display("bCDB_T :%h", cdb_dbg.T);
-        $display("bCDB_V :%h", cdb_dbg.V);
+        $display("bCDB_valid %h", cdb_dbg.valid);
+        $display("bCDB_T %h", cdb_dbg.T);
+        $display("bCDB_V %h", cdb_dbg.V);
 
 
         // Reservation Station signals (`RS_SZ) - prefix 'r'
-
         $display("rRS_busy 2:%h", busy_dbg);
-
-        // Show key info for busy entries
+        // Entries
         for (int i = 0; i < `RS_SZ; i++) begin
             if (busy_dbg[i]) begin
                 $display("rRS%0d_T 2:%02h", i, rs_table_dbg[i].T);
                 $display("rRS%0d_T1 2:%02h", i, rs_table_dbg[i].T1);
                 $display("rRS%0d_T2 2:%02h", i, rs_table_dbg[i].T2);
+                $display("rRS%0d_V1 2:%02h", i, rs_table_dbg[i].V1);
+                $display("rRS%0d_V2 2:%02h", i, rs_table_dbg[i].V2);
                 $display("rRS%0d_ready 1:%02h", i, rs_table_dbg[i].ready);
             end
         end
