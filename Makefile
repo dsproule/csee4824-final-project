@@ -377,7 +377,8 @@ SOURCES = verilog/pipeline.sv \
           verilog/mult_stage.sv \
 		  verilog/rps4.sv \
 		  verilog/rob.sv \
-		  verilog/if_stage.sv
+		  verilog/if_stage.sv \
+		  verilog/p3/stage_if.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 

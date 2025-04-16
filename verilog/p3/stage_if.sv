@@ -13,6 +13,7 @@
 module stage_if (
     input             clock,          // system clock
     input             reset,          // system reset
+    input             pipe_stall,
     input             if_valid,       // only go to next PC when true
     input             take_branch,    // taken-branch signal
     input [`XLEN-1:0] branch_target,  // target pc: use if take_branch is TRUE
@@ -30,7 +31,7 @@ module stage_if (
             PC_reg <= 0;             // initial PC value is 0 (the memory address where our program starts)
         end else if (take_branch) begin
             PC_reg <= branch_target; // update to a taken branch (does not depend on valid bit)
-        end else if (if_valid) begin
+        end else if (if_valid & ~pipe_stall) begin
             PC_reg <= PC_reg + 4;    // or transition to next PC if valid
         end
     end
