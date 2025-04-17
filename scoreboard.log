@@ -1,11 +1,11 @@
 
 ================== SCOREBOARD ==================
-Test Run: Thu Apr 17 07:36:37 EDT 2025
+Test Run: Thu Apr 17 11:01:23 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
 evens_long           | PASS       | PASS       | 4.483582   | WFI instruction               
 load_tests           | PASS       | PASS       | 8.857143   | WFI instruction               
-matrix_mult_rec      | FAIL       | FAIL       | 10.391880  | WFI instruction               
+matrix_mult_rec      | PASS       | PASS       | 10.718629  | WFI instruction               
 fc_forward           | PASS       | PASS       | 5.923168   | WFI instruction               
 parallel             | PASS       | PASS       | 4.989950   | WFI instruction               
 omegalul             | PASS       | PASS       | 6.041096   | WFI instruction               

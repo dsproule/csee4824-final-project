@@ -98,19 +98,10 @@ module rob(
                 regfile_write_idx <= rob_table[head].r; 
                 regfile_write_data <= rob_table[head].V; 
                 ppln_ctrl <= rob_table[head].ppln_ctrl;
-                rob_table[head] <= 0;
 
                 retire_T <= head;
                 head <= (head == `ROB_SZ - 1) ? 1 : head + 1; // change here
                 head_wrap <= (head == `ROB_SZ - 1) ? ~head_wrap : head_wrap; // change here
-
-                if (rob_table[head].ppln_ctrl.flush) begin //FLUSH
-                    for (int i = 1; i <= `ROB_SZ; i++) begin
-                        rob_table[i] <= 0;  
-                    end
-                    head <= 1;  // flushing zeros out the head/tail --> empty
-                    tail <= 1; 
-                end
             end else begin
                 retire <= 0;
             end

@@ -278,9 +278,13 @@ module testbench;
     always @(posedge clock) begin
         if (~reset) begin
             // only start printing after first inst arrives
-            if (IF_ID_reg_dbg.valid)
-            // if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'h10))
+            // if (IF_ID_reg_dbg.valid)
+            if ((clock_count >= 11607)) begin
                 prog_start <= 1;
+            // if ((clock_count >= 11618)) begin
+                // show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
+                // $finish;
+            end
 
 
             if (prog_start) begin
@@ -379,10 +383,10 @@ module testbench;
             // print register write information to the writeback output file
             if (pipeline_completed_insts > 0) begin
                 if(pipeline_commit_wr_en)
-                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
+                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x, T=%d", 
                               pipeline_commit_NPC - 4,
                               pipeline_commit_wr_idx,
-                              pipeline_commit_wr_data
+                              pipeline_commit_wr_data, clock_count
                               );
                 else
                     $fdisplay(wb_fileno, "PC=%x, ---", pipeline_commit_NPC - 4);

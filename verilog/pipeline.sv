@@ -364,7 +364,8 @@ module pipeline (
     );
 
     func_unit_2 func_unit_02 (
-        .clock(clock), .reset(reset | take_branch), .Dmem_gnt(Dmem_gnt[1]),
+        .clock(clock), .reset(reset | take_branch), 
+        .Dmem_gnt(Dmem_gnt[1]),
         .retired(gnt[2]),
         .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
         .Dmem2proc_data(mem2proc_data),
