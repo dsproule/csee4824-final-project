@@ -1,7 +1,7 @@
 
 ================== SCOREBOARD ==================
-Test Run: Tue Apr 15 19:42:10 EDT 2025
+Test Run: Wed Apr 16 23:57:02 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
-bfs                  | FAIL       | FAIL       | 5.213058   | memory error (EXPECTED: WFI instruction)
+saxpy                | FAIL       | FAIL       | 4.403509   | WFI instruction               
 ==========================================================================================

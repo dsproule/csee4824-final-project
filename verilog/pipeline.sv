@@ -207,7 +207,7 @@ module pipeline (
     always_ff @(posedge clock) begin
         if (reset | take_branch) begin
             IF_ID_reg <= '0;
-        end else if (IF_enable & ~rs_stall) begin
+        end else if (IF_enable) begin
             IF_ID_reg <= IF_packet;
         end
     end
@@ -232,7 +232,7 @@ module pipeline (
             D_S_reg <= '0;
         // separated because may need a signal to stall
         end else if (D_enable) begin
-            D_S_reg <= (D_packet.valid) ? D_packet : '0;
+            D_S_reg <= D_packet;
         end
     end
 
