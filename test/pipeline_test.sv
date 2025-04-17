@@ -278,16 +278,16 @@ module testbench;
     always @(posedge clock) begin
         if (~reset) begin
             // only start printing after first inst arrives
-            // if (IF_ID_reg_dbg.valid)
-            if ((clock_count >= 11607)) begin
+            // if ((clock_count >= 11607)) begin
+            if (IF_ID_reg_dbg.valid)
                 prog_start <= 1;
             // if ((clock_count >= 11618)) begin
                 // show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
                 // $finish;
-            end
+            // end
 
 
-            if (prog_start) begin
+            if (prog_start & (clock_count < 2000)) begin
                 // print_if;
                 // print_ds;
                 // print_rs;

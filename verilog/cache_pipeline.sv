@@ -87,6 +87,9 @@ module pipeline (
     logic [1:0] Dmem_gnt;
     logic wr_mem, rd_mem;
 
+    logic [1:0] cache2mem_command;
+    logic [`XLEN-1:0] cache2mem_addr;
+
     // ROB outputs
     PPLN_CTRL pipeline_control;
     logic rob_full, rob_empty, retire;
@@ -107,15 +110,6 @@ module pipeline (
     logic [4:0] retire_r_wire;
     ROB_T rob_T_wire, retire_T_wire;
     ROB_T rob_head, rob_tail;
-
-    // Caches 
-    logic [`XLEN-1:0] proc2Icache_addr;
-    logic [63:0] Icache_data_out;
-    logic Icache_valid_out;
-    logic [`XLEN-1:0] cache2Dmem_addr;
-    logic [1:0] cache2Dmem_command;
-    logic [63:0] Dcache_data_out;
-    logic Dcache_valid_out;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -144,9 +138,7 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign rd_mem = S_X_regs[2].valid;
-    assign wr_mem = S_X_regs[3].valid;
-    assign Dmem_req = (wr_mem | rd_mem);
+    assign Dmem_req = (rd_mem | S_X_regs[3].valid);
 
     // for all memory vectors, ind0 -> wr and ind1 -> rd
 
@@ -159,8 +151,8 @@ module pipeline (
                 proc2mem_command = proc2Dmem_command;
                 Dmem_gnt = 2'b01;
             end else begin
-                proc2mem_addr    = cache2Dmem_addr;
-                proc2mem_command = cache2Dmem_command;
+                proc2mem_addr    = cache2mem_addr;
+                proc2mem_command = cache2mem_command;
                 Dmem_gnt = 2'b10;
             end
         end else begin
@@ -179,35 +171,17 @@ module pipeline (
     assign take_branch   = pipeline_control.flush;
     assign branch_target = pipeline_control.branch_addr; 
 
-    icache icache_0 (
-        .clock(clock), .reset(reset | take_branch),
-        .Imem2proc_response((Dmem_req) ? '0 : mem2proc_response), // Should be zero unless there is a response
-        .Imem2proc_data(mem2proc_data),
-        .Imem2proc_tag(mem2proc_tag),
-
-        // From fetch stage
-        .proc2Icache_addr(proc2Icache_addr),
-
-        // To memory
-        .proc2Imem_command(proc2Imem_command),
-        .proc2Imem_addr(proc2Imem_addr),
-
-        // To fetch stage
-        .Icache_data_out(Icache_data_out), // Data is mem[proc2Icache_addr]
-        .Icache_valid_out(Icache_valid_out) // When valid is high
-    );
-
     if_stage if_stage_0(
-        .clock(clock), .reset(reset), 
-        .if_valid(~Dmem_req & Icache_valid_out),
-        .pipe_stall(rs_stall),
+        .clock(clock), .reset(reset), .stall(rs_stall), .Imem_gnt(~Dmem_req & ~rs_stall),
         .take_branch(take_branch),
         .branch_target(branch_target),
-        .Imem2proc_data(Icache_data_out),
+        .Imem2proc_data(mem2proc_data),
+        .Imem2proc_response(mem2proc_response), .Imem2proc_tag(mem2proc_tag),
 
-        
-        .if_packet(IF_packet),
-        .proc2Imem_addr(proc2Icache_addr)
+        .mem_req(Imem_req),
+        .IF_packet(IF_packet),
+        .proc2Imem_command(proc2Imem_command),
+        .proc2Imem_addr(proc2Imem_addr)
     );
 
     assign IF_enable = 1'b1 & ~rs_stall;
@@ -215,7 +189,7 @@ module pipeline (
         if (reset | take_branch) begin
             IF_ID_reg <= '0;
         end else if (IF_enable) begin
-            IF_ID_reg <= IF_packet;
+            IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
         end
     end
 
@@ -239,7 +213,7 @@ module pipeline (
             D_S_reg <= '0;
         // separated because may need a signal to stall
         end else if (D_enable) begin
-            D_S_reg <= D_packet;
+            D_S_reg <= (D_packet.valid) ? D_packet : '0;
         end
     end
 
@@ -268,7 +242,9 @@ module pipeline (
     assign V2_rs = (T2_wire.plus == 1) ? V2_rob_final : V2_regfile;
 
     logic rs_idx_full;
+    logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
+    assign FU_ready_no_lsq = {FU_ready[3] & ~S_X_regs[2].valid, FU_ready[2] & ~S_X_regs[3].valid, FU_ready[1:0]};
     assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
     rs_stage rs_stage_inst (
         // Inputs
@@ -367,33 +343,47 @@ module pipeline (
         .X_packet(X_packets[1])
     );
 
-    dcache dache_0(
-        .clock(clock), .reset(reset | wr_mem),
+    //////////////////////////////////////////////////
+    //                                              //
+    //                 Cache FUs                    //
+    //                                              //
+    //////////////////////////////////////////////////
 
-        // From memory
-        .Dmem2proc_response((Dmem_gnt[1]) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
-        .Dmem2proc_data(mem2proc_data),
+    logic        cache_valid;
+    logic [63:0] cache2proc_data, proc2cache_data;
+    logic [`XLEN-1:0] proc2cache_addr;
+    logic [1:0] proc2cache_command;
 
-        // From fetch stage
-        .proc2Dcache_addr(proc2Dmem_addr[1]),
+    cache dcache(
+        .clock(clock), .reset(reset | take_branch),
 
-        // To memory
-        .proc2Dmem_command(cache2Dmem_command),
-        .proc2Dmem_addr(cache2Dmem_addr),
+        // From proc to cache (proc controls)
+        .proc2cache_addr(proc2cache_addr),
+        .rd_mem(rd_mem), .wr_mem(proc2cache_command == BUS_STORE),
+        .proc2cache_data(proc2cache_data),
 
-        // To fetch stage
-        .Dcache_data_out(Dcache_data_out),
-        .Dcache_valid_out(Dcache_valid_out)
+        // From mem to cache
+        .mem2cache_response((Dmem_gnt[1]) ? mem2proc_response : '0), .mem2cache_tag(mem2proc_tag),
+        .mem2cache_data(mem2proc_data),
+
+        // From cache to mem
+        .cache2mem_addr(cache2mem_addr),
+        .cache2mem_command(cache2mem_command),
+        .cache2mem_data(),
+
+        .cache2proc_data(cache2proc_data),
+        .cache_valid(cache_valid)
     );
 
+    assign rd_mem = (S_X_regs[2].valid);
+
     func_unit_2 func_unit_02 (
-        .clock(clock), .reset(reset | take_branch), 
-        .committed(gnt[2]), .data_valid(Dcache_valid_out),
-        .Dmem2proc_data(Dcache_data_out),
+        .clock(clock), .reset(reset), 
+        .committed(gnt[2]), .data_valid(cache_valid),
+        .Dmem2proc_data(cache2proc_data),
         .S_X_reg(S_X_regs[2]),
 
-        // output logic mem_load_pend,
-        .proc2Dmem_addr(proc2Dmem_addr[1]),
+        .proc2Dmem_addr(proc2cache_addr),
         .X_packet(X_packets[2])
     );
 
@@ -405,7 +395,7 @@ module pipeline (
         .Dmem2proc_data(mem2proc_data),
         .S_X_reg(S_X_regs[3]),
 
-        .mem_store_pend(),             // the module is attempting to store a value
+        .mem_store_pend(wr_mem),             // the module is attempting to store a value
         .proc2Dmem_addr(proc2Dmem_addr[0]),
         .proc2Dmem_command(proc2Dmem_command),
         .proc2Dmem_data(proc2Dmem_data),
