@@ -65,6 +65,7 @@ WINDOW *instr_win;
 WINDOW *clock_win;
 WINDOW *pipe_win;
 WINDOW *if_win;
+WINDOW *ds_win; //changed
 WINDOW *vtuber_win;
 WINDOW *rs_win; //changed
 WINDOW *cdb_win; // changed
@@ -75,6 +76,7 @@ WINDOW *mt_win; // changed
 int history_num=0;
 int num_if_regs = 0;
 
+int num_ds_regs = 0;
 int num_rs_regs = 0;
 int num_cdb_regs = 0;
 int num_rob_regs = 0;
@@ -88,11 +90,13 @@ char *resets;
 char **inst_contents;
 char ***if_contents;
 
+char ***ds_contents;   // D_S
 char ***rs_contents;   // Reservation Station
 char ***cdb_contents;  // Common Data Bus
 char ***rob_contents;  // Reorder Buffer
 char ***mt_contents;   // Map Table
 char **if_reg_names;
+char **ds_reg_names; //changed
 char **rs_reg_names; //changed 
 char **cdb_reg_names; // changed 
 char **rob_reg_names; // changed 
@@ -102,7 +106,7 @@ char *get_opcode_str(int inst, int valid_inst);
 void parse_register(char* readbuf, int reg_num, char*** contents, char** reg_names);
 int get_time();
 
-int rs_width = 60;               // Width of the RS window
+int rs_width = 63;               // Width of the RS window
 int rs_height = 10;              // Height for the RS window 
 
 char entry_text[80];
@@ -193,7 +197,7 @@ void update_clock(char clock_val) {
 
 // Function to create and initialize the gui
 
-void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs) {
+void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, int ds_regs) {
     initscr();
     if (has_colors()) {
         start_color();
@@ -214,24 +218,29 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs) {
     wrefresh(stdscr);
     int pipe_width=0;
 
-    int rob_width = 30; 
+    int if_startx = 0;
+
+    int ds_width = 40;
+    int ds_height = ds_regs + 2;
+    int ds_starty = LINES - 30;
+    int ds_startx = 0;
+
+    int rs_starty = ds_starty + ds_height + 2;  
+    int rs_startx = 0;  
+
+    int rob_width = 33; 
     int rob_height = rob_regs + 4;
-    int rob_starty = LINES- 37; 
-    int rob_startx = 0;
+    int rob_starty = LINES - 37; 
+    int rob_startx = rs_startx + rs_width + 2;
+
+    int cdb_width = 20; 
+    int cdb_starty = LINES - 30; 
+    int cdb_startx = rs_startx + rs_width - cdb_width -2;
 
     int mt_width = 30; 
     int mt_height = mt_regs + 4;
-    int mt_starty = LINES- 37; 
+    int mt_starty = LINES - 37; 
     int mt_startx = rob_startx + rob_width + 2;
-    
-    int rs_starty = LINES - 30;  
-    int rs_startx = mt_startx + mt_width + 2;  
-
-    int cdb_width = 20; 
-    int cdb_starty = LINES- 20; 
-    int cdb_startx = rs_startx + rs_width - cdb_width;
-
-    int if_startx = mt_startx + mt_width + 2;
 
     // instantiate the title window at top of screen
     title_win = create_newwin(3,COLS,0,0,4);
@@ -257,9 +266,14 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs) {
     wrefresh(clock_win);
 
     // instantiate window to visualize IF stage (including IF/ID)
-    if_win = create_newwin((num_if_regs+2),20,LINES- 37,if_startx,3);
+    if_win = create_newwin((num_if_regs+4),25,LINES- 37,if_startx, 3);
     mvwprintw(if_win,0,6,"IF STAGE");
     wrefresh(if_win);
+
+    // instantiate window to visualize IF stage (including IF/ID)
+    ds_win = create_newwin(ds_height,ds_width,ds_starty,ds_startx, 5);
+    mvwprintw(ds_win, 0, (ds_width - 4) / 2, "D/S");
+    wrefresh(ds_win);
 
     // instantiate a window to visualize Reservation Station //changed
     rs_win = create_newwin(rs_height, rs_width, rs_starty, rs_startx, 1); 
@@ -362,7 +376,7 @@ void parsedata(int history_num_in) {
             wattron(if_win, A_REVERSE);
         else
             wattroff(if_win, A_REVERSE);
-
+    
         // Print "PC: " or "inst: " before the value depending on index
         if (i == 0) {
             mvwprintw(if_win, i + 1, 1, "PC:  %s", if_contents[history_num_in][i]);
@@ -373,20 +387,45 @@ void parsedata(int history_num_in) {
             mvwprintw(if_win, i + 1, 1, "%s", if_contents[history_num_in][i]);
         }
     }
-    wattroff(if_win, A_REVERSE);  // safety: ensure reverse is off
+    wattroff(if_win, A_REVERSE);  // safety: ensure reverse is offn
     wrefresh(if_win);
 
+    // D_S window
+    for (i = 0; i < num_ds_regs; i++) {
+        if (strcmp(ds_contents[history_num_in][i],
+                ds_contents[old_history_num_in][i]) != 0)
+            wattron(ds_win, A_REVERSE);
+        else
+            wattroff(ds_win, A_REVERSE);
 
-    // // Handle updating the IF window
-    // for (i=0;i<num_if_regs;i++) {
-    //     if (strcmp(if_contents[history_num_in][i],
-    //             if_contents[old_history_num_in][i]))
-    //         wattron(if_win, A_REVERSE);
-    //     else
-    //         wattroff(if_win, A_REVERSE);
-    //     mvwaddstr(if_win,i+1,strlen(if_reg_names[i])+3,if_contents[history_num_in][i]);
-    // }
-    // wrefresh(if_win);
+        if (i == 0) {
+            mvwprintw(ds_win, i + 1, 1, "INST->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 1) {
+            mvwprintw(ds_win, i + 1, 1, "PC->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 2) {
+            mvwprintw(ds_win, i + 1, 1, "NPC->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 3) {
+            mvwprintw(ds_win, i + 1, 1, "r->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 4) {
+            mvwprintw(ds_win, i + 1, 1, "r1->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 5) {
+            mvwprintw(ds_win, i + 1, 1, "r2->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 6) {
+            mvwprintw(ds_win, i + 1, 1, "opA->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 7) {
+            mvwprintw(ds_win, i + 1, 1, "opB->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 8) {
+            mvwprintw(ds_win, i + 1, 1, "branch->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 9) {
+            mvwprintw(ds_win, i + 1, 1, "ALU->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 10) {
+            mvwprintw(ds_win, i + 1, 1, "rs_id_x->  %s", ds_contents[history_num_in][i]);
+        } else if (i == 11) {
+            mvwprintw(ds_win, i + 1, 1, "Flags->  %s", ds_contents[history_num_in][i]);
+        } 
+    }
+    // wattroff(ds_win, A_REVERSE);
+    wrefresh(ds_win);
 
     // update the time window
     mvwprintw(time_win, 1, 1, "%s", timebuffer[history_num_in]);
@@ -399,25 +438,27 @@ void parsedata(int history_num_in) {
 
     // Update Reservation Station
     for (i = 0; i < num_rs_regs; i++) {
-        // busy flag is a single bit 
         char busy_cur = rs_contents[history_num_in][i][0];  
         char busy_old = rs_contents[old_history_num_in][i][0];
         if (busy_cur != busy_old) wattron(rs_win, A_REVERSE);
         else wattroff(rs_win, A_REVERSE);
         // print the Busy line once (only at i==0)
         if (i == 0) {
-            mvwprintw(rs_win, 0, 5, "Busy: %s", busy_cur ? "1" : "0");
+            mvwprintw(rs_win, 1, 5, "Busy: %s", busy_cur ? "1" : "0");
         }
         // now the fields T, T1, T2, V1, V2, ready
-        mvwprintw(rs_win, i+2, 2,
+        int base = 1 + i*6;
+        /* clear old contents, width = window_width-4 */
+        mvwprintw(rs_win, i+3, 2, "%*s", getmaxx(rs_win)-4, "");
+        mvwprintw(rs_win, i+3, 2,
             "RS%1d-> T:%-4s T1:%-4s T2:%-4s V1:%-4s V2:%-4s Ready:%-4s",
             i,
-            rs_contents[history_num_in][i*6 + 0],
-            rs_contents[history_num_in][i*6 + 1],
-            rs_contents[history_num_in][i*6 + 2],
-            rs_contents[history_num_in][i*6 + 3],
-            rs_contents[history_num_in][i*6 + 4],
-            rs_contents[history_num_in][i*6 + 5]
+            rs_contents[history_num_in][base + 0],
+            rs_contents[history_num_in][base + 1],
+            rs_contents[history_num_in][base + 2],
+            rs_contents[history_num_in][base + 3],
+            rs_contents[history_num_in][base + 4],
+            rs_contents[history_num_in][base + 5]
         );
     }
     wrefresh(rs_win);
@@ -514,11 +555,10 @@ int processinput() {
     // get rid of newline character
     readbuffer[strlen(readbuffer)-1] = 0;
 
-    
+    // CDB
     if (strncmp(readbuffer, "bCDB_valid", 10) == 0) {
         char v[8];
         sscanf(readbuffer, "bCDB_valid %s", v);
-        // store into cdb_contents
         strcpy(cdb_contents[history_num][0], v);
         return 0;
     } else if (strncmp(readbuffer, "bCDB_T", 6) == 0) {
@@ -531,10 +571,11 @@ int processinput() {
         sscanf(readbuffer, "bCDB_V %s", v);
         strcpy(cdb_contents[history_num][2], v);
         return 0;
+
+    // Map Table
     } else if (strncmp(readbuffer, "tMT_entry", 9) == 0) {
         int idx, T, plus;
         if (sscanf(readbuffer, "tMT_entry %d T:%d plus:%d", &idx, &T, &plus) == 3) {
-            // convert to strings
             char bufT[8], bufP[4];
             sprintf(bufT, "%d", T);
             sprintf(bufP, "%d", plus);
@@ -542,10 +583,11 @@ int processinput() {
             strcpy(mt_contents[history_num][2*idx+1], bufP);
         }
         return 0;
+
+    // Reservation Station
     } else if (strncmp(readbuffer, "rRS_busy", 8) == 0) {
         char v[4];
         sscanf(readbuffer, "rRS_busy %*d:%s", v);
-        // busy is field 0 of RS
         strcpy(rs_contents[history_num][0], v);
         return 0;
     } else if (strncmp(readbuffer, "rRS", 3) == 0) {
@@ -590,11 +632,8 @@ int processinput() {
         // We are getting information about which instructions are in each stage
         strcpy(inst_contents[history_num], readbuffer+1);
 
+        // IF/ID packet
     } else if (strncmp(readbuffer,"f",1) == 0) {
-        // We are getting an IF register
-
-        // If this is the first time we've seen the register,
-        // add name and data to arrays
         if (!setup_registers) {
             parse_register(readbuffer, if_reg_num, if_contents, if_reg_names);
             mvwaddstr(if_win,if_reg_num+1,1,if_reg_names[if_reg_num]);
@@ -604,38 +643,104 @@ int processinput() {
             sscanf(readbuffer,"%*c%s %d:%s",name_buf,&tmp_len,val_buf);
             strcpy(if_contents[history_num][if_reg_num],val_buf);
         }
-
         if_reg_num++;
+
+        // ROB
     } else if (strncmp(readbuffer, "oROB_entry", 10) == 0) {
-        int slot, idx, r, V;
-        int retire;         // expecting a boolean printed as integer (0 or 1)
-        int retire_T;       // an integer for the retire ROB tag
-        int flush;          // flush flag (0 or 1)
-        unsigned int write_data; // use unsigned int to capture hex write-back data
+        // We are getting ROB entries
+        int slot, idx, r, V, ready;
         char buf[128];
-
-        if (sscanf(readbuffer, "oROB_entry:%0d %4d->   r:%4d   V:%4d", &slot, &idx, &r, &V) == 4) {
-
-            sprintf(buf, "%2d->  r:%4d  V:%4d", idx, r, V);
-            
+        if (sscanf(readbuffer, "oROB_entry:%0d %4d->   r:%4d  V:%4d  ready:%1d", &slot, &idx, &r, &V, &ready) == 5) {
+            sprintf(buf, "%2d->  r:%4d  V:%4d  ready: %1d", idx, r, V, ready);
             strcpy(rob_contents[history_num][2 + slot], buf);
         }
         return 0;    
     } else if (strncmp(readbuffer, "ohead", 5) == 0) {
+        // We are getting ROB head
         char v[32];
         sscanf(readbuffer, "ohead %s", v);
         strcpy(rob_contents[history_num][0], v);
         return 0;
     }  else if (strncmp(readbuffer, "otail", 5) == 0) {
+        // We are getting ROB head
         char v[32];
         sscanf(readbuffer, "otail %s", v);
         strcpy(rob_contents[history_num][1], v);
         return 0;
     } else if (strncmp(readbuffer, "oretire", 7) == 0) {
+        // We are getting ROB retire
         char v[32];
         sscanf(readbuffer, "oretire %s", v);
         strcpy(rob_contents[history_num][2], v);
         return 0;
+        
+        // D/S
+    } else if (strncmp(readbuffer, "dINST", 5) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dINST %s", v);
+        strcpy(ds_contents[history_num][0], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dPC", 3) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dPC %s", v);
+        strcpy(ds_contents[history_num][1], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dNPC", 4) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dNPC %s", v);
+        strcpy(ds_contents[history_num][2], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dsr", 2) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dsr %s", v);
+        strcpy(ds_contents[history_num][3], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dpr1", 4) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dpr1 %s", v);
+        strcpy(ds_contents[history_num][4], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dqr2", 4) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dqr2 %s", v);
+        strcpy(ds_contents[history_num][5], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dopa", 4) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dopa %s", v);
+        strcpy(ds_contents[history_num][6], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dopb", 4) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dopb %s", v);
+        strcpy(ds_contents[history_num][7], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dbranch", 7) == 0) {
+        char buf[64];
+        char v[32], v1[32], v2[32];
+        sscanf(readbuffer, "dbranch %s %s", v1, v2);
+        snprintf(buf, sizeof(buf), "cond: %s ucond: %s", v1, v2);
+        strcpy(ds_contents[history_num][8], buf);
+        return 0;
+    } else if (strncmp(readbuffer, "dalu", 4) == 0) {
+        char v[32];
+        sscanf(readbuffer, "dalu %s", v);
+        strcpy(ds_contents[history_num][9], v);
+        return 0;
+    } else if (strncmp(readbuffer, "drsidx", 6) == 0) {
+        char v[32];
+        sscanf(readbuffer, "drsidx %s", v);
+        strcpy(ds_contents[history_num][10], v);
+        return 0;
+    } else if (strncmp(readbuffer, "dflags", 6) == 0) {
+        char buf[64];
+        char f1[8], f2[8], f3[8], f4[8];
+        sscanf(readbuffer, "dflags %s %s %s %s", f1, f2, f3, f4);
+        snprintf(buf,32,"f1: %s f2: %s f3: %s f4: %s",f1,f2,f3,f4);
+        strcpy(ds_contents[history_num][11], buf);
+        return 0;
+
+        // Break
     } else if (strncmp(readbuffer,"break",4) == 0) {
         // If this is the first time through, indicate that we've setup all of
         // the register arrays.
@@ -660,7 +765,7 @@ int processinput() {
 //     int misc_regs, int rs_regs, int cdb_regs, int mt_regs, int rob_regs) { // count =14
 
 // this initializes a ncurses window and sets up the arrays for exchanging reg information
-extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, int rob_regs) { // count = 5
+extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, int ds_regs) { // count = 5
     int nbytes;
     int ready_val;
 
@@ -668,6 +773,7 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
     echo_data = 1;
     num_if_regs = if_regs;
 
+    num_ds_regs = ds_regs;
     num_rs_regs = rs_regs;
     num_cdb_regs = cdb_regs;
     num_mt_regs = mt_regs;
@@ -689,6 +795,7 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
         int i=0;
         if_contents       = (char***) malloc(NUM_HISTORY*sizeof(char**));
   
+        ds_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
         rs_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
         cdb_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
         mt_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
@@ -706,6 +813,8 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
             if_reg_names[j] = (char*)malloc(16);
             if_reg_names[j][0] = '\0';
         }
+
+        ds_reg_names = (char**) malloc(num_ds_regs*sizeof(char*));
 
         rs_reg_names = (char**) malloc(num_rs_regs*sizeof(char*));
         cdb_reg_names = (char**) malloc(num_cdb_regs*sizeof(char*));
@@ -727,6 +836,13 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
             for (int j = 0; j < num_if_regs; j++) {
               if_contents[i][j] = (char*)malloc(16);
               if_contents[i][j][0] = '\0';
+            }
+
+            // DS
+            ds_contents[i] = (char**)malloc(num_ds_regs * sizeof(char*));
+            for (int j = 0; j < num_ds_regs; j++) {
+              ds_contents[i][j] = (char*)malloc(32);
+              ds_contents[i][j][0] = '\0';
             }
           
             // RS
@@ -779,7 +895,7 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
             }
           }
           
-        setup_gui(fp, rs_regs, cdb_regs, mt_regs, rob_regs);
+        setup_gui(fp, rs_regs, cdb_regs, mt_regs, rob_regs, ds_regs);
 
         // Main loop for retrieving data and taking commands from user
         char quit_flag = 0;

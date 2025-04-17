@@ -1,0 +1,14 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr 15 23:32 2025
+Map table testbench starting...
+@@@ Failed basic read check! Expected T1=9, T2=7. Got T1=0, T2=0
+@@@ Failed at time 600
+$finish called from file "test/map_table_test.sv", line 43.
+$finish at simulation time                  600
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 60000 ps
+CPU Time:      0.310 seconds;       Data structure size:   0.0Mb
+Tue Apr 15 23:32:18 2025

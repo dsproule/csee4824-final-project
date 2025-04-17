@@ -9,7 +9,7 @@
 
 `include "verilog/sys_defs.svh"
 
-extern void initcurses(int,int,int,int,int); //count = 5
+extern void initcurses(int,int,int,int,int,int); //count = 6
 extern void flushpipe();
 extern void waitforresponse();
 extern void initmem();
@@ -46,6 +46,7 @@ module testbench;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg;
     ROB_T rob_head_dbg, rob_tail_dbg, retire_T_wire_dbg;
     IF_ID_PACKET            IF_ID_reg_dbg;
+    D_S_PACKET              D_S_reg_dbg;
     PPLN_CTRL rob_pipeline_control_dbg;
 
 `ifndef CACHE_MODE
@@ -90,6 +91,7 @@ module testbench;
         // .if_inst_dbg      (if_inst_dbg),
         // .if_valid_dbg     (if_valid_dbg),
         .IF_ID_reg_dbg(IF_ID_reg_dbg),
+        .D_S_reg_dbg(D_S_reg_dbg),
         .rs_table_dbg   (rs_table_dbg),
         .cdb_dbg        (cdb_dbg),
         .busy_dbg       (busy_dbg),
@@ -148,12 +150,13 @@ module testbench;
         // Call to initialize visual debugger
         // Note that after this, all stdout output goes to visual debugger
         // each argument is number of registers/signals for the group
-        initcurses( // count = 5
+        initcurses( // count = 6
             2,  // IF
             `RS_SZ,  // Reservation Station
             3,  // CDB
             32, // Map Table
-            `ROB_SZ  // ROB
+            `ROB_SZ,  // ROB
+            12 //D_S
         );
 
         // Pulse the reset signal
@@ -210,16 +213,6 @@ module testbench;
         // format is "<reg group prefix><name> <width in hex chars>:<data>"
         // Current register groups (and prefixes) are:
         // f: IF  r: RS b: CDB o: ROB Mt: Map Table
-
-        // // // IF signals (5) - prefix 'f'
-        // $display("fNPC 8:%h",         pipeline_0.if_packet.NPC);
-        // $display("finst 8:%h",        pipeline_0.if_packet.inst);
-        // $display("fImem_addr 8:%h",   pipeline_0.stage_if_0.proc2Imem_addr);
-        // $display("fPC_reg 8:%h",      pipeline_0.stage_if_0.PC_reg);
-        // $display("fvalid 1:%h",       pipeline_0.if_packet.valid);
-        // // haven't updated VTUBER to use rd_unsigned yet
-        // $display("imem_size 1:%h",    {pipeline_0.ex_mem_reg.rd_unsigned, pipeline_0.ex_mem_reg.mem_size});
-
         
         // IF/ID packet (prefix 'f')
         if (IF_ID_reg_dbg.valid) begin
@@ -227,18 +220,36 @@ module testbench;
             $display("finst 8:%h", IF_ID_reg_dbg.inst);
         end
 
+
+        // D_S packet (prefix 'd')
+        if (D_S_reg_dbg.valid) begin
+            $display("dINST %0h", D_S_reg_dbg.inst);
+            $display("dPC   %0h", D_S_reg_dbg.PC);
+            $display("dNPC  %0h", D_S_reg_dbg.NPC);
+            $display("dsr    %0h", D_S_reg_dbg.r);
+            $display("dpr1   %0h", D_S_reg_dbg.r1);
+            $display("dqr2   %0h", D_S_reg_dbg.r2);
+            $display("dopa  %0h", D_S_reg_dbg.opa_select);
+            $display("dopb  %0h", D_S_reg_dbg.opb_select);
+            $display("dbranch %b %b", D_S_reg_dbg.cond_branch, D_S_reg_dbg.uncond_branch);
+            $display("dalu   %0h", D_S_reg_dbg.alu_func);
+            $display("drsidx %0h", D_S_reg_dbg.rs_idx);
+            $display("dflags %b %b %b %b", D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+        end
+
+
         // ROB - prefix 'o'
         $display("ohead %h", rob_head_dbg);
         $display("otail %h", rob_tail_dbg);
         $display("oretire %h", rob_retire_dbg);
-        //entries
+        // Entries
         for (int i = 1; i < `ROB_SZ; i++) begin
             ROB_ENTRY entry;
             entry = rob_table_out_dbg[i * $bits(ROB_ENTRY) +: $bits(ROB_ENTRY)];
-            $display("oROB_entry:%0d %4d->   r:%4d   V:%4d", i, i, entry.r, entry.V);
+            $display("oROB_entry:%0d %4d->   r:%4d  V:%4d  ready:%1d", i, i, entry.r, entry.V, entry.ready);
                     
         end
-        //ROB_T: %4d, flush: %0d branch_addr???
+      
 
         // Map - Table 'Mt'
         for (int i = 0; i < 32; i++) begin
@@ -246,7 +257,7 @@ module testbench;
             entry = mt_table_out_dbg[i * $bits(MT_ENTRY) +: $bits(MT_ENTRY)];
             $display("tMT_entry %0d T:%4d plus:%1d", i, entry.T, entry.plus);
         end
-        //"T1:%4d       T2:%4d", core.T1_wire, core.T2_wire)??
+
 
         // CDB - prefix 'b'
         // Show CDB state
