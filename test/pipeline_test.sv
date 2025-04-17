@@ -284,16 +284,16 @@ module testbench;
 
 
             if (prog_start) begin
-                print_if;
-                print_ds;
-                print_rs;
-                print_mt;
-                print_cdb;
-                print_rob;
-                print_regs;
-                print_sx;
-                print_mem;
-                print_xc;
+                // print_if;
+                // print_ds;
+                // print_rs;
+                // print_mt;
+                // print_cdb;
+                // print_rob;
+                // print_regs;
+                // print_sx;
+                // print_mem;
+                // print_xc;
                 // if (IF_ID_reg_dbg.PC == `XLEN'hef8) $display("mayday");
                 
                 // print_x_pkt;
@@ -379,17 +379,17 @@ module testbench;
             // print register write information to the writeback output file
             if (pipeline_completed_insts > 0) begin
                 if(pipeline_commit_wr_en)
-                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x, T=%d",
+                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
                               pipeline_commit_NPC - 4,
                               pipeline_commit_wr_idx,
-                              pipeline_commit_wr_data,
-                              clock_count);
+                              pipeline_commit_wr_data
+                              );
                 else
                     $fdisplay(wb_fileno, "PC=%x, ---", pipeline_commit_NPC - 4);
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 15000000) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
                 // print_regs;
                 // print_sx;
                 // print_mem;

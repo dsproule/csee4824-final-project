@@ -173,7 +173,7 @@ module pipeline (
     logic Icache_valid_out;
 
     icache icache_0 (
-        .clock(clock), .reset(reset),
+        .clock(clock), .reset(reset | take_branch),
         .Imem2proc_response((Dmem_req) ? '0 : mem2proc_response), // Should be zero unless there is a response
         .Imem2proc_data(mem2proc_data),
         .Imem2proc_tag(mem2proc_tag),
