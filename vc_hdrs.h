@@ -40,7 +40,7 @@ typedef struct VeriC_Descriptor *vc_handle;
 
 #endif /* _VC_TYPES_ */
 
-void initcurses(int , int , int , int , int , int );
+void initcurses(int , int , int , int , int , int , int , int );
 void flushpipe();
 void waitforresponse();
 void initmem();
