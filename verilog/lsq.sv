@@ -18,7 +18,7 @@ module lsq(
     input logic [63:0] store_data,
 
     // retire from rob
-    input ROB_T retire_T,
+    input SQ_T retire_sq_T,
     input logic retire_en,
 
     //query LSQ for load execution
@@ -46,6 +46,10 @@ module lsq(
     • When store retires, head of LSQ written to D$
     • When loads execute, access LSQ and D$ in parallel
     • Forward from LSQ if older store with matching address
+    */
+    /*
+    TODO: update RS with the relevant load and store positions
+    TODO insert control signals into pipeline
     */
 
 
@@ -92,8 +96,8 @@ module lsq(
             sq_tail_wrap <= 0;
         end else begin
             // SQ
-            //dispatch alloc on decode
-            if (sq_alloc) begin
+            //dispatch alloc on decode, record current lq_tail in rs station as store position
+            if (sq_alloc  && !sq_full) begin
                 sq[sq_tail] <= 0;
                 sq[sq_tail].valid <= `TRUE;
                 sq[sq_tail].T <= T;
@@ -110,9 +114,24 @@ module lsq(
                 sq[sq_X_T].addr_valid <= `TRUE;
             end
 
+            if(retire_en) begin //akin to setting ready in ROB
+                sq[retire_sq_T].retired <= `TRUE;
+            end
 
-            // LQ Dispatch, Execute
-            if (lq_alloc) begin
+            // Write address/data from SQ head to D$, free SQ head
+            if(!sq_empty && sq[sq_head].retired && sq[sq_head].addr_valid && sq[sq_head].data_valid) begin
+                mem_write_en <= `TRUE;
+                proc2mem_addr <= sq[sq_head].addr;
+                proc2mem_data <= sq[sq_head].data;
+
+                sq_head <= (sq_head == `SQ_SZ - 1) ? 1 : sq_head + 1; // change here
+                sq_head_wrap <= (sq_head == `SQ_SZ - 1) ? ~sq_head_wrap : sq_head_wrap; // change here
+            end
+
+
+            // LQ - In-Flight Load addresses
+            //Dispatch, Execute
+            if (lq_alloc && !lq_full) begin
                 lq[lq_tail] <= 0;
                 lq[lq_tail].valid <= `TRUE;
                 lq[lq_tail].T <= T;
@@ -125,6 +144,8 @@ module lsq(
                 lq[lq_X_T].addr <= load_addr;
                 lq[lq_X_T].addr_valid <= `TRUE;
             end
+
+            if(!lq_empty && lq[lq_head].)
         end
     end
 endmodule

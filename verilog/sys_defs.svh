@@ -391,7 +391,7 @@ typedef struct packed {
     ROB_T T;                            // Tag to ensure in-order commit
     logic addr_valid;                   // Address is computed
     logic data_valid;                   // Data is ready (i.e., value from reg/CDB)
-    logic committed;                    // Set when ROB retires this store
+    logic retired;                    // Set when ROB retires this store
 } SQ_ENTRY;
 
 typedef struct packed {
