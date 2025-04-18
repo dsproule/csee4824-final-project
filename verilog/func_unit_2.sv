@@ -12,7 +12,7 @@ module func_unit_2(
     logic [`XLEN-1:0] rawDmem_addr, shifted_result;
     logic [5:0]       shift;
     logic [63:0]      Dmem_data;
-    logic [3:0]       nextDmem_tag, line_offset;
+    logic [3:0]       line_offset;
     mem_proc_states   mem_state;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0

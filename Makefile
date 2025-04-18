@@ -220,7 +220,7 @@ DEPS = $(1).simv $(1).cov synth/$(1).vg
 MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
 $(call DEPS,func_unit_1): $(MULT_DEPS)
 
-MEM_DEPS = test/mem.sv
+MEM_DEPS = test/mem.sv verilog/dcache.sv
 $(call DEPS,func_unit_3): $(MEM_DEPS)
 $(call DEPS,func_unit_2): $(MEM_DEPS)
 

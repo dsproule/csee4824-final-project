@@ -3,7 +3,6 @@
 /* Pipeline test where we will manually feed instructions. Includes I-stage and D-stage */
 
 module testbench;
-    logic clock, reset;
 
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
@@ -26,89 +25,101 @@ module testbench;
         end
     endtask; // task show_mem_with_decimal
 
+    logic clock, reset;
     logic [`XLEN-1:0] proc2mem_addr;
-    logic [63:0]      proc2mem_data, mem2proc_data;
-    logic [1:0]       proc2mem_command;
-    logic [3:0]       mem2proc_response, mem2proc_tag;
-    X_C_PACKET        X_packet, X_C_reg;
-    logic [`RS_SZ:0]  X_idx;
-
-    logic [`XLEN-1:0] proc2Dmem_data;
-    logic [`XLEN-1:0] proc2Dmem_addr;
-    logic [1:0] proc2Dmem_command;
-    S_X_PACKET S_X_reg;
-    logic mem_store_pend, Dmem_gnt, store_retired;
+    logic [63:0] proc2mem_data, mem2proc_data, cache2Dmem_data;
+    logic [1:0] proc2mem_command;
+    logic [3:0] mem2proc_response, mem2proc_tag;
 
 
     mem memory(
         .clk(clock),
         .proc2mem_addr(proc2mem_addr),
-        .proc2mem_data(proc2mem_data),
+        .proc2mem_data(cache2Dmem_data),
         .proc2mem_command(proc2mem_command),
-    `ifndef CACHE_MODE
-        .proc2mem_size(WORD), // BYTE, HALF, WORD or DOUBLE
-    `endif
 
-        .mem2proc_response(mem2proc_response),
-        .mem2proc_data(mem2proc_data),
-        .mem2proc_tag(mem2proc_tag)
+        .mem2proc_response(mem2proc_response),        // will need to change when Dmem gets introduced
+        .mem2proc_data(mem2proc_data),                // will need to change when Dmem gets introduced
+        .mem2proc_tag(mem2proc_tag)                   // will need to change when Dmem gets introduced
     );
 
     initial begin
         forever #(`CLOCK_PERIOD / 2.0) clock = ~clock;
-    end
+    end    
+
+    S_X_PACKET [`RS_SZ-1:0] S_X_regs;
+    logic [`XLEN-1:0] proc2Dmem_addr [1:0];
+    logic wr_mem, Dmem_req;
+
+    logic [`XLEN-1:0] cache2Dmem_addr;
+    logic [1:0]       cache2Dmem_command;
+    logic [63:0]      Dcache_data_out;
+    logic Dcache_valid_out, take_branch;
+
+    assign Dmem_req = wr_mem;
+    assign wr_mem = S_X_regs[3].valid;
 
     /* Module start */
 
+    logic [63:0] proc2Dcache_data, cache2Dmem_data;
+    logic wr_proc, wr_valid;
+
     always_comb begin
-        if (mem_store_pend) begin
-            proc2mem_command = BUS_STORE;
-            proc2mem_addr = proc2Dmem_addr;
+        if (Dmem_req) begin
+            proc2mem_command = cache2Dmem_command;
+            proc2mem_addr    = cache2Dmem_addr;
         end else begin
-            proc2mem_addr = '0;
-            proc2mem_command = BUS_NONE;
 
         end
-        proc2mem_data = {32'b0, proc2Dmem_data};
     end
 
-    func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset), 
-        .Dmem_gnt(Dmem_gnt), .retired(store_retired), 
-        .S_X_reg(S_X_reg),
+    assign wr_proc = wr_mem & Dcache_valid_out & ~wr_valid;
 
-        .mem_store_pend(mem_store_pend),
-        .proc2Dmem_addr(proc2Dmem_addr),
-        .proc2Dmem_data(proc2Dmem_data),
-        .X_packet(X_packet)
+    dcache dache_0(
+        .clock(clock), .reset(reset | take_branch),
+
+        // From memory
+        .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
+        .Dmem2proc_data(mem2proc_data),
+
+        // From FU stage
+        .proc2Dcache_addr((wr_mem) ? proc2Dmem_addr[0] : proc2Dmem_addr[1]),
+        .proc2Dcache_data(proc2Dcache_data),
+        .wr_proc(wr_proc),
+
+        // To memory
+        .proc2Dmem_command(cache2Dmem_command),
+        .proc2Dmem_addr(cache2Dmem_addr),
+        .proc2Dmem_data(cache2Dmem_data),
+
+        // To fetch stage
+        .Dcache_data_out(Dcache_data_out),
+        .Dcache_valid_out(Dcache_valid_out),
+        .wr_valid(wr_valid)
     );
-
-    /* Module end */
 
     initial begin
         clock = 0;
         reset = 1;
-        S_X_reg = '0;
-        store_retired = `FALSE;
-        Dmem_gnt = `TRUE;
+        take_branch = 0;
+        S_X_regs = '0;
+        @(negedge clock);
+        memory.unified_memory[0] = 64'h0020011300000000;
+        memory.unified_memory[1] = 64'h002081b300210233;
         @(negedge clock);
         reset = 0;
-        S_X_reg.V1 = `XLEN'h0;
-        S_X_reg.mem_offset = 32'h0;            // has offset of 4 embedded in here
-        S_X_reg.V2 = `XLEN'hcdeadf;
-        S_X_reg.T = 3;
-        S_X_reg.valid = `TRUE;
 
-        repeat (8) @(negedge clock);
-        S_X_reg.V1 = `XLEN'h8;
-        S_X_reg.V2 = `XLEN'hdead;
-        store_retired = `TRUE;
-        @(negedge clock);
+        // checking a store works
+        proc2Dmem_addr[0] = `XLEN'h0;
+        S_X_regs[3].valid = `TRUE;
+        @(posedge Dcache_valid_out);
+        proc2Dcache_data = {Dcache_data_out[63:32], 32'h00100093};
+        @(negedge clock);           // let values settle 
+        @(posedge wr_valid);
+        S_X_regs[3].valid = `FALSE;
 
-        repeat (8) @(negedge clock);
-
-        show_mem_with_decimal(0, 12);
-
+        show_mem_with_decimal(0, 16);
+        
         $finish;
     end
 

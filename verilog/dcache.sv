@@ -27,16 +27,20 @@ module dcache (
     input [3:0]  Dmem2proc_response, Dmem2proc_tag,
     input [63:0] Dmem2proc_data,
 
-    // From fetch stage
+    // From FU stage
     input [`XLEN-1:0] proc2Dcache_addr,
+    input [63:0]      proc2Dcache_data,
+    input             wr_proc,
 
     // To memory
     output logic [1:0]       proc2Dmem_command,
     output logic [`XLEN-1:0] proc2Dmem_addr,
+    output logic [63:0]      proc2Dmem_data,
 
     // To fetch stage
     output logic [63:0] Dcache_data_out,
-    output logic        Dcache_valid_out
+    output logic        Dcache_valid_out,
+    output logic        wr_valid
 );
 
     // ---- Cache data ---- //
@@ -70,8 +74,19 @@ module dcache (
                                         : miss_outstanding && (Dmem2proc_response == 0);
 
     // Keep sending memory requests until we receive a response tag or change addresses
-    assign proc2Dmem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : BUS_NONE;
+    assign proc2Dmem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : 
+                               (wr_proc & Dcache_valid_out) ?        BUS_STORE : BUS_NONE;
     assign proc2Dmem_addr    = {proc2Dcache_addr[31:3],3'b0};
+
+    always_comb begin
+        if (wr_proc & Dcache_valid_out & (Dmem2proc_response != 0)) begin
+            // proc2Dmem_command = BUS_STORE;
+            proc2Dmem_data = proc2Dcache_data;
+            wr_valid = `TRUE;
+        end else begin
+            wr_valid = `FALSE;
+        end
+    end
 
     // ---- Cache state registers ---- //
 
@@ -94,6 +109,9 @@ module dcache (
                 icache_data[current_index].tags  <= current_tag;
                 icache_data[current_index].valid <= 1;
             end
+
+            if (wr_proc & Dcache_valid_out)
+                icache_data[current_index].data <= proc2Dcache_data;
         end
     end
 

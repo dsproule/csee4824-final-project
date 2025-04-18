@@ -374,7 +374,7 @@ module pipeline (
         .Dmem2proc_response((Dmem_gnt[1]) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
         .Dmem2proc_data(mem2proc_data),
 
-        // From fetch stage
+        // From FU stage
         .proc2Dcache_addr(proc2Dmem_addr[1]),
 
         // To memory
