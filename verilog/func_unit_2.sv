@@ -5,7 +5,6 @@ module func_unit_2(
     input [63:0] Dmem2proc_data,
     input S_X_PACKET S_X_reg,
 
-    // output logic mem_load_pend,
     output [`XLEN-1:0] proc2Dmem_addr,
     output X_C_PACKET X_packet
 );

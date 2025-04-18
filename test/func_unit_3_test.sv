@@ -98,6 +98,16 @@ module testbench;
         .wr_valid(wr_valid)
     );
 
+    func_unit_3 func_unit_03(
+        .clock(clock), .reset(reset), .committed(committed), .wr_valid(wr_valid),
+        .Dmem2proc_data(Dcache_data_out),
+        .S_X_reg(S_X_regs[3]),
+
+        .proc2Dmem_addr(proc2Dmem_addr[0]),
+        .proc2Dcache_data(proc2Dcache_data),
+        .X_packet()
+);
+
     initial begin
         clock = 0;
         reset = 1;
@@ -110,13 +120,14 @@ module testbench;
         reset = 0;
 
         // checking a store works
-        proc2Dmem_addr[0] = `XLEN'h0;
-        S_X_regs[3].valid = `TRUE;
-        @(posedge Dcache_valid_out);
-        proc2Dcache_data = {Dcache_data_out[63:32], 32'h00100093};
-        @(negedge clock);           // let values settle 
-        @(posedge wr_valid);
-        S_X_regs[3].valid = `FALSE;
+        // S_X_reg.V
+        // proc2Dmem_addr[0] = `XLEN'h0;
+        // S_X_regs[3].valid = `TRUE;
+        // @(posedge Dcache_valid_out);
+        // proc2Dcache_data = {Dcache_data_out[63:32], 32'h00100093};
+        // @(negedge clock);           // let values settle 
+        // @(posedge wr_valid);
+        // S_X_regs[3].valid = `FALSE;
 
         show_mem_with_decimal(0, 16);
         
