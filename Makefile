@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rob
 
 MODULE = pipeline
 
