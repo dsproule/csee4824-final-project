@@ -84,7 +84,6 @@ module pipeline (
     logic [63:0] proc2Dmem_data;
     MEM_SIZE proc2Dmem_size;
     logic [`XLEN-1:0] proc2Dmem_addr [1:0];
-    logic [1:0] Dmem_gnt;
     logic wr_mem, rd_mem;
 
     // ROB outputs
@@ -112,10 +111,12 @@ module pipeline (
     logic [`XLEN-1:0] proc2Icache_addr;
     logic [63:0] Icache_data_out;
     logic Icache_valid_out;
+    
     logic [`XLEN-1:0] cache2Dmem_addr;
     logic [1:0] cache2Dmem_command;
-    logic [63:0] Dcache_data_out;
     logic Dcache_valid_out;
+    logic [63:0] proc2Dcache_data, cache2Dmem_data, Dcache_data_out;
+    logic wr_proc, wr_valid;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -151,18 +152,9 @@ module pipeline (
     // for all memory vectors, ind0 -> wr and ind1 -> rd
 
     always_comb begin
-        Dmem_gnt = 2'b00;
-
         if (Dmem_req) begin
-            if (wr_mem) begin
-                proc2mem_addr    = proc2Dmem_addr[0];
-                proc2mem_command = proc2Dmem_command;
-                Dmem_gnt = 2'b01;
-            end else begin
-                proc2mem_addr    = cache2Dmem_addr;
-                proc2mem_command = cache2Dmem_command;
-                Dmem_gnt = 2'b10;
-            end
+            proc2mem_addr        = cache2Dmem_addr;
+            proc2mem_command     = cache2Dmem_command;
         end else begin
             proc2mem_addr        = proc2Imem_addr;
             proc2mem_command     = proc2Imem_command;
@@ -368,23 +360,29 @@ module pipeline (
     );
 
     dcache dache_0(
-        .clock(clock), .reset(reset | wr_mem),
+        .clock(clock), .reset(reset | take_branch),
 
         // From memory
-        .Dmem2proc_response((Dmem_gnt[1]) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
+        .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
         .Dmem2proc_data(mem2proc_data),
 
         // From FU stage
-        .proc2Dcache_addr(proc2Dmem_addr[1]),
+        .proc2Dcache_addr((wr_mem) ? proc2Dmem_addr[0] : proc2Dmem_addr[1]),
+        .proc2Dcache_data(proc2Dcache_data),
+        .wr_proc(wr_proc),
 
         // To memory
         .proc2Dmem_command(cache2Dmem_command),
         .proc2Dmem_addr(cache2Dmem_addr),
+        .proc2Dmem_data(cache2Dmem_data),
 
         // To fetch stage
         .Dcache_data_out(Dcache_data_out),
-        .Dcache_valid_out(Dcache_valid_out)
+        .Dcache_valid_out(Dcache_valid_out),
+        .wr_valid(wr_valid)
     );
+
+    assign wr_proc = wr_mem & Dcache_valid_out;
 
     func_unit_2 func_unit_02 (
         .clock(clock), .reset(reset | take_branch), 
@@ -397,21 +395,15 @@ module pipeline (
         .X_packet(X_packets[2])
     );
 
-    func_unit_3 func_unit_03 (
-        .clock(clock), .reset(reset | take_branch), 
-        .Dmem_gnt(Dmem_gnt[0]),              // signal that the memory was listening to this module
-        .retired(gnt[3]),                    // the current mem_store has been 
-        .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
-        .Dmem2proc_data(mem2proc_data),
+    func_unit_3 func_unit_03(
+        .clock(clock), .reset(reset), .committed(gnt[3]), .wr_valid(wr_valid),
+        .Dmem2proc_data(Dcache_data_out),
         .S_X_reg(S_X_regs[3]),
 
-        .mem_store_pend(),             // the module is attempting to store a value
         .proc2Dmem_addr(proc2Dmem_addr[0]),
-        .proc2Dmem_command(proc2Dmem_command),
-        .proc2Dmem_data(proc2Dmem_data),
+        .proc2Dcache_data(proc2Dcache_data),
         .X_packet(X_packets[3])
     );
-
     // X_C regs
     always_ff @(posedge clock) begin
         for (X_idx = 0; X_idx < `RS_SZ; X_idx++)

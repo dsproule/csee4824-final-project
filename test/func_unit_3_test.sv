@@ -100,14 +100,14 @@ module testbench;
     assign wr_proc = wr_mem & Dcache_valid_out;
 
     func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset), .committed(committed), .wr_valid(wr_valid),
+        .clock(clock), .reset(reset), .committed(gnt[3]), .wr_valid(wr_valid),
         .Dmem2proc_data(Dcache_data_out),
         .S_X_reg(S_X_regs[3]),
 
         .proc2Dmem_addr(proc2Dmem_addr[0]),
         .proc2Dcache_data(proc2Dcache_data),
         .X_packet(X_packets[3])
-);
+    );
 
     initial begin
         clock = 0;
@@ -120,23 +120,22 @@ module testbench;
         @(negedge clock);
         reset = 0;
 
-        // checking a store works
+        // checking a store works for basic case
         S_X_regs[3].V1 = `XLEN'h0;
         S_X_regs[3].V2 = `XLEN'hcdeadf;    
         S_X_regs[3].mem_size = WORD;    
         S_X_regs[3].valid = `TRUE;
+        
+        // CDB simulation logic (copy-paste)
         @(posedge X_packets[3].valid);
         @(posedge clock);
-        S_X_regs = '0;
-        repeat (3) @(posedge clock);
-        // S_X_reg.V
-        // proc2Dmem_addr[0] = `XLEN'h0;
-        // S_X_regs[3].valid = `TRUE;
-        // @(posedge Dcache_valid_out);
-        // proc2Dcache_data = {Dcache_data_out[63:32], 32'h00100093};
-        // @(negedge clock);           // let values settle 
-        // @(posedge wr_valid);
-        // S_X_regs[3].valid = `FALSE;
+        gnt[3] = `TRUE;
+        @(posedge clock);
+        S_X_regs[3] = '0;
+
+        // check store works for every mem size
+        // check store works for case where one comes directly after another finishes
+        // check store works for case where CDB is servicing other requests
 
         show_mem_with_decimal(0, 16);
         

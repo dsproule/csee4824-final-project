@@ -241,7 +241,7 @@ module testbench;
         if (proc2mem_command != BUS_NONE) begin
             $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
             $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
-            $display("Dmem_gnt: %2b, take_branch: %1b", core.Dmem_gnt, core.take_branch);
+            $display("rd/wr: %2b, take_branch: %1b", {core.rd_mem, core.wr_mem}, core.take_branch);
             $display("------------------------------------------");
         end
     endtask
@@ -393,7 +393,8 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 550) begin
+            // if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
                 // print_regs;
                 // print_sx;
                 // print_mem;
