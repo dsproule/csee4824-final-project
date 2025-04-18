@@ -30,7 +30,8 @@
 
 // worry about these later
 `define BRANCH_PRED_SZ xx
-`define LSQ_SZ xx
+`define SQ_SZ 6 //15-20% of ROB
+`define LQ_SZ 8 //20-30% of ROB
 
 // functional units (you should decide if you want more or fewer types of FUs)
 `define NUM_FU_ALU 0
@@ -105,6 +106,13 @@ typedef enum logic [1:0] {
     BUS_LOAD   = 2'h1,
     BUS_STORE  = 2'h2
 } BUS_COMMAND;
+
+// Memory bus commands
+typedef enum logic [1:0] {
+    NONE   = 2'h0,
+    LOAD   = 2'h1,
+    STORE  = 2'h2
+} MEM_OP;
 
 ///////////////////////////////
 // ---- Exception Codes ---- //
@@ -323,6 +331,9 @@ typedef struct packed {
 } D_S_PACKET;
 
 typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
+typedef logic [$clog2(`LQ_SZ)-1:0] LQ_T;
+typedef logic [$clog2(`SQ_SZ)-1:0] SQ_T;
+
 
 typedef struct packed {
     logic flush;
@@ -364,6 +375,24 @@ typedef struct packed {
     logic ready;
 } ROB_ENTRY;
 
+typedef struct packed {
+    logic valid;                         // Entry is in use
+    logic [`XLEN-1:0] addr;              // Effective address (if known)
+    logic [`XLEN-1:0] data;              // Loaded data (if forwarded)
+    ROB_T T;                       // Tag for tracking commit order
+    logic addr_valid;                   // Address is computed
+    logic data_ready;                   // Data has been forwarded or loaded
+} LQ_ENTRY;
+
+typedef struct packed {
+    logic valid;                         // Entry is in use
+    logic [`XLEN-1:0] addr;              // Effective address (if known)
+    logic [`XLEN-1:0] data;              // Data to store (if known)
+    ROB_T T;                            // Tag to ensure in-order commit
+    logic addr_valid;                   // Address is computed
+    logic data_valid;                   // Data is ready (i.e., value from reg/CDB)
+    logic committed;                    // Set when ROB retires this store
+} SQ_ENTRY;
 
 typedef struct packed {
     /* General pipeline*/

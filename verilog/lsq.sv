@@ -1,12 +1,21 @@
 `include "verilog/sys_defs.svh"
 
-module lsq#(
-    parameter  LSQ_SZ     = 8,
-    localparam PTR_WIDTH  = $clog2(LSQ_SZ))(
+//exists in pipeline interacts with all other units, func units 2 and 3 write addr to it
+module lsq(
     // alloc inputs
     input logic clock, reset, 
-    input logic alloc_en, 
-    input LSQ_ENTRY lsq_entry,
+    input logic dispatch_valid, 
+    input logic sq_alloc, lq_alloc,
+    input ROB_T T,
+
+    //addr data computed by func unit
+    input logic store_X, load_X,
+    input SQ_T sq_X_T,
+    input LQ_T lq_X_T,
+    input logic [`XLEN-1:0] store_addr,
+    input logic [`XLEN-1:0] load_addr, 
+
+    input logic [63:0] store_data,
 
     // retire from rob
     input ROB_T retire_T,
@@ -26,7 +35,9 @@ module lsq#(
     output logic [`XLEN-1:0] proc2mem_data,
 
     //control signals for structural hazards
-    output logic full, empty
+    output LQ_T lq_tail, // for reservation station on dispatch
+    output SQ_T sq_tail,
+    output logic sq_full, sq_empty, lq_full, lq_empty
 );
 
     /*
@@ -38,15 +49,88 @@ module lsq#(
     */
 
 
-    LSQ_ENTRY queue[LSQ_SZ];
-    logic [PTR_WIDTH:0] big_head, big_tail; //one extra bit for easy full/empty check and built in wraparound
-    logic [PTR_WIDTH-1:0] head, tail;
+    LQ_ENTRY lq[`LQ_SZ-1:0];
+    logic [LQ_PTR-1:0] lq_head, lq_tail;
+    logic lq_head_wrap, lq_tail_wrap, lq_alloc;
 
-    assign head = big_head[PTR_WIDTH-1:0];
-    assign tail = big_tail[PTR_WIDTH-1:0];
+    //assign lq_alloc = (alloc_mem_command == LOAD) && dispatch_valid && !lq_full;
 
-    assign full = (head == tail) && (big_tail[PTR_WIDTH] != big_head[PTR_WIDTH]);
-    assign empty = (big_head == big_tail);
+    assign lq_full = (lq_head == lq_tail) && (lq_head_wrap != lq_tail_wrap);
+    assign lq_empty = (lq_head == lq_tail) && (lq_head_wrap == lq_tail_wrap);
+
+    SQ_ENTRY sq[`SQ_SZ-1:0];
+    logic [SQ_PTR-1:0] sq_head, sq_tail;
+    logic sq_head_wrap, sq_tail_wrap, sq_alloc;
+
+   // assign sq_alloc = (alloc_mem_command == STORE) && dispatch_valid && !sq_full;
+
+    assign sq_full = (sq_head == sq_tail) && (sq_head_wrap != sq_tail_wrap);
+    assign sq_empty = (sq_head == sq_tail) && (sq_head_wrap == sq_tail_wrap);
+
+    //forwarding unit - youngest store older than load forwards to load
+    always_comb begin
+
+
+    end
+
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            for (int i = 0; i < `LQ_SZ; i++) begin
+                lq[i] <= 0;
+            end
+            for (int i = 0; i < `SQ_SZ; i++) begin
+                sq[i] <= 0;
+            end
+            lq_head <= 0;
+            lq_tail <= 0;
+            lq_head_wrap <= 0;
+            lq_tail_wrap <= 0;
+
+            sq_head <= 0;
+            sq_tail <= 0;
+            sq_head_wrap <= 0;
+            sq_tail_wrap <= 0;
+        end else begin
+            // SQ
+            //dispatch alloc on decode
+            if (sq_alloc) begin
+                sq[sq_tail] <= 0;
+                sq[sq_tail].valid <= `TRUE;
+                sq[sq_tail].T <= T;
+
+                sq_tail <= (sq_tail == `SQ_SZ - 1) ? 0 : (sq_tail + 1);
+                sq_tail_wrap <= (sq_tail == `SQ_SZ - 1) ? ~sq_tail_wrap : sq_tail_wrap; // change here
+            end
+
+            // store func unit writes address/data into slot, rs gets cleared
+            if (store_X) begin //comes from RS
+                sq[sq_X_T].addr <= store_addr;
+                sq[sq_X_T].data <= store_data;
+                sq[sq_X_T].data_valid <= `TRUE;
+                sq[sq_X_T].addr_valid <= `TRUE;
+            end
+
+
+            // LQ Dispatch, Execute
+            if (lq_alloc) begin
+                lq[lq_tail] <= 0;
+                lq[lq_tail].valid <= `TRUE;
+                lq[lq_tail].T <= T;
+
+                lq_tail <= (lq_tail == `LQ_SZ - 1) ? 0 : (lq_tail + 1);
+                lq_tail_wrap <= (lq_tail == `LQ_SZ - 1) ? ~lq_tail_wrap : lq_tail_wrap; // change here
+            end
+
+            if (load_X) begin
+                lq[lq_X_T].addr <= load_addr;
+                lq[lq_X_T].addr_valid <= `TRUE;
+            end
+        end
+    end
+endmodule
+
+
+    //OLD CODE
 
     // if a retire happens, write head to D$
     assign mem_write_en = queue[head].valid && queue[head].is_store && retire_en && (queue[head].T == retire_T);
@@ -68,32 +152,6 @@ module lsq#(
         end
     end
 
-    
-    always_ff @(posedge clock) begin
-        if (reset) begin
-            big_head <= 0;
-            big_tail <= 0;
-            for (int i = 0; i < LSQ_SZ; i++) begin
-                queue[i] <= '0;
-            end
-        end else begin 
-            // allocating to LSQ
-            if (alloc_en && !full) begin
-                queue[tail] <= lsq_entry;
-                queue[tail].valid <= 1;
-                queue[tail].ready <= lsq_entry.is_store; // TODO store address is ready at issue here, but really set by EX stage so need to set
-                big_tail <= big_tail + 1;
-            end
-
-            // deallocating from LSQ
-            if (mem_write_en) begin
-                queue[head].valid <= 0;
-                queue[head].ready <= 0;
-                big_head <= big_head + 1;
-            end
-        end
-    end
 
 
-endmodule
 
