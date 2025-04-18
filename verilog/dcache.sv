@@ -80,7 +80,6 @@ module dcache (
 
     always_comb begin
         if (wr_proc & Dcache_valid_out & (Dmem2proc_response != 0)) begin
-            // proc2Dmem_command = BUS_STORE;
             proc2Dmem_data = proc2Dcache_data;
             wr_valid = `TRUE;
         end else begin

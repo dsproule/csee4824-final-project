@@ -11,11 +11,10 @@ module func_unit_3(
 );
 
     logic [`XLEN-1:0] rawDmem_addr;
-    logic [3:0]       nextDmem_tag, line_offset;
-    logic [5:0]       shift, size_offset;
-    logic [63:0]      rawDmem_data, Dmem_data;
+    logic [3:0]       line_offset;
+    logic [5:0]       shift;
+    logic [63:0]      Dmem_data;
     mem_proc_states   mem_state;
-    logic             fetchDmem_valid;
 
     // should be word-aligned. If a value is invalid proc_resp will be 0
     assign rawDmem_addr   = S_X_reg.V1 + S_X_reg.mem_offset;
@@ -23,7 +22,7 @@ module func_unit_3(
     assign line_offset    = rawDmem_addr[2:0];
 
     always_comb begin
-        Dmem_data = rawDmem_data;
+        Dmem_data = Dmem2proc_data;
         case (S_X_reg.mem_size)
             BYTE: begin
                 shift = (line_offset) << 3;
@@ -56,7 +55,6 @@ module func_unit_3(
             end
             default: begin
                 shift = '0;
-                size_offset = '0;
             end
         endcase
     end

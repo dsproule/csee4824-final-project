@@ -48,6 +48,7 @@ module testbench;
     end    
 
     S_X_PACKET [`RS_SZ-1:0] S_X_regs;
+    X_C_PACKET [`RS_SZ-1:0] X_packets;
     logic [`XLEN-1:0] proc2Dmem_addr [1:0];
     logic wr_mem, Dmem_req;
 
@@ -73,8 +74,6 @@ module testbench;
         end
     end
 
-    assign wr_proc = wr_mem & Dcache_valid_out & ~wr_valid;
-
     dcache dache_0(
         .clock(clock), .reset(reset | take_branch),
 
@@ -98,6 +97,8 @@ module testbench;
         .wr_valid(wr_valid)
     );
 
+    assign wr_proc = wr_mem & Dcache_valid_out;
+
     func_unit_3 func_unit_03(
         .clock(clock), .reset(reset), .committed(committed), .wr_valid(wr_valid),
         .Dmem2proc_data(Dcache_data_out),
@@ -105,7 +106,7 @@ module testbench;
 
         .proc2Dmem_addr(proc2Dmem_addr[0]),
         .proc2Dcache_data(proc2Dcache_data),
-        .X_packet()
+        .X_packet(X_packets[3])
 );
 
     initial begin
@@ -120,6 +121,14 @@ module testbench;
         reset = 0;
 
         // checking a store works
+        S_X_regs[3].V1 = `XLEN'h0;
+        S_X_regs[3].V2 = `XLEN'hcdeadf;    
+        S_X_regs[3].mem_size = WORD;    
+        S_X_regs[3].valid = `TRUE;
+        @(posedge X_packets[3].valid);
+        @(posedge clock);
+        S_X_regs = '0;
+        repeat (3) @(posedge clock);
         // S_X_reg.V
         // proc2Dmem_addr[0] = `XLEN'h0;
         // S_X_regs[3].valid = `TRUE;
