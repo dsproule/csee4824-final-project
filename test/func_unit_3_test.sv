@@ -50,6 +50,7 @@ module testbench;
     S_X_PACKET [`RS_SZ-1:0] S_X_regs;
     X_C_PACKET [`RS_SZ-1:0] X_packets;
     logic [`XLEN-1:0] proc2Dmem_addr [1:0];
+    logic [`RS_SZ-1:0] gnt;
     logic wr_mem, Dmem_req;
 
     logic [`XLEN-1:0] cache2Dmem_addr;
@@ -112,11 +113,12 @@ module testbench;
     initial begin
         clock = 0;
         reset = 1;
+        gnt = '0;
         take_branch = 0;
         S_X_regs = '0;
         @(negedge clock);
-        memory.unified_memory[0] = 64'h0020011300000000;
-        memory.unified_memory[1] = 64'h002081b300210233;
+        // memory.unified_memory[0] = 64'h0020011300000000;
+        // memory.unified_memory[1] = 64'h002081b300210233;
         @(negedge clock);
         reset = 0;
 
@@ -131,7 +133,16 @@ module testbench;
         @(posedge clock);
         gnt[3] = `TRUE;
         @(posedge clock);
-        S_X_regs[3] = '0;
+        // S_X_regs[3] = '0;
+
+        // check store on cached value
+        S_X_regs[3].V1 = `XLEN'h4;
+        S_X_regs[3].mem_size = HALF;    
+        @(posedge X_packets[3].valid);
+        @(posedge clock);
+        gnt[3] = `TRUE;
+        @(posedge clock);
+
 
         // check store works for every mem size
         // check store works for case where one comes directly after another finishes

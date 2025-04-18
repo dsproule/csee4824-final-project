@@ -81,7 +81,6 @@ module pipeline (
     logic [`RS_SZ:0] fu_idx, S_idx, X_idx, req_idx;    
     S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_regs;
     X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_regs;
-    logic [63:0] proc2Dmem_data;
     MEM_SIZE proc2Dmem_size;
     logic [`XLEN-1:0] proc2Dmem_addr [1:0];
     logic wr_mem, rd_mem;
@@ -159,7 +158,7 @@ module pipeline (
             proc2mem_addr        = proc2Imem_addr;
             proc2mem_command     = proc2Imem_command;
         end
-        proc2mem_data = proc2Dmem_data;
+        proc2mem_data = cache2Dmem_data;
     end
 
     //////////////////////////////////////////////////
@@ -386,7 +385,7 @@ module pipeline (
 
     func_unit_2 func_unit_02 (
         .clock(clock), .reset(reset | take_branch), 
-        .committed(gnt[2]), .data_valid(Dcache_valid_out),
+        .committed(gnt[2]), .data_valid(Dcache_valid_out & rd_mem),
         .Dmem2proc_data(Dcache_data_out),
         .S_X_reg(S_X_regs[2]),
 
@@ -396,7 +395,7 @@ module pipeline (
     );
 
     func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset), .committed(gnt[3]), .wr_valid(wr_valid),
+        .clock(clock), .reset(reset | take_branch), .committed(gnt[3]), .wr_valid(wr_valid & wr_mem),
         .Dmem2proc_data(Dcache_data_out),
         .S_X_reg(S_X_regs[3]),
 

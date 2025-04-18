@@ -203,7 +203,7 @@ module testbench;
 
     task print_cdb;
         $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T:%4h\t  V:%4h", cdb_dbg.T, cdb_dbg.V);
+        $display("T:%4h\t  V:%4h valid:%1b", cdb_dbg.T, cdb_dbg.V, cdb_dbg.valid);
         $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
         $display("------------------------------------------");
     endtask // print_cdb
@@ -287,7 +287,7 @@ module testbench;
             // end
 
 
-            if (prog_start & (clock_count < 2000)) begin
+            if (prog_start) begin
                 // print_if;
                 // print_ds;
                 // print_rs;
@@ -302,7 +302,7 @@ module testbench;
                 
                 // print_x_pkt;
             end
-            // if(clock_count > 200000)
+            // if(clock_count > 500)
             //     $finish;
         end
     end
@@ -393,8 +393,8 @@ module testbench;
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 550) begin
-            // if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
+            // if(pipeline_error_status != NO_ERROR || debug_counter > 550) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
                 // print_regs;
                 // print_sx;
                 // print_mem;

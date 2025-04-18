@@ -1,7 +1,7 @@
 
 ================== SCOREBOARD ==================
-Test Run: Thu Apr 17 22:07:23 EDT 2025
+Test Run: Fri Apr 18 18:17:28 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
-store_tests          | PASS       | PASS       | 10.000000  | WFI instruction               
+basic_malloc         | FAIL       | FAIL       | 5.885714   | WFI instruction               
 ==========================================================================================

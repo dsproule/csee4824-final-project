@@ -43,6 +43,7 @@ module dcache (
     output logic        wr_valid
 );
 
+    logic wr_mem;
     // ---- Cache data ---- //
 
     DCACHE_ENTRY [`CACHE_LINES-1:0] icache_data;
@@ -55,7 +56,9 @@ module dcache (
 
     assign {current_tag, current_index} = proc2Dcache_addr[15:3];
 
-    assign Dcache_data_out = icache_data[current_index].data;
+    assign wr_mem = (wr_proc & Dcache_valid_out);
+
+    assign Dcache_data_out = (wr_mem) ? proc2Dcache_data : icache_data[current_index].data;
     assign Dcache_valid_out = icache_data[current_index].valid &&
                               (icache_data[current_index].tags == current_tag);
 
@@ -75,7 +78,7 @@ module dcache (
 
     // Keep sending memory requests until we receive a response tag or change addresses
     assign proc2Dmem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : 
-                               (wr_proc & Dcache_valid_out) ?        BUS_STORE : BUS_NONE;
+                               (wr_mem)                            ? BUS_STORE : BUS_NONE;
     assign proc2Dmem_addr    = {proc2Dcache_addr[31:3],3'b0};
 
     always_comb begin
@@ -109,7 +112,7 @@ module dcache (
                 icache_data[current_index].valid <= 1;
             end
 
-            if (wr_proc & Dcache_valid_out)
+            if (wr_mem)
                 icache_data[current_index].data <= proc2Dcache_data;
         end
     end
