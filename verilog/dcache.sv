@@ -42,8 +42,6 @@ module dcache (
     output logic        Dcache_valid_out,
     output logic        wr_valid
 );
-
-    logic wr_mem;
     // ---- Cache data ---- //
 
     DCACHE_ENTRY [`CACHE_LINES-1:0] icache_data;
@@ -54,11 +52,13 @@ module dcache (
     logic [12-`CACHE_LINE_BITS:0] current_tag, last_tag;
     logic [`CACHE_LINE_BITS - 1:0] current_index, last_index;
 
+    logic wr_mem;
+
     assign {current_tag, current_index} = proc2Dcache_addr[15:3];
 
     assign wr_mem = (wr_proc & Dcache_valid_out);
 
-    assign Dcache_data_out = (wr_mem) ? proc2Dcache_data : icache_data[current_index].data;
+    assign Dcache_data_out = icache_data[current_index].data;
     assign Dcache_valid_out = icache_data[current_index].valid &&
                               (icache_data[current_index].tags == current_tag);
 
