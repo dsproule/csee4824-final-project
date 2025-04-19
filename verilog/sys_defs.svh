@@ -25,7 +25,7 @@
 
 // sizes
 `define ROB_SZ 32
-`define RS_SZ 4
+`define RS_SZ 6
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
 // worry about these later

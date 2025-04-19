@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps
 
 MODULE = pipeline
 
@@ -375,7 +375,7 @@ SOURCES = verilog/pipeline.sv \
 		  verilog/func_unit_*.sv \
           verilog/mult.sv \
           verilog/mult_stage.sv \
-		  verilog/rps4.sv \
+		  verilog/rps.sv \
 		  verilog/rob.sv \
 		  verilog/if_stage.sv \
 		  verilog/dcache.sv

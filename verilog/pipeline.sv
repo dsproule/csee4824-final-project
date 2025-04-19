@@ -216,9 +216,12 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
+    logic alu_fu, mult_fu;
     d_stage d_stage_0(
         // Inputs
         .IF_ID_reg(IF_ID_reg),
+        .alu_fu(alu_fu),
+        .mult_fu(mult_fu),
 
         // Outputs
         .D_packet(D_packet)
@@ -228,10 +231,18 @@ module pipeline (
     always_ff @(posedge clock) begin
         if (reset | take_branch) begin
             D_S_reg <= '0;
+            alu_fu <= '0;
+            mult_fu <= '0;
         // separated because may need a signal to stall
         end else if (D_enable) begin
             D_S_reg <= D_packet;
+
+            if (D_packet.valid & (D_packet.rs_idx == 0 || D_packet.rs_idx == 4))
+                alu_fu <= ~alu_fu;
+            if (D_packet.valid & (D_packet.rs_idx == 1 || D_packet.rs_idx == 5))
+                mult_fu <= ~mult_fu;
         end
+
     end
 
     //////////////////////////////////////////////////
@@ -262,7 +273,7 @@ module pipeline (
     logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
     assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
-    assign FU_ready_no_lsq = {FU_ready[3] & ~rd_mem, FU_ready[2] & ~wr_mem, FU_ready[1:0]};
+    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3] & ~rd_mem, FU_ready[2] & ~wr_mem, FU_ready[1:0]};
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
@@ -405,6 +416,25 @@ module pipeline (
         .proc2Dcache_data(proc2Dcache_data),
         .X_packet(X_packets[3])
     );
+
+    func_unit_0 func_unit_04(
+        // Inputs
+        .S_X_reg(S_X_regs[4]), 
+        
+        // Outputs
+        .X_packet(X_packets[4])
+    );
+
+    func_unit_1 func_unit_05(
+        // Inputs
+        .clock(clock), .reset(reset | take_branch), 
+        .retired(gnt[5]),
+        .S_X_reg(S_X_regs[5]), 
+
+        // Outputs    
+        .X_packet(X_packets[5])
+    );
+
     // X_C regs
     always_ff @(posedge clock) begin
         for (X_idx = 0; X_idx < `RS_SZ; X_idx++)
@@ -424,7 +454,6 @@ module pipeline (
     //////////////////////////////////////////////////
 
     // CDB stage
-    assign cdb_valid = (gnt != 4'h0);
     always_comb begin
         // turn the arbiter signal to idx
         for (gnt_idx = 0; gnt_idx < `RS_SZ; gnt_idx++)
@@ -444,12 +473,12 @@ module pipeline (
         cdb.valid = cdb_valid;
     end
 
-    rps4 arb (
+    rps arb (
         .clock(clock), .reset(reset | take_branch), 
         .req(FU_req), 
         .en(1'b1), 
         
-        .gnt(gnt), .count()
+        .gnt(gnt), .req_up(cdb_valid)
     );
 
     //////////////////////////////////////////////////
