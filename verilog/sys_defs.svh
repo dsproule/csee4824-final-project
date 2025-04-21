@@ -375,6 +375,12 @@ typedef struct packed {
     logic ready;
 } ROB_ENTRY;
 
+typedef struct packed { //used to keep track of needed parts of S_X for mem access
+    logic [3:0]       line_offset;
+    logic             rd_unsigned;
+    MEM_SIZE          mem_size;
+} MEM_ACCESS;
+
 typedef struct packed {
     logic valid;                         // Entry is in use
     logic [`XLEN-1:0] addr;              // Effective address (if known)
@@ -382,6 +388,7 @@ typedef struct packed {
     ROB_T T;                       // Tag for tracking commit order
     logic addr_valid;                   // Address is computed
     logic data_ready;                   // Data has been forwarded or loaded
+    MEM_ACCESS mem_access;              
 } LQ_ENTRY;
 
 typedef struct packed {
@@ -392,7 +399,10 @@ typedef struct packed {
     logic addr_valid;                   // Address is computed
     logic data_valid;                   // Data is ready (i.e., value from reg/CDB)
     logic retired;                    // Set when ROB retires this store
+    MEM_ACCESS mem_access;          // relevant addressing and masking info
 } SQ_ENTRY;
+
+
 
 typedef struct packed {
     /* General pipeline*/
