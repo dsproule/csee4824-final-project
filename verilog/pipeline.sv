@@ -10,6 +10,8 @@
 
 `include "verilog/sys_defs.svh"
 
+`define ASSUME_TAKEN
+
 module pipeline (
     input        clock,             // System clock
     input        reset,             // System reset
@@ -200,13 +202,20 @@ module pipeline (
         .proc2Imem_addr(proc2Icache_addr)
     );
 
+`ifdef ASSUME_TAKEN
     two_bit_pred branch_pred_0(
-        .clock(clock), .reset(reset), .en(D_packet.cond_branch & ~take_branch & D_packet.valid), 
-        .D_packet(D_packet),
+        .clock(clock), .reset(reset), 
+        // .update_table(S_X_regs[0].valid & S_X_regs[0].cond_branch),                         // fu0 is processing a branch (should update the state table)
+        // .update_branch_choice(X_packets[0].flush ^ S_X_regs[0].branch_pred),                // if flush, means negate
+        .en(D_packet.cond_branch & ~take_branch & D_packet.valid),                          // detects if inst in IF_ID is branch. (To pred jump)
+        .D_packet(D_packet),                                                                // inst info to pred from (inst, PC, NPC, valid)
 
-        .branch_target(branch_pred_target),
-        .branch_pred(branch_pred)
+        .branch_target(branch_pred_target),                                                 // branch addr to jump to
+        .branch_pred(branch_pred)                                                           // to branch or not to branch
     );
+`else
+
+`endif
 
     assign IF_enable = 1'b1 & ~rs_stall;
     always_ff @(posedge clock) begin
