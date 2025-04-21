@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////////////////////////////
 
 `include "verilog/sys_defs.svh"
+`include "branch_pred.sv"
 
 module if_stage (
     input             clock,          // system clock
