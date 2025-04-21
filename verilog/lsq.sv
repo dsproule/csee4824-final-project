@@ -4,7 +4,6 @@
 module lsq(
     // alloc inputs
     input logic clock, reset, 
-    input logic dispatch_valid, 
     input logic sq_alloc, lq_alloc,
     input ROB_T T,
 
@@ -25,11 +24,15 @@ module lsq(
     output logic mem_write_en,
     output logic [`XLEN-1:0] proc2Dmem_addr_store,
     output logic [`XLEN-1:0] proc2Dmem_data_store,
+    output MEM_ACCESS mem_access_store,
+    output ROB_T store_T,
 
     // lq output for cdb or D$ if needed
+    output logic load_data_valid,
     output logic [`XLEN-1:0] proc2Dmem_addr_load,
     output logic [`XLEN-1:0] proc2Dmem_data_load,
-    output logic load_data_valid,
+    output MEM_ACCESS mem_access_load,
+    output ROB_T load_T,
 
     //control signals for structural hazards
     output logic sq_full, sq_empty, lq_full, lq_empty
@@ -47,8 +50,8 @@ module lsq(
     */
 
     // address calculation
-    MEM_ACCESS mem_access_load;
-    MEM_ACCESS mem_access_store;
+    MEM_ACCESS mem_access_load_wire;
+    MEM_ACCESS mem_access_store_wire;
     logic [`XLEN-1:0] rawDmem_addr_load;
     logic [`XLEN-1:0] S_X_load_addr;
     logic [`XLEN-1:0] rawDmem_addr_store;
@@ -58,16 +61,16 @@ module lsq(
         rawDmem_addr_load = S_X_load.V1 + S_X_load.mem_offset;
         S_X_load_addr = {rawDmem_addr_load[`XLEN-1:3], 3'b0};
 
-        mem_access_load.line_offset = rawDmem_addr_load[2:0];
-        mem_access_load.rd_unsigned = S_X_load.rd_unsigned;
-        mem_access_load.mem_size = S_X_load.mem_size;
+        mem_access_load_wire.line_offset = rawDmem_addr_load[2:0];
+        mem_access_load_wire.rd_unsigned = S_X_load.rd_unsigned;
+        mem_access_load_wire.mem_size = S_X_load.mem_size;
 
         rawDmem_addr_store = S_X_store.V1 + S_X_store.mem_offset;
         S_X_store_addr = {rawDmem_addr_store[`XLEN-1:3], 3'b0};
 
-        mem_access_store.line_offset = rawDmem_addr_store[2:0];
-        mem_access_store.rd_unsigned = S_X_store.rd_unsigned;
-        mem_access_store.mem_size = S_X_store.mem_size;
+        mem_access_store_wire.line_offset = rawDmem_addr_store[2:0];
+        mem_access_store_wire.rd_unsigned = S_X_store.rd_unsigned;
+        mem_access_store_wire.mem_size = S_X_store.mem_size;
     end
 
 
@@ -153,10 +156,18 @@ module lsq(
 
             mem_write_en <= 0;
             load_data_valid <= 0;
+            proc2Dmem_addr_store <= 0;
+            proc2Dmem_data_store <= 0;
+            proc2Dmem_addr_load <= 0;
+            proc2Dmem_data_load <= 0;
+            mem_access_load <= 0;
+            mem_access_store <= 0;
+            load_T <= 0;
+            store_T <= 0;
         end else begin
             mem_write_en <= 0;
             load_data_valid <= 0;
-            
+
             // SQ
             //dispatch alloc on decode, record current lq_tail in rs station as store position
             if (sq_alloc  && !sq_full) begin
@@ -174,7 +185,7 @@ module lsq(
                 sq[sq_X_T].data <= S_X_store.V2; //to be masked in FU
                 sq[sq_X_T].data_valid <= `TRUE;
                 sq[sq_X_T].addr_valid <= `TRUE;
-                sq[sq_X_T].mem_access <= mem_access_store;
+                sq[sq_X_T].mem_access <= mem_access_store_wire;
             end
 
             if(retire_en && sq[retire_sq_T].addr_valid && sq[retire_sq_T].data_valid) begin //akin to setting ready in ROB
@@ -188,6 +199,8 @@ module lsq(
                 mem_write_en <= `TRUE;
                 proc2Dmem_addr_store <= sq[sq_head].addr;
                 proc2Dmem_data_store <= sq[sq_head].data;
+                mem_access_store <= sq[sq_head].mem_access;
+                store_T <= sq[sq_head].T;
 
                 sq_head <= (sq_head == `SQ_SZ - 1) ? 1 : sq_head + 1; // change here
                 sq_head_wrap <= (sq_head == `SQ_SZ - 1) ? ~sq_head_wrap : sq_head_wrap; // change here
@@ -208,7 +221,7 @@ module lsq(
             if (load_X && lq[lq_X_T].valid) begin
                 lq[lq_X_T].addr <= S_X_load_addr;
                 lq[lq_X_T].addr_valid <= `TRUE;
-                lq[lq_X_T].mem_access <= mem_access_load;
+                lq[lq_X_T].mem_access <= mem_access_load_wire;
 
                 if (store_load_fwd) begin //forwards if the address is already present
                     lq[lq_X_T].data <= load_data;
@@ -221,6 +234,8 @@ module lsq(
                 load_data_valid <= lq[lq_head].data_ready;
                 proc2Dmem_addr_load <= lq[lq_head].addr;
                 proc2Dmem_data_load <= lq[lq_head].data;
+                mem_access_load <= lq[lq_head].mem_access;
+                load_T <= lq[lq_head].T;
 
                 lq_head <= (lq_head == `LQ_SZ - 1) ? 0 : (lq_head + 1);
                 lq_head_wrap <= (lq_head == `LQ_SZ - 1) ? ~lq_head_wrap : lq_head_wrap;
