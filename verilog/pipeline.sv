@@ -65,7 +65,7 @@ module pipeline (
     D_S_PACKET D_S_reg, D_packet;
     logic [1:0] proc2Dmem_command, proc2Imem_command;
     logic [`XLEN-1:0] proc2Imem_addr;
-    logic [`XLEN-1:0] branch_target;
+    logic [`XLEN-1:0] branch_target, branch_pred_target;
 
     // Map table outputs
     MT_ENTRY T1_wire, T2_wire;
@@ -192,18 +192,25 @@ module pipeline (
         .clock(clock), .reset(reset), 
         .if_valid(~Dmem_req & Icache_valid_out),
         .pipe_stall(rs_stall),
-        .take_branch(take_branch),
-        .branch_target(branch_target),
+        .take_branch(take_branch | branch_pred),
+        .branch_target((branch_pred) ? branch_pred_target : branch_target),
         .Imem2proc_data(Icache_data_out),
 
-        
         .if_packet(IF_packet),
         .proc2Imem_addr(proc2Icache_addr)
     );
 
+    two_bit_pred branch_pred_0(
+        .clock(clock), .reset(reset), .en(D_packet.cond_branch & ~take_branch & D_packet.valid), 
+        .D_packet(D_packet),
+
+        .branch_target(branch_pred_target),
+        .branch_pred(branch_pred)
+    );
+
     assign IF_enable = 1'b1 & ~rs_stall;
     always_ff @(posedge clock) begin
-        if (reset | take_branch) begin
+        if (reset | take_branch | branch_pred) begin
             IF_ID_reg <= '0;
         end else if (IF_enable) begin
             IF_ID_reg <= IF_packet;
@@ -236,6 +243,7 @@ module pipeline (
         // separated because may need a signal to stall
         end else if (D_enable) begin
             D_S_reg <= D_packet;
+            D_S_reg.branch_pred <= branch_pred;
 
             if (D_packet.valid & (D_packet.rs_idx == 0 || D_packet.rs_idx == 4))
                 alu_fu <= ~alu_fu;

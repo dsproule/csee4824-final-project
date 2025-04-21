@@ -378,7 +378,8 @@ SOURCES = verilog/pipeline.sv \
 		  verilog/rps.sv \
 		  verilog/rob.sv \
 		  verilog/if_stage.sv \
-		  verilog/dcache.sv
+		  verilog/dcache.sv \
+		  verilog/two_bit_pred.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 
