@@ -190,6 +190,7 @@ endmodule // decoder
 
 module d_stage (
     input IF_ID_PACKET IF_ID_reg,
+    input alu_fu, mult_fu,
 
     output D_S_PACKET D_packet
 );
@@ -224,9 +225,9 @@ module d_stage (
             D_packet.rs_idx = `NUM_FU_STORE;
         else if (D_packet.alu_func == ALU_MUL    | D_packet.alu_func == ALU_MULHSU |
                  D_packet.alu_func == ALU_MULH | D_packet.alu_func == ALU_MULHU)
-            D_packet.rs_idx = `NUM_FU_MULT;
+            D_packet.rs_idx = (mult_fu) ? 5 : `NUM_FU_MULT;
         else
-            D_packet.rs_idx = `NUM_FU_ALU;
+            D_packet.rs_idx = (alu_fu) ? 4 : `NUM_FU_ALU;
     end
 
     decoder decoder_0 (

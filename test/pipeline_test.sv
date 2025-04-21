@@ -203,7 +203,7 @@ module testbench;
 
     task print_cdb;
         $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T:%4h\t  V:%4h", cdb_dbg.T, cdb_dbg.V);
+        $display("T:%4h\t  V:%4h valid:%1b", cdb_dbg.T, cdb_dbg.V, cdb_dbg.valid);
         $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
         $display("------------------------------------------");
     endtask // print_cdb
@@ -241,7 +241,7 @@ module testbench;
         if (proc2mem_command != BUS_NONE) begin
             $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
             $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
-            $display("Dmem_gnt: %2b, take_branch: %1b", core.Dmem_gnt, core.take_branch);
+            $display("rd/wr: %2b, take_branch: %1b", {core.rd_mem, core.wr_mem}, core.take_branch);
             $display("------------------------------------------");
         end
     endtask
@@ -278,13 +278,13 @@ module testbench;
     always @(posedge clock) begin
         if (~reset) begin
             // only start printing after first inst arrives
-            // if (IF_ID_reg_dbg.valid)
-            if ((clock_count >= 11607)) begin
+            // if ((clock_count >= 11607)) begin
+            if (IF_ID_reg_dbg.valid)
                 prog_start <= 1;
             // if ((clock_count >= 11618)) begin
                 // show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
                 // $finish;
-            end
+            // end
 
 
             if (prog_start) begin
@@ -302,7 +302,7 @@ module testbench;
                 
                 // print_x_pkt;
             end
-            // if(clock_count > 200000)
+            // if(clock_count > 500)
             //     $finish;
         end
     end
@@ -393,6 +393,7 @@ module testbench;
             end
 
             // deal with any halting conditions
+            // if(pipeline_error_status != NO_ERROR || debug_counter > 550) begin
             if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
                 // print_regs;
                 // print_sx;

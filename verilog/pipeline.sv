@@ -81,10 +81,8 @@ module pipeline (
     logic [`RS_SZ:0] fu_idx, S_idx, X_idx, req_idx;    
     S_X_PACKET [`RS_SZ-1:0] S_packets, S_X_regs;
     X_C_PACKET [`RS_SZ-1:0] X_packets, X_C_regs;
-    logic [63:0] proc2Dmem_data;
     MEM_SIZE proc2Dmem_size;
     logic [`XLEN-1:0] proc2Dmem_addr [1:0];
-    logic [1:0] Dmem_gnt;
     logic wr_mem, rd_mem;
 
     // ROB outputs
@@ -110,8 +108,14 @@ module pipeline (
 
     // Caches 
     logic [`XLEN-1:0] proc2Icache_addr;
-    logic [63:0]      Icache_data_out;
+    logic [63:0] Icache_data_out;
     logic Icache_valid_out;
+    
+    logic [`XLEN-1:0] cache2Dmem_addr;
+    logic [1:0] cache2Dmem_command;
+    logic Dcache_valid_out;
+    logic [63:0] proc2Dcache_data, cache2Dmem_data, Dcache_data_out;
+    logic wr_proc, wr_valid;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -147,23 +151,14 @@ module pipeline (
     // for all memory vectors, ind0 -> wr and ind1 -> rd
 
     always_comb begin
-        Dmem_gnt = 2'b00;
-
         if (Dmem_req) begin
-            if (wr_mem) begin
-                proc2mem_addr    = proc2Dmem_addr[0];
-                proc2mem_command = proc2Dmem_command;
-                Dmem_gnt = 2'b01;
-            end else begin
-                proc2mem_addr    = proc2Dmem_addr[1];
-                proc2mem_command = BUS_LOAD;
-                Dmem_gnt = 2'b10;
-            end
+            proc2mem_addr        = cache2Dmem_addr;
+            proc2mem_command     = cache2Dmem_command;
         end else begin
             proc2mem_addr        = proc2Imem_addr;
             proc2mem_command     = proc2Imem_command;
         end
-        proc2mem_data = proc2Dmem_data;
+        proc2mem_data = cache2Dmem_data;
     end
 
     //////////////////////////////////////////////////
@@ -221,9 +216,12 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
+    logic alu_fu, mult_fu;
     d_stage d_stage_0(
         // Inputs
         .IF_ID_reg(IF_ID_reg),
+        .alu_fu(alu_fu),
+        .mult_fu(mult_fu),
 
         // Outputs
         .D_packet(D_packet)
@@ -233,10 +231,18 @@ module pipeline (
     always_ff @(posedge clock) begin
         if (reset | take_branch) begin
             D_S_reg <= '0;
+            alu_fu <= '0;
+            mult_fu <= '0;
         // separated because may need a signal to stall
         end else if (D_enable) begin
             D_S_reg <= D_packet;
+
+            if (D_packet.valid & (D_packet.rs_idx == 0 || D_packet.rs_idx == 4))
+                alu_fu <= ~alu_fu;
+            if (D_packet.valid & (D_packet.rs_idx == 1 || D_packet.rs_idx == 5))
+                mult_fu <= ~mult_fu;
         end
+
     end
 
     //////////////////////////////////////////////////
@@ -264,13 +270,15 @@ module pipeline (
     assign V2_rs = (T2_wire.plus == 1) ? V2_rob_final : V2_regfile;
 
     logic rs_idx_full;
+    logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
     assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
+    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3] & ~rd_mem, FU_ready[2] & ~wr_mem, FU_ready[1:0]};
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
         .cdb(cdb), .D_S_reg(D_S_reg), 
-        .FU_ready(FU_ready),
+        .FU_ready(FU_ready_no_lsq),
         .T(rob_T_wire), .T1(T1_wire), .T2(T2_wire), 
         .V1(V1_rs), .V2(V2_rs), 
 
@@ -363,32 +371,68 @@ module pipeline (
         .X_packet(X_packets[1])
     );
 
+    dcache dache_0(
+        .clock(clock), .reset(reset | take_branch),
+
+        // From memory
+        .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
+        .Dmem2proc_data(mem2proc_data),
+
+        // From FU stage
+        .proc2Dcache_addr((wr_mem) ? proc2Dmem_addr[0] : proc2Dmem_addr[1]),
+        .proc2Dcache_data(proc2Dcache_data),
+        .wr_proc(wr_proc),
+
+        // To memory
+        .proc2Dmem_command(cache2Dmem_command),
+        .proc2Dmem_addr(cache2Dmem_addr),
+        .proc2Dmem_data(cache2Dmem_data),
+
+        // To fetch stage
+        .Dcache_data_out(Dcache_data_out),
+        .Dcache_valid_out(Dcache_valid_out),
+        .wr_valid(wr_valid)
+    );
+
+    assign wr_proc = wr_mem & Dcache_valid_out;
+
     func_unit_2 func_unit_02 (
         .clock(clock), .reset(reset | take_branch), 
-        .Dmem_gnt(Dmem_gnt[1]),
-        .retired(gnt[2]),
-        .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
-        .Dmem2proc_data(mem2proc_data),
+        .committed(gnt[2]), .data_valid(Dcache_valid_out & rd_mem),
+        .Dmem2proc_data(Dcache_data_out),
         .S_X_reg(S_X_regs[2]),
 
-        .mem_load_pend(),
+        // output logic mem_load_pend,
         .proc2Dmem_addr(proc2Dmem_addr[1]),
         .X_packet(X_packets[2])
     );
 
-    func_unit_3 func_unit_03 (
-        .clock(clock), .reset(reset | take_branch), 
-        .Dmem_gnt(Dmem_gnt[0]),              // signal that the memory was listening to this module
-        .retired(gnt[3]),                    // the current mem_store has been 
-        .mem2proc_response(mem2proc_response), .mem2proc_tag(mem2proc_tag),
-        .Dmem2proc_data(mem2proc_data),
+    func_unit_3 func_unit_03(
+        .clock(clock), .reset(reset | take_branch), .committed(gnt[3]), .wr_valid(wr_valid & wr_mem),
+        .Dmem2proc_data(Dcache_data_out),
         .S_X_reg(S_X_regs[3]),
 
-        .mem_store_pend(),             // the module is attempting to store a value
         .proc2Dmem_addr(proc2Dmem_addr[0]),
-        .proc2Dmem_command(proc2Dmem_command),
-        .proc2Dmem_data(proc2Dmem_data),
+        .proc2Dcache_data(proc2Dcache_data),
         .X_packet(X_packets[3])
+    );
+
+    func_unit_0 func_unit_04(
+        // Inputs
+        .S_X_reg(S_X_regs[4]), 
+        
+        // Outputs
+        .X_packet(X_packets[4])
+    );
+
+    func_unit_1 func_unit_05(
+        // Inputs
+        .clock(clock), .reset(reset | take_branch), 
+        .retired(gnt[5]),
+        .S_X_reg(S_X_regs[5]), 
+
+        // Outputs    
+        .X_packet(X_packets[5])
     );
 
     // X_C regs
@@ -410,7 +454,6 @@ module pipeline (
     //////////////////////////////////////////////////
 
     // CDB stage
-    assign cdb_valid = (gnt != 4'h0);
     always_comb begin
         // turn the arbiter signal to idx
         for (gnt_idx = 0; gnt_idx < `RS_SZ; gnt_idx++)
@@ -430,12 +473,12 @@ module pipeline (
         cdb.valid = cdb_valid;
     end
 
-    rps4 arb (
+    rps arb (
         .clock(clock), .reset(reset | take_branch), 
         .req(FU_req), 
         .en(1'b1), 
         
-        .gnt(gnt), .count()
+        .gnt(gnt), .req_up(cdb_valid)
     );
 
     //////////////////////////////////////////////////
