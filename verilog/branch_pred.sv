@@ -11,33 +11,33 @@ module BHT(
     output  logic [1:0]     take_branch
 );
 
-logic [1:0] bht [0:255];
-integer i;
-logic [7:0] bhr;
-logic [7:0] entry;
+    logic [1:0] bht [0:255];
+    integer i;
+    logic [7:0] bhr;
+    logic [7:0] entry;
 
-assign entry = bhr ^ pc_index;
+    assign entry = bhr ^ pc_index;
 
-always_ff @(posedge clk) begin
-    if(reset) begin
-        for (i = 0; i < 256; i=i+1) begin
-            bht[i] <= 2'b00;
+    always_ff @(posedge clk) begin
+        if(reset) begin
+            for (i = 0; i < 256; i=i+1) begin
+                bht[i] <= 2'b00;
+            end
+            bhr <= 8'b0;
         end
-        bhr <= 8'b0;
-    end
-    else if(update_en) begin
-        if (update_take_branch && (bht[entry] != 2'b11))
-            bht[entry] <= bht[entry] + 1;
-        else if (!update_take_branch && (bht[pc_index] != 2'b00))
-            bht[entry] <= bht[entry] - 1;
+        else if(update_en) begin
+            if (update_take_branch && (bht[entry] != 2'b11))
+                bht[entry] <= bht[entry] + 1;
+            else if (!update_take_branch && (bht[pc_index] != 2'b00))
+                bht[entry] <= bht[entry] - 1;
 
-        bhr <= {bhr[6:0] , update_take_branch};
+            bhr <= {bhr[6:0] , update_take_branch};
+        end
     end
-end
 
-always_comb begin
-    take_branch = bht[pc_index][1];
-end
+    always_comb begin
+        take_branch = bht[pc_index][1];
+    end
 endmodule
 
 // a small branch target cache 
@@ -50,20 +50,20 @@ module BTB (
     output  logic           hit,
     output  logic [31:0]    predicted_target
 );
-    reg [31:0] btb_pc [0:255];
-    reg [31:0] btb_target [0:255];
+    logic [31:0] btb_pc [0:255];
+    logic [31:0] btb_target [0:255];
 
     integer i;
 
     always_ff @(posedge clk) begin
-        if (rst) begin
+        if (reset) begin
             for (i = 0; i < 256; i = i + 1) begin
                 btb_pc[i] <= 32'h0;
                 btb_target[i] <= 32'h0;
             end
         end else if (update_en) begin
             btb_pc[pc[9:2]] <= pc;
-            btb_target[pc[9:2]] <= target_addr;
+            btb_target[pc[9:2]] <= update_target_addr;
         end
     end
 
