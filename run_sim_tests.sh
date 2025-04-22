@@ -103,10 +103,7 @@ for program in "${!scoreboard_reg[@]}"; do
     echo -n " | "
     printf "%-10s | " "${cpi_values[$program]}"
     echo -ne "${halt_messages[$program]}"
-    echo ""
-
-    cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
-    ((num_program += 1))
+    echo ""    
 
     # Strip ANSI codes for log file
     reg_plain=$(echo -e "${scoreboard_reg[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
@@ -116,6 +113,9 @@ for program in "${!scoreboard_reg[@]}"; do
     # Log plain output aligned
     printf "%-20s | %-10s | %-10s | %-10s | %-30s\n" \
         "$program" "$reg_plain" "$mem_plain" "${cpi_values[$program]}" "$halt_plain" >> "$LOG_FILE"
+    
+    cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
+    ((num_program += 1))
 done
 
 echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)"
