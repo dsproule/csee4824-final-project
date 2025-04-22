@@ -11,6 +11,7 @@
 
 // Internal macros, no other file should need these
 `define CACHE_LINES 32
+`define NB_LINES 2
 `define CACHE_LINE_BITS $clog2(`CACHE_LINES)
 
 typedef struct packed {
@@ -20,29 +21,13 @@ typedef struct packed {
     logic                         valid;
 } ICACHE_ENTRY;
 
-/**
- * A quick overview of the cache and memory:
- *
- * We've increased the memory latency from 1 cycle to 100ns. which will be
- * multiple cycles for any reasonable processor. Thus, memory can have multiple
- * transactions pending and coordinates them via memory tags (different meaning
- * than cache tags) which represent a transaction it's working on. Memory tags
- * are 4 bits long since 15 mem accesses can be live at one time, and only one
- * access happens per cycle.
- *
- * On a request, memory *responds* with the tag it will use for that request
- * then ceiling(100ns/clock period) cycles later, it will return the data with
- * the corresponding tag. The 0 tag is a sentinel value and unused. It would be
- * very difficult to push your clock period past 100ns/15=6.66ns, so 15 tags is
- * sufficient.
- *
- * This cache coordinates those memory tags to speed up fetching reused data.
- *
- * Note that this cache is blocking, and will wait on one memory request before
- * sending another (unless the input address changes, in which case it abandons
- * that request). Implementing a non-blocking cache can count towards simple
- * feature points, but will require careful management of memory tags.
- */
+typedef struct packed {
+    logic [`XLEN-1:0] addr;
+    logic [3:0] mem_tag;
+
+    logic miss_outstanding;
+    logic valid;
+} MSHR_ENTRY;
 
 module icache (
     input clock,
@@ -68,6 +53,7 @@ module icache (
     // ---- Cache data ---- //
 
     ICACHE_ENTRY [`CACHE_LINES-1:0] icache_data;
+    MSHR_ENTRY [`NB_LINES-1:0] mshr;
 
     // ---- Addresses and final outputs ---- //
 
@@ -84,21 +70,39 @@ module icache (
     // ---- Main cache logic ---- //
 
     logic [3:0] current_mem_tag; // The current memory tag we might be waiting on
-    logic miss_outstanding; // Whether a miss has received its response tag to wait on
-
-    wire got_mem_data = (current_mem_tag == Imem2proc_tag) && (current_mem_tag != 0);
+    logic got_mem_data, miss_outstanding; // Whether a miss has received its response tag to wait on
 
     wire changed_addr = (current_index != last_index) || (current_tag != last_tag);
 
-    // Set mem tag to zero if we changed_addr, and keep resetting while there is
-    // a miss_outstanding. Then set to zero when we got_mem_data.
-    // (this relies on Imem2proc_response being zero when there is no request)
     wire update_mem_tag = changed_addr || miss_outstanding || got_mem_data;
 
-    // If we have a new miss or still waiting for the response tag, we might
-    // need to wait for the response tag because dcache has priority over icache
     wire unanswered_miss = changed_addr ? !Icache_valid_out
                                         : miss_outstanding && (Imem2proc_response == 0);
+
+    logic cur_mshr_idx, addr_waiting;
+    always_comb begin
+        cur_mshr_idx = 0;
+        addr_waiting = 0;
+        
+        for (logic [$clog2(`NB_LINES):0] mshr_idx = 0; mshr_idx < `NB_LINES; mshr_idx++) begin
+
+            // if its a new addr, attempts to allocate it to an mshr (latch)
+            if (changed_addr) begin
+                // if the line is valid (it got freed or init), allocate it
+                if (~mshr[mshr_idx].valid)
+                    cur_mshr_idx = mshr_idx;
+                
+                // cache is already servicing this mem address
+                if (mshr[mshr_idx] == proc2Icache_addr)
+                    addr_waiting = 1;
+            end
+
+            // if any MSHR has a miss outstanding, attempt mem request
+            
+            // if tag matches a value coming in,  
+            got_mem_data = (current_mem_tag == Imem2proc_tag) && (current_mem_tag != 0);
+        end
+    end
 
     // Keep sending memory requests until we receive a response tag or change addresses
     assign proc2Imem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : BUS_NONE;
@@ -112,18 +116,35 @@ module icache (
             last_tag         <= -1; // reset goes low because addr "changes"
             current_mem_tag  <= 0;
             miss_outstanding <= 0;
+            mshr             <= 0;
             icache_data      <= 0; // Set all cache data to 0 (including valid bits)
         end else begin
             last_index       <= current_index;
             last_tag         <= current_tag;
             miss_outstanding <= unanswered_miss;
+            
+            // if new addr and not servicing/in cache, alloc it
+            if (changed_addr && !Icache_valid_out && !addr_waiting) begin
+                mshr[cur_mshr_idx].addr <= proc2Icache_addr;
+                mshr[cur_mshr_idx].mem_tag <= 0;
+
+                mshr[cur_mshr_idx].miss_outstanding <= 1;
+                mshr[cur_mshr_idx].valid <= 1;
+            end
+
             if (update_mem_tag) begin
                 current_mem_tag <= Imem2proc_response;
+
+                // update mshr (set miss_outstanding to 0, set tag to response)
             end
+
+
             if (got_mem_data) begin // If data came from memory, meaning tag matches
                 icache_data[current_index].data  <= Imem2proc_data;
                 icache_data[current_index].tags  <= current_tag;
                 icache_data[current_index].valid <= 1;
+
+                // free mshr (set valid to 0)
             end
         end
     end
