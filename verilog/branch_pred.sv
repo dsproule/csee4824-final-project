@@ -7,6 +7,7 @@ module BHT(
     input   logic           reset,  
     input   logic [`BHT_WIDTH-1:0]     pc_index,
     input   logic           update_en,
+    input   logic [`XLEN-1:0]           update_pc,
     input   logic           update_take_branch,
     output  logic [1:0]     take_branch
 );
@@ -14,9 +15,10 @@ module BHT(
     logic [1:0] bht [0:`BHT_BIT-1];
     integer i;
     logic [`BHT_WIDTH-1:0] bhr;
-    logic [`BHT_WIDTH-1:0] entry;
+    logic [`BHT_WIDTH-1:0] entry, update_entry;
 
-    assign entry = pc_index ^ bhr;
+    assign entry = pc_index;
+    assign update_entry = update_pc[`BHT_WIDTH-1:0];
 
     always_ff @(posedge clock) begin
         if(reset) begin
@@ -26,10 +28,10 @@ module BHT(
             bhr <= 8'b0;
         end
         else if(update_en) begin
-            if (update_take_branch && (bht[entry] != 2'b11))
-                bht[entry] <= bht[entry] + 1;
-            else if (!update_take_branch && (bht[entry] != 2'b00))
-                bht[entry] <= bht[entry] - 1;
+            if (update_take_branch && (bht[update_entry] != 2'b11))
+                bht[update_entry] <= bht[update_entry] + 1;
+            else if (!update_take_branch && (bht[update_entry] != 2'b00))
+                bht[update_entry] <= bht[update_entry] - 1;
 
             bhr <= {bhr[`BHT_WIDTH-2:0] , update_take_branch};
         end
@@ -164,6 +166,7 @@ module simple_branch_pred(
     input   clock,
     input   reset,
     input   update_table,
+    input   [`XLEN-1:0] update_pc,
     input   update_branch_choice,
     input   en,
     input   D_S_PACKET  D_packet,
@@ -178,6 +181,7 @@ module simple_branch_pred(
         .reset(reset),  
         .pc_index(D_packet.PC[7:0]),
         .update_en(update_table),
+        .update_pc(update_pc),
         .update_take_branch(update_branch_choice),
         .take_branch(bht_take_branch)
     );
