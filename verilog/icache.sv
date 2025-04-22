@@ -70,20 +70,21 @@ module icache (
     // ---- Main cache logic ---- //
 
     logic [3:0] current_mem_tag; // The current memory tag we might be waiting on
-    logic got_mem_data, miss_outstanding; // Whether a miss has received its response tag to wait on
+    logic got_mem_data, miss_outstanding;
 
     wire changed_addr = (current_index != last_index) || (current_tag != last_tag);
 
     wire update_mem_tag = changed_addr || miss_outstanding || got_mem_data;
 
-    wire unanswered_miss = changed_addr ? !Icache_valid_out
-                                        : miss_outstanding && (Imem2proc_response == 0);
-
-    logic cur_mshr_idx, addr_waiting;
+    logic cur_mshr_idx, addr_waiting, mem_mshr_idx, resp_mshr_idx;
     always_comb begin
-        cur_mshr_idx = 0;
+        cur_mshr_idx = 0;                   // allocate mshr
         addr_waiting = 0;
-        
+        mem_mshr_idx = 0;                   // handle mem tag for mshr
+        resp_mshr_idx = 0;                  // handle mem tag for mshr
+        miss_outstanding = 1;
+        got_mem_data = 1;                   // handle mem responses
+
         for (logic [$clog2(`NB_LINES):0] mshr_idx = 0; mshr_idx < `NB_LINES; mshr_idx++) begin
 
             // if its a new addr, attempts to allocate it to an mshr (latch)
@@ -98,10 +99,18 @@ module icache (
             end
 
             // if any MSHR has a miss outstanding, attempt mem request
-            
-            // if tag matches a value coming in,  
-            got_mem_data = (current_mem_tag == Imem2proc_tag) && (current_mem_tag != 0);
+            if (mshr[mshr_idx].miss_outstanding & mshr[mshr_idx].valid) begin
+                mem_mshr_idx = mshr_idx;
+                miss_outstanding = 1;
+            end
+
+            // if tag matches a value coming in, 
+            if (mshr[mshr_idx].mem_tag == Imem2proc_tag && mshr[mshr_idx].valid && (current_mem_tag != 0)) begin
+                resp_mshr_idx = mshr_idx;
+                got_mem_data = 1;
+            end
         end
+
     end
 
     // Keep sending memory requests until we receive a response tag or change addresses
@@ -114,14 +123,11 @@ module icache (
         if (reset) begin
             last_index       <= -1; // These are -1 to get ball rolling when
             last_tag         <= -1; // reset goes low because addr "changes"
-            current_mem_tag  <= 0;
-            miss_outstanding <= 0;
             mshr             <= 0;
             icache_data      <= 0; // Set all cache data to 0 (including valid bits)
         end else begin
             last_index       <= current_index;
             last_tag         <= current_tag;
-            miss_outstanding <= unanswered_miss;
             
             // if new addr and not servicing/in cache, alloc it
             if (changed_addr && !Icache_valid_out && !addr_waiting) begin
@@ -133,9 +139,8 @@ module icache (
             end
 
             if (update_mem_tag) begin
-                current_mem_tag <= Imem2proc_response;
-
-                // update mshr (set miss_outstanding to 0, set tag to response)
+                mshr[mem_mshr_idx].mem_tag <= Imem2proc_response;
+                mshr[mem_mshr_idx].miss_outstanding <= (Imem2proc_response != 0);
             end
 
 
@@ -145,6 +150,7 @@ module icache (
                 icache_data[current_index].valid <= 1;
 
                 // free mshr (set valid to 0)
+                mshr[resp_mshr_idx] <= 0;
             end
         end
     end
