@@ -6,13 +6,18 @@ module testbench;
 
     logic clock, reset, done, correct, retired;
     logic [63:0] value, cycles;
-    logic [31:0] result, target;
+    logic [31:0] target;
 
     S_X_PACKET S_X_reg;
     X_C_PACKET X_packet;
 
     /* Call this to run a test */
-    task wait_until_done_no_reset(logic [31:0] V1, logic [31:0] V2, logic [31:0] targ, ALU_FUNC alu_func);
+    task wait_until_done_no_reset(
+        logic [31:0] V1,
+        logic [31:0] V2,
+        logic [31:0] targ,
+        ALU_FUNC alu_func
+    );
         // load up S_X_reg
         @(negedge clock);
         S_X_reg.V1 = V1;
@@ -22,12 +27,21 @@ module testbench;
         S_X_reg.alu_func = alu_func;
         target = targ;
         @(negedge clock);
-        //S_X_reg.valid = `FALSE;
+        S_X_reg.valid = `FALSE;
+
         forever begin : wait_loop
             @(posedge clock);
             if (done) begin
-                $display("%0d x %0d = %0d", $signed(V1), $signed(V2), $signed(X_packet.result));
-                disable wait_until_done_no_reset;
+                if (X_packet.result !== target) begin
+                    $display("@@@ Incorrect");
+                    $display("FAILED: %0d x %0d = %0d (expected %0d)",
+                        $signed(V1), $signed(V2), $signed(X_packet.result), $signed(target));
+                    $finish;
+                end else begin
+                    $display("PASS: %0d x %0d = %0d", 
+                        $signed(V1), $signed(V2), $signed(X_packet.result));
+                    disable wait_until_done_no_reset;
+                end
             end
         end
     endtask
@@ -47,7 +61,8 @@ module testbench;
         #(`CLOCK_PERIOD*0.2); // a short wait to let signals stabilize
         if (!correct && done) begin
             $display("@@@ Incorrect");
-            $display("Module returned a value of (%0d) when it was supposed to give (%0d)", $signed(result), $signed(target));
+            $display("Module returned a value of (%0d) when it was supposed to give (%0d)",
+                     $signed(X_packet.result), $signed(target));
             $finish;
         end
     end
@@ -55,7 +70,6 @@ module testbench;
     func_unit_1 FU_1(
         .clock(clock), .reset(reset), .retired(retired),
         .S_X_reg(S_X_reg),
-
         .X_packet(X_packet)
     );
 
@@ -69,23 +83,28 @@ module testbench;
         @(negedge clock);
         @(negedge clock);
         reset = 0;
+
         // signed tests 
         wait_until_done_no_reset(32'd2, 32'd2, 32'd4, ALU_MUL);
         retired = 1;
         @(negedge clock);
         retired = 0;
+
         wait_until_done_no_reset(32'd3, 32'd5, 32'd15, ALU_MUL);
         retired = 1;
         @(negedge clock);
         retired = 0;
+
         wait_until_done_no_reset(32'd0, 32'd2, 32'd0, ALU_MUL);
         retired = 1;
         @(negedge clock);
         retired = 0;
+
         wait_until_done_no_reset(32'd44589, 32'd345, 32'd15383205, ALU_MUL);
         retired = 1;
         @(negedge clock);
         retired = 0;
+
         wait_until_done_no_reset(-32'd1, 32'd2, -32'd2, ALU_MUL);
         retired = 1;
         @(negedge clock);
@@ -96,8 +115,8 @@ module testbench;
         retired = 1;
         @(negedge clock);
         retired = 0;
-        wait_until_done_no_reset(32'd4454589, 32'd355545, 32'd368, ALU_MULHSU);
 
+        wait_until_done_no_reset(32'd4454589, 32'd355545, 32'd368, ALU_MULHSU);
         retired = 1;
         @(negedge clock);
         retired = 0;
