@@ -76,14 +76,14 @@ module lsq(
 
     LQ_ENTRY lq[`LQ_SZ-1:0];
     LQ_T lq_head, lq_tail;
-    logic lq_head_wrap, lq_tail_wrap, lq_alloc;
+    logic lq_head_wrap, lq_tail_wrap;
 
     assign lq_full = (lq_head == lq_tail) && (lq_head_wrap != lq_tail_wrap);
     assign lq_empty = (lq_head == lq_tail) && (lq_head_wrap == lq_tail_wrap);
 
     SQ_ENTRY sq[`SQ_SZ-1:0];
-    logic SQ_T sq_head, sq_tail;
-    logic sq_head_wrap, sq_tail_wrap, sq_alloc;
+     SQ_T sq_head, sq_tail;
+    logic sq_head_wrap, sq_tail_wrap;
 
     assign sq_full = (sq_head == sq_tail) && (sq_head_wrap != sq_tail_wrap);
     assign sq_empty = (sq_head == sq_tail) && (sq_head_wrap == sq_tail_wrap);
@@ -102,7 +102,7 @@ module lsq(
         best_T = 0;
 
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
-            if (sq[i].valid && !sq[i].committed && sq[i].addr_valid &&
+            if (sq[i].valid && !sq[i].retired && sq[i].addr_valid &&
                 (sq[i].addr == S_X_load_addr) && (sq[i].T < S_X_load.T)) begin
                 if (sq[i].data_valid && load_X && lq[lq_X_T].valid && sq[i].T >= best_T) begin
                     load_data = sq[i].data; 
