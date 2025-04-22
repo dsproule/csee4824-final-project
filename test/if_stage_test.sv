@@ -5,6 +5,8 @@
 module testbench;
     logic clock, reset;
 
+    logic [3:0] delay_count;
+
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
         input [31:0] start_addr;
@@ -26,17 +28,23 @@ module testbench;
         end
     endtask // task show_mem_with_decimal
 
-    IF_ID_PACKET IF_ID_reg, IF_packet;
-    D_S_PACKET D_S_reg, D_packet;
+    //IF_ID_PACKET IF_ID_reg, IF_packet;
+    //D_S_PACKET D_S_reg, D_packet;
+    //logic IF_valid;
+    //logic [`XLEN-1:0] IF_PC;
+    //logic [31:0] IF_inst;
+    IF_ID_PACKET if_packet;
     logic [63:0] proc2mem_data;
     logic [63:0] mem2proc_data;
-    logic [3:0] mem2proc_tag;
-    logic [3:0] mem2proc_response;
-    logic [1:0] proc2Dmem_command, proc2Imem_command, proc2mem_command;
-    logic [`XLEN-1:0] proc2Imem_addr, proc2Dmem_addr, proc2mem_addr;
+    //logic [3:0] mem2proc_tag;
+    //logic [3:0] mem2proc_response;
+    //logic [1:0] proc2Dmem_command, proc2Imem_command, proc2mem_command;
+    //logic [`XLEN-1:0] proc2Imem_addr, proc2Dmem_addr, proc2mem_addr;
+    logic [1:0] proc2Imem_command;
+    logic [`XLEN-1:0] proc2Imem_addr;
     logic take_branch;
     logic [`XLEN-1:0] branch_target;
-
+/*
     task store_mem;
         input [`XLEN-1:0] addr;
         input [63:0] data;
@@ -50,19 +58,22 @@ module testbench;
         proc2Dmem_command = BUS_NONE;
     endtask;
 
+
     // new signals
     logic [3:0] nextImem_tag;
     logic new_addr, Imem_req, Dmem_req;
-
+*/
     mem memory(
         .clk(clock),
-        .proc2mem_addr(proc2mem_addr),
+        .proc2mem_addr(proc2Imem_addr),
         .proc2mem_data(proc2mem_data),
-        .proc2mem_command(proc2mem_command),
+        //.proc2mem_command(proc2mem_command),
 
-        .mem2proc_response(mem2proc_response),        // will need to change when Dmem gets introduced
+        //.mem2proc_response(mem2proc_response),        // will need to change when Dmem gets introduced
+        .proc2mem_command(proc2Imem_command),
         .mem2proc_data(mem2proc_data),                // will need to change when Dmem gets introduced
-        .mem2proc_tag(mem2proc_tag)                   // will need to change when Dmem gets introduced
+        //.mem2proc_tag(mem2proc_tag)                   // will need to change when Dmem gets introduced
+        .mem2proc_tag(), .mem2proc_response()
     );
     
     // icache icache_0 (
@@ -95,7 +106,7 @@ module testbench;
     end
 
     /* Module start */
-
+/*
     assign Dmem_req = (proc2Dmem_command != BUS_NONE);
 
     always_comb begin
@@ -107,10 +118,12 @@ module testbench;
             proc2mem_command = proc2Imem_command;
         end
     end
-
+*/
 
     if_stage if_stage_0(
-        .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req),
+        .clock(clock), .reset(reset), 
+        /*
+        .Imem_gnt(~Dmem_req),
         .take_branch(take_branch),
         .branch_target(),
         .Imem2proc_data(mem2proc_data),
@@ -120,10 +133,25 @@ module testbench;
         .IF_packet(IF_packet),
         .proc2Imem_command(proc2Imem_command),
         .proc2Imem_addr(proc2Imem_addr)
+        */
+        .take_branch(take_branch),
+        .branch_target(branch_target),
+        .Imem2proc_data(mem2proc_data),
+
+        //.IF_valid(IF_valid),
+        //.IF_PC(IF_PC),
+        //.IF_inst(IF_inst)\
+        .pipe_stall(1'b0),
+        .if_valid(1'b1),
+        .take_branch(take_branch),
+        .branch_target(branch_target),
+        .Imem2proc_data(mem2proc_data),
+        .if_packet(if_packet),
+        .proc2Imem_addr(proc2Imem_addr)
     );
 
     // when response comes back in turn on the if_stage
-
+/*
     always_ff @(posedge clock) begin
         if (reset) begin
             IF_ID_reg <= '0;
@@ -145,16 +173,21 @@ module testbench;
             D_S_reg <= (D_packet.valid) ? D_packet : '0;
         end
     end
-
+*/
 
     /* Module end */
 
     always @(posedge clock) begin
+        /*
         if (IF_ID_reg.valid & ~reset)
             $display("IF_ID_reg -- PC: %2h, INST: %8h", IF_ID_reg.PC, IF_ID_reg.inst);
         if (D_S_reg.valid)
             $display("D_packet -- INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
                     D_S_reg.inst, D_S_reg.PC, D_S_reg.NPC, D_S_reg.r, D_S_reg.r1, D_S_reg.r2, D_S_reg.opa_select, D_S_reg.opb_select, D_S_reg.cond_branch,D_S_reg.uncond_branch,D_S_reg.alu_func, D_S_reg.rs_idx, D_S_reg.halt, D_S_reg.illegal, D_S_reg.csr_op, D_S_reg.valid);
+        */
+        if (!reset && if_packet.valid) begin
+            $display("Fetched: PC = %x, INST = %x", if_packet.PC, if_packet.inst);
+        end
     end
 
     initial begin
@@ -166,12 +199,18 @@ module testbench;
         @(negedge clock);
         reset = 0;
         @(negedge clock);
-
+/*
         store_mem(`XLEN'h0,  64'h0020011300100093);
         store_mem(`XLEN'h8,  64'h002081b300210233);
         store_mem(`XLEN'h10, 64'h0081011310412023);
         store_mem(`XLEN'h18, 64'h0103229300130313);
-        
+   */
+        // Store instruction pairs so that PC[2] = 0 maps to lower 32b
+        memory.unified_memory[0]  = 64'h0010009300200113;  // inst 0 & 4
+        memory.unified_memory[1]  = 64'h00210233002081b3;  // inst 8 & C
+        memory.unified_memory[2]  = 64'h1041202300810113;  // inst 10 & 14
+        memory.unified_memory[3]  = 64'h0013031301032293;  // inst 18 & 1C
+
         @(negedge clock);
         @(negedge clock);
         @(negedge clock);
@@ -181,6 +220,7 @@ module testbench;
         @(negedge clock);
         @(negedge clock);
         reset = 0;
+        repeat (4) @(negedge clock);
         branch_target = 32'h4;
 
         // magic should start happening now

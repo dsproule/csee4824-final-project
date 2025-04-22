@@ -22,7 +22,7 @@ module map_table (
         end
 
         T1 = 0;
-        T1 = 0;
+        T2 = 0; //im assuming 2 T1 initializations is a typo? 
         
         //functionally conditionals should never both be true
         T1 = (cdb.valid && (cdb.T == mt_table[r1].T)) ? {mt_table[r1].T, `TRUE} : mt_table[r1]; //functionally conditionals should never both be true
