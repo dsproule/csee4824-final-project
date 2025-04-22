@@ -91,6 +91,9 @@ done
     echo "------------------------------------------------------------------------------------------"
 } | tee "$LOG_FILE"
 
+cpi_sum=0
+num_program=0
+
 for program in "${!scoreboard_reg[@]}"; do
     # Terminal output with color
     printf "%-20s | " "$program"
@@ -102,6 +105,9 @@ for program in "${!scoreboard_reg[@]}"; do
     echo -ne "${halt_messages[$program]}"
     echo ""
 
+    cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
+    ((num_program += 1))
+
     # Strip ANSI codes for log file
     reg_plain=$(echo -e "${scoreboard_reg[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
     mem_plain=$(echo -e "${scoreboard_mem[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
@@ -112,6 +118,6 @@ for program in "${!scoreboard_reg[@]}"; do
         "$program" "$reg_plain" "$mem_plain" "${cpi_values[$program]}" "$halt_plain" >> "$LOG_FILE"
 done
 
-
+echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)"
 echo "==========================================================================================" | tee -a "$LOG_FILE"
 echo "Scoreboard saved to $LOG_FILE"
