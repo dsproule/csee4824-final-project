@@ -79,6 +79,7 @@ module func_unit_0 (
     // pipeline control
     assign branch_mispred        = (take_conditional != S_X_reg.branch_pred) & S_X_reg.cond_branch;
 
+    // unconditional can still jump
     assign ppln_ctrl.flush       = S_X_reg.uncond_branch || (branch_mispred);
     assign ppln_ctrl.is_branch   = S_X_reg.uncond_branch | S_X_reg.cond_branch;
     assign ppln_ctrl.branch_addr = (branch_mispred & S_X_reg.branch_pred) ? S_X_reg.NPC : alu_result;

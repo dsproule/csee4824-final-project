@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps  
 
 MODULE = pipeline
 
@@ -379,7 +379,8 @@ SOURCES = verilog/pipeline.sv \
 		  verilog/rob.sv \
 		  verilog/if_stage.sv \
 		  verilog/dcache.sv \
-		  verilog/two_bit_pred.sv
+		  verilog/two_bit_pred.sv \
+		  verilog/branch_pred.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 
