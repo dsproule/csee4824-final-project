@@ -18,7 +18,7 @@ module lsq_tb;
   MEM_ACCESS mem_access_load;
   ROB_T load_T;
 
-  logic mem_write_en;
+  logic mem_write_en, mem_read_en;
   logic sq_full, sq_empty, lq_full, lq_empty;
 
   lsq dut (
@@ -36,6 +36,7 @@ module lsq_tb;
     .store_T(store_T),
     .proc2Dmem_addr_load(proc2Dmem_addr_load),
     .mem_access_load(mem_access_load),
+    .mem_read_en(mem_read_en),
     .load_T(load_T),
     .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
   );
@@ -145,7 +146,16 @@ module lsq_tb;
     @(posedge clock); #1;
     retire_en = 0;
     check("Delayed Store Committed", mem_write_en && proc2Dmem_data_store == 32'hDEADBEEF && !load_fwd_packet.valid);
-    @(negedge clock); retire_T = 3; retire_en = 1;
+    
+    @(negedge clock); lq_alloc = 1; T = 6;
+
+    @(negedge clock); lq_alloc = 0; load_X = 1;
+    S_X_load = '{T:6, V1:32'h1238, mem_offset:0, mem_size:2'b10, rd_unsigned:0, default:0};
+    @(negedge clock); retire_T = 6; retire_en = 1; load_X = 0;
+    @(posedge clock); #1;
+    check("Load Cache Req", mem_read_en && proc2Dmem_addr_load == 32'h1238);
+    
+    @(negedge clock); retire_T = 3;
     @(posedge clock); #1;
     retire_en = 0;
     check("Final Empty State", lq_empty && sq_empty);

@@ -27,6 +27,7 @@ module lsq(
     output ROB_T store_T,
 
     // lq output for cdb or D$ if needed
+    output logic mem_read_en,
     output logic [`XLEN-1:0] proc2Dmem_addr_load,
     output MEM_ACCESS mem_access_load,
     output ROB_T load_T,
@@ -178,6 +179,7 @@ module lsq(
             sq_tail_wrap <= 0;
 
             mem_write_en <= 0;
+            mem_read_en <= 0;
             proc2Dmem_addr_store <= 0;
             proc2Dmem_data_store <= 0;
             proc2Dmem_addr_load <= 0;
@@ -188,6 +190,7 @@ module lsq(
             load_fwd_packet <= 0;
         end else begin
             mem_write_en <= 0;
+            mem_read_en <= 0;
             load_fwd_packet <= 0;
 
             // SQ
@@ -236,7 +239,7 @@ module lsq(
             // Write address/data from SQ head to D$, free SQ head
             if(free_sq_head) begin
                 sq[sq_head] <= 0;
-                mem_write_en <= `TRUE;
+                mem_write_en <= `TRUE; 
                 proc2Dmem_addr_store <= sq[sq_head].addr;
                 proc2Dmem_data_store <= sq[sq_head].data;
                 mem_access_store <= sq[sq_head].mem_access;
@@ -284,6 +287,7 @@ module lsq(
                 //making mem request if no dependencies
                 proc2Dmem_addr_load <= lq[lq_head].addr;
                 mem_access_load <= lq[lq_head].mem_access;
+                mem_read_en <= `TRUE;
                 load_T <= lq[lq_head].T;
 
                 lq_head <= (lq_head == `LQ_SZ - 1) ? 0 : (lq_head + 1);

@@ -398,35 +398,33 @@ module pipeline (
     MEM_ACCESS mem_access_load_wire, mem_access_store_wire;
     logic [`XLEN-1:0] proc2Dmem_data_wire;
 
-    lsq lsq_inst( //TODO wr_mem diff now bc S_X
-        //inputs
-        .clock(clock), .reset(reset | take_branch),
-        // From dispatch
-        .sq_alloc(), .lq_alloc(), //D_S reg --> if store or load respec
-        .T(rob_T_wire),
-        // From S_X
-        .S_X_load(S_X_regs[2]), .S_X_store(S_X_regs[3]),
-        .load_X(), .store_X(), //new signal --> rising edge of valid
-        // From retire
-        .retire_T(retire_T_wire), .retire_en(retire),
-        // To cdb (forwarding if addr present)
-        .load_data(), .store_load_fwd(),
-        // to store FU
-        .mem_write_en(), // FIXME interacts with write mem
-        .proc2Dmem_addr_store(proc2Dmem_addr[0]),
-        .proc2Dmem_data_store(proc2Dmem_data_wire),
-        .mem_access_store(mem_access_store_wire),
-        .store_T(store_T_wire), 
-        //to load FU or CDB if data ready
-        .load_data_valid(), // mux with cdb
-        .proc2Dmem_addr_load(proc2Dmem_addr[1]),
-        .proc2Dmem_data_load(),
-        .mem_access_load(mem_access_load_wire),
-        .load_T(load_T_wire),
-        //control signals
-        .sq_full(), .sq_empty(),
-        .lq_full(), .lq_empty()
-    )
+    lsq lsq_inst (
+    // inputs
+    .clock(clock), 
+    .reset(reset | take_branch),
+    .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
+    .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
+    .T(rob_T_wire),
+    .S_X_store(S_X_regs[3]), 
+    .S_X_load(S_X_regs[2]),
+    .store_X(S_X_regs[3].valid), //TODO this might be fine
+    .load_X(S_X_regs[2].valid),
+    .retire_T(retire_T_wire), 
+    .retire_en(retire),
+
+    // outputs
+    .load_fwd_packet(X_packets[2]), //  FIXME forward to X_C_regs[2] if needed
+    .mem_write_en(mem_write_en),
+    .proc2Dmem_addr_store(proc2Dmem_addr[0]),
+    .proc2Dmem_data_store(proc2Dmem_data_wire),
+    .mem_access_store(mem_access_store_wire),
+    .store_T(store_T_wire),
+    .proc2Dmem_addr_load(proc2Dmem_addr[1]),
+    .mem_access_load(mem_access_load_wire),
+    .load_T(load_T_wire),
+    .sq_full(), .sq_empty(), .lq_full(), .lq_empty()
+    
+    );
     assign wr_proc = wr_mem & Dcache_valid_out;
 
     func_unit_2 func_unit_02 (
