@@ -207,7 +207,7 @@ module pipeline (
         .clock(clock), .reset(reset), 
         // .update_table(S_X_regs[0].valid & S_X_regs[0].cond_branch),                         // fu0 is processing a branch (should update the state table)
         // .update_branch_choice(X_packets[0].flush ^ S_X_regs[0].branch_pred),                // if flush, means negate
-        .en(D_packet.cond_branch & ~take_branch & D_packet.valid),                          // detects if inst in IF_ID is branch. (To pred jump)
+        .en(D_packet.cond_branch & ~take_branch & D_packet.valid & ~rs_stall),                          // detects if inst in IF_ID is branch. (To pred jump)
         .D_packet(D_packet),                                                                // inst info to pred from (inst, PC, NPC, valid)
 
         .branch_target(branch_pred_target),                                                 // branch addr to jump to
@@ -233,7 +233,7 @@ module pipeline (
             IF_ID_reg <= '0;
         end else if (IF_enable) begin
             IF_ID_reg <= IF_packet;
-        end
+        end 
     end
 
     //////////////////////////////////////////////////
@@ -514,7 +514,7 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign pipeline_completed_insts = {3'b0, retire};    // commit one valid instruction
+    assign pipeline_completed_insts = {3'b0, retire & ~pipeline_control.halt};    // commit one valid instruction
     assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
                                       pipeline_control.halt           ? HALTED_ON_WFI :
                                       (mem2proc_response==4'h0 & (proc2mem_command != BUS_NONE)) ? LOAD_ACCESS_FAULT : NO_ERROR;

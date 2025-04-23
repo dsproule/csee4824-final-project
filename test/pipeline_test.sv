@@ -384,16 +384,16 @@ module testbench;
             if (pipeline_completed_insts > 0) begin
                 if(pipeline_commit_wr_en)
                     $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x, T=%d", 
-                              pipeline_commit_NPC - 4,
+                              pipeline_commit_NPC,
                               pipeline_commit_wr_idx,
                               pipeline_commit_wr_data, clock_count
                               );
                 else
-                    $fdisplay(wb_fileno, "PC=%x, ---", pipeline_commit_NPC - 4);
+                    $fdisplay(wb_fileno, "PC=%x, ---, T=%d", pipeline_commit_NPC, clock_count); //, clock_count);
             end
 
             // deal with any halting conditions
-            // if(pipeline_error_status != NO_ERROR || debug_counter > 550) begin
+            // if(pipeline_error_status != NO_ERROR || clock_count > 5000) begin
             if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
                 // print_regs;
                 // print_sx;
