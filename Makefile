@@ -231,8 +231,8 @@ $(call DEPS,rob): $(ROB_DEPS)
 MULTI_MODULE_DEPS = verilog/*.sv
 $(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
 
-IF_STAGE_DEPS = verilog/icache.sv verilog/d_stage.sv
-$(call DEPS,if_stage): $(IF_STAGE_DEPS) $(MEM_DEPS)
+IF_STAGE_DEPS = verilog/icache.sv
+$(call DEPS,if_stage): $(IF_STAGE_DEPS) test/mem.sv
 
 # This allows you to use the following make targets:
 # make <module>.pass   <- greps for "@@@ Passed" or "@@@ Incorrect" in the output

@@ -22,7 +22,7 @@ typedef struct packed {
 } ICACHE_ENTRY;
 
 typedef struct packed {
-    logic [`XLEN-1:0] addr;
+    logic [`XLEN-1:3] addr;
     logic [3:0] mem_tag;
 
     logic miss_outstanding;
@@ -115,7 +115,7 @@ module icache (
 
     // Keep sending memory requests until we receive a response tag or change addresses
     assign proc2Imem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : BUS_NONE;
-    assign proc2Imem_addr    = {proc2Icache_addr[31:3],3'b0};
+    assign proc2Imem_addr    = {mshr[mem_mshr_idx],3'b0};
 
     // ---- Cache state registers ---- //
 
@@ -131,7 +131,7 @@ module icache (
             
             // if new addr and not servicing/in cache, alloc it
             if (changed_addr && !Icache_valid_out && !addr_waiting) begin
-                mshr[cur_mshr_idx].addr <= proc2Icache_addr;
+                mshr[cur_mshr_idx].addr <= proc2Icache_addr[`XLEN-1:3];
                 mshr[cur_mshr_idx].mem_tag <= 0;
 
                 mshr[cur_mshr_idx].miss_outstanding <= 1;
