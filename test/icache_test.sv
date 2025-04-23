@@ -26,7 +26,6 @@ module testbench;
         end
     endtask // task show_mem_with_decimal
 
-    IF_ID_PACKET IF_packet;
     logic [63:0] proc2mem_data, mem2proc_data, Icache_data_out;
     logic [3:0] mem2proc_tag, mem2proc_response;
     logic [1:0] proc2mem_command;
@@ -72,17 +71,19 @@ module testbench;
 
     /* Module start */
 
-    if_stage if_stage_0(
-        .clock(clock), .reset(reset), 
-        .if_valid(1'b1 & Icache_valid_out),
-        .pipe_stall(1'b0),
-        .take_branch(1'b0),
-        .branch_target(1'b0),
-        .Imem2proc_data(Icache_data_out),
 
-        .if_packet(IF_packet),
-        .proc2Imem_addr(proc2Icache_addr)
-    );
+    // if_stage if_stage_0(
+    //     .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req),
+    //     .take_branch(take_branch),
+    //     .branch_target(),
+    //     .Imem2proc_data(mem2proc_data),
+    //     .Imem2proc_response(mem2proc_response), .Imem2proc_tag(mem2proc_tag),
+
+    //     .mem_req(mem_req),
+    //     .IF_packet(IF_packet),
+    //     .proc2Imem_command(proc2Imem_command),
+    //     .proc2Imem_addr(proc2Imem_addr)
+    // );
 
     // when response comes back in turn on the if_stage
 
@@ -115,10 +116,10 @@ module testbench;
         reset = 0;
         show_mem_with_decimal(0, 12);
         
-        // proc2Icache_addr = `XLEN'h0;
-        // @(negedge clock);
-        // proc2Icache_addr = `XLEN'h8;
-        // @(negedge clock);
+        proc2Icache_addr = `XLEN'h0;
+        @(negedge clock);
+        proc2Icache_addr = `XLEN'h8;
+        @(negedge clock);
         // @(posedge Icache_valid_out);
         // proc2Icache_addr = `XLEN'h10;
         repeat (9) @(negedge clock);

@@ -196,7 +196,6 @@ module pipeline (
         .branch_target(branch_target),
         .Imem2proc_data(Icache_data_out),
 
-        
         .if_packet(IF_packet),
         .proc2Imem_addr(proc2Icache_addr)
     );

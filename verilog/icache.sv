@@ -25,7 +25,6 @@ typedef struct packed {
     logic [`XLEN-1:3] addr;
     logic [3:0] mem_tag;
 
-    logic miss_outstanding;
     logic valid;
 } MSHR_ENTRY;
 
@@ -73,12 +72,12 @@ module icache (
 
     wire changed_addr = (current_index != last_index) || (current_tag != last_tag);
 
-    wire update_mem_tag = changed_addr || miss_outstanding || got_mem_data;
+    wire update_mem_tag = changed_addr || miss_outstanding;
 
     logic cur_mshr_idx, addr_waiting, mem_mshr_idx, resp_mshr_idx;
     always_comb begin
         cur_mshr_idx = 0;                   // allocate mshr
-        addr_waiting = 0;
+        addr_waiting = Icache_valid_out;
         mem_mshr_idx = 0;                   // handle mem tag for mshr
         resp_mshr_idx = 0;                  // handle mem tag for mshr
         miss_outstanding = 0;
@@ -90,15 +89,15 @@ module icache (
             if (changed_addr) begin
                 // if the line is valid (it got freed or init), allocate it
                 if (~mshr[mshr_idx].valid)
-                    cur_mshr_idx = mshr_idx;
-                
-                // cache is already servicing this mem address
-                if ((mshr[mshr_idx] == proc2Icache_addr[`XLEN-1:3]) & (mshr[mshr_idx].valid))
-                    addr_waiting = 1;
+                    cur_mshr_idx = mshr_idx; 
             end
+            
+            // cache is already servicing this mem address
+            if ((mshr[mshr_idx].addr == proc2Icache_addr[`XLEN-1:3]) & (mshr[mshr_idx].valid))
+                addr_waiting = 1;
 
             // if any MSHR has a miss outstanding, attempt mem request
-            if (mshr[mshr_idx].miss_outstanding & mshr[mshr_idx].valid) begin
+            if ((mshr[mshr_idx].mem_tag == 0) & mshr[mshr_idx].valid) begin
                 mem_mshr_idx = mshr_idx;
                 miss_outstanding = 1;
             end
@@ -114,7 +113,7 @@ module icache (
 
     // Keep sending memory requests until we receive a response tag or change addresses
     assign proc2Imem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : BUS_NONE;
-    assign proc2Imem_addr    = {mshr[mem_mshr_idx].addr,3'b0};
+    assign proc2Imem_addr    = {mshr[mem_mshr_idx].addr, 3'b0};
 
     // ---- Cache state registers ---- //
 
@@ -129,17 +128,15 @@ module icache (
             last_tag         <= current_tag;
             
             // if new addr and not servicing/in cache, alloc it
-            if (changed_addr && !Icache_valid_out && !addr_waiting) begin
+            if (changed_addr & ~addr_waiting & ~mshr[cur_mshr_idx].valid) begin
                 mshr[cur_mshr_idx].addr <= proc2Icache_addr[`XLEN-1:3];
                 mshr[cur_mshr_idx].mem_tag <= 0;
 
-                mshr[cur_mshr_idx].miss_outstanding <= 1;
                 mshr[cur_mshr_idx].valid <= 1;
             end
 
             if (update_mem_tag) begin
                 mshr[mem_mshr_idx].mem_tag <= Imem2proc_response;
-                mshr[mem_mshr_idx].miss_outstanding <= (Imem2proc_response == 0) & (mshr[mem_mshr_idx].valid);
             end
 
 

@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps icache
 
 MODULE = pipeline
 
@@ -233,6 +233,7 @@ $(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
 
 IF_STAGE_DEPS = verilog/icache.sv
 $(call DEPS,if_stage): $(IF_STAGE_DEPS) test/mem.sv
+$(call DEPS,icache): test/mem.sv
 
 # This allows you to use the following make targets:
 # make <module>.pass   <- greps for "@@@ Passed" or "@@@ Incorrect" in the output

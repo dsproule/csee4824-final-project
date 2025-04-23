@@ -2,7 +2,7 @@ Magic 271485
 Revision Verdi_U-2023.03-SP2-1
 
 ; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
-viewPort 0 25 771 291 179 82
+viewPort 0 25 979 378 179 82
 
 ; File list:
 ; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
@@ -16,16 +16,16 @@ signalSpacing 5
 
 ; windowTimeUnit is used for zoom, cursor & marker
 ; waveform viewport range
-zoom 0.000000 32000.000000
-cursor 24500.000000
+zoom 19543.089431 39543.089431
+cursor 31500.000000
 marker 0.000000
 
 ; user define markers
 ; userMarker time_pos marker_name color linestyle
 ; visible top row signal index
-top 5
+top 2
 ; marker line index
-markerPos 11
+markerPos 15
 
 ; event list
 ; addEvent event_name event_expression
@@ -57,7 +57,11 @@ addSignal -h 15 -UNSIGNED -HEX /testbench/icache_0/proc2Imem_command[1:0]
 addSignal -h 15 -UNSIGNED -HEX /testbench/icache_0/proc2Imem_addr[31:0]
 addSignal -h 15 -UNSIGNED -HEX /testbench/icache_0/Icache_data_out[63:0]
 addSignal -h 15 /testbench/icache_0/Icache_valid_out
-addSignal -h 15 /testbench/icache_0/mshr[1:0]
+addSignal -h 15 /testbench/icache_0/mshr[1]
+addSignal -h 15 /testbench/icache_0/mshr[0]
+addSignal -h 15 /testbench/icache_0/icache_data[31:0]
+addSignal -h 15 /testbench/icache_0/addr_waiting
+addSignal -h 15 /testbench/icache_0/changed_addr
 addGroup "G2"
 
 ; getSignalForm Scope Hierarchy Status
