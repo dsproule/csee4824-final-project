@@ -17,8 +17,7 @@ module lsq(
     input logic retire_en,
 
     //forwarding outputs
-    output logic [`XLEN-1:0] load_data,
-    output logic store_load_fwd,
+    output X_C_PACKET load_fwd_packet [1:0],
 
     //mem write from head when store is committed
     output logic mem_write_en,
@@ -28,11 +27,11 @@ module lsq(
     output ROB_T store_T,
 
     // lq output for cdb or D$ if needed
-    output logic load_data_valid,
     output logic [`XLEN-1:0] proc2Dmem_addr_load,
-    output logic [`XLEN-1:0] proc2Dmem_data_load,
     output MEM_ACCESS mem_access_load,
     output ROB_T load_T,
+    output logic [`XLEN-1:0] proc2Dmem_data_load, //for speculative loads
+    output logic load_data_valid,
 
     //control signals for structural hazards
     output logic sq_full, sq_empty, lq_full, lq_empty
@@ -82,7 +81,7 @@ module lsq(
     assign lq_empty = (lq_head == lq_tail) && (lq_head_wrap == lq_tail_wrap);
 
     SQ_ENTRY sq[`SQ_SZ-1:0];
-     SQ_T sq_head, sq_tail;
+    SQ_T sq_head, sq_tail;
     logic sq_head_wrap, sq_tail_wrap;
 
     assign sq_full = (sq_head == sq_tail) && (sq_head_wrap != sq_tail_wrap);
@@ -92,23 +91,43 @@ module lsq(
     LQ_T lq_X_T;
 
     //forwarding unit - youngest store older than load forwards to load
+    
+    logic waiting_for_fwd;
+    SQ_T dep_sq_T;
 
     // loop temp logic that should get compiled out
     ROB_T best_T; // may cause synthesis to freak out,  but should be fine
     always_comb begin
         // Forwarding logic
-        store_load_fwd = 0;
-        load_data = '0;
         best_T = 0;
+        waiting_for_fwd = 0;
+        dep_sq_T = 0;
+        load_fwd_packet[0] = 0;
+        load_fwd_packet[1] = 0;
 
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
             if (sq[i].valid && !sq[i].retired && sq[i].addr_valid &&
-                (sq[i].addr == S_X_load_addr) && (sq[i].T < S_X_load.T)) begin
-                if (sq[i].data_valid && load_X && lq[lq_X_T].valid && sq[i].T >= best_T) begin
-                    load_data = sq[i].data; 
+                    (sq[i].addr == S_X_load_addr) && (sq[i].T < S_X_load.T) && 
+                    load_X && lq[lq_X_T].valid && sq[i].T >= best_T) begin
+                if (sq[i].data_valid) begin
                     best_T = sq[i].T;
-                    store_load_fwd = 1;
+                    load_fwd_packet[0].T =  sq[i].T;
+                    load_fwd_packet[0].result = sq[i].data;;
+                    load_fwd_packet[0].valid = `TRUE;
+                end else begin
+                    waiting_for_fwd = 1;
+                    dep_sq_T = i;
                 end
+            end
+        end
+   
+
+        for (int j = 0; j < `LQ_SZ; j++) begin //on store update
+            if (store_X && sq[sq_X_T].valid && 
+            (lq[j].state == WAITING) && (lq[j].dep_sq_T == sq_X_T)) begin
+                load_fwd_packet[1].T = lq[j].T;
+                load_fwd_packet[1].result =S_X_store.V2;
+                load_fwd_packet[1].valid = `TRUE;
             end
         end
     end
@@ -125,16 +144,17 @@ module lsq(
         end
 
         for (int i = 0; i < `SQ_SZ; i++) begin
-                if (S_X_store.T == sq[i].T) begin
-                    sq_X_T = i;
-                end
-                if (retire_T == sq[i].T) begin
-                    retire_sq_T = i;
-                end
+            if (S_X_store.T == sq[i].T) begin
+                sq_X_T = i;
+            end
+            if (retire_T == sq[i].T) begin
+                retire_sq_T = i;
+            end
         end
     end
 
-    // TODO flush unit --> sets data to not ready if collision    
+    // TODO flush unit --> sets data to not ready if collision 
+    // TODO masking data if mem_size is different   
 
     always_ff @(posedge clock) begin
         if (reset) begin
@@ -186,6 +206,13 @@ module lsq(
                 sq[sq_X_T].data_valid <= `TRUE;
                 sq[sq_X_T].addr_valid <= `TRUE;
                 sq[sq_X_T].mem_access <= mem_access_store_wire;
+
+                for (int j = 0; j < `LQ_SZ; j++) begin
+                    if (lq[j].state == WAITING && lq[j].dep_sq_T == sq_X_T) begin
+                        lq[j].data <= S_X_store.V2;
+                        lq[j].state <= FORWARDED;
+                    end
+                end
             end
 
             if(retire_en && sq[retire_sq_T].addr_valid && sq[retire_sq_T].data_valid) begin //akin to setting ready in ROB
@@ -193,9 +220,9 @@ module lsq(
             end
 
             // Write address/data from SQ head to D$, free SQ head
-            if(!sq_empty && (sq[sq_head].retired || sq_head == retire_sq_T) && 
+            if(!sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
                         sq[sq_head].addr_valid && sq[sq_head].data_valid) begin
-                
+                sq[sq_head] <= 0;
                 mem_write_en <= `TRUE;
                 proc2Dmem_addr_store <= sq[sq_head].addr;
                 proc2Dmem_data_store <= sq[sq_head].data;
@@ -223,17 +250,23 @@ module lsq(
                 lq[lq_X_T].addr_valid <= `TRUE;
                 lq[lq_X_T].mem_access <= mem_access_load_wire;
 
-                if (store_load_fwd) begin //forwards if the address is already present
-                    lq[lq_X_T].data <= load_data;
-                    lq[lq_X_T].data_ready <= `TRUE;
+                if (load_fwd_packet[0].valid) begin //forwards if the address is already present
+                    lq[lq_X_T].data <= load_fwd_packet[0].result;
+                    lq[lq_X_T].state <= FORWARDED;
+                end else if (waiting_for_fwd) begin
+                    lq[lq_X_T].dep_sq_T <= dep_sq_T; 
+                    lq[lq_X_T].state <= WAITING;
                 end
             end
 
             //output --> send to cache if data isnt ready, otherwise cdb
-            if(!lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid) begin
-                load_data_valid <= lq[lq_head].data_ready;
-                proc2Dmem_addr_load <= lq[lq_head].addr;
+            if(!lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && (lq[lq_head].state != WAITING)) begin
+                lq[lq_head] <= 0;
+                load_data_valid <= (lq[lq_head].state == DATA_READY); //speculative loads
                 proc2Dmem_data_load <= lq[lq_head].data;
+
+                //making mem request if no dependencies
+                proc2Dmem_addr_load <= lq[lq_head].addr;
                 mem_access_load <= lq[lq_head].mem_access;
                 load_T <= lq[lq_head].T;
 

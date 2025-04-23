@@ -381,13 +381,21 @@ typedef struct packed { //used to keep track of needed parts of S_X for mem acce
     MEM_SIZE          mem_size;
 } MEM_ACCESS;
 
+typedef enum logic [1:0] {
+    LQ_NONE  = 2'h0,
+    DATA_READY  = 2'h1,
+    WAITING   = 2'h2,
+    FORWARDED = 2'h3
+} LQ_FLAG;
+
 typedef struct packed {
     logic valid;                         // Entry is in use
     logic [`XLEN-1:0] addr;              // Effective address (if known)
     logic [`XLEN-1:0] data;              // Loaded data (if forwarded)
     ROB_T T;                       // Tag for tracking commit order
     logic addr_valid;                   // Address is computed
-    logic data_ready;                   // Data has been forwarded or loaded
+    LQ_FLAG state;
+    SQ_T dep_sq_T;
     MEM_ACCESS mem_access;              
 } LQ_ENTRY;
 
