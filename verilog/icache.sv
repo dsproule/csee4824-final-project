@@ -69,7 +69,6 @@ module icache (
 
     // ---- Main cache logic ---- //
 
-    logic [3:0] current_mem_tag; // The current memory tag we might be waiting on
     logic got_mem_data, miss_outstanding;
 
     wire changed_addr = (current_index != last_index) || (current_tag != last_tag);
@@ -82,8 +81,8 @@ module icache (
         addr_waiting = 0;
         mem_mshr_idx = 0;                   // handle mem tag for mshr
         resp_mshr_idx = 0;                  // handle mem tag for mshr
-        miss_outstanding = 1;
-        got_mem_data = 1;                   // handle mem responses
+        miss_outstanding = 0;
+        got_mem_data = 0;                   // handle mem responses
 
         for (logic [$clog2(`NB_LINES):0] mshr_idx = 0; mshr_idx < `NB_LINES; mshr_idx++) begin
 
@@ -94,7 +93,7 @@ module icache (
                     cur_mshr_idx = mshr_idx;
                 
                 // cache is already servicing this mem address
-                if (mshr[mshr_idx] == proc2Icache_addr)
+                if ((mshr[mshr_idx] == proc2Icache_addr[`XLEN-1:3]) & (mshr[mshr_idx].valid))
                     addr_waiting = 1;
             end
 
@@ -105,7 +104,7 @@ module icache (
             end
 
             // if tag matches a value coming in, 
-            if (mshr[mshr_idx].mem_tag == Imem2proc_tag && mshr[mshr_idx].valid && (current_mem_tag != 0)) begin
+            if (mshr[mshr_idx].mem_tag == Imem2proc_tag && (mshr[mshr_idx].mem_tag != 0)) begin
                 resp_mshr_idx = mshr_idx;
                 got_mem_data = 1;
             end
@@ -115,7 +114,7 @@ module icache (
 
     // Keep sending memory requests until we receive a response tag or change addresses
     assign proc2Imem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : BUS_NONE;
-    assign proc2Imem_addr    = {mshr[mem_mshr_idx],3'b0};
+    assign proc2Imem_addr    = {mshr[mem_mshr_idx].addr,3'b0};
 
     // ---- Cache state registers ---- //
 
@@ -140,7 +139,7 @@ module icache (
 
             if (update_mem_tag) begin
                 mshr[mem_mshr_idx].mem_tag <= Imem2proc_response;
-                mshr[mem_mshr_idx].miss_outstanding <= (Imem2proc_response != 0);
+                mshr[mem_mshr_idx].miss_outstanding <= (Imem2proc_response == 0) & (mshr[mem_mshr_idx].valid);
             end
 
 
