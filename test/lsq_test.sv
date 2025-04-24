@@ -29,6 +29,7 @@ module lsq_tb;
     .store_X(store_X), .load_X(load_X),
     .retire_T(retire_T), .retire_en(retire_en),
     .load_fwd_packet(load_fwd_packet),
+    .store_X_packet(),
     .mem_write_en(mem_write_en),
     .proc2Dmem_addr_store(proc2Dmem_addr_store),
     .proc2Dmem_data_store(proc2Dmem_data_store),

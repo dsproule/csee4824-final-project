@@ -18,6 +18,7 @@ module lsq(
 
     //forwarding outputs
     output X_C_PACKET load_fwd_packet,
+    output X_C_PACKET store_X_packet,
 
     //mem write from head when store is committed
     output logic mem_write_en,
@@ -90,6 +91,9 @@ module lsq(
     LQ_T lq_X_T;
 
     logic free_sq_head, free_lq_head, fwd_head;
+    logic update_sq;
+
+    assign update_sq = store_X && sq[sq_X_T].valid;
     assign free_sq_head = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
                         sq[sq_head].addr_valid && sq[sq_head].data_valid;
 
@@ -142,6 +146,8 @@ module lsq(
         sq_X_T = 0;
         lq_X_T = 0;
         retire_sq_T = 0;
+        store_X_packet = 0;
+
         for (int i = 0; i < `LQ_SZ; i++) begin
             if (S_X_load.T == lq[i].T)
                 lq_X_T = i;
@@ -155,13 +161,19 @@ module lsq(
                 retire_sq_T = i;
             end
         end
+
+        if (update_sq) begin
+            store_X_packet.T = sq[sq_X_T].T;
+            store_X_packet.result = 0;
+            store_X_packet.valid = `TRUE;
+            store_X_packet.ppln_ctrl.is_store = `TRUE;
+        end
     end
 
     // TODO flush unit --> sets data to not ready if collision 
     // TODO masking data if mem_size is different   
 
-    logic update_sq;
-    assign update_sq = store_X && sq[sq_X_T].valid;
+    
 
     always_ff @(posedge clock) begin
         if (reset) begin
@@ -220,6 +232,8 @@ module lsq(
                 sq[sq_X_T].data_valid <= `TRUE;
                 sq[sq_X_T].addr_valid <= `TRUE;
                 sq[sq_X_T].mem_access <= mem_access_store_wire;
+
+                
 
                 
                 for (int j = 0; j < `LQ_SZ; j++) begin

@@ -454,6 +454,7 @@ module pipeline (
     .mem_access_load(mem_access_load_wire),
     .mem_read_en(mem_read_en),
     .load_T(load_T_wire),
+    .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
     .sq_full(), .sq_empty(), .lq_full(), .lq_empty()
     
     );
@@ -481,7 +482,7 @@ module pipeline (
         .proc2Dmem_data(proc2Dmem_data_wire), //handles masking before storing
 
         .proc2Dcache_data(proc2Dcache_data),
-        .X_packet(X_packets[3])
+        .X_packet()
     );
 
     func_unit_0 func_unit_04(

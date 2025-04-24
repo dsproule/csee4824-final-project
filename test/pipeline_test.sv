@@ -237,6 +237,45 @@ module testbench;
         $display("------------------------------------------");
     endtask
 
+     task print_sq;
+    $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
+    $display("--------------------------------------------------------------------------------");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | Retired");
+    $display("--------------------------------------------------------------------------------");
+    for (int i = 0; i < `SQ_SZ; i++) begin
+      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |   %1b",
+               i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
+               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].retired);
+    end
+    $display("--------------------------------------------------------------------------------\n");
+  endtask
+
+  task print_lq;
+    $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.sq_tail, clock_count);
+    $display("----------------------------------------------------------------------------------------------------------");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Dep_SQ_T");
+    $display("----------------------------------------------------------------------------------------------------------");
+    for (int i = 0; i < `LQ_SZ; i++) begin
+      string state_str;
+      case (core.lsq_inst.lq[i].state)
+        NONE:      state_str = "NONE";
+        DATA_READY:state_str = "DATA_READY";
+        WAITING:   state_str = "WAITING";
+        FORWARDED: state_str = "FORWARDED";
+        default:   state_str = "???";
+      endcase
+      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %2d",
+               i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
+               core.lsq_inst.lq[i].addr_valid, state_str, core.lsq_inst.lq[i].dep_sq_T);
+    end
+    $display("----------------------------------------------------------------------------------------------------------\n");
+  endtask
+
+  task print_lsq;
+    print_lq();
+    print_sq();
+  endtask
+
     task print_mem;
         if (proc2mem_command != BUS_NONE) begin
             $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
@@ -281,24 +320,24 @@ module testbench;
             // if ((clock_count >= 11607)) begin
             if (IF_ID_reg_dbg.valid)
                 prog_start <= 1;
-            // if ((clock_count >= 11618)) begin
-                // show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
-                // $finish;
-            // end
+            if ((clock_count >= 100)) begin
+                show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
+                $finish;
+            end
 
 
             if (prog_start) begin
-                print_if;
+                // print_if;
                 // print_ds;
-                // print_rs;
+                print_rs;
                 // print_mt;
-                // print_cdb;
-                // print_rob;
-                // print_regs;
-                // print_sx;
+                print_cdb;
+                print_rob;
+                //print_regs;
+                print_sx;
+                print_lsq;
                 print_mem;
-                // print_xc;
-                // if (IF_ID_reg_dbg.PC == `XLEN'hef8) $display("mayday");
+                print_xc;
                 
                 // print_x_pkt;
             end
