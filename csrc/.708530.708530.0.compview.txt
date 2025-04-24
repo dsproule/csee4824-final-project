@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1745381391.221064751, "rt":1.15, "ut":0.35, "st":0.20}}
+{"vcselab":{"timestamp_begin":1745381392.417454239, "rt":0.64, "ut":0.26, "st":0.10}}
+{"link":{"timestamp_begin":1745381393.098842004, "rt":0.66, "ut":0.25, "st":0.10}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1745381390.561233761}
+{"VCS_COMP_START_TIME": 1745381390.561233761}
+{"VCS_COMP_END_TIME": 1745381394.144509206}
+{"VCS_USER_OPTIONS": "-sverilog +vc -Mupdate -line -full64 -kdb -lca -nc -debug_access+all+reverse +warn=noTFIPC +warn=noDEBUG_DEP +warn=noENUMASSIGN +define+CLOCK_PERIOD=350.0 test/rob_test.sv verilog/rob.sv -o rob.simv"}
+{"vcs1": {"peak_mem": 551076}}
+{"vcselab": {"peak_mem": 246056}}
