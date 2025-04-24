@@ -42,6 +42,10 @@
 // number of mult stages (2, 4, or 8)
 `define MULT_STAGES 4
 
+// width of Branch Prediction Table
+`define BHT_BIT     16
+`define BHT_WIDTH   4
+
 ///////////////////////////////
 // ---- Basic Constants ---- //
 ///////////////////////////////
@@ -311,6 +315,7 @@ typedef struct packed {
 
     logic cond_branch;
     logic uncond_branch;
+    logic branch_pred;
 
     ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
     
@@ -421,7 +426,7 @@ typedef struct packed {
 
     logic cond_branch;
     logic uncond_branch;
-    logic has_dest;
+    logic branch_pred;
 
     ALU_OPA_SELECT opa_select;
     ALU_OPB_SELECT opb_select;
@@ -432,6 +437,7 @@ typedef struct packed {
     logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
     MEM_SIZE          mem_size;
     
+    logic has_dest;
     /* P6-microarchitecture specific */
 
     ROB_T T;

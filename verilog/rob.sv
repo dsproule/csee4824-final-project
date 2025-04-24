@@ -28,8 +28,6 @@ module rob(
     assign retire_T_out = (retire) ? retire_T : 0;
     assign regfile_write_idx_out = (retire) ? regfile_write_idx : 0;
 
-    assign commit_NPC = rob_table[head].NPC;
-
     /* ONLY WORKS IF SIZE IS POWER OF TWO, BUT MORE EFFICIENT AND SIMPLER LOGIC FOR CONTROL BITS/MULTIPLE ISSUES WHEN WE SUPERSCALAR
 
         Extra bit in big_head or big_tail acts as a wraparound detector. If the MSB of each is equal, they are on the same "wraparound"
@@ -94,9 +92,11 @@ module rob(
 
             // commit --> retire head/free rob entry [x], write to regfile [x], clear maptable entry if valid, fkush after this if needed
             if (!empty && rob_table[head].ready) begin
+                rob_table[head] <= 0;
                 retire <= 1;
                 regfile_write_idx <= rob_table[head].r; 
                 regfile_write_data <= rob_table[head].V; 
+                commit_NPC <= rob_table[head].NPC;
                 ppln_ctrl <= rob_table[head].ppln_ctrl;
 
                 retire_T <= head;

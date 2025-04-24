@@ -185,6 +185,7 @@ module RS_VALUE(
                     S_packet[s_idx].mem_size      = rs_table[s_idx].D_S_reg.mem_size;
                     S_packet[s_idx].valid         = `TRUE;
                     S_packet[s_idx].has_dest      = rs_table[s_idx].D_S_reg.has_dest;
+                    S_packet[s_idx].branch_pred   = rs_table[s_idx].D_S_reg.branch_pred;
                     
                     rs_free[s_idx] = 1'b1;
                 end else begin
