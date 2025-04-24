@@ -1,7 +1,7 @@
 
 ================== SCOREBOARD ==================
-Test Run: Wed Apr 23 02:18:05 EDT 2025
+Test Run: Thu Apr 24 03:25:42 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
-matrix_mult_rec      | FAIL       | FAIL       | 7.863195   | WFI instruction               
+matrix_mult_rec      | FAIL       | FAIL       | 5.632174   | WFI instruction               
 ==========================================================================================

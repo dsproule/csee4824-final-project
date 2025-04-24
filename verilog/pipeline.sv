@@ -514,7 +514,7 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign pipeline_completed_insts = {3'b0, retire & ~pipeline_control.halt};    // commit one valid instruction
+    assign pipeline_completed_insts = {3'b0, retire};    // commit one valid instruction
     assign pipeline_error_status    = pipeline_control.illegal        ? ILLEGAL_INST :
                                       pipeline_control.halt           ? HALTED_ON_WFI :
                                       (mem2proc_response==4'h0 & (proc2mem_command != BUS_NONE)) ? LOAD_ACCESS_FAULT : NO_ERROR;
