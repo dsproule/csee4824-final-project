@@ -118,8 +118,8 @@ module testbench;
         
         proc2Icache_addr = `XLEN'h0;
         @(negedge clock);
+        @(posedge clock);
         proc2Icache_addr = `XLEN'h8;
-        @(negedge clock);
         // @(posedge Icache_valid_out);
         // proc2Icache_addr = `XLEN'h10;
         repeat (9) @(negedge clock);

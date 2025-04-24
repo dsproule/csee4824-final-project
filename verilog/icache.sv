@@ -57,8 +57,8 @@ module icache (
     // ---- Addresses and final outputs ---- //
 
     // Note: cache tags, not memory tags
-    logic [12-`CACHE_LINE_BITS:0] current_tag, last_tag;
-    logic [`CACHE_LINE_BITS - 1:0] current_index, last_index;
+    logic [12-`CACHE_LINE_BITS:0] current_tag, last_tag, resp_tag;
+    logic [`CACHE_LINE_BITS - 1:0] current_index, last_index, resp_index;
 
     assign {current_tag, current_index} = proc2Icache_addr[15:3];
 
@@ -115,6 +115,8 @@ module icache (
     assign proc2Imem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : BUS_NONE;
     assign proc2Imem_addr    = {mshr[mem_mshr_idx].addr, 3'b0};
 
+    assign {resp_tag, resp_index} = mshr[resp_mshr_idx].addr[15:3];
+
     // ---- Cache state registers ---- //
 
     always_ff @(posedge clock) begin
@@ -133,6 +135,11 @@ module icache (
                 mshr[cur_mshr_idx].mem_tag <= 0;
 
                 mshr[cur_mshr_idx].valid <= 1;
+                
+                mshr[~cur_mshr_idx].addr <= {proc2Icache_addr + 12}[`XLEN-1:3];
+                mshr[~cur_mshr_idx].mem_tag <= 0;
+
+                mshr[~cur_mshr_idx].valid <= 1;
             end
 
             if (update_mem_tag) begin
@@ -141,9 +148,9 @@ module icache (
 
 
             if (got_mem_data) begin // If data came from memory, meaning tag matches
-                icache_data[current_index].data  <= Imem2proc_data;
-                icache_data[current_index].tags  <= current_tag;
-                icache_data[current_index].valid <= 1;
+                icache_data[resp_index].data  <= Imem2proc_data;
+                icache_data[resp_index].tags  <= resp_tag;
+                icache_data[resp_index].valid <= 1;
 
                 // free mshr (set valid to 0)
                 mshr[resp_mshr_idx] <= 0;

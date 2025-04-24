@@ -77,7 +77,7 @@ module testbench;
         .if_valid(1'b1 & Icache_valid_out),
         .pipe_stall(1'b0),
         .take_branch(1'b0),
-        .branch_target(1'b0),
+        .branch_target(`XLEN'b0),
         .Imem2proc_data(Icache_data_out),
 
         .if_packet(IF_packet),
@@ -85,16 +85,6 @@ module testbench;
     );
 
     // when response comes back in turn on the if_stage
-
-    // always_ff @(posedge clock) begin
-    //     if (reset) begin
-    //         IF_ID_reg <= '0;
-    //     end else begin
-    //         IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
-    //     end
-    // end
-
-    /* Module end */
 
     // always @(posedge clock) begin
     //     if (IF_ID_reg.valid & ~reset)
