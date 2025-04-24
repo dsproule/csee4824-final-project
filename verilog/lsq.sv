@@ -160,6 +160,9 @@ module lsq(
     // TODO flush unit --> sets data to not ready if collision 
     // TODO masking data if mem_size is different   
 
+    logic update_sq;
+    assign update_sq = store_X && sq[sq_X_T].valid;
+
     always_ff @(posedge clock) begin
         if (reset) begin
             for (int i = 0; i < `LQ_SZ; i++) begin
@@ -211,7 +214,7 @@ module lsq(
             end
 
             // store func unit writes address/data into slot, rs gets cleared
-            if (store_X && sq[sq_X_T].valid) begin //comes from RS
+            if (update_sq) begin //comes from RS
                 sq[sq_X_T].addr <= S_X_store_addr;
                 sq[sq_X_T].data <= S_X_store.V2; //to be masked in FU
                 sq[sq_X_T].data_valid <= `TRUE;
@@ -279,7 +282,6 @@ module lsq(
             if(free_lq_head) begin
                 lq[lq_head] <= 0;
 
-                //will only have values from forwarding atm
                 load_fwd_packet.valid <= (lq[lq_head].state == DATA_READY || fwd_head);
                 load_fwd_packet.T <= lq[lq_head].T;
                 load_fwd_packet.result <= lq[lq_head].data;
@@ -287,7 +289,7 @@ module lsq(
                 //making mem request if no dependencies
                 proc2Dmem_addr_load <= lq[lq_head].addr;
                 mem_access_load <= lq[lq_head].mem_access;
-                mem_read_en <= `TRUE;
+                mem_read_en <= !(lq[lq_head].state == DATA_READY || fwd_head);
                 load_T <= lq[lq_head].T;
 
                 lq_head <= (lq_head == `LQ_SZ - 1) ? 0 : (lq_head + 1);
@@ -295,4 +297,28 @@ module lsq(
             end
         end
     end
+
+    // genvar j; Michael's suggestion for separating out fsm
+    // generate
+        
+    //     for (j = 0; j < `LQ_SZ; j++) begin: g_lq_fsm
+            
+    //         always_ff @(posedge clock) begin
+    //             if (reset) begin
+    //                 lq[j] = reset_val;
+    //             end else if (update_sq) begin
+    //                 if (sq_X_T == lq[j].dep_sq_T) begin 
+    //                     lq[j].state <= (lq[j].state == FORWARDED) ? DATA_READY : LQ_NONE; // all dep stores done
+    //                 end 
+
+    //                 if (lq[j].valid && (lq[j].addr == S_X_store_addr) && (lq[j].T > S_X_store.T)) begin
+    //                     lq[j].data <= S_X_store.V2; //forward early
+    //                     if (sq_X_T == lq[j].dep_sq_T) lq[j].state <= DATA_READY; // all dep stores done
+    //                     else lq[j].state <= FORWARDED; //early forward
+    //                 end     
+    //             end
+    //         end
+
+    //     end
+    // endgenerate
 endmodule

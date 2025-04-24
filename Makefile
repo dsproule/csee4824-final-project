@@ -177,8 +177,8 @@ GREP = grep -E --color=auto
 # - added to TESTED_MODULES as: 'rob'
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
-TESTBENCH = multi_module_test_done
-MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv
+TESTBENCH = lsq_test
+MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv ./verilog/lsq.sv
 OUTPUT_DIR = ./output
 SIMV = $(TESTBENCH).simv
 SIM_OUT = $(OUTPUT_DIR)/$(TESTBENCH).out
@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps lsq
 
 MODULE = pipeline
 
@@ -378,6 +378,7 @@ SOURCES = verilog/pipeline.sv \
 		  verilog/rps.sv \
 		  verilog/rob.sv \
 		  verilog/if_stage.sv \
+		  verilog/lsq.sv \
 		  verilog/dcache.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg

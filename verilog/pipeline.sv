@@ -117,6 +117,9 @@ module pipeline (
     logic [63:0] proc2Dcache_data, cache2Dmem_data, Dcache_data_out;
     logic wr_proc, wr_valid;
 
+    // lsq
+    logic mem_read_en, mem_write_en;
+
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
     assign D_S_reg_dbg       = D_S_reg;
@@ -144,8 +147,8 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign rd_mem = S_X_regs[2].valid;
-    assign wr_mem = S_X_regs[3].valid; //FIXME
+    assign rd_mem = mem_read_en;
+    assign wr_mem = mem_write_en;
     assign Dmem_req = (wr_mem | rd_mem);
 
     // for all memory vectors, ind0 -> wr and ind1 -> rd
@@ -397,8 +400,9 @@ module pipeline (
     ROB_T store_T_wire, load_T_wire;
     MEM_ACCESS mem_access_load_wire, mem_access_store_wire;
     logic [`XLEN-1:0] proc2Dmem_data_wire;
+    X_C_PACKET lsq_fwd_packet, func_unit_2_x_packet;
 
-    lsq lsq_inst (
+    lsq lsq_inst(
     // inputs
     .clock(clock), 
     .reset(reset | take_branch),
@@ -407,13 +411,13 @@ module pipeline (
     .T(rob_T_wire),
     .S_X_store(S_X_regs[3]), 
     .S_X_load(S_X_regs[2]),
-    .store_X(S_X_regs[3].valid), //TODO this might be fine
+    .store_X(S_X_regs[3].valid), // this is okay bc just updates with addr
     .load_X(S_X_regs[2].valid),
     .retire_T(retire_T_wire), 
     .retire_en(retire),
 
     // outputs
-    .load_fwd_packet(X_packets[2]), //  FIXME forward to X_C_regs[2] if needed
+    .load_fwd_packet(lsq_fwd_packet), //  FIXME forward to X_C_regs[2] if needed
     .mem_write_en(mem_write_en),
     .proc2Dmem_addr_store(proc2Dmem_addr[0]),
     .proc2Dmem_data_store(proc2Dmem_data_wire),
@@ -421,6 +425,7 @@ module pipeline (
     .store_T(store_T_wire),
     .proc2Dmem_addr_load(proc2Dmem_addr[1]),
     .mem_access_load(mem_access_load_wire),
+    .mem_read_en(mem_read_en),
     .load_T(load_T_wire),
     .sq_full(), .sq_empty(), .lq_full(), .lq_empty()
     
@@ -435,8 +440,11 @@ module pipeline (
         .mem_access(mem_access_load_wire),
 
         // output logic mem_load_pend,
-        .X_packet(X_packets[2])
+        .X_packet(func_unit_2_x_packet)
     );
+
+    //forwarding from lsq if cdb is valid
+    assign X_packets[2] = (lsq_fwd_packet.valid) ? lsq_fwd_packet : func_unit_2_x_packet;
 
     func_unit_3 func_unit_03(
         .clock(clock), .reset(reset | take_branch), .committed(gnt[3]), .wr_valid(wr_valid & wr_mem),
