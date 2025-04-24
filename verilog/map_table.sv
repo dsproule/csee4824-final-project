@@ -13,7 +13,7 @@ module map_table (
     logic retire_entry;
     MT_ENTRY mt_table [31:0];
 
-    assign retire_entry = (mt_table[retire_r].T == retire_T); // && (retire_r != r);
+    assign retire_entry = (mt_table[retire_r].T == retire_T);// && (retire_r != r);
 
     // forwards signal that rob has value present if cdb collides
     always_comb begin
