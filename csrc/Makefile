@@ -8,7 +8,7 @@ VSRC=..
 TARGET_ARCH=
 
 # Choose name of executable 
-PRODUCTBASE=$(VSRC)/rob.simv
+PRODUCTBASE=$(VSRC)/func_unit_1.simv
 
 PRODUCT=$(PRODUCTBASE)
 
@@ -39,7 +39,7 @@ STDLIB =
 STRIPFLAGS= 
 
 PRE_LDFLAGS= # Loader Flags
-LDFLAGS= -rdynamic  -Wl,-rpath='$$ORIGIN'/rob.simv.daidir -Wl,-rpath=./rob.simv.daidir -Wl,-rpath=/tools/synopsys/vcs/current/linux64/lib -L/tools/synopsys/vcs/current/linux64/lib 
+LDFLAGS= -rdynamic  -Wl,-rpath='$$ORIGIN'/func_unit_1.simv.daidir -Wl,-rpath=./func_unit_1.simv.daidir -Wl,-rpath=/tools/synopsys/vcs/current/linux64/lib -L/tools/synopsys/vcs/current/linux64/lib 
 # Picarchive Flags
 PICLDFLAGS= -Wl,-rpath-link=./ 
 PIC_LD=ld

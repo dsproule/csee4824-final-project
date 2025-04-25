@@ -2658,16 +2658,16 @@ static inline U asm_bsf (U in)
 #ifdef __cplusplus
 extern "C" {
 #endif
-void  rmaPropagate0_p_rob_simv_daidir (UB  * pcode, scalar  val);
-void  rmaPropagate0_rob_simv_daidir (UB  * pcode, scalar  val);
-void  rmaPropagate0_f_rob_simv_daidir (UB  * pcode, scalar  val, U  I614, scalar  * I1420, U  did);
-void  rmaPropagate0_r_rob_simv_daidir (UB  * pcode);
-void  rmaPropagate0_wn_rob_simv_daidir (UB  * pcode, scalar  val);
-void  rmaPropagate1_p_rob_simv_daidir (UB  * pcode, scalar  val);
-void  rmaPropagate1_rob_simv_daidir (UB  * pcode, scalar  val);
-void  rmaPropagate1_f_rob_simv_daidir (UB  * pcode, scalar  val, U  I614, scalar  * I1420, U  did);
-void  rmaPropagate1_r_rob_simv_daidir (UB  * pcode);
-void  rmaPropagate1_wn_rob_simv_daidir (UB  * pcode, scalar  val);
+void  rmaPropagate0_p_func_unit_1_simv_daidir (UB  * pcode, scalar  val);
+void  rmaPropagate0_func_unit_1_simv_daidir (UB  * pcode, scalar  val);
+void  rmaPropagate0_f_func_unit_1_simv_daidir (UB  * pcode, scalar  val, U  I614, scalar  * I1420, U  did);
+void  rmaPropagate0_r_func_unit_1_simv_daidir (UB  * pcode);
+void  rmaPropagate0_wn_func_unit_1_simv_daidir (UB  * pcode, scalar  val);
+void  rmaPropagate1_p_func_unit_1_simv_daidir (UB  * pcode, scalar  val);
+void  rmaPropagate1_func_unit_1_simv_daidir (UB  * pcode, scalar  val);
+void  rmaPropagate1_f_func_unit_1_simv_daidir (UB  * pcode, scalar  val, U  I614, scalar  * I1420, U  did);
+void  rmaPropagate1_r_func_unit_1_simv_daidir (UB  * pcode);
+void  rmaPropagate1_wn_func_unit_1_simv_daidir (UB  * pcode, scalar  val);
 void  schedNewEvent (struct dummyq_struct * I1405, EBLK  * I1400, U  I622);
 #ifdef __cplusplus
 }
