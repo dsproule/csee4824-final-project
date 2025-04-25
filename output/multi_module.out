@@ -1,0 +1,191 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr 24 23:22 2025
+
+(RS_TABLE)	time:          1
+------------------------------------------
+index:    0   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   1   ready:00
+index:    1   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+index:    2   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+index:    3   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+------------------------------------------
+
+(MAP_TABLE)	time:          1
+------------------------------------------
+index:    1   T:   0	  plus:   0
+index:    2   T:   0	  plus:   0
+index:    3   T:   0	  plus:   0
+index:    4   T:   0	  plus:   0
+------------------------------------------
+@@@Failed at time:          1	
+@@@correct answer should be = index:    2   T:   1   plus:   0
+
+(ROB_TABLE)	time:          1
+------------------------------------------
+index:    1   r:   2   V:   0
+index:    2   r:   0   V:   0
+index:    3   r:   0   V:   0
+index:    4   r:   0   V:   0
+index:    5   r:   0   V:   0
+index:    6   r:   0   V:   0
+index:    7   r:   0   V:   0
+------------------------------------------
+
+(FU)	time:          1
+------------------------------------------
+index:    0   T:   0	  result:   0	    valid:   0
+index:    1   T:   0	  result:         x	    valid:   0
+------------------------------------------
+
+(CDB)	time:          1
+------------------------------------------
+T:   0	  V:   0
+FU_ready:11	  FU_req:00	    gnt:00
+------------------------------------------
+
+(RS_TABLE)	time:          2
+------------------------------------------
+index:    0   T:   1   T1:   0   T2:   0   V1:   0   V2:   8   busy:   1   ready:11
+index:    1   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   1   ready:00
+index:    2   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+index:    3   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+------------------------------------------
+
+(MAP_TABLE)	time:          2
+------------------------------------------
+index:    1   T:   0	  plus:   0
+index:    2   T:   0	  plus:   0
+index:    3   T:   0	  plus:   0
+index:    4   T:   0	  plus:   0
+------------------------------------------
+@@@Failed at time:          2	
+@@@correct answer should be = index:    2   T:   1   plus:   0
+@@@Failed at time:          2	
+@@@correct answer should be = index:    3   T:   2   plus:   0
+
+(ROB_TABLE)	time:          2
+------------------------------------------
+index:    1   r:   2   V:   0
+index:    2   r:   3   V:   0
+index:    3   r:   0   V:   0
+index:    4   r:   0   V:   0
+index:    5   r:   0   V:   0
+index:    6   r:   0   V:   0
+index:    7   r:   0   V:   0
+------------------------------------------
+
+(FU)	time:          2
+------------------------------------------
+index:    0   T:   0	  result:   0	    valid:   0
+index:    1   T:   0	  result:         x	    valid:   0
+------------------------------------------
+
+(CDB)	time:          2
+------------------------------------------
+T:   0	  V:   0
+FU_ready:11	  FU_req:00	    gnt:00
+------------------------------------------
+
+(RS_TABLE)	time:          3
+------------------------------------------
+index:    0   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+index:    1   T:   2   T1:   0   T2:   0   V1:   5   V2:   6   busy:   1   ready:11
+index:    2   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   1   ready:00
+index:    3   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+------------------------------------------
+@@@Failed at time:          3	
+@@@correct answer should be = index:    1   T:   2   T1:   0   T2:   1   V1:   5   V2:   0
+
+(MAP_TABLE)	time:          3
+------------------------------------------
+index:    1   T:   0	  plus:   0
+index:    2   T:   0	  plus:   0
+index:    3   T:   0	  plus:   0
+index:    4   T:   0	  plus:   0
+------------------------------------------
+@@@Failed at time:          3	
+@@@correct answer should be = index:    1   T:   3   plus:   0
+@@@Failed at time:          3	
+@@@correct answer should be = index:    2   T:   1   plus:   0
+@@@Failed at time:          3	
+@@@correct answer should be = index:    3   T:   2   plus:   0
+
+(ROB_TABLE)	time:          3
+------------------------------------------
+index:    1   r:   2   V:   0
+index:    2   r:   3   V:   0
+index:    3   r:   1   V:   0
+index:    4   r:   0   V:   0
+index:    5   r:   0   V:   0
+index:    6   r:   0   V:   0
+index:    7   r:   0   V:   0
+------------------------------------------
+
+(FU)	time:          3
+------------------------------------------
+index:    0   T:   1	  result:   8	    valid:   1
+index:    1   T:   0	  result:         x	    valid:   0
+------------------------------------------
+
+(CDB)	time:          3
+------------------------------------------
+T:   1	  V:   8
+FU_ready:01	  FU_req:10	    gnt:10
+------------------------------------------
+
+(RS_TABLE)	time:          4
+------------------------------------------
+index:    0   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+index:    1   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+index:    2   T:   3   T1:   0   T2:   0   V1:   7   V2:   8   busy:   1   ready:11
+index:    3   T:   0   T1:   0   T2:   0   V1:   0   V2:   0   busy:   0   ready:00
+------------------------------------------
+@@@Failed at time:          4	
+@@@correct answer should be = index:    1   T:   2   T1:   0   T2:   0   V1:   5   V2:   8
+@@@Failed at time:          4	
+@@@correct answer should be = index:    2   T:   3   T1:   2   T2:   0   V1:   0   V2:   8
+
+(MAP_TABLE)	time:          4
+------------------------------------------
+index:    1   T:   0	  plus:   0
+index:    2   T:   0	  plus:   0
+index:    3   T:   0	  plus:   0
+index:    4   T:   0	  plus:   0
+------------------------------------------
+@@@Failed at time:          4	
+@@@correct answer should be = index:    1   T:   3   plus:   0
+@@@Failed at time:          4	
+@@@correct answer should be = index:    2   T:   1   plus:   1
+@@@Failed at time:          4	
+@@@correct answer should be = index:    3   T:   2   plus:   0
+
+(ROB_TABLE)	time:          4
+------------------------------------------
+index:    1   r:   2   V:   8
+index:    2   r:   3   V:   0
+index:    3   r:   1   V:   0
+index:    4   r:   0   V:   0
+index:    5   r:   0   V:   0
+index:    6   r:   0   V:   0
+index:    7   r:   0   V:   0
+------------------------------------------
+
+(FU)	time:          4
+------------------------------------------
+index:    0   T:   0	  result:   0	    valid:   0
+index:    1   T:   2	  result:         x	    valid:   0
+------------------------------------------
+
+(CDB)	time:          4
+------------------------------------------
+T:   0	  V:   0
+FU_ready:10	  FU_req:00	    gnt:00
+------------------------------------------
+$finish called from file "test/multi_module_test.sv", line 474.
+$finish at simulation time                45500
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 4550000 ps
+CPU Time:      0.150 seconds;       Data structure size:   0.1Mb
+Thu Apr 24 23:22:41 2025

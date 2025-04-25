@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1745550945.200927176, "rt":0.92, "ut":0.11, "st":0.09}}
+{"vcselab":{"timestamp_begin":1745550946.142421173, "rt":0.42, "ut":0.10, "st":0.03}}
+{"link":{"timestamp_begin":1745550946.587571711, "rt":0.40, "ut":0.07, "st":0.03}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1745550944.929977567}
+{"VCS_COMP_START_TIME": 1745550944.929977567}
+{"VCS_COMP_END_TIME": 1745550947.622081796}
+{"VCS_USER_OPTIONS": "-sverilog +vc -Mupdate -line -full64 -kdb -lca -nc -debug_access+all+reverse +warn=noTFIPC +warn=noDEBUG_DEP +warn=noENUMASSIGN +define+CLOCK_PERIOD=350.0 test/func_unit_1_test.sv verilog/func_unit_1.sv verilog/mult_stage.sv verilog/mult.sv -o func_unit_1.simv"}
+{"vcs1": {"peak_mem": 551080}}
+{"vcselab": {"peak_mem": 246052}}

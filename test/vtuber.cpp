@@ -121,7 +121,6 @@ int rs_height = 9;
 
 char entry_text[80];
 
-
 // Helper function for ncurses gui setup
 WINDOW *create_newwin(int height, int width, int starty, int startx, int color) {
     WINDOW *local_win;
@@ -542,7 +541,8 @@ void parsedata(int history_num_in) {
             wattroff(ds_win, A_REVERSE);
 
         if (i == 0) {
-            mvwprintw(ds_win, i + 1, 1, "INST->  %s", ds_contents[history_num_in][i]);
+            unsigned inst_val = (unsigned)strtoul(ds_contents[history_num_in][i], NULL, 16);
+            mvwprintw(ds_win, i + 1, 1, "INST->  %08x", inst_val);
         } else if (i == 1) {
             mvwprintw(ds_win, i + 1, 1, "PC->  %s", ds_contents[history_num_in][i]);
         } else if (i == 2) {
@@ -817,7 +817,7 @@ int processinput() {
         char halt, valid;
         if (sscanf(readbuffer, "ySX %d %x %x %x %x %x %c %c", &idx, &PC, &INST, &T, &V1, &V2, &halt, &valid) == 8){
             char buf[128];
-            snprintf(buf, sizeof(buf), "PC:%08x inst:%08x T:%x V1:%x V2:%x h:%d v:%d", PC, INST, T, V1, V2, halt, valid);
+            snprintf(buf, sizeof(buf), "PC:%08x inst:%08x T:%x V1:%04x V2:%04x h:%d v:%02d", PC, INST, T, V1, V2, halt, valid);
             strcpy(sx_contents[history_num][idx], buf);
         }
         return 0;

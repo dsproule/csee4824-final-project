@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1745551830.315220887, "rt":0.90, "ut":0.10, "st":0.09}}
+{"vcselab":{"timestamp_begin":1745551831.234400603, "rt":0.42, "ut":0.10, "st":0.04}}
+{"link":{"timestamp_begin":1745551831.683432149, "rt":0.40, "ut":0.07, "st":0.03}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1745551830.046289585}
+{"VCS_COMP_START_TIME": 1745551830.046289585}
+{"VCS_COMP_END_TIME": 1745551832.401141264}
+{"VCS_USER_OPTIONS": "-sverilog +vc -Mupdate -line -full64 -kdb -lca -nc -debug_access+all+reverse +warn=noTFIPC +warn=noDEBUG_DEP +warn=noENUMASSIGN +define+CLOCK_PERIOD=350.0 test/func_unit_2_test.sv verilog/func_unit_2.sv test/mem.sv -o func_unit_2.simv"}
+{"vcs1": {"peak_mem": 551080}}
+{"vcselab": {"peak_mem": 262488}}

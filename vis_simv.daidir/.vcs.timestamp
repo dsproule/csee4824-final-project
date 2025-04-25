@@ -63,10 +63,10 @@ verilog/rob.sv
 verilog/if_stage.sv
 86
 which_declare=declare -f
-XDG_SESSION_ID=559
+XDG_SESSION_ID=25
 XDG_RUNTIME_DIR=/run/user/35016
 XDG_DATA_DIRS=/user/stud/fall24/am6542/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
-VSCODE_IPC_HOOK_CLI=/run/user/35016/vscode-ipc-3866c637-fd40-4f31-bc1a-0bf8b4089d16.sock
+VSCODE_IPC_HOOK_CLI=/run/user/35016/vscode-ipc-a5ceee57-5945-44f7-b1b4-d30fce18d8bd.sock
 VSCODE_GIT_IPC_HANDLE=/run/user/35016/vscode-git-cd4ae920b6.sock
 VSCODE_GIT_ASKPASS_NODE=/homes/user/stud/fall24/am6542/.vscode-server/cli/servers/Stable-17baf841131aa23349f217ca7c570c76ee87b957/server/node
 VSCODE_GIT_ASKPASS_MAIN=/homes/user/stud/fall24/am6542/.vscode-server/cli/servers/Stable-17baf841131aa23349f217ca7c570c76ee87b957/server/extensions/git/dist/askpass-main.js
@@ -94,8 +94,8 @@ STROOT=/tools/synopsys/sentaurus/current
 STDB=/user/stud/fall24/am6542/DB
 SSL_CERT_FILE=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
 SSL_CERT_DIR=/etc/pki/tls/certs
-SSH_CONNECTION=10.192.157.98 28291 128.59.64.121 22
-SSH_CLIENT=10.192.157.98 28291 22
+SSH_CONNECTION=10.192.150.177 11106 128.59.64.121 22
+SSH_CLIENT=10.192.150.177 11106 22
 SSH_ASKPASS=/usr/libexec/openssh/gnome-ssh-askpass
 SNPS_VERDI_INTERNAL_LP_XML_NEW_FLOW=1
 SNPS_VCS_PYTHON3=/tools/synopsys/vcs/current/linux64/bin/Python-3.6.1/bin/python3
@@ -120,8 +120,8 @@ MGLS_LICENSE_FILE=1720@bioeelincad.ee.columbia.edu
 MGC_HOME=/tools/mentor/aok_cal_2024.3_25.13
 MFLAGS=
 MENTOR_ENV_SET=1
-MAKE_TERMOUT=/dev/pts/6
-MAKE_TERMERR=/dev/pts/6
+MAKE_TERMOUT=/dev/pts/5
+MAKE_TERMERR=/dev/pts/5
 MAKELEVEL=1
 MAKEFLAGS=
 LIBRARY_PATH=/user/stud/fall24/am6542/.local/lib:/user/stud/fall24/am6542/.local/lib:/user/stud/fall24/am6542/.local/lib:
@@ -151,32 +151,32 @@ ADS_ENV_SET=1
 0
 0
 21
-1744774531 verilog/if_stage.sv
-1744774531 verilog/rob.sv
+1745552097 verilog/if_stage.sv
+1745552097 verilog/rob.sv
 1744771720 verilog/rps4.sv
 1743627448 verilog/mult_stage.sv
 1743627448 verilog/mult.sv
-1744774531 verilog/func_unit_1.sv
+1745552097 verilog/func_unit_1.sv
 1744771720 verilog/func_unit_0.sv
-1744774531 verilog/func_unit_3.sv
-1744774531 verilog/func_unit_2.sv
-1744774531 verilog/rs_stage.sv
-1744774531 verilog/map_table.sv
-1744774531 verilog/d_stage.sv
+1745552097 verilog/func_unit_3.sv
+1745552097 verilog/func_unit_2.sv
+1745552097 verilog/rs_stage.sv
+1745552097 verilog/map_table.sv
+1745552097 verilog/d_stage.sv
 1742489685 verilog/icache.sv
 1743548136 verilog/regfile.sv
-1744774531 verilog/pipeline.sv
+1745552097 verilog/pipeline.sv
 1742489685 test/mem.sv
-1744953245 test/vtuber_test.sv
+1745552097 test/vtuber_test.sv
 1742489685 verilog/ISA.svh
-1744774531 verilog/sys_defs.svh
+1745552097 verilog/sys_defs.svh
 1697019014 /tools/synopsys/verdi/verdi/U-2023.03-SP2-1/share/PLI/VCS/LINUX64/verdi.tab
 1697253802 /tools/synopsys/vcs/current/linux64/lib/vcsdp_lite.tab
 5
-1744957385 test/vtuber.cpp
+1745553542 test/vtuber.cpp
 1697255420 /tools/synopsys/vcs/current/linux64/lib/libvirsim.so
 1697254610 /tools/synopsys/vcs/current/linux64/lib/liberrorinf.so
 1697254517 /tools/synopsys/vcs/current/linux64/lib/libsnpsmalloc.so
 1697254604 /tools/synopsys/vcs/current/linux64/lib/libvfs.so
-1744957397 vis_simv.daidir
+1745553550 vis_simv.daidir
 -1 partitionlib
