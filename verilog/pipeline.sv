@@ -479,7 +479,7 @@ module pipeline (
     assign X_packets[2] = (lsq_fwd_packet.valid) ? lsq_fwd_packet : func_unit_2_x_packet;
 
     func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset | take_branch), .committed(gnt[3]), .wr_valid(wr_valid & wr_mem),
+        .clock(clock), .reset(reset | take_branch), .wr_valid(wr_valid & wr_mem),
         .Dmem2proc_data(Dcache_data_out),
         .T(store_T_wire),
         .mem_access(mem_access_store_wire),

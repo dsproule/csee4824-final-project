@@ -1,7 +1,7 @@
 `include "verilog/sys_defs.svh"
 
 module func_unit_3(
-    input clock, reset, committed, wr_valid,
+    input clock, reset, wr_valid,
     input [63:0] Dmem2proc_data,
     input ROB_T T, //pass through
     input MEM_ACCESS mem_access, //for shifting
