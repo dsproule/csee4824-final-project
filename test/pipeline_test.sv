@@ -198,7 +198,7 @@ module testbench;
         $display("\n(ROB_TABLE) h: %2d, t: %2d empty: %1h full: %1h \ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, core.rob_empty, core.rob_full, clock_count);
         for(n = 1; n < 32; n=n+1)
             $display("index: %4d   r:%4d   NPC:%4h    V:%4d    ready:%1b", n, rob_table[n].r, rob_table[n].NPC, rob_table[n].V, rob_table[n].ready);
-        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
+        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d data: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
     endtask // print_rob
 
     task print_cdb;
@@ -288,7 +288,7 @@ module testbench;
 
 
             if (prog_start) begin
-                // print_if;
+                print_if;
                 // print_ds;
                 // print_rs;
                 // print_mt;
@@ -296,7 +296,7 @@ module testbench;
                 // print_rob;
                 // print_regs;
                 // print_sx;
-                // print_mem;
+                print_mem;
                 // print_xc;
                 // if (IF_ID_reg_dbg.PC == `XLEN'hef8) $display("mayday");
                 
@@ -384,12 +384,12 @@ module testbench;
             if (pipeline_completed_insts > 0) begin
                 if(pipeline_commit_wr_en)
                     $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x, T=%d", 
-                              pipeline_commit_NPC - 4,
+                              pipeline_commit_NPC,
                               pipeline_commit_wr_idx,
                               pipeline_commit_wr_data, clock_count
                               );
                 else
-                    $fdisplay(wb_fileno, "PC=%x, ---", pipeline_commit_NPC - 4);
+                    $fdisplay(wb_fileno, "PC=%x, ---, T=%d", pipeline_commit_NPC, clock_count); //, clock_count); //, clock_count);
             end
 
             // deal with any halting conditions

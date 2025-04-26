@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps icache
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps  
 
 MODULE = pipeline
 
@@ -231,9 +231,8 @@ $(call DEPS,rob): $(ROB_DEPS)
 MULTI_MODULE_DEPS = verilog/*.sv
 $(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
 
-IF_STAGE_DEPS = verilog/icache.sv
-$(call DEPS,if_stage): $(IF_STAGE_DEPS) test/mem.sv
-$(call DEPS,icache): test/mem.sv
+IF_STAGE_DEPS = verilog/icache.sv verilog/d_stage.sv
+$(call DEPS,if_stage): $(IF_STAGE_DEPS) $(MEM_DEPS)
 
 # This allows you to use the following make targets:
 # make <module>.pass   <- greps for "@@@ Passed" or "@@@ Incorrect" in the output
@@ -379,7 +378,9 @@ SOURCES = verilog/pipeline.sv \
 		  verilog/rps.sv \
 		  verilog/rob.sv \
 		  verilog/if_stage.sv \
-		  verilog/dcache.sv
+		  verilog/dcache.sv \
+		  verilog/two_bit_pred.sv \
+		  verilog/branch_pred.sv
 
 SYNTH_FILES = synth/pipeline.vg # synth/map_table.vg
 
