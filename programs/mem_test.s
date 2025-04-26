@@ -1,9 +1,11 @@
 li x2, 0xabcdef98 #
 sw x2, 0x100(x0)
+sw x2, 0x200(x0)
 nop
 nop
 nop
-nop
-nop
-nop
+lw x3, 0x200(x0)
+lw x4, 0x100(x0)
+lw x5, 0x100(x0)
+lw x6, 0x100(x0)
 wfi

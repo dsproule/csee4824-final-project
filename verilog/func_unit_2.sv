@@ -6,7 +6,8 @@ module func_unit_2(
     input ROB_T T, //pass through
     input MEM_ACCESS mem_access, //for shifting
 
-    output X_C_PACKET X_packet
+    output X_C_PACKET X_packet,
+    output logic dcache_ack_load
 );
     logic [`XLEN-1:0] shifted_result;
     logic [5:0]       shift;
@@ -35,6 +36,8 @@ module func_unit_2(
         end
         shifted_result = Dmem_data[`XLEN-1:0];
     end
+    
+    assign dcache_ack_load = X_packet.valid;
 
     // state machine to handle loads
     always_ff @(posedge clock) begin

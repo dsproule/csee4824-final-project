@@ -428,6 +428,7 @@ module pipeline (
     MEM_ACCESS mem_access_load_wire, mem_access_store_wire;
     logic [`XLEN-1:0] proc2Dmem_data_wire;
     X_C_PACKET lsq_fwd_packet, func_unit_2_x_packet;
+    logic dcache_ack_store, dcache_ack_load;
 
     lsq lsq_inst(
     // inputs
@@ -438,13 +439,15 @@ module pipeline (
     .T(rob_T_wire),
     .S_X_store(S_X_regs[3]), 
     .S_X_load(S_X_regs[2]),
-    .store_X(S_X_regs[3].valid), // this is okay bc just updates with addr
+    .store_X(S_X_regs[3].valid),
     .load_X(S_X_regs[2].valid),
     .retire_T(retire_T_wire), 
     .retire_en(retire),
+    .dcache_ack_store(dcache_ack_store),
+    .dcache_ack_load(dcache_ack_load),
 
     // outputs
-    .load_fwd_packet(lsq_fwd_packet), //  FIXME forward to X_C_regs[2] if needed
+    .load_fwd_packet(lsq_fwd_packet),
     .mem_write_en(mem_write_en),
     .proc2Dmem_addr_store(proc2Dmem_addr[0]),
     .proc2Dmem_data_store(proc2Dmem_data_wire),
@@ -468,7 +471,8 @@ module pipeline (
         .mem_access(mem_access_load_wire),
 
         // output logic mem_load_pend,
-        .X_packet(func_unit_2_x_packet)
+        .X_packet(func_unit_2_x_packet),
+        .dcache_ack_load(dcache_ack_load)
     );
 
     //forwarding from lsq if cdb is valid
@@ -482,7 +486,7 @@ module pipeline (
         .proc2Dmem_data(proc2Dmem_data_wire), //handles masking before storing
 
         .proc2Dcache_data(proc2Dcache_data),
-        .X_packet()
+        .d_cache_ack_store(dcache_ack_store) //throttle sq flow
     );
 
     func_unit_0 func_unit_04(

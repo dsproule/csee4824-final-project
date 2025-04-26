@@ -16,6 +16,10 @@ module lsq(
     input ROB_T retire_T,
     input logic retire_en,
 
+    //Dcache received
+    input logic dcache_ack_store,
+    input logic dcache_ack_load,
+
     //forwarding outputs
     output X_C_PACKET load_fwd_packet,
     output X_C_PACKET store_X_packet,
@@ -90,16 +94,16 @@ module lsq(
     SQ_T sq_X_T, retire_sq_T;
     LQ_T lq_X_T;
 
-    logic free_sq_head, free_lq_head, fwd_head;
+    logic sq2Dcache, lq2Dcache, fwd_head;
     logic update_sq;
 
     assign update_sq = store_X && sq[sq_X_T].valid;
-    assign free_sq_head = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
+    assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
                         sq[sq_head].addr_valid && sq[sq_head].data_valid;
 
-    assign fwd_head = store_X && sq[sq_X_T].valid &&  ((sq_X_T == lq[lq_head].dep_sq_T) && (lq[lq_head].state == FORWARDED));
+    assign fwd_head = store_X && sq[sq_X_T].valid && ((sq_X_T == lq[lq_head].dep_sq_T) && (lq[lq_head].state == FORWARDED));
 
-    assign free_lq_head = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && ((lq[lq_head].state == LQ_NONE) || (lq[lq_head].state == DATA_READY) || fwd_head);
+    assign lq2Dcache = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && ((lq[lq_head].state == LQ_NONE) || (lq[lq_head].state == DATA_READY) || fwd_head);
 
     //forwarding unit - youngest store older than load forwards to load
     X_C_PACKET fwd_packet_wire;
@@ -168,13 +172,21 @@ module lsq(
             store_X_packet.valid = `TRUE;
             store_X_packet.ppln_ctrl.is_store = `TRUE;
         end
+
+        mem_write_en = sq2Dcache; 
+        proc2Dmem_addr_store = sq[sq_head].addr;
+        proc2Dmem_data_store = sq[sq_head].data;
+        mem_access_store = sq[sq_head].mem_access;
+        store_T = sq[sq_head].T;
+
+        proc2Dmem_addr_load = lq[lq_head].addr;
+        mem_access_load = lq[lq_head].mem_access;
+        mem_read_en = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && lq[lq_head].state == LQ_NONE;
+        load_T = lq[lq_head].T;
     end
 
     // TODO flush unit --> sets data to not ready if collision 
     // TODO masking data if mem_size is different   
-
-    
-
     always_ff @(posedge clock) begin
         if (reset) begin
             for (int i = 0; i < `LQ_SZ; i++) begin
@@ -193,19 +205,8 @@ module lsq(
             sq_head_wrap <= 0;
             sq_tail_wrap <= 0;
 
-            mem_write_en <= 0;
-            mem_read_en <= 0;
-            proc2Dmem_addr_store <= 0;
-            proc2Dmem_data_store <= 0;
-            proc2Dmem_addr_load <= 0;
-            mem_access_load <= 0;
-            mem_access_store <= 0;
-            load_T <= 0;
-            store_T <= 0;
             load_fwd_packet <= 0;
         end else begin
-            mem_write_en <= 0;
-            mem_read_en <= 0;
             load_fwd_packet <= 0;
 
             // SQ
@@ -254,15 +255,9 @@ module lsq(
             end
 
             // Write address/data from SQ head to D$, free SQ head
-            if(free_sq_head) begin
+            if(sq2Dcache && dcache_ack_store) begin
                 sq[sq_head] <= 0;
-                mem_write_en <= `TRUE; 
-                proc2Dmem_addr_store <= sq[sq_head].addr;
-                proc2Dmem_data_store <= sq[sq_head].data;
-                mem_access_store <= sq[sq_head].mem_access;
-                store_T <= sq[sq_head].T;
-
-                sq_head <= (sq_head == `SQ_SZ - 1) ? 1 : sq_head + 1; // change here
+                sq_head <= (sq_head == `SQ_SZ - 1) ? 0 : sq_head + 1; // change here
                 sq_head_wrap <= (sq_head == `SQ_SZ - 1) ? ~sq_head_wrap : sq_head_wrap; // change here
             end
 
@@ -293,21 +288,17 @@ module lsq(
             end
 
             //output --> send to cache if data isnt ready, otherwise cdb
-            if(free_lq_head) begin
-                lq[lq_head] <= 0;
-
+            if(lq2Dcache) begin
                 load_fwd_packet.valid <= (lq[lq_head].state == DATA_READY || fwd_head);
                 load_fwd_packet.T <= lq[lq_head].T;
                 load_fwd_packet.result <= lq[lq_head].data;
 
                 //making mem request if no dependencies
-                proc2Dmem_addr_load <= lq[lq_head].addr;
-                mem_access_load <= lq[lq_head].mem_access;
-                mem_read_en <= !(lq[lq_head].state == DATA_READY || fwd_head);
-                load_T <= lq[lq_head].T;
-
-                lq_head <= (lq_head == `LQ_SZ - 1) ? 0 : (lq_head + 1);
-                lq_head_wrap <= (lq_head == `LQ_SZ - 1) ? ~lq_head_wrap : lq_head_wrap;
+                if (dcache_ack_load || lq[lq_head].state == DATA_READY || fwd_head) begin
+                    lq[lq_head] <= 0;
+                    lq_head <= (lq_head == `LQ_SZ - 1) ? 0 : (lq_head + 1);
+                    lq_head_wrap <= (lq_head == `LQ_SZ - 1) ? ~lq_head_wrap : lq_head_wrap;
+                end
             end
         end
     end
