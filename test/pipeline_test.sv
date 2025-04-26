@@ -288,7 +288,7 @@ module testbench;
 
 
             if (prog_start) begin
-                print_if;
+                // print_if;
                 // print_ds;
                 // print_rs;
                 // print_mt;
@@ -296,7 +296,7 @@ module testbench;
                 // print_rob;
                 // print_regs;
                 // print_sx;
-                print_mem;
+                // print_mem;
                 // print_xc;
                 // if (IF_ID_reg_dbg.PC == `XLEN'hef8) $display("mayday");
                 

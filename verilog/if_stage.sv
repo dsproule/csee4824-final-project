@@ -38,7 +38,7 @@ module if_stage (
 
     // address of the instruction we're fetching (64 bit memory lines)
     // mem always gives us 8=2^3 bytes, so ignore the last 3 bits
-    assign proc2Imem_addr = {PC_reg[`XLEN-1:3], 3'b0};
+    assign proc2Imem_addr = PC_reg;
 
     // this mux is because the Imem gives us 64 bits not 32 bits
     assign if_packet.inst = (~if_valid) ? `NOP :

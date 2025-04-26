@@ -28,6 +28,8 @@ typedef struct packed {
     logic valid;
 } MSHR_ENTRY;
 
+// Non-blocking cache. on changed_addr, checks if next inst 
+
 module icache (
     input clock,
     input reset,
@@ -51,8 +53,10 @@ module icache (
 
     // ---- Cache data ---- //
 
+    logic cur_mshr_idx, addr_waiting, mem_mshr_idx, resp_mshr_idx;
     ICACHE_ENTRY [`CACHE_LINES-1:0] icache_data;
     MSHR_ENTRY [`NB_LINES-1:0] mshr;
+    logic [`XLEN-1:0] last_addr;
 
     // ---- Addresses and final outputs ---- //
 
@@ -63,18 +67,16 @@ module icache (
     assign {current_tag, current_index} = proc2Icache_addr[15:3];
 
     assign Icache_data_out = icache_data[current_index].data;
-    assign Icache_valid_out = icache_data[current_index].valid &&
-                              (icache_data[current_index].tags == current_tag);
+    assign Icache_valid_out = icache_data[current_index].valid && (icache_data[current_index].tags == current_tag);
 
     // ---- Main cache logic ---- //
 
     logic got_mem_data, miss_outstanding;
 
-    wire changed_addr = (current_index != last_index) || (current_tag != last_tag);
+    wire changed_addr = (current_index != last_index) || (current_tag != last_tag) || (last_addr != proc2Icache_addr);
 
     wire update_mem_tag = changed_addr || miss_outstanding;
 
-    logic cur_mshr_idx, addr_waiting, mem_mshr_idx, resp_mshr_idx;
     always_comb begin
         cur_mshr_idx = 0;                   // allocate mshr
         addr_waiting = Icache_valid_out;
@@ -123,11 +125,13 @@ module icache (
         if (reset) begin
             last_index       <= -1; // These are -1 to get ball rolling when
             last_tag         <= -1; // reset goes low because addr "changes"
+            last_addr        <= 1;
             mshr             <= 0;
             icache_data      <= 0; // Set all cache data to 0 (including valid bits)
         end else begin
             last_index       <= current_index;
             last_tag         <= current_tag;
+            last_addr        <= proc2Icache_addr;
             
             // if new addr and not servicing/in cache, alloc it
             if (changed_addr & ~addr_waiting & ~mshr[cur_mshr_idx].valid) begin
@@ -136,10 +140,6 @@ module icache (
 
                 mshr[cur_mshr_idx].valid <= 1;
                 
-                mshr[~cur_mshr_idx].addr <= {proc2Icache_addr + 12}[`XLEN-1:3];
-                mshr[~cur_mshr_idx].mem_tag <= 0;
-
-                mshr[~cur_mshr_idx].valid <= 1;
             end
 
             if (update_mem_tag) begin
