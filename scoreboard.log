@@ -1,7 +1,7 @@
 
 ================== SCOREBOARD ==================
-Test Run: Sat Apr 26 14:58:25 EDT 2025
+Test Run: Sat Apr 26 17:21:25 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
-branch_test          | PASS       | PASS       | 5.500000   | WFI instruction               
+branch_test          | FAIL       | PASS       | N/A        | memory error (EXPECTED: WFI instruction)
 ==========================================================================================

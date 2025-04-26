@@ -69,39 +69,6 @@ module testbench;
         forever #(`CLOCK_PERIOD / 2.0) clock = ~clock;
     end
 
-    /* Module start */
-
-
-    // if_stage if_stage_0(
-    //     .clock(clock), .reset(reset), .Imem_gnt(~Dmem_req),
-    //     .take_branch(take_branch),
-    //     .branch_target(),
-    //     .Imem2proc_data(mem2proc_data),
-    //     .Imem2proc_response(mem2proc_response), .Imem2proc_tag(mem2proc_tag),
-
-    //     .mem_req(mem_req),
-    //     .IF_packet(IF_packet),
-    //     .proc2Imem_command(proc2Imem_command),
-    //     .proc2Imem_addr(proc2Imem_addr)
-    // );
-
-    // when response comes back in turn on the if_stage
-
-    // always_ff @(posedge clock) begin
-    //     if (reset) begin
-    //         IF_ID_reg <= '0;
-    //     end else begin
-    //         IF_ID_reg <= (IF_packet.valid) ? IF_packet : '0;
-    //     end
-    // end
-
-    /* Module end */
-
-    // always @(posedge clock) begin
-    //     if (IF_ID_reg.valid & ~reset)
-    //         $display("IF_ID_reg -- PC: %2h, INST: %8h", IF_ID_reg.PC, IF_ID_reg.inst);
-    // end
-
     initial begin
         clock = 0;
         reset = 1;

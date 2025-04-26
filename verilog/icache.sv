@@ -11,8 +11,9 @@
 
 // Internal macros, no other file should need these
 `define CACHE_LINES 32
-`define NB_LINES 2
 `define CACHE_LINE_BITS $clog2(`CACHE_LINES)
+// how many outstanding misses to handle at a time
+`define MSHR_SLOTS 3
 
 typedef struct packed {
     logic [63:0]                  data;
@@ -27,8 +28,6 @@ typedef struct packed {
 
     logic valid;
 } MSHR_ENTRY;
-
-// Non-blocking cache. on changed_addr, checks if next inst 
 
 module icache (
     input clock,
@@ -53,114 +52,113 @@ module icache (
 
     // ---- Cache data ---- //
 
-    logic cur_mshr_idx, addr_waiting, mem_mshr_idx, resp_mshr_idx;
-    logic got_mem_data, miss_outstanding;
     ICACHE_ENTRY [`CACHE_LINES-1:0] icache_data;
-    MSHR_ENTRY [`NB_LINES-1:0] mshr;
-    logic [`XLEN-1:0] last_addr;
+    MSHR_ENTRY [`MSHR_SLOTS-1:0] mshr;
 
     // ---- Addresses and final outputs ---- //
 
     // Note: cache tags, not memory tags
-    logic [12-`CACHE_LINE_BITS:0] current_tag, last_tag, resp_tag;
-    logic [`CACHE_LINE_BITS - 1:0] current_index, last_index, resp_index;
+    logic [12-`CACHE_LINE_BITS:0] current_tag, last_tag;
+    logic [`CACHE_LINE_BITS - 1:0] current_index, last_index;
+    logic mem_forward;
+    
+    // ---- MSHR non-blocking logic ---- // 
 
     assign {current_tag, current_index} = proc2Icache_addr[15:3];
 
+    // forwarding logic to squeeze data out of cache a cycle sooner
     always_comb begin
-        if (got_mem_data && (mshr[resp_mshr_idx].addr == proc2Icache_addr[`XLEN-1:0])) begin
+        if (mem_forward) begin
             Icache_data_out = Imem2proc_data;
-            Icache_valid_out = 1;
-        end else begin
+            Icache_valid_out = `TRUE; 
+        end else begin 
             Icache_data_out = icache_data[current_index].data;
-            Icache_valid_out = icache_data[current_index].valid && 
-                    (icache_data[current_index].tags == current_tag);
+            Icache_valid_out = icache_data[current_index].valid &&
+                                (icache_data[current_index].tags == current_tag);
         end
     end
 
-    // ---- Main cache logic ---- //
-
-    wire changed_addr = (current_index != last_index) || (current_tag != last_tag) || (last_addr != proc2Icache_addr);
-
-    wire update_mem_tag = changed_addr || miss_outstanding;
-
+    logic [$clog2(`MSHR_SLOTS)-1:0] mshr_next_idx;
+    logic current_in_mshr;
+    // checks mshr for current addr presence also saves open slot  
     always_comb begin
-        cur_mshr_idx = 0;                   // allocate mshr
-        addr_waiting = Icache_valid_out;
-        mem_mshr_idx = 0;                   // handle mem tag for mshr
-        resp_mshr_idx = 0;                  // handle mem tag for mshr
+        mshr_next_idx   = 0;
+        current_in_mshr = `FALSE;
+
+        for (logic [$clog2(`MSHR_SLOTS):0] mshr_set_idx = 0; mshr_set_idx < `MSHR_SLOTS; mshr_set_idx++) begin
+            if (mshr[mshr_set_idx].valid & (mshr[mshr_set_idx].addr == proc2Icache_addr[`XLEN-1:3]))
+                current_in_mshr = `TRUE;
+
+            if (~mshr[mshr_set_idx].valid)
+                mshr_next_idx = mshr_set_idx;
+        end
+    end
+
+    logic [$clog2(`MSHR_SLOTS)-1:0] mshr_req_idx;
+    logic miss_outstanding;
+    // checks mshr for any addr without mem tags (means they need to request an addr)
+    always_comb begin
         miss_outstanding = 0;
-        got_mem_data = 0;                   // handle mem responses
 
-        for (logic [$clog2(`NB_LINES):0] mshr_idx = 0; mshr_idx < `NB_LINES; mshr_idx++) begin
-
-            // if its a new addr, attempts to allocate it to an mshr (latch)
-            if (changed_addr) begin
-                // if the line is valid (it got freed or init), allocate it
-                if (~mshr[mshr_idx].valid)
-                    cur_mshr_idx = mshr_idx; 
-            end
-            
-            // cache is already servicing this mem address
-            if ((mshr[mshr_idx].addr == proc2Icache_addr[`XLEN-1:3]) & (mshr[mshr_idx].valid))
-                addr_waiting = 1;
-
-            // if any MSHR has a miss outstanding, attempt mem request
-            if ((mshr[mshr_idx].mem_tag == 0) & mshr[mshr_idx].valid) begin
-                mem_mshr_idx = mshr_idx;
+        for (logic [$clog2(`MSHR_SLOTS):0] mshr_miss_idx = 0; mshr_miss_idx < `MSHR_SLOTS; mshr_miss_idx++) begin
+            if ((mshr[mshr_miss_idx].mem_tag == 0) & mshr[mshr_miss_idx].valid) begin
+                mshr_req_idx = mshr_miss_idx;
                 miss_outstanding = 1;
             end
+        end
+    end
 
-            // if tag matches a value coming in, 
-            if (mshr[mshr_idx].mem_tag == Imem2proc_tag && (mshr[mshr_idx].mem_tag != 0)) begin
-                resp_mshr_idx = mshr_idx;
+    logic [$clog2(`MSHR_SLOTS)-1:0] mshr_resp_idx;
+    logic [12-`CACHE_LINE_BITS:0] resp_tag;
+    logic [`CACHE_LINE_BITS - 1:0] resp_index;
+    logic got_mem_data;
+    // if any of the mem_tags match the memory response, set the flag and save the idx
+    always_comb begin
+        got_mem_data = 0;
+
+        for (logic [$clog2(`MSHR_SLOTS):0] mshr_miss_idx = 0; mshr_miss_idx < `MSHR_SLOTS; mshr_miss_idx++) begin
+            if ((mshr[mshr_miss_idx].mem_tag == Imem2proc_tag) & mshr[mshr_miss_idx].valid) begin
+                mshr_resp_idx = mshr_miss_idx;
                 got_mem_data = 1;
             end
         end
 
+        {resp_tag, resp_index} = mshr[mshr_resp_idx].addr[15:3];
     end
 
-    // Keep sending memory requests until we receive a response tag or change addresses
-    assign proc2Imem_command = (miss_outstanding && !changed_addr) ? BUS_LOAD : BUS_NONE;
-    assign proc2Imem_addr    = {mshr[mem_mshr_idx].addr, 3'b0};
+    assign mem_forward = (proc2Icache_addr[`XLEN-1:3] == mshr[mshr_resp_idx].addr) & (got_mem_data);
 
-    assign {resp_tag, resp_index} = mshr[resp_mshr_idx].addr[15:3];
+    // ---- Memory access logic ---- //
+
+    // Keep sending memory requests until we receive a response tag or change addresses
+    assign proc2Imem_command = (miss_outstanding) ? BUS_LOAD : BUS_NONE;
+    assign proc2Imem_addr    = {mshr[mshr_req_idx].addr, 3'b0};
 
     // ---- Cache state registers ---- //
 
     always_ff @(posedge clock) begin
         if (reset) begin
-            last_index       <= -1; // These are -1 to get ball rolling when
-            last_tag         <= -1; // reset goes low because addr "changes"
-            last_addr        <= 1;
-            mshr             <= 0;
-            icache_data      <= 0; // Set all cache data to 0 (including valid bits)
+            mshr        <= 0;
+            icache_data <= 0; // Set all cache data to 0 (including valid bits)
         end else begin
-            last_index       <= current_index;
-            last_tag         <= current_tag;
-            last_addr        <= proc2Icache_addr;
-            
-            // if new addr and not servicing/in cache, alloc it
-            if (changed_addr & ~addr_waiting & ~mshr[cur_mshr_idx].valid) begin
-                mshr[cur_mshr_idx].addr <= proc2Icache_addr[`XLEN-1:3];
-                mshr[cur_mshr_idx].mem_tag <= 0;
+            // if slot is empty and the req address is not present, allocate it
+            if (~mshr[mshr_next_idx].valid & ~current_in_mshr & ~Icache_valid_out) begin
+                mshr[mshr_next_idx].addr    <= proc2Icache_addr[`XLEN-1:3];
+                mshr[mshr_next_idx].mem_tag <= 0;
 
-                mshr[cur_mshr_idx].valid <= 1;
-                
+                mshr[mshr_next_idx].valid   <= `TRUE;
             end
 
-            if (update_mem_tag) begin
-                mshr[mem_mshr_idx].mem_tag <= Imem2proc_response;
-            end
+            if (miss_outstanding)
+                mshr[mshr_req_idx].mem_tag <= Imem2proc_response;
 
-
-            if (got_mem_data) begin // If data came from memory, meaning tag matches
+            // if memory tag corresponds with a mshr entry, save the value and free the slot
+            if (got_mem_data) begin
                 icache_data[resp_index].data  <= Imem2proc_data;
                 icache_data[resp_index].tags  <= resp_tag;
                 icache_data[resp_index].valid <= 1;
 
-                // free mshr (set valid to 0)
-                mshr[resp_mshr_idx] <= 0;
+                mshr[mshr_resp_idx] <= 0;
             end
         end
     end
