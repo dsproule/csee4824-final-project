@@ -54,6 +54,7 @@ module icache (
     // ---- Cache data ---- //
 
     logic cur_mshr_idx, addr_waiting, mem_mshr_idx, resp_mshr_idx;
+    logic got_mem_data, miss_outstanding;
     ICACHE_ENTRY [`CACHE_LINES-1:0] icache_data;
     MSHR_ENTRY [`NB_LINES-1:0] mshr;
     logic [`XLEN-1:0] last_addr;
@@ -66,12 +67,18 @@ module icache (
 
     assign {current_tag, current_index} = proc2Icache_addr[15:3];
 
-    assign Icache_data_out = icache_data[current_index].data;
-    assign Icache_valid_out = icache_data[current_index].valid && (icache_data[current_index].tags == current_tag);
+    always_comb begin
+        if (got_mem_data && (mshr[resp_mshr_idx].addr == proc2Icache_addr[`XLEN-1:0])) begin
+            Icache_data_out = Imem2proc_data;
+            Icache_valid_out = 1;
+        end else begin
+            Icache_data_out = icache_data[current_index].data;
+            Icache_valid_out = icache_data[current_index].valid && 
+                    (icache_data[current_index].tags == current_tag);
+        end
+    end
 
     // ---- Main cache logic ---- //
-
-    logic got_mem_data, miss_outstanding;
 
     wire changed_addr = (current_index != last_index) || (current_tag != last_tag) || (last_addr != proc2Icache_addr);
 
