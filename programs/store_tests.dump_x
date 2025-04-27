@@ -1,0 +1,79 @@
+
+programs/store_tests.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <.text>:
+   0:	abcdf0b7          	lui	x1,0xabcdf
+   4:	f9808093          	addi	x1,x1,-104 # abcdef98 <_sp+0xabccef98>
+   8:	00001137          	lui	x2,0x1
+   c:	23410113          	addi	x2,x2,564 # 1234 <_ebss+0x1134>
+  10:	06700193          	addi	x3,x0,103
+  14:	10000213          	addi	x4,x0,256
+  18:	00222023          	sw	x2,0(x4) # 0 <_ebss-0x100>
+  1c:	00122023          	sw	x1,0(x4) # 0 <_ebss-0x100>
+  20:	00221023          	sh	x2,0(x4) # 0 <_ebss-0x100>
+  24:	00320023          	sb	x3,0(x4) # 0 <_ebss-0x100>
+  28:	001221a3          	sw	x1,3(x4) # 3 <_ebss-0xfd>
+  2c:	002210a3          	sh	x2,1(x4) # 1 <_ebss-0xff>
+  30:	10020213          	addi	x4,x4,256 # 100 <_ebss>
+  34:	00122223          	sw	x1,4(x4) # 4 <_ebss-0xfc>
+  38:	00221123          	sh	x2,2(x4) # 2 <_ebss-0xfe>
+  3c:	003200a3          	sb	x3,1(x4) # 1 <_ebss-0xff>
+  40:	00122323          	sw	x1,6(x4) # 6 <_ebss-0xfa>
+  44:	002211a3          	sh	x2,3(x4) # 3 <_ebss-0xfd>
+  48:	00122423          	sw	x1,8(x4) # 8 <_ebss-0xf8>
+  4c:	00221423          	sh	x2,8(x4) # 8 <_ebss-0xf8>
+  50:	00320423          	sb	x3,8(x4) # 8 <_ebss-0xf8>
+  54:	15b00093          	addi	x1,x0,347
+  58:	01ffe137          	lui	x2,0x1ffe
+  5c:	22210113          	addi	x2,x2,546 # 1ffe222 <_sp+0x1fee222>
+  60:	10500073          	wfi
+  64:	022081b3          	mul	x3,x1,x2
+  68:	3e800213          	addi	x4,x0,1000
+  6c:	3f000413          	addi	x8,x0,1008
+  70:	00222023          	sw	x2,0(x4) # 0 <_ebss-0x100>
+  74:	00022283          	lw	x5,0(x4) # 0 <_ebss-0x100>
+  78:	00222223          	sw	x2,4(x4) # 4 <_ebss-0xfc>
+  7c:	00422283          	lw	x5,4(x4) # 4 <_ebss-0xfc>
+  80:	00222423          	sw	x2,8(x4) # 8 <_ebss-0xf8>
+  84:	00822283          	lw	x5,8(x4) # 8 <_ebss-0xf8>
+  88:	00220023          	sb	x2,0(x4) # 0 <_ebss-0x100>
+  8c:	002200a3          	sb	x2,1(x4) # 1 <_ebss-0xff>
+  90:	00221123          	sh	x2,2(x4) # 2 <_ebss-0xfe>
+  94:	00022283          	lw	x5,0(x4) # 0 <_ebss-0x100>
+  98:	00220323          	sb	x2,6(x4) # 6 <_ebss-0xfa>
+  9c:	002203a3          	sb	x2,7(x4) # 7 <_ebss-0xf9>
+  a0:	00221223          	sh	x2,4(x4) # 4 <_ebss-0xfc>
+  a4:	00422283          	lw	x5,4(x4) # 4 <_ebss-0xfc>
+  a8:	00022423          	sw	x0,8(x4) # 8 <_ebss-0xf8>
+  ac:	00220423          	sb	x2,8(x4) # 8 <_ebss-0xf8>
+  b0:	00221523          	sh	x2,10(x4) # a <_ebss-0xf6>
+  b4:	00822283          	lw	x5,8(x4) # 8 <_ebss-0xf8>
+  b8:	00222123          	sw	x2,2(x4) # 2 <_ebss-0xfe>
+  bc:	10500073          	wfi
+	...
+
+Disassembly of section .riscv.attributes:
+
+00000000 <.riscv.attributes>:
+   0:	2b41                	.insn	2, 0x2b41
+   2:	0000                	.insn	2, 0x
+   4:	7200                	.insn	2, 0x7200
+   6:	7369                	.insn	2, 0x7369
+   8:	01007663          	bgeu	x0,x16,14 <_ebss-0xec>
+   c:	0021                	.insn	2, 0x0021
+   e:	0000                	.insn	2, 0x
+  10:	7205                	.insn	2, 0x7205
+  12:	3376                	.insn	2, 0x3376
+  14:	6932                	.insn	2, 0x6932
+  16:	7032                	.insn	2, 0x7032
+  18:	5f31                	.insn	2, 0x5f31
+  1a:	326d                	.insn	2, 0x326d
+  1c:	3070                	.insn	2, 0x3070
+  1e:	7a5f 6d6d 6c75      	.insn	6, 0x6c756d6d7a5f
+  24:	7031                	.insn	2, 0x7031
+  26:	0030                	.insn	2, 0x0030
+  28:	0108                	.insn	2, 0x0108
+  2a:	0b0a                	.insn	2, 0x0b0a

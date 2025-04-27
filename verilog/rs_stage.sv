@@ -50,28 +50,26 @@ module RS_ALLOC(
                 end
             
             if (next_re_valid) begin
+                rs_table[rs_update_idx] <= next_re;
                 if(cdb.valid & (next_re.T1 == cdb.T)) begin
-                    rs_table[rs_update_idx].T <= next_re.T;
+                    // rs_table[rs_update_idx].T <= next_re.T;
                     rs_table[rs_update_idx].T1 <= 0;
-                    rs_table[rs_update_idx].T2 <= next_re.T2;
+                    // rs_table[rs_update_idx].T2 <= next_re.T2;
                     rs_table[rs_update_idx].V1 <= cdb.V;
-                    rs_table[rs_update_idx].V2 <= next_re.V2;
-                    rs_table[rs_update_idx].D_S_reg <= next_re.D_S_reg;
+                    // rs_table[rs_update_idx].V2 <= next_re.V2;
+                    // rs_table[rs_update_idx].D_S_reg <= next_re.D_S_reg;
                     rs_table[rs_update_idx].ready[0] <= `TRUE;
-                    rs_table[rs_update_idx].ready[1] <= next_re.ready[1];
+                    // rs_table[rs_update_idx].ready[1] <= next_re.ready[1];
                 end
-                else if(cdb.valid & (next_re.T2 == cdb.T)) begin
-                    rs_table[rs_update_idx].T <= next_re.T;
-                    rs_table[rs_update_idx].T1 <= next_re.T1;
+                if(cdb.valid & (next_re.T2 == cdb.T)) begin
+                    // rs_table[rs_update_idx].T <= next_re.T;
+                    // rs_table[rs_update_idx].T1 <= next_re.T1;
                     rs_table[rs_update_idx].T2 <= 0;
-                    rs_table[rs_update_idx].V1 <= next_re.V1;
+                    // rs_table[rs_update_idx].V1 <= next_re.V1;
                     rs_table[rs_update_idx].V2 <= cdb.V;
-                    rs_table[rs_update_idx].D_S_reg <= next_re.D_S_reg;
+                    // rs_table[rs_update_idx].D_S_reg <= next_re.D_S_reg;
                     rs_table[rs_update_idx].ready[1] <= `TRUE;
-                    rs_table[rs_update_idx].ready[0] <= next_re.ready[0];
-                end
-                else begin
-                    rs_table[rs_update_idx] <= next_re;
+                    // rs_table[rs_update_idx].ready[0] <= next_re.ready[0];
                 end
                 next_re_valid <= `FALSE;
             end
