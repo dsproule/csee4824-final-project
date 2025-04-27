@@ -397,7 +397,8 @@ typedef struct packed {
     logic valid;                         // Entry is in use
     logic [`XLEN-1:0] addr;              // Effective address (if known)
     logic [`XLEN-1:0] data;              // Loaded data (if forwarded)
-    ROB_T T;                       // Tag for tracking commit order
+    ROB_T T;
+    logic ROB_wrap;                       // Tag for tracking commit order
     logic addr_valid;                   // Address is computed
     LQ_FLAG state;
     SQ_T dep_sq_T;
@@ -408,7 +409,8 @@ typedef struct packed {
     logic valid;                         // Entry is in use
     logic [`XLEN-1:0] addr;              // Effective address (if known)
     logic [`XLEN-1:0] data;              // Data to store (if known)
-    ROB_T T;                            // Tag to ensure in-order commit
+    ROB_T T;
+    logic ROB_wrap;                            // Tag to ensure in-order commit
     logic addr_valid;                   // Address is computed
     logic data_valid;                   // Data is ready (i.e., value from reg/CDB)
     logic retired;                    // Set when ROB retires this store

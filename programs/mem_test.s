@@ -1,11 +1,9 @@
-li x2, 0xabcdef98 #
-sw x2, 0x100(x0)
-sw x2, 0x200(x0)
+data = 0x1000
+li	x6, 0
+li	x2, data
+li  x31, 0x0a
+mul	x3,	x6,	x31
+sw	x3, 0(x2)
+lw	x4, 0(x2)
 nop
-nop
-nop
-lw x3, 0x200(x0)
-lw x4, 0x100(x0)
-lw x5, 0x100(x0)
-lw x6, 0x100(x0)
 wfi

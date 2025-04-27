@@ -30,6 +30,9 @@ module lsq_tb;
     .retire_T(retire_T), .retire_en(retire_en),
     .load_fwd_packet(load_fwd_packet),
     .store_X_packet(),
+    .ROB_wrap(),
+    .dcache_ack_store(), //update todo
+    .dcache_ack_load(),
     .mem_write_en(mem_write_en),
     .proc2Dmem_addr_store(proc2Dmem_addr_store),
     .proc2Dmem_data_store(proc2Dmem_data_store),
@@ -118,7 +121,7 @@ module lsq_tb;
 
     @(negedge clock); retire_T = 1; retire_en = 1;
     @(posedge clock); #1;
-    retire_en = 0;
+    retire_en = 0; 
     check("Basic Store Committed", mem_write_en && proc2Dmem_data_store == 32'hCAFEFEED);
     check("Queue empty after commit", lq_empty && sq_empty);
 

@@ -16,6 +16,7 @@ module rob(
     output logic [`XLEN-1:0] V1, V2, regfile_write_data,
     output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out,
     output ROB_T head, tail,
+    output logic tail_wrap,
     output logic [`XLEN-1:0] commit_NPC
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
@@ -41,7 +42,7 @@ module rob(
                         tail=head=1, but big_tail[MSB] == 1 and big_head[MSB] == 0)
     */
 
-    logic head_wrap, tail_wrap;
+    logic head_wrap;
 
     //outputs // change here
     assign full = (head == tail) && (head_wrap != tail_wrap);

@@ -92,6 +92,7 @@ module pipeline (
     logic rob_full, rob_empty, retire;
     logic [`XLEN-1:0] V1_rob, V2_rob, rob_write_data, V1_rob_final, V2_rob_final;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
+    logic ROB_tail_wrap;
 
     // Regfile inputs/outputs
     logic regfile_write_en;
@@ -150,7 +151,7 @@ module pipeline (
     //////////////////////////////////////////////////
 
     assign rd_mem = mem_read_en;
-    assign wr_mem = mem_write_en;
+    assign wr_mem = mem_write_en && !mem_read_en;
     assign Dmem_req = (wr_mem | rd_mem);
 
     // for all memory vectors, ind0 -> wr and ind1 -> rd
@@ -338,7 +339,7 @@ module pipeline (
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
         
         // Outputs
-        .T(rob_T_wire), .retire_T_out(retire_T_wire), 
+        .T(rob_T_wire), .retire_T_out(retire_T_wire), .tail_wrap(ROB_tail_wrap),
         .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), 
         .retire(retire), .regfile_write_idx_out(retire_r_wire), 
         .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
@@ -437,18 +438,19 @@ module pipeline (
     .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
     .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
     .T(rob_T_wire),
+    .ROB_wrap(ROB_tail_wrap),
     .S_X_store(S_X_regs[3]), 
     .S_X_load(S_X_regs[2]),
     .store_X(S_X_regs[3].valid),
     .load_X(S_X_regs[2].valid),
     .retire_T(retire_T_wire), 
     .retire_en(retire),
-    .dcache_ack_store(dcache_ack_store),
+    .dcache_ack_store(dcache_ack_store), //prioritize loads for speed
     .dcache_ack_load(dcache_ack_load),
 
     // outputs
     .load_fwd_packet(lsq_fwd_packet),
-    .mem_write_en(mem_write_en),
+    .mem_write_en(mem_write_en), //
     .proc2Dmem_addr_store(proc2Dmem_addr[0]),
     .proc2Dmem_data_store(proc2Dmem_data_wire),
     .mem_access_store(mem_access_store_wire),

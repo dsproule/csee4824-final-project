@@ -5,6 +5,7 @@ module lsq(
     // alloc inputs
     input logic clock, reset, 
     input logic sq_alloc, lq_alloc,
+    input logic ROB_wrap,
     input ROB_T T,
 
     // Data/Addr Update Inputs
@@ -99,7 +100,7 @@ module lsq(
 
     assign update_sq = store_X && sq[sq_X_T].valid;
     assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
-                        sq[sq_head].addr_valid && sq[sq_head].data_valid;
+                        sq[sq_head].addr_valid && sq[sq_head].data_valid && !mem_read_en; //prioritize loads
 
     assign fwd_head = store_X && sq[sq_X_T].valid && ((sq_X_T == lq[lq_head].dep_sq_T) && (lq[lq_head].state == FORWARDED));
 
@@ -108,20 +109,20 @@ module lsq(
     //forwarding unit - youngest store older than load forwards to load
     X_C_PACKET fwd_packet_wire;
 
-    // loop temp logic that should get compiled out
-    // may cause synthesis to freak out,  but should be fine
+    // loop temp logic that gets compiled out, can be optimized with a prediction
     ROB_T best_T_store;
+    
+    //FIXME
     always_comb begin
         // Forwarding logic
         best_T_store = 0;
         fwd_packet_wire = 0;
-        // fwd_packet_wire[1] = 0;
 
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
-            if (sq[i].valid && !sq[i].retired && sq[i].addr_valid &&
-                    (sq[i].addr == S_X_load_addr) && (sq[i].T < S_X_load.T) && 
-                    load_X && lq[lq_X_T].valid && sq[i].T >= best_T_store) begin
-                if (sq[i].data_valid) begin
+            if (sq[i].valid && !sq[i].retired && sq[i].addr_valid && sq[i].data_valid &&
+                    (sq[i].addr == S_X_load_addr) && load_X && lq[lq_X_T].valid && sq[i].T >= best_T_store) begin
+                if ((sq[i].T < S_X_load.T && sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap) || 
+                    (sq[i].T > S_X_load.T && sq[i].ROB_wrap != lq[lq_X_T].ROB_wrap)) begin
                     best_T_store = sq[i].T;
                     fwd_packet_wire.T =  sq[i].T;
                     fwd_packet_wire.result = sq[i].data;;
@@ -132,16 +133,6 @@ module lsq(
 
         // if the tag hits the store on execute, there are no other later stores, can forward
         // safely
-
-        //on store update TODO
-        // for (int j = 0; j < `LQ_SZ; j++) begin //on store update
-        //     if (store_X && sq[sq_X_T].valid && (lq[j].addr == S_X_store_addr) &&
-        //     (lq[j].T > S_X_store.T) && (lq[j].dep_sq_T > sq_X_T)) begin
-        //         fwd_packet_wire[1].T = lq[j].T;
-        //         fwd_packet_wire[1].result =S_X_store.V2;
-        //         fwd_packet_wire[1].valid = `TRUE;
-        //     end
-        // end
     end
 
     // CAMS for lq/sq indices --> can load sq_tail and lq_head into
@@ -215,6 +206,7 @@ module lsq(
                 sq[sq_tail] <= 0;
                 sq[sq_tail].valid <= `TRUE;
                 sq[sq_tail].T <= T;
+                sq[sq_tail].ROB_wrap <= ROB_wrap;
 
                 //RECORD LAST DEP SQ INDEX
                 if (!lq_full) begin
@@ -242,7 +234,9 @@ module lsq(
                         lq[j].state <= (lq[j].state == FORWARDED) ? DATA_READY : LQ_NONE; // all dep stores done
                     end 
 
-                    if (lq[j].valid && (lq[j].addr == S_X_store_addr) && (lq[j].T > S_X_store.T)) begin
+                    if (lq[j].valid && (lq[j].addr == S_X_store_addr) && lq[j].addr_valid &&
+                        ((lq[j].T > S_X_store.T && lq[j].ROB_wrap == sq[sq_X_T].ROB_wrap) || 
+                        (lq[j].T < S_X_store.T && lq[j].ROB_wrap != sq[sq_X_T].ROB_wrap)) ) begin
                         lq[j].data <= S_X_store.V2; //forward early
                         if (sq_X_T == lq[j].dep_sq_T) lq[j].state <= DATA_READY; // all dep stores done
                         else lq[j].state <= FORWARDED; //early forward
@@ -268,6 +262,7 @@ module lsq(
                 lq[lq_tail] <= 0;
                 lq[lq_tail].valid <= `TRUE;
                 lq[lq_tail].T <= T;
+                lq[lq_tail].ROB_wrap <= ROB_wrap;
                 lq[lq_tail].state <= lq[lq_tail].state;
                 lq[lq_tail].dep_sq_T <= lq[lq_tail].dep_sq_T;
                 // last dep store and state also allocated
