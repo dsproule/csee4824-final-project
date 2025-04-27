@@ -151,7 +151,7 @@ module pipeline (
     //////////////////////////////////////////////////
 
     assign rd_mem = mem_read_en;
-    assign wr_mem = mem_write_en && !mem_read_en;
+    assign wr_mem = mem_write_en;
     assign Dmem_req = (wr_mem | rd_mem);
 
     // for all memory vectors, ind0 -> wr and ind1 -> rd

@@ -102,7 +102,7 @@ module lsq(
 
     assign update_sq = store_X && sq[sq_X_T].valid;
     assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
-                        sq[sq_head].addr_valid && sq[sq_head].data_valid; //prioritize loads
+                        sq[sq_head].addr_valid && sq[sq_head].data_valid && sq_older; //prioritize loads
 
     assign fwd_head = store_X && sq[sq_X_T].valid && ((sq_X_T == lq[lq_head].dep_sq_T) && (lq[lq_head].state == FORWARDED));
 
@@ -110,9 +110,9 @@ module lsq(
 
     assign sq_free = sq2Dcache && dcache_ack_store;
 
-    assign sq_older = !lq[lq_head].valid || (sq[sq_head].valid && ((sq[sq_head].T < lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap)));
+    assign sq_older = sq[sq_head].valid && (!lq[lq_head].valid || (lq[lq_head].valid && ((sq[sq_head].T < lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap))));
 
-    assign lq_older = !sq[sq_head].valid || (lq[lq_head].valid && (sq[sq_head].T > lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap));
+    assign lq_older = lq[lq_head].valid && (!sq[sq_head].valid || (sq[sq_head].valid && (sq[sq_head].T > lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap)));
     //forwarding unit - youngest store older than load forwards to load
     X_C_PACKET fwd_packet_wire;
 

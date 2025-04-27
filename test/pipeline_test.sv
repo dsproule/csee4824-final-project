@@ -277,6 +277,8 @@ module testbench;
   task print_lsq;
     print_lq();
     print_sq();
+    $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache);
+    $display("----------------------------------------------------------------------------------------------------------\n");
   endtask
 
     task print_mem;
@@ -335,7 +337,7 @@ module testbench;
                 // print_rs;
                 // print_mt;
                 // print_cdb;
-                // print_rob;
+                print_rob;
                 // print_regs;
                 // print_sx;
                 print_lsq;

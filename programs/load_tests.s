@@ -1,5 +1,5 @@
 addi x1, x0, 347
-li x2, 33546786
+li x2, 0x01ffe222
 mul x3, x1, x2
 addi x4, x0, 1000
 addi x8, x0, 1008
