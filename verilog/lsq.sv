@@ -110,19 +110,29 @@ module lsq(
 
     assign sq_free = sq2Dcache && dcache_ack_store;
 
-    assign sq_older = !lq[lq_head].valid || (sq[sq_head].valid && ((sq[sq_head].T < lq[lq_head].T && sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap) ||
-                        (sq[sq_head].T > lq[lq_head].T && sq[sq_head].ROB_wrap != lq[lq_head].ROB_wrap)));
+    assign sq_older = !lq[lq_head].valid || (sq[sq_head].valid && ((sq[sq_head].T < lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap)));
 
-    assign lq_older = !sq[sq_head].valid || (lq[lq_head].valid && ((sq[sq_head].T > lq[lq_head].T && sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap) ||
-                        (sq[sq_head].T < lq[lq_head].T && sq[sq_head].ROB_wrap != lq[lq_head].ROB_wrap)));
+    assign lq_older = !sq[sq_head].valid || (lq[lq_head].valid && (sq[sq_head].T > lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap));
     //forwarding unit - youngest store older than load forwards to load
     X_C_PACKET fwd_packet_wire;
+
+    /*
+        Note: To determine age: the older instruction is the one with a lower ROB_T, as long as the tail has not wrapped around
+        so to compensate for this an older load queue entry could be determined with
+
+        (lq_ROB_T < sq_ROB_T && lq_ROB_tail_wrap == sq_ROB_tail_wrap) || (lq_ROB_T > sq_ROB_T && lq_ROB_tail_wrap != sq_ROB_tail_wrap)
+
+        Because the tags are unique, this can be simplified to:
+        (lq_ROB_T < sq_ROB_T && lq_ROB_tail_wrap == sq_ROB_tail_wrap) || (lq_ROB_T >= sq_ROB_T && lq_ROB_tail_wrap != sq_ROB_tail_wrap)
+
+        And thus this can be expressed as the XNOR
+
+        (lq_ROB_T < sq_ROB_T ~^ lq_ROB_tail_wrap == sq_ROB_tail_wrap)        
+  */
 
     // loop temp logic that gets compiled out, can be optimized with a prediction
     ROB_T best_T_store;
     logic [`SQ_SZ-1:0] fwd_match;
-    
-
     always_comb begin
         // Forwarding logic
         best_T_store = 0;
@@ -132,8 +142,7 @@ module lsq(
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
             if (sq[i].valid && sq[i].addr_valid && sq[i].data_valid &&
                     (sq[i].addr == S_X_load_addr) && load_X && lq[lq_X_T].valid && sq[i].T >= best_T_store) begin
-                if (((sq[i].T < S_X_load.T && sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap) || 
-                    (sq[i].T > S_X_load.T && sq[i].ROB_wrap != lq[lq_X_T].ROB_wrap)) && (sq[i].mem_access == mem_access_load_wire)) begin
+                if (((sq[i].T < S_X_load.T ~^ sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap)) && (sq[i].mem_access == mem_access_load_wire)) begin
                     best_T_store = sq[i].T;
                     fwd_packet_wire.T =  sq[i].T;
                     fwd_packet_wire.result = sq[i].data;
@@ -245,8 +254,7 @@ module lsq(
                     end 
 
                     if (lq[j].valid && (lq[j].addr == S_X_store_addr) && lq[j].addr_valid &&
-                        ((lq[j].T > S_X_store.T && lq[j].ROB_wrap == sq[sq_X_T].ROB_wrap) || 
-                        (lq[j].T < S_X_store.T && lq[j].ROB_wrap != sq[sq_X_T].ROB_wrap)) && 
+                        (lq[j].T > S_X_store.T ~^ lq[j].ROB_wrap == sq[sq_X_T].ROB_wrap) && 
                         lq[j].mem_access == mem_access_store_wire) begin
                         lq[j].data <= S_X_store.V2; //forward early
                         if (sq_X_T == lq[j].dep_sq_T) lq[j].state <= DATA_READY; // all dep stores done
