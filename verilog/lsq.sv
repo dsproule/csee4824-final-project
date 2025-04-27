@@ -37,6 +37,7 @@ module lsq(
     output logic [`XLEN-1:0] proc2Dmem_addr_load,
     output MEM_ACCESS mem_access_load,
     output ROB_T load_T,
+    output logic sq_free,
 
     //control signals for structural hazards
     output logic sq_full, sq_empty, lq_full, lq_empty
@@ -97,36 +98,47 @@ module lsq(
 
     logic sq2Dcache, lq2Dcache, fwd_head;
     logic update_sq;
+    logic sq_older, lq_older; //sq head is older than lq head
 
     assign update_sq = store_X && sq[sq_X_T].valid;
     assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
-                        sq[sq_head].addr_valid && sq[sq_head].data_valid && !mem_read_en; //prioritize loads
+                        sq[sq_head].addr_valid && sq[sq_head].data_valid; //prioritize loads
 
     assign fwd_head = store_X && sq[sq_X_T].valid && ((sq_X_T == lq[lq_head].dep_sq_T) && (lq[lq_head].state == FORWARDED));
 
-    assign lq2Dcache = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && ((lq[lq_head].state == LQ_NONE) || (lq[lq_head].state == DATA_READY) || fwd_head);
+    assign lq2Dcache = !lq_empty && lq[lq_head].addr_valid && lq_older && lq[lq_head].valid && ((lq[lq_head].state == LQ_NONE) || (lq[lq_head].state == DATA_READY) || fwd_head);
 
+    assign sq_free = sq2Dcache && dcache_ack_store;
+
+    assign sq_older = !lq[lq_head].valid || (sq[sq_head].valid && ((sq[sq_head].T < lq[lq_head].T && sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap) ||
+                        (sq[sq_head].T > lq[lq_head].T && sq[sq_head].ROB_wrap != lq[lq_head].ROB_wrap)));
+
+    assign lq_older = !sq[sq_head].valid || (lq[lq_head].valid && ((sq[sq_head].T > lq[lq_head].T && sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap) ||
+                        (sq[sq_head].T < lq[lq_head].T && sq[sq_head].ROB_wrap != lq[lq_head].ROB_wrap)));
     //forwarding unit - youngest store older than load forwards to load
     X_C_PACKET fwd_packet_wire;
 
     // loop temp logic that gets compiled out, can be optimized with a prediction
     ROB_T best_T_store;
+    logic [`SQ_SZ-1:0] fwd_match;
     
-    //FIXME
+
     always_comb begin
         // Forwarding logic
         best_T_store = 0;
         fwd_packet_wire = 0;
+        fwd_match = 0;
 
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
-            if (sq[i].valid && !sq[i].retired && sq[i].addr_valid && sq[i].data_valid &&
+            if (sq[i].valid && sq[i].addr_valid && sq[i].data_valid &&
                     (sq[i].addr == S_X_load_addr) && load_X && lq[lq_X_T].valid && sq[i].T >= best_T_store) begin
-                if ((sq[i].T < S_X_load.T && sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap) || 
-                    (sq[i].T > S_X_load.T && sq[i].ROB_wrap != lq[lq_X_T].ROB_wrap)) begin
+                if (((sq[i].T < S_X_load.T && sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap) || 
+                    (sq[i].T > S_X_load.T && sq[i].ROB_wrap != lq[lq_X_T].ROB_wrap)) && (sq[i].mem_access == mem_access_load_wire)) begin
                     best_T_store = sq[i].T;
                     fwd_packet_wire.T =  sq[i].T;
-                    fwd_packet_wire.result = sq[i].data;;
+                    fwd_packet_wire.result = sq[i].data;
                     fwd_packet_wire.valid = `TRUE;
+                    fwd_match[i] = 1;
                 end 
             end
         end
@@ -177,7 +189,7 @@ module lsq(
     end
 
     // TODO flush unit --> sets data to not ready if collision 
-    // TODO masking data if mem_size is different   
+
     always_ff @(posedge clock) begin
         if (reset) begin
             for (int i = 0; i < `LQ_SZ; i++) begin
@@ -227,8 +239,6 @@ module lsq(
                 sq[sq_X_T].mem_access <= mem_access_store_wire;
 
                 
-
-                
                 for (int j = 0; j < `LQ_SZ; j++) begin
                     if (sq_X_T == lq[j].dep_sq_T) begin 
                         lq[j].state <= (lq[j].state == FORWARDED) ? DATA_READY : LQ_NONE; // all dep stores done
@@ -236,7 +246,8 @@ module lsq(
 
                     if (lq[j].valid && (lq[j].addr == S_X_store_addr) && lq[j].addr_valid &&
                         ((lq[j].T > S_X_store.T && lq[j].ROB_wrap == sq[sq_X_T].ROB_wrap) || 
-                        (lq[j].T < S_X_store.T && lq[j].ROB_wrap != sq[sq_X_T].ROB_wrap)) ) begin
+                        (lq[j].T < S_X_store.T && lq[j].ROB_wrap != sq[sq_X_T].ROB_wrap)) && 
+                        lq[j].mem_access == mem_access_store_wire) begin
                         lq[j].data <= S_X_store.V2; //forward early
                         if (sq_X_T == lq[j].dep_sq_T) lq[j].state <= DATA_READY; // all dep stores done
                         else lq[j].state <= FORWARDED; //early forward
@@ -287,6 +298,8 @@ module lsq(
                 load_fwd_packet.valid <= (lq[lq_head].state == DATA_READY || fwd_head);
                 load_fwd_packet.T <= lq[lq_head].T;
                 load_fwd_packet.result <= lq[lq_head].data;
+                load_fwd_packet.ppln_ctrl.has_dest <= `TRUE;
+
 
                 //making mem request if no dependencies
                 if (dcache_ack_load || lq[lq_head].state == DATA_READY || fwd_head) begin
@@ -297,28 +310,4 @@ module lsq(
             end
         end
     end
-
-    // genvar j; Michael's suggestion for separating out fsm
-    // generate
-        
-    //     for (j = 0; j < `LQ_SZ; j++) begin: g_lq_fsm
-            
-    //         always_ff @(posedge clock) begin
-    //             if (reset) begin
-    //                 lq[j] = reset_val;
-    //             end else if (update_sq) begin
-    //                 if (sq_X_T == lq[j].dep_sq_T) begin 
-    //                     lq[j].state <= (lq[j].state == FORWARDED) ? DATA_READY : LQ_NONE; // all dep stores done
-    //                 end 
-
-    //                 if (lq[j].valid && (lq[j].addr == S_X_store_addr) && (lq[j].T > S_X_store.T)) begin
-    //                     lq[j].data <= S_X_store.V2; //forward early
-    //                     if (sq_X_T == lq[j].dep_sq_T) lq[j].state <= DATA_READY; // all dep stores done
-    //                     else lq[j].state <= FORWARDED; //early forward
-    //                 end     
-    //             end
-    //         end
-
-    //     end
-    // endgenerate
 endmodule

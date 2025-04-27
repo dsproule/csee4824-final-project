@@ -240,20 +240,21 @@ module testbench;
      task print_sq;
     $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
     $display("--------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | Retired");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired");
     $display("--------------------------------------------------------------------------------");
     for (int i = 0; i < `SQ_SZ; i++) begin
-      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |   %1b",
+      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b",
                i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
-               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].retired);
+               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired);
     end
+    $display("X_store: %b mem_access_store: %d", core.lsq_inst.update_sq, core.lsq_inst.mem_access_store_wire);
     $display("--------------------------------------------------------------------------------\n");
   endtask
 
   task print_lq;
     $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.sq_tail, clock_count);
     $display("----------------------------------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Dep_SQ_T");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | MEM_ACC  | Dep_SQ_T");
     $display("----------------------------------------------------------------------------------------------------------");
     for (int i = 0; i < `LQ_SZ; i++) begin
       string state_str;
@@ -264,11 +265,13 @@ module testbench;
         FORWARDED: state_str = "FORWARDED";
         default:   state_str = "???";
       endcase
-      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %2d",
+      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |     %d    |   %2d",
                i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
-               core.lsq_inst.lq[i].addr_valid, state_str, core.lsq_inst.lq[i].dep_sq_T);
+               core.lsq_inst.lq[i].addr_valid, state_str, core.lsq_inst.lq[i].mem_access, core.lsq_inst.lq[i].dep_sq_T);
     end
+    $display("X_load: %b mem_access_load: %d", core.lsq_inst.load_X, core.lsq_inst.mem_access_load_wire);
     $display("----------------------------------------------------------------------------------------------------------\n");
+
   endtask
 
   task print_lsq;
@@ -320,10 +323,10 @@ module testbench;
             // if ((clock_count >= 11607)) begin
             if (IF_ID_reg_dbg.valid && (clock_count >= 0))
                 prog_start <= 1;
-            // if ((clock_count >= 400)) begin
-            //     show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
-            //     $finish;
-            // end
+            if ((clock_count >= 1000)) begin
+                show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
+                $finish;
+            end
 
 
             if (prog_start) begin
@@ -331,9 +334,9 @@ module testbench;
                 // print_ds;
                 // print_rs;
                 // print_mt;
-                print_cdb;
-                print_rob;
-                print_regs;
+                // print_cdb;
+                // print_rob;
+                // print_regs;
                 // print_sx;
                 print_lsq;
                 // print_mem;

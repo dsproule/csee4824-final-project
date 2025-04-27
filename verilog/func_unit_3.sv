@@ -1,14 +1,14 @@
 `include "verilog/sys_defs.svh"
 
 module func_unit_3(
-    input clock, reset, wr_valid,
+    input clock, reset, wr_valid, sq_free,
     input [63:0] Dmem2proc_data,
     input ROB_T T, //pass through
     input MEM_ACCESS mem_access, //for shifting
     input logic [`XLEN-1:0] proc2Dmem_data,
 
     output [63:0]      proc2Dcache_data,
-    output logic d_cache_ack_store
+    output logic dcache_ack_store
 );
 
     logic [`XLEN-1:0] rawDmem_addr;
@@ -56,36 +56,29 @@ module func_unit_3(
     end
 
     assign proc2Dcache_data = Dmem_data;
-    logic old_dcache_ack;
 
      // state machine to handle loads
     always_ff @(posedge clock) begin
         if (reset) begin
-            d_cache_ack_store  <= 0;
+            dcache_ack_store  <= 0;
             mem_state <= MEM_WAIT_FOR_TAG;
-            old_dcache_ack <= 0;
         end else begin
+            case (mem_state) 
+                // if valid pass to X_packet
+                MEM_WAIT_FOR_TAG:
+                    if (wr_valid) begin
+                        dcache_ack_store <= `TRUE;
+                        mem_state <= MEM_NONE;
+                    end
+                MEM_NONE: begin
+                    // if committed, return back to state waiting to give to X_packet
+                    dcache_ack_store <= `FALSE;
+                    if (sq_free)
+                        mem_state <= MEM_WAIT_FOR_TAG;
+                end
+                default: ;
 
-            //rising edge detector for dcache acknowledgement
-            old_dcache_ack <= wr_valid;
-            d_cache_ack_store <= `FALSE;
-            if (wr_valid && !old_dcache_ack)
-                d_cache_ack_store <= `TRUE;
-
-            // case (mem_state) 
-            //     // if valid pass to X_packet
-            //     MEM_WAIT_FOR_TAG:
-            //         if (wr_valid) begin
-            //             mem_state <= MEM_NONE;
-            //         end
-            //     MEM_NONE: begin
-            //         // if committed, return back to state waiting to give to X_packet
-            //         //if (committed)
-            //             mem_state <= MEM_WAIT_FOR_TAG;
-            //     end
-            //     default: ;
-
-            // endcase
+            endcase
         end
     end    
 

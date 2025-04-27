@@ -42,8 +42,8 @@ for source_file in "${sources[@]}"; do
 
     ### REG CHECK
     diff -y --suppress-common-lines \
-      <(grep 'REG\[' correct_out/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') \
-      <(grep 'REG\[' output/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') > /dev/null
+        <(grep 'REG\[' correct_out/"$program".wb | grep -v 'REG\[ *0\]' | sed -n 's/.*\(REG\[[^]]*\]=[0-9A-Fa-f]\{8\}\).*/\1/p') \
+        <(grep 'REG\[' output/"$program".wb | grep -v 'REG\[ *0\]' | sed -n 's/.*\(REG\[[^]]*\]=[0-9A-Fa-f]\{8\}\).*/\1/p') > /dev/null
     status_reg=$?
 
     ### MEM CHECK

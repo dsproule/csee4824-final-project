@@ -29,18 +29,6 @@ module rob(
     assign retire_T_out = (retire) ? retire_T : 0;
     assign regfile_write_idx_out = (retire) ? regfile_write_idx : 0;
 
-    /* ONLY WORKS IF SIZE IS POWER OF TWO, BUT MORE EFFICIENT AND SIMPLER LOGIC FOR CONTROL BITS/MULTIPLE ISSUES WHEN WE SUPERSCALAR
-
-        Extra bit in big_head or big_tail acts as a wraparound detector. If the MSB of each is equal, they are on the same "wraparound"
-        
-        for example:    initialized fifo big_head=big_tail=0, MSBs are equal --> empty
-                        allocate SIZE entries big_head={1'b0,0} big_tail={1'b1,0} because of wraparound --> full
-                        also tells you which entry is newer
-
-                        ht             h t           h   t           h t           h   t       t  h           th (FULL) 
-                        [0 0 0 0] --> [1 0 0 0] --> [1 2 0 0] --> [0 2 0 0] --> [0 2 3 0] --> [0 2 3 4] --> [5 2 3 4] 
-                        tail=head=1, but big_tail[MSB] == 1 and big_head[MSB] == 0)
-    */
 
     logic head_wrap;
 

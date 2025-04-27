@@ -304,7 +304,7 @@ module pipeline (
     logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
     assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
-    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3] & ~rd_mem, FU_ready[2] & ~wr_mem, FU_ready[1:0]};
+    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3] & ~rd_mem, FU_ready[2], FU_ready[1:0]};
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
@@ -429,7 +429,7 @@ module pipeline (
     MEM_ACCESS mem_access_load_wire, mem_access_store_wire;
     logic [`XLEN-1:0] proc2Dmem_data_wire;
     X_C_PACKET lsq_fwd_packet, func_unit_2_x_packet;
-    logic dcache_ack_store, dcache_ack_load;
+    logic dcache_ack_store, dcache_ack_load, sq_free;
 
     lsq lsq_inst(
     // inputs
@@ -460,6 +460,7 @@ module pipeline (
     .mem_read_en(mem_read_en),
     .load_T(load_T_wire),
     .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
+    .sq_free(sq_free),
     .sq_full(), .sq_empty(), .lq_full(), .lq_empty()
     
     );
@@ -481,14 +482,14 @@ module pipeline (
     assign X_packets[2] = (lsq_fwd_packet.valid) ? lsq_fwd_packet : func_unit_2_x_packet;
 
     func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset | take_branch), .wr_valid(wr_valid & wr_mem),
+        .clock(clock), .reset(reset | take_branch), .wr_valid(wr_valid & wr_mem), .sq_free(sq_free),
         .Dmem2proc_data(Dcache_data_out),
         .T(store_T_wire),
         .mem_access(mem_access_store_wire),
         .proc2Dmem_data(proc2Dmem_data_wire), //handles masking before storing
 
         .proc2Dcache_data(proc2Dcache_data),
-        .d_cache_ack_store(dcache_ack_store) //throttle sq flow
+        .dcache_ack_store(dcache_ack_store) //throttle sq flow
     );
 
     func_unit_0 func_unit_04(
