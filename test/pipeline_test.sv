@@ -393,7 +393,7 @@ module testbench;
             end
 
             // deal with any halting conditions
-            // if(pipeline_error_status != NO_ERROR || debug_counter > 50) begin
+            // if(pipeline_error_status != NO_ERROR || debug_counter > 250) begin
             if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
                 // print_regs;
                 // print_sx;

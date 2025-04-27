@@ -117,7 +117,7 @@ module icache (
         got_mem_data = 0;
 
         for (logic [$clog2(`MSHR_SLOTS):0] mshr_miss_idx = 0; mshr_miss_idx < `MSHR_SLOTS; mshr_miss_idx++) begin
-            if ((mshr[mshr_miss_idx].mem_tag == Imem2proc_tag) & mshr[mshr_miss_idx].valid) begin
+            if ((mshr[mshr_miss_idx].mem_tag == Imem2proc_tag) & mshr[mshr_miss_idx].valid & (Imem2proc_tag != 0)) begin
                 mshr_resp_idx = mshr_miss_idx;
                 got_mem_data = 1;
             end
