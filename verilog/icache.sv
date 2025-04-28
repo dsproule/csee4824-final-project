@@ -58,8 +58,8 @@ module icache (
     // ---- Addresses and final outputs ---- //
 
     // Note: cache tags, not memory tags
-    logic [12-`CACHE_LINE_BITS:0] current_tag, last_tag;
-    logic [`CACHE_LINE_BITS - 1:0] current_index, last_index;
+    logic [12-`CACHE_LINE_BITS:0] current_tag, main_tag;
+    logic [`CACHE_LINE_BITS - 1:0] current_index, main_index;
     logic mem_forward;
 
     logic fetch_main_addr, current_in_cache;
@@ -68,6 +68,7 @@ module icache (
     // ---- MSHR non-blocking logic ---- // 
 
     assign {current_tag, current_index} = cur_addr[15:3];
+    assign {main_tag, main_index} = proc2Icache_addr[15:3];
 
     // forwarding logic to squeeze data out of cache a cycle sooner
     always_comb begin
@@ -77,8 +78,9 @@ module icache (
             Icache_data_out = Imem2proc_data;
             Icache_valid_out = `TRUE; 
         end else begin 
-            Icache_data_out = icache_data[current_index].data;
-            Icache_valid_out = current_in_cache & (cur_addr == proc2Icache_addr);
+            Icache_data_out = icache_data[main_index].data;
+            Icache_valid_out = icache_data[main_index].valid &&
+                                (icache_data[main_index].tags == main_tag);
         end
     end
 
@@ -131,9 +133,10 @@ module icache (
     end
 
     // ---- Prefetch logic ---- //
-    wire prefetch_valid = fetch_main_addr;
+    logic last_fetch_hit;
+    wire prefetch_valid = fetch_main_addr | last_fetch_hit;
 
-    assign cur_addr = prefetch_valid ? proc2Icache_addr + 8 : proc2Icache_addr;
+    assign cur_addr = prefetch_valid ? proc2Icache_addr + 12 : proc2Icache_addr;
 
     assign mem_forward = (proc2Icache_addr[`XLEN-1:3] == mshr[mshr_resp_idx].addr) & (got_mem_data);
 
@@ -150,7 +153,9 @@ module icache (
             mshr           <= 0;
             icache_data    <= 0; // Set all cache data to 0 (including valid bits)
             fetch_main_addr <= 0;
+            last_fetch_hit <= 0;
         end else begin
+            last_fetch_hit <= Icache_valid_out;
             // if slot is empty and the req address is not present, allocate it
             if (~mshr[mshr_next_idx].valid & ~current_in_mshr & ~current_in_cache) begin
                 mshr[mshr_next_idx].addr    <= cur_addr[`XLEN-1:3];
