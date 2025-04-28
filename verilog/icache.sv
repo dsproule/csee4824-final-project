@@ -62,7 +62,7 @@ module icache (
     logic [`CACHE_LINE_BITS - 1:0] current_index, last_index;
     logic mem_forward;
 
-    logic prefetch_valid;
+    logic fetch_main_addr, current_in_cache;
     logic [`XLEN-1:0] cur_addr;
     
     // ---- MSHR non-blocking logic ---- // 
@@ -71,13 +71,14 @@ module icache (
 
     // forwarding logic to squeeze data out of cache a cycle sooner
     always_comb begin
+        current_in_cache = icache_data[current_index].valid &&
+                                (icache_data[current_index].tags == current_tag);
         if (mem_forward) begin
             Icache_data_out = Imem2proc_data;
             Icache_valid_out = `TRUE; 
         end else begin 
             Icache_data_out = icache_data[current_index].data;
-            Icache_valid_out = icache_data[current_index].valid &&
-                                (icache_data[current_index].tags == current_tag);
+            Icache_valid_out = current_in_cache & (cur_addr == proc2Icache_addr);
         end
     end
 
@@ -130,6 +131,8 @@ module icache (
     end
 
     // ---- Prefetch logic ---- //
+    wire prefetch_valid = fetch_main_addr;
+
     assign cur_addr = prefetch_valid ? proc2Icache_addr + 8 : proc2Icache_addr;
 
     assign mem_forward = (proc2Icache_addr[`XLEN-1:3] == mshr[mshr_resp_idx].addr) & (got_mem_data);
@@ -146,15 +149,15 @@ module icache (
         if (reset) begin
             mshr           <= 0;
             icache_data    <= 0; // Set all cache data to 0 (including valid bits)
-            prefetch_valid <= 0;
+            fetch_main_addr <= 0;
         end else begin
             // if slot is empty and the req address is not present, allocate it
-            if (~mshr[mshr_next_idx].valid & ~current_in_mshr & ~Icache_valid_out) begin
+            if (~mshr[mshr_next_idx].valid & ~current_in_mshr & ~current_in_cache) begin
                 mshr[mshr_next_idx].addr    <= cur_addr[`XLEN-1:3];
                 mshr[mshr_next_idx].mem_tag <= 0;
 
                 if (cur_addr == proc2Icache_addr)
-                    prefetch_valid <= 1;
+                    fetch_main_addr <= 1;
 
                 mshr[mshr_next_idx].valid   <= `TRUE;
             end
@@ -169,7 +172,7 @@ module icache (
                 icache_data[resp_index].valid <= 1;
 
                 if (mshr[mshr_resp_idx].addr == proc2Icache_addr[`XLEN-1:3])
-                    prefetch_valid <= 0;
+                    fetch_main_addr <= 0;
 
                 mshr[mshr_resp_idx] <= 0;
             end
