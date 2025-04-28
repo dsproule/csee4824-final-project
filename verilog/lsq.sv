@@ -127,7 +127,11 @@ module lsq(
 
         And thus this can be expressed as the XNOR
 
-        (lq_ROB_T < sq_ROB_T ~^ lq_ROB_tail_wrap == sq_ROB_tail_wrap)        
+        (lq_ROB_T < sq_ROB_T ~^ lq_ROB_tail_wrap == sq_ROB_tail_wrap)     
+
+        or (but i find this more confusing)
+
+        (lq_ROB_T < sq_ROB_T) == (lq_ROB_tail_wrap == sq_ROB_tail_wrap)   
   */
 
     // loop temp logic that gets compiled out, can be optimized with a prediction
@@ -193,7 +197,7 @@ module lsq(
 
         proc2Dmem_addr_load = lq[lq_head].addr;
         mem_access_load = lq[lq_head].mem_access;
-        mem_read_en = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && lq[lq_head].state == LQ_NONE;
+        mem_read_en = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && lq[lq_head].state == LQ_NONE && lq_older && !dcache_ack_load;
         load_T = lq[lq_head].T;
     end
 

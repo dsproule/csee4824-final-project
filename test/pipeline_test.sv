@@ -247,37 +247,50 @@ module testbench;
                i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
                core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired);
     end
-    $display("X_store: %b mem_access_store: %d", core.lsq_inst.update_sq, core.lsq_inst.mem_access_store_wire);
     $display("--------------------------------------------------------------------------------\n");
   endtask
 
-  task print_lq;
-    $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.sq_tail, clock_count);
-    $display("----------------------------------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | MEM_ACC  | Dep_SQ_T");
-    $display("----------------------------------------------------------------------------------------------------------");
+task print_lq;
+    $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", 
+             core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.lq_tail, clock_count);
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Line_Ofs | Size | Unsigned | Dep_SQ_T");
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
     for (int i = 0; i < `LQ_SZ; i++) begin
-      string state_str;
-      case (core.lsq_inst.lq[i].state)
-        NONE:      state_str = "NONE";
-        DATA_READY:state_str = "DATA_READY";
-        WAITING:   state_str = "WAITING";
-        FORWARDED: state_str = "FORWARDED";
-        default:   state_str = "???";
-      endcase
-      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |     %d    |   %2d",
-               i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
-               core.lsq_inst.lq[i].addr_valid, state_str, core.lsq_inst.lq[i].mem_access, core.lsq_inst.lq[i].dep_sq_T);
+        string state_str;
+        case (core.lsq_inst.lq[i].state)
+            NONE:      state_str = "NONE";
+            DATA_READY:state_str = "DATA_READY";
+            WAITING:   state_str = "WAITING";
+            FORWARDED: state_str = "FORWARDED";
+            default:   state_str = "???";
+        endcase
+        $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %1d     |   %1d  |     %1d    |   %2d",
+                 i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, 
+                 core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
+                 core.lsq_inst.lq[i].addr_valid, state_str,
+                 core.lsq_inst.lq[i].mem_access.line_offset,
+                 core.lsq_inst.lq[i].mem_access.mem_size,
+                 core.lsq_inst.lq[i].mem_access.rd_unsigned,
+                 core.lsq_inst.lq[i].dep_sq_T);
     end
-    $display("X_load: %b mem_access_load: %d", core.lsq_inst.load_X, core.lsq_inst.mem_access_load_wire);
-    $display("----------------------------------------------------------------------------------------------------------\n");
 
-  endtask
+    $display("Current load_X: %1b | mem_access_load_wire: Line_Ofs: %0d Size: %0d Unsigned: %0d", 
+             core.lsq_inst.load_X, 
+             core.lsq_inst.mem_access_load_wire.line_offset, 
+             core.lsq_inst.mem_access_load_wire.mem_size, 
+             core.lsq_inst.mem_access_load_wire.rd_unsigned);
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+endtask
+
+
 
   task print_lsq;
     print_lq();
     print_sq();
-    $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache);
+    $display("mem_read_en: %b mem_write_en: %d", core.rd_mem, core.wr_mem);
+    $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b funcunit2_T %d funcunit2_valid %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache, core.func_unit_2_x_packet.T, core.func_unit_2_x_packet.valid);
     $display("----------------------------------------------------------------------------------------------------------\n");
   endtask
 
@@ -325,24 +338,24 @@ module testbench;
             // if ((clock_count >= 11607)) begin
             if (IF_ID_reg_dbg.valid && (clock_count >= 0))
                 prog_start <= 1;
-            if ((clock_count >= 1000)) begin
-                show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
-                $finish;
-            end
+            // if ((clock_count >= 1000)) begin
+            //     show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
+            //     $finish;
+            // end
 
 
             if (prog_start) begin
                 // print_if;
                 // print_ds;
-                // print_rs;
+                print_rs;
                 // print_mt;
                 // print_cdb;
-                print_rob;
-                // print_regs;
-                // print_sx;
+                // print_rob;
+                // // print_regs;
+                // // print_sx;
                 print_lsq;
-                // print_mem;
-                // print_xc;
+                print_mem;
+                print_xc;
                 
                 // print_x_pkt;
             end

@@ -36,6 +36,7 @@ module func_unit_2(
         end
         shifted_result = Dmem_data[`XLEN-1:0];
     end
+
     
     assign dcache_ack_load = X_packet.valid;
 
