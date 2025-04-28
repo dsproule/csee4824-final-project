@@ -84,9 +84,12 @@ module testbench;
         show_mem_with_decimal(0, 12);
         
         proc2Icache_addr = `XLEN'h0;
-        @(negedge clock);
-        @(posedge clock);
-        // proc2Icache_addr = `XLEN'h8;
+        repeat (1) @(negedge clock);
+        proc2Icache_addr = `XLEN'h8;
+        repeat (1) @(negedge clock);
+        proc2Icache_addr = `XLEN'h0;
+        @(posedge Icache_valid_out);
+        proc2Icache_addr = `XLEN'h8;
         // @(posedge Icache_valid_out);
         // proc2Icache_addr = `XLEN'h10;
         repeat (9) @(negedge clock);

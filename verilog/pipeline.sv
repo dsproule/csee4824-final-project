@@ -172,7 +172,7 @@ module pipeline (
     assign take_branch   = pipeline_control.flush;
     assign branch_target = pipeline_control.branch_addr; 
 
-    icache icache_0 (
+    icache icache_inst (
         .clock(clock), .reset(reset | take_branch),
         .Imem2proc_response((Dmem_req) ? '0 : mem2proc_response), // Should be zero unless there is a response
         .Imem2proc_data(mem2proc_data),
@@ -190,7 +190,7 @@ module pipeline (
         .Icache_valid_out(Icache_valid_out) // When valid is high
     );
 
-    if_stage if_stage_0(
+    if_stage if_stage_inst (
         .clock(clock), .reset(reset), 
         .if_valid(~Dmem_req & Icache_valid_out),
         .pipe_stall(rs_stall),
@@ -207,7 +207,7 @@ module pipeline (
         .clock(clock), .reset(reset), 
         // .update_table(S_X_regs[0].valid & S_X_regs[0].cond_branch),                         // fu0 is processing a branch (should update the state table)
         // .update_branch_choice(X_packets[0].flush ^ S_X_regs[0].branch_pred),                // if flush, means negate
-        .en(D_packet.cond_branch & ~take_branch & D_packet.valid & ~rs_stall),                          // detects if inst in IF_ID is branch. (To pred jump)
+        .en(D_packet.cond_branch & ~take_branch & D_packet.valid & ~rs_stall & 0),                          // detects if inst in IF_ID is branch. (To pred jump)
         .D_packet(D_packet),                                                                // inst info to pred from (inst, PC, NPC, valid)
 
         .branch_target(branch_pred_target),                                                 // branch addr to jump to
@@ -243,7 +243,7 @@ module pipeline (
     //////////////////////////////////////////////////
 
     logic alu_fu, mult_fu;
-    d_stage d_stage_0(
+    d_stage d_stage_inst (
         // Inputs
         .IF_ID_reg(IF_ID_reg),
         .alu_fu(alu_fu),
@@ -398,7 +398,7 @@ module pipeline (
         .X_packet(X_packets[1])
     );
 
-    dcache dache_0(
+    dcache dcache_inst (
         .clock(clock), .reset(reset | take_branch),
 
         // From memory
