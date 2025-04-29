@@ -4,17 +4,31 @@ echo "Comparing ground truth outputs to new processor"
 
 LOG_FILE="scoreboard.log"
 
+file_ext=""
+while getopts "sc" opt; do
+    case $opt in
+        s) file_ext="s" ;;
+        c) file_ext="c" ;;
+        *) echo "Usage: $0 [-s] [-c]" >&2; exit 1 ;;
+    esac
+done
+shift $((OPTIND -1))
 
-
-# Gather source programs
-if [[ $# -gt 0 ]]; then
-    sources=()
-    for program in "$@"; do
-        sources+=("programs/$program.s")
-        sources+=("programs/$program.c")
-    done
+# Decide which sources to gather
+if [[ "$file_ext" == "s" ]]; then
+    sources=(programs/*.s)
+elif [[ "$file_ext" == "c" ]]; then
+    sources=(programs/*.c)
 else
-    sources=(programs/*.{s,c})
+    if [[ $# -gt 0 ]]; then
+        sources=()
+        for program in "$@"; do
+            sources+=("programs/$program.s")
+            sources+=("programs/$program.c")
+        done
+    else
+        sources=(programs/*.{s,c})
+    fi
 fi
 
 # Declare associative arrays
@@ -42,8 +56,8 @@ for source_file in "${sources[@]}"; do
 
     ### REG CHECK
     diff -y --suppress-common-lines \
-      <(grep 'REG\[' correct_out/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') \
-      <(grep 'REG\[' output/"$program".wb | grep -v 'REG\[ *0\]' | awk -F', ' '{print $2}') > /dev/null
+        <(grep 'REG\[' correct_out/"$program".wb | grep -v 'REG\[ *0\]' | sed -n 's/.*\(REG\[[^]]*\]=[0-9A-Fa-f]\{8\}\).*/\1/p') \
+        <(grep 'REG\[' output/"$program".wb | grep -v 'REG\[ *0\]' | sed -n 's/.*\(REG\[[^]]*\]=[0-9A-Fa-f]\{8\}\).*/\1/p') > /dev/null
     status_reg=$?
 
     ### MEM CHECK
@@ -105,9 +119,6 @@ for program in "${!scoreboard_reg[@]}"; do
     echo -ne "${halt_messages[$program]}"
     echo ""
 
-    cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
-    ((num_program += 1))
-
     # Strip ANSI codes for log file
     reg_plain=$(echo -e "${scoreboard_reg[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
     mem_plain=$(echo -e "${scoreboard_mem[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
@@ -116,8 +127,18 @@ for program in "${!scoreboard_reg[@]}"; do
     # Log plain output aligned
     printf "%-20s | %-10s | %-10s | %-10s | %-30s\n" \
         "$program" "$reg_plain" "$mem_plain" "${cpi_values[$program]}" "$halt_plain" >> "$LOG_FILE"
+    
+    if [[ "${cpi_values[$program]}" != "N/A" ]]; then
+        cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
+        ((num_program += 1))
+    fi
 done
 
-echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)"
+if (( num_program > 0 )); then
+    echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)"
+else
+    echo "Average CPI = N/A"
+fi
+
 echo "==========================================================================================" | tee -a "$LOG_FILE"
 echo "Scoreboard saved to $LOG_FILE"
