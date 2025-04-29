@@ -13,7 +13,7 @@
 `define CACHE_LINES 32
 `define CACHE_LINE_BITS $clog2(`CACHE_LINES)
 // how many outstanding misses to handle at a time
-`define MSHR_SLOTS 3
+`define MSHR_SLOTS 5
 
 typedef struct packed {
     logic [63:0]                  data;
