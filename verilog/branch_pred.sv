@@ -1,3 +1,4 @@
+
 `include "verilog/sys_defs.svh"
 `include "verilog/ISA.svh"
 
@@ -9,7 +10,7 @@ module BHT(
     input   logic           update_en,
     input   logic [`XLEN-1:0]           update_pc,
     input   logic           update_take_branch,
-    output  logic [1:0]     take_branch
+    output  logic           take_branch
 );
 
     logic [1:0] bht [0:`BHT_BIT-1];

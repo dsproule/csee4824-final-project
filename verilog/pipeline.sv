@@ -10,7 +10,7 @@
 
 `include "verilog/sys_defs.svh"
 
-`define ASSUME_TAKEN
+// `define ASSUME_TAKEN
 
 module pipeline (
     input        clock,             // System clock
@@ -224,7 +224,7 @@ module pipeline (
         .update_table(S_X_regs[0].valid & S_X_regs[0].cond_branch),                         // fu0 is processing a branch (should update the state table)
         .update_pc(S_X_regs[0].PC),
         .update_branch_choice(X_packets[0].ppln_ctrl.flush ^ S_X_regs[0].branch_pred),      // if flush, means negate
-        .en(D_packet.cond_branch & ~take_branch & D_packet.valid),                          // detects if inst in IF_ID is branch. (To pred jump)
+        .en(D_packet.cond_branch & ~take_branch & D_packet.valid & ~rs_stall),                          // detects if inst in IF_ID is branch. (To pred jump)
         .D_packet(D_packet),                                                                // inst info to pred from (inst, PC, NPC, valid)
 
         .branch_target(branch_pred_target),                                                 // branch addr to jump to
