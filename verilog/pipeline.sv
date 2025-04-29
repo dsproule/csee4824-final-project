@@ -122,6 +122,7 @@ module pipeline (
 
     // lsq
     logic mem_read_en, mem_write_en;
+    logic sq_empty, sq_full, lq_empty, lq_full;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -337,6 +338,7 @@ module pipeline (
         .NPC(D_S_reg.PC),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
+        .sq_empty(sq_empty),
         
         // Outputs
         .T(rob_T_wire), .retire_T_out(retire_T_wire), .tail_wrap(ROB_tail_wrap),
@@ -461,7 +463,7 @@ module pipeline (
     .load_T(load_T_wire),
     .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
     .sq_free(sq_free),
-    .sq_full(), .sq_empty(), .lq_full(), .lq_empty()
+    .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
     
     );
     assign wr_proc = wr_mem & Dcache_valid_out;

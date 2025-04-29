@@ -6,7 +6,8 @@ module rob(
     input [4:0] r, 
     input ROB_T T1, T2,
     input CDB cdb,
-    input dispatch_valid,
+    input logic dispatch_valid,
+    input logic sq_empty,
     input logic [`XLEN-1:0] NPC,                // used for wb
 
     output ROB_T T, retire_T_out,
@@ -80,7 +81,7 @@ module rob(
             end
 
             // commit --> retire head/free rob entry [x], write to regfile [x], clear maptable entry if valid, fkush after this if needed
-            if (!empty && rob_table[head].ready) begin
+            if (!empty && rob_table[head].ready && !(rob_table[head].ppln_ctrl.halt && !sq_empty)) begin
                 rob_table[head] <= 0;
                 retire <= 1;
                 regfile_write_idx <= rob_table[head].r; 

@@ -152,6 +152,15 @@ module lsq(
                     best_T_store = sq[i].T;
                     fwd_packet_wire.T =  sq[i].T;
                     fwd_packet_wire.result = sq[i].data;
+
+                    if (mem_access_load_wire.rd_unsigned) begin
+                        if (mem_access_load_wire.mem_size == BYTE) fwd_packet_wire.result[`XLEN-1:8] = 0;
+                        else if (mem_access_load_wire.mem_size == HALF) fwd_packet_wire.result[`XLEN-1:16] = 0;
+                    end else begin
+                        if (mem_access_load_wire.mem_size == BYTE) fwd_packet_wire.result[`XLEN-1:8] = {(`XLEN-8){sq[i].data[7]}};
+                        else if (mem_access_load_wire.mem_size == HALF) fwd_packet_wire.result[`XLEN-1:16] = {(`XLEN-16){sq[i].data[15]}};
+                    end
+
                     fwd_packet_wire.valid = `TRUE;
                     fwd_match[i] = 1;
                 end 
@@ -286,6 +295,16 @@ module lsq(
                         (lq[j].T > S_X_store.T ~^ lq[j].ROB_wrap == sq[sq_X_T].ROB_wrap) && 
                         lq[j].mem_access == mem_access_store_wire) begin
                         lq[j].data <= S_X_store.V2; //forward early
+
+                        if (mem_access_store_wire.rd_unsigned) begin
+                            if (mem_access_store_wire.mem_size == BYTE) lq[j].data[`XLEN-1:8] <= 0;
+                            else if (mem_access_store_wire.mem_size == HALF) lq[j].data[`XLEN-1:16] <= 0;
+                        end else begin
+                            if (mem_access_store_wire.mem_size == BYTE) lq[j].data[`XLEN-1:8] <= {(`XLEN-8){S_X_store.V2[7]}};
+                            else if (mem_access_store_wire.mem_size == HALF) lq[j].data[`XLEN-1:8]<= {(`XLEN-16){S_X_store.V2[15]}};
+                        end
+
+
                         if (sq_X_T == lq[j].dep_sq_T) lq[j].state <= DATA_READY; // all dep stores done
                         else lq[j].state <= FORWARDED; //early forward
                     end     
