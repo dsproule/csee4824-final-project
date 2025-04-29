@@ -3,7 +3,7 @@
 //exists in pipeline interacts with all other units, func units 2 and 3 write addr to it
 module lsq(
     // alloc inputs
-    input logic clock, reset, 
+    input logic clock, reset, take_branch,
     input logic sq_alloc, lq_alloc,
     input logic ROB_wrap,
     input ROB_T T,
@@ -114,7 +114,7 @@ module lsq(
 
     assign sq_older = sq[sq_head].valid && (!lq[lq_head].valid || (lq[lq_head].valid && ((sq[sq_head].T < lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap))));
 
-    assign lq_older = lq[lq_head].valid && (!sq[sq_head].valid || (sq[sq_head].valid && (sq[sq_head].T > lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap)));
+    assign lq_older = lq[lq_head].valid && (!sq[sq_head].valid || sq[sq_head].dirty || (sq[sq_head].valid && (sq[sq_head].T > lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap)));
     //forwarding unit - youngest store older than load forwards to load
     X_C_PACKET fwd_packet_wire;
 
@@ -197,7 +197,7 @@ module lsq(
             store_X_packet.ppln_ctrl.is_store = `TRUE;
         end
 
-        mem_write_en = sq2Dcache; 
+        mem_write_en = sq2Dcache && !sq[sq_head].dirty; 
         proc2Dmem_addr_store = sq[sq_head].addr;
         proc2Dmem_data_store = sq[sq_head].data;
         mem_access_store = sq[sq_head].mem_access;
@@ -228,6 +228,23 @@ module lsq(
             sq_tail <= 0;
             sq_head_wrap <= 0;
             sq_tail_wrap <= 0;
+
+            load_fwd_packet <= 0;
+        end else if (take_branch) begin
+            for (int i = 0; i < `LQ_SZ; i++) begin
+                lq[i] <= 0;
+            end
+
+            for (int i = 0; i < `SQ_SZ; i++) begin
+                if(sq[i].valid && !sq[i].retired) begin
+                    sq[i].dirty <= `TRUE;
+                end
+            end
+
+            lq_head <= 0;
+            lq_tail <= 0;
+            lq_head_wrap <= 0;
+            lq_tail_wrap <= 0;
 
             load_fwd_packet <= 0;
         end else begin
@@ -280,7 +297,7 @@ module lsq(
             end
 
             // Write address/data from SQ head to D$, free SQ head
-            if(sq2Dcache && dcache_ack_store) begin
+            if(sq2Dcache && dcache_ack_store || sq[sq_head].dirty) begin
                 sq[sq_head] <= 0;
                 sq_head <= (sq_head == `SQ_SZ - 1) ? 0 : sq_head + 1; // change here
                 sq_head_wrap <= (sq_head == `SQ_SZ - 1) ? ~sq_head_wrap : sq_head_wrap; // change here
@@ -322,7 +339,7 @@ module lsq(
 
 
                 //making mem request if no dependencies
-                if (dcache_ack_load || lq[lq_head].state == DATA_READY || fwd_head) begin
+                if (dcache_ack_load || lq[lq_head].state == DATA_READY || fwd_head ) begin
                     lq[lq_head] <= 0;
                     lq_head <= (lq_head == `LQ_SZ - 1) ? 0 : (lq_head + 1);
                     lq_head_wrap <= (lq_head == `LQ_SZ - 1) ? ~lq_head_wrap : lq_head_wrap;

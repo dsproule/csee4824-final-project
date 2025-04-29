@@ -415,6 +415,7 @@ typedef struct packed {
     logic data_valid;                   // Data is ready (i.e., value from reg/CDB)
     logic retired;                    // Set when ROB retires this store
     MEM_ACCESS mem_access;          // relevant addressing and masking info
+    logic dirty;                    // used to indicate the signal should be flushed
 } SQ_ENTRY;
 
 

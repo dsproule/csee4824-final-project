@@ -304,7 +304,7 @@ module pipeline (
     logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
     assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
-    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3] & ~rd_mem, FU_ready[2], FU_ready[1:0]};
+    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3], FU_ready[2], FU_ready[1:0]};
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
@@ -403,7 +403,7 @@ module pipeline (
     );
 
     dcache dache_0(
-        .clock(clock), .reset(reset | take_branch),
+        .clock(clock), .reset(reset),
 
         // From memory
         .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
@@ -434,7 +434,7 @@ module pipeline (
     lsq lsq_inst(
     // inputs
     .clock(clock), 
-    .reset(reset | take_branch),
+    .reset(reset), .take_branch(take_branch),
     .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
     .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
     .T(rob_T_wire),

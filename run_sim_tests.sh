@@ -4,17 +4,31 @@ echo "Comparing ground truth outputs to new processor"
 
 LOG_FILE="scoreboard.log"
 
+file_ext=""
+while getopts "sc" opt; do
+    case $opt in
+        s) file_ext="s" ;;
+        c) file_ext="c" ;;
+        *) echo "Usage: $0 [-s] [-c]" >&2; exit 1 ;;
+    esac
+done
+shift $((OPTIND -1))
 
-
-# Gather source programs
-if [[ $# -gt 0 ]]; then
-    sources=()
-    for program in "$@"; do
-        sources+=("programs/$program.s")
-        sources+=("programs/$program.c")
-    done
+# Decide which sources to gather
+if [[ "$file_ext" == "s" ]]; then
+    sources=(programs/*.s)
+elif [[ "$file_ext" == "c" ]]; then
+    sources=(programs/*.c)
 else
-    sources=(programs/*.{s,c})
+    if [[ $# -gt 0 ]]; then
+        sources=()
+        for program in "$@"; do
+            sources+=("programs/$program.s")
+            sources+=("programs/$program.c")
+        done
+    else
+        sources=(programs/*.{s,c})
+    fi
 fi
 
 # Declare associative arrays
@@ -114,10 +128,17 @@ for program in "${!scoreboard_reg[@]}"; do
     printf "%-20s | %-10s | %-10s | %-10s | %-30s\n" \
         "$program" "$reg_plain" "$mem_plain" "${cpi_values[$program]}" "$halt_plain" >> "$LOG_FILE"
     
-    cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
-    ((num_program += 1))
+    if [[ "${cpi_values[$program]}" != "N/A" ]]; then
+        cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
+        ((num_program += 1))
+    fi
 done
 
-echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)"
+if (( num_program > 0 )); then
+    echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)"
+else
+    echo "Average CPI = N/A"
+fi
+
 echo "==========================================================================================" | tee -a "$LOG_FILE"
 echo "Scoreboard saved to $LOG_FILE"
