@@ -1,25 +1,54 @@
 
 ================== SCOREBOARD ==================
-Test Run: Tue Apr 29 16:16:34 EDT 2025
+Test Run: Tue Apr 29 17:55:18 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
-matrix_mult_rec      | PASS       | PASS       | 5.273851   | WFI instruction               
-fc_forward           | PASS       | PASS       | 4.419230   | WFI instruction               
+evens_long           | PASS       | PASS       | 4.453731   | WFI instruction               
+load_tests           | PASS       | PASS       | 5.619048   | WFI instruction               
+matrix_mult_rec      | PASS       | PASS       | 7.372763   | WFI instruction               
+fc_forward           | PASS       | PASS       | 5.550899   | WFI instruction               
+parallel             | PASS       | PASS       | 4.834171   | WFI instruction               
 omegalul             | PASS       | PASS       | 4.712329   | WFI instruction               
-graph                | PASS       | PASS       | 5.317483   | WFI instruction               
-basic_malloc         | PASS       | PASS       | 5.514316   | WFI instruction               
-insertionsort        | PASS       | PASS       | 4.377714   | WFI instruction               
-bfs                  | PASS       | PASS       | 4.712317   | WFI instruction               
-backtrack            | PASS       | PASS       | 5.184002   | WFI instruction               
-link_list            | PASS       | PASS       | 5.505346   | WFI instruction               
-sort_search          | PASS       | PASS       | 4.360992   | WFI instruction               
-priority_queue       | PASS       | PASS       | 5.594911   | WFI instruction               
-quicksort            | PASS       | PASS       | 4.559317   | WFI instruction               
-malloc_test          | PASS       | PASS       | 5.542857   | WFI instruction               
-c_test               | PASS       | PASS       | 4.953125   | WFI instruction               
-dft                  | PASS       | PASS       | 4.195359   | WFI instruction               
-dfs                  | PASS       | PASS       | 4.812912   | WFI instruction               
-outer_product        | PASS       | PASS       | 3.911097   | WFI instruction               
-alexnet              | PASS       | PASS       | 4.387544   | WFI instruction               
-mergesort            | PASS       | PASS       | 4.787997   | WFI instruction               
+graph                | PASS       | PASS       | 5.418067   | WFI instruction               
+copy                 | PASS       | PASS       | 6.694656   | WFI instruction               
+branch_test          | PASS       | PASS       | 7.900000   | WFI instruction               
+basic_malloc         | PASS       | PASS       | 5.432662   | WFI instruction               
+insertionsort        | PASS       | PASS       | 5.573801   | WFI instruction               
+bfs                  | PASS       | PASS       | 5.020385   | WFI instruction               
+btest2               | PASS       | PASS       | 6.144737   | WFI instruction               
+ppln_test            | PASS       | PASS       | 5.833333   | WFI instruction               
+backtrack            | PASS       | PASS       | 5.132065   | WFI instruction               
+insertion            | PASS       | PASS       | 5.045151   | WFI instruction               
+btest1               | PASS       | PASS       | 6.856522   | WFI instruction               
+halt                 | PASS       | PASS       | N/A        | WFI instruction               
+link_list            | PASS       | PASS       | 5.518289   | WFI instruction               
+ppl_test             | PASS       | PASS       | 5.250000   | WFI instruction               
+sort_search          | PASS       | PASS       | 5.365190   | WFI instruction               
+priority_queue       | PASS       | PASS       | 5.527510   | WFI instruction               
+store_tests          | PASS       | PASS       | 5.260870   | WFI instruction               
+fib_long             | PASS       | PASS       | 3.979592   | WFI instruction               
+quicksort            | PASS       | PASS       | 5.482371   | WFI instruction               
+malloc_test          | PASS       | PASS       | 5.379592   | WFI instruction               
+fib_rec              | PASS       | PASS       | 6.558836   | WFI instruction               
+mult_test            | PASS       | PASS       | 11.000000  | WFI instruction               
+mem_test             | PASS       | PASS       | 10.545455  | WFI instruction               
+fib                  | PASS       | PASS       | 4.919463   | WFI instruction               
+c_test               | PASS       | PASS       | 4.742188   | WFI instruction               
+no_hazard            | PASS       | PASS       | 15.000000  | WFI instruction               
+dft                  | PASS       | PASS       | 4.769132   | WFI instruction               
+dfs                  | PASS       | PASS       | 5.114835   | WFI instruction               
+raw_program          | PASS       | PASS       | 7.333333   | WFI instruction               
+if_stage_test        | PASS       | PASS       | 7.000000   | WFI instruction               
+outer_product        | PASS       | PASS       | 4.939911   | WFI instruction               
+evens                | PASS       | PASS       | 6.612245   | WFI instruction               
+easy_program         | PASS       | PASS       | 6.000000   | WFI instruction               
+more_mult            | PASS       | PASS       | 7.888889   | WFI instruction               
+haha                 | PASS       | PASS       | 4.705882   | WFI instruction               
+alexnet              | PASS       | PASS       | 4.366541   | WFI instruction               
+saxpy                | PASS       | PASS       | 5.978495   | WFI instruction               
+mult                 | PASS       | PASS       | 5.913846   | WFI instruction               
+sampler              | PASS       | PASS       | 4.798165   | WFI instruction               
+copy_long            | PASS       | PASS       | 4.255499   | WFI instruction               
+mergesort            | PASS       | PASS       | 4.867630   | WFI instruction               
+mult_no_lsq          | PASS       | PASS       | 4.421986   | WFI instruction               
 ==========================================================================================

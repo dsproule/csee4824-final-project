@@ -43,8 +43,8 @@
 `define MULT_STAGES 4
 
 // width of Branch Prediction Table
-`define BHT_BIT     16
-`define BHT_WIDTH   4
+`define BHT_BIT     256
+`define BHT_WIDTH   8
 
 ///////////////////////////////
 // ---- Basic Constants ---- //
