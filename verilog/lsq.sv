@@ -99,11 +99,11 @@ module lsq(
     logic sq2Dcache, lq2Dcache, fwd_head;
     logic update_sq, update_lq;
     logic sq_older, lq_older; //sq head is older than lq head
-    logic ld_valid, st_valid;
+    logic ld_valid, st_valid, retire_valid;
 
     assign update_sq = store_X && sq[sq_X_T].valid && S_X_store.valid && st_valid;
     assign update_lq = load_X && lq[lq_X_T].valid && S_X_load.valid && ld_valid;
-    assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
+    assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en && retire_valid)) && 
                         sq[sq_head].addr_valid && sq[sq_head].data_valid && sq_older; //prioritize loads
 
     assign fwd_head = store_X && sq[sq_X_T].valid && ((sq_X_T == lq[lq_head].dep_sq_T) && (lq[lq_head].state == FORWARDED));
@@ -181,6 +181,7 @@ module lsq(
         store_X_packet = 0;
         ld_valid = 0;
         st_valid = 0;
+        retire_valid = 0;
 
         for (int i = 0; i < `LQ_SZ; i++) begin
             if (S_X_load.T == lq[i].T) begin
@@ -196,6 +197,7 @@ module lsq(
             end
             if (retire_T == sq[i].T) begin
                 retire_sq_T = i;
+                retire_valid = 1;
             end
         end
 
@@ -311,7 +313,7 @@ module lsq(
                 end
             end
 
-            if(retire_en && sq[retire_sq_T].addr_valid && sq[retire_sq_T].data_valid) begin //akin to setting ready in ROB
+            if(retire_en && sq[retire_sq_T].addr_valid && sq[retire_sq_T].data_valid && retire_valid) begin //akin to setting ready in ROB
                 sq[retire_sq_T].retired <= `TRUE;
             end
 

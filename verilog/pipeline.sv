@@ -301,21 +301,16 @@ module pipeline (
     assign V1_rs = (T1_wire.plus == 1) ? V1_rob_final : V1_regfile;
     assign V2_rs = (T2_wire.plus == 1) ? V2_rob_final : V2_regfile;
 
-    logic rs_idx_full;
-    logic [`RS_SZ-1:0] FU_ready_no_lsq;
-
-    assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
-    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3], FU_ready[2], FU_ready[1:0]};
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
         .cdb(cdb), .D_S_reg(D_S_reg), 
-        .FU_ready(FU_ready_no_lsq),
+        .FU_ready(FU_ready),
         .T(rob_T_wire), .T1(T1_wire), .T2(T2_wire), 
         .V1(V1_rs), .V2(V2_rs), 
 
         // Outputs           
-        .rs_idx_full(rs_idx_full),
+        .rs_idx_full(rs_stall),
         .S_packet(S_packets), 
         .rs_table(rs_table_out), .busy(busy)
     );
