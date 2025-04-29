@@ -1,4 +1,0 @@
-test/func_unit_2_test.sv
-test/mem.sv
-verilog/func_unit_2.sv
-verilog/sys_defs.svh

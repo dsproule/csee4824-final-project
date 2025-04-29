@@ -232,3 +232,5 @@ make vis_simv          <- compile the vtuber executable from VTUBER and SOURCES
 make clean            <- remove per-run files and compiled executable files
 make nuke             <- remove all files created from make rules
 ```
+## Vtuber Debugger
+To run the Vtuber, follow the INSTALL_NCURSES tutorial. It displays the processor’s internal state cycle-by-cycle, including the ROB, Reservation Station, and functional units.

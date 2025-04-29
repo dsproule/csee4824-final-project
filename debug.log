@@ -1,0 +1,186 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr  4 23:55 2025
+[?1049h[22;0;0t[1;48r(B[m[4l[?7h[39;49m[?25l[?1h=[39;49m[37m[40m[36m[40m[H[2J[J(B[m[39;49m[37m[40m(0[0m[33m[44mlq[199bk(B(B[m[39;49m[37m[40m[2;1H(0[0m[33m[44mx(B[0m[33m[44m[200X[202G(0[0m[33m[44mx(B(B[m[39;49m[37m[40m[3;1H(0[0m[33m[44mmq[199bj(B(B[m[39;49m[37m[40m[1;1H(0[0m[33m[44m(B(B[m[39;49m[37m[40m[2;2H[33m[44mSIMULATION INTERFACE V1[2;181HBEN KEMPKE/JOSH SMITH(B[m[39;49m[37m[40m[9;193H(0[0m[33m[40mlq[7bk(B(B[m[39;49m[37m[40m[10;193H(0[0m[33m[40mx(B[0m[33m[40m [7b(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[11;193H(0[0m[33m[40mmq[7bj(B(B[m[39;49m[37m[40m[9;193H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[196G[33m[40mTIME(B[m[39;49m[37m[40m[12;193H(0[0m[33m[40mlq[7bk(B(B[m[39;49m[37m[40m[13;193H(0[0m[33m[40mx(B[0m[33m[40m [7b(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[14;193H(0[0m[33m[40mmq[7bj(B(B[m[39;49m[37m[40m[12;193H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[C[33m[40mSIM TIME(B[m[39;49m[37m[40m[9;178H(0[0m[33m[40mlq[12bk(B(B[m[39;49m[37m[40m[10;178H(0[0m[33m[40mx(B[0m[33m[40m [12b(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[11;178H(0[0m[33m[40mx(B[0m[33m[40m [12b(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[12;178H(0[0m[33m[40mx(B[0m[33m[40m [12b(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[13;178H(0[0m[33m[40mx(B[0m[33m[40m [12b(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[14;178H(0[0m[33m[40mmq[12bj(B(B[m[39;49m[37m[40m[9;178H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[183G[33m[40mCLOCK[10;179Hcycle:[11;179H(0[0;1m[33m[40mqqqqqqk(B(B[m[39;49m[37m[40m[12d(0[0;1m[33m[40mx(B(B[m[39;49m[37m[40m[13d(0[0;1m[33m[40mmqqqqqq(B(B[m[39;49m[37m[40m[11d(0[0;1m[33m[40m(B(B[m[39;49m[37m[40m[15;178H(0[0m[33m[40mlq[22bk(B(B[m[39;49m[37m[40m[16;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[17;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[18;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[19;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[20;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[21;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[22;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[23;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[24;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[25;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[26;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[27;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[28;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[29;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[30;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[31;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[32;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[33;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[34;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[35;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[36;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[37;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[38;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[39;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[40;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[41;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[42;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[43;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[44;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[45;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[46;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[47;178H(0[0m[33m[40mx(B[0m[33m[40m[23X[202G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[48;178H(0[0m[33m[40mmq[22b[?7lj[?7h(B(B[m[39;49m[37m[40m[15;178H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[15;191H[33m[40mARF[16;179Hx00:[17;179Hx01:[18;179Hx02:[19;179Hx03:[20;179Hx04:[21;179Hx05:[22;179Hx06:[23;179Hx07:[24;179Hx08:[25;179Hx09:[26;179Hx10:[27;179Hx11:[28;179Hx12:[29;179Hx13:[30;179Hx14:[31;179Hx15:[32;179Hx16:[33;179Hx17:[34;179Hx18:[35;179Hx19:[36;179Hx20:[37;179Hx21:[38;179Hx22:[39;179Hx23:[40;179Hx24:[41;179Hx25:[42;179Hx26:[43;179Hx27:[44;179Hx28:[45;179Hx29:[46;179Hx30:[47;179Hx31: (B[m[39;49m[37m[40m[4d(0[0m[35m[40mlq[199bk(B(B[m[39;49m[37m[40m[5;1H(0[0m[35m[40mx(B[0m[35m[40m[200X[202G(0[0m[35m[40mx(B(B[m[39;49m[37m[40m[6;1H(0[0m[35m[40mx(B[0m[35m[40m[200X[202G(0[0m[35m[40mx(B(B[m[39;49m[37m[40m[7;1H(0[0m[35m[40mx(B[0m[35m[40m[200X[202G(0[0m[35m[40mx(B(B[m[39;49m[37m[40m[8;1H(0[0m[35m[40mmq[199bj(B(B[m[39;49m[37m[40m[4;1H(0[0m[35m[40m(B(B[m[39;49m[37m[40m[4;98H[35m[40mPIPELINE[5;32H(B[0;4m[35m[40mIF[5;65HID[5;98HEX[5;130HMEM[5;163HWB(B[m[39;49m[37m[40m[9d(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[10d(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[A(0[0m[33m[40m(B(B[m[39;49m[37m[40m[9;11H[33m[40mIF STAGE(B[m[39;49m[37m[40m[11d(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[12d(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[A(0[0m[33m[40m(B(B[m[39;49m[37m[40m[11;13H[33m[40mIF/ID(B[m[39;49m[37m[40m[9;31H(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[10;31H(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[9;31H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[9;41H[33m[40mID STAGE(B[m[39;49m[37m[40m[9;61H(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[10;61H(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[9;61H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[9;73H[33m[40mID/EX(B[m[39;49m[37m[40m[9;91H(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[10;91H(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[9;91H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[9;101H[33m[40mEX STAGE(B[m[39;49m[37m[40m[40d(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[41d(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[A(0[0m[33m[40m(B(B[m[39;49m[37m[40m[40;13H[33m[40mEX/MEM(B[m[39;49m[37m[40m[40;31H(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[41;31H(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[40;31H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[40;41H[33m[40mMEM STAGE(B[m[39;49m[37m[40m[40;61H(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[41;61H(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[40;61H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[40;73H[33m[40mMEM/WB(B[m[39;49m[37m[40m[40;91H(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[41;91H(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[40;91H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[40;101H[33m[40mWB STAGE(B[m[39;49m[37m[40m[42d(0[0m[33m[40mlq[27bk(B(B[m[39;49m[37m[40m[43d(0[0m[33m[40mx(B[0m[33m[40m[28X[43;30H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[44d(0[0m[33m[40mx(B[0m[33m[40m[28X[44;30H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[45d(0[0m[33m[40mx(B[0m[33m[40m[28X[45;30H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[46d(0[0m[33m[40mx(B[0m[33m[40m[28X[46;30H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[47d(0[0m[33m[40mx(B[0m[33m[40m[28X[47;30H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[48d(0[0m[33m[40mmq[27bj(B(B[m[39;49m[37m[40m[42d(0[0m[33m[40m(B(B[m[39;49m[37m[40m[42;10H[33m[40mINSTRUCTIONS[43;2H'n'   -> Next clock edge[44;2H'b'   -> Previous clock edge[45;2H'c/g' -> Goto specified time[46;2H'r'   -> Run to end of sim[47;2H'q'   -> Quit Simulator(B[m[39;49m[37m[40m[42;31H(0[0m[33m[40mlq[22bk(B(B[m[39;49m[37m[40m[43;31H(0[0m[33m[40mx(B[0m[33m[40m[23X[43;55H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[44;31H(0[0m[33m[40mx(B[0m[33m[40m[23X[44;55H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[45;31H(0[0m[33m[40mx(B[0m[33m[40m[23X[45;55H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[46;31H(0[0m[33m[40mx(B[0m[33m[40m[23X[46;55H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[47;31H(0[0m[33m[40mx(B[0m[33m[40m[23X[47;55H(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[48;31H(0[0m[33m[40mmq[22bj(B(B[m[39;49m[37m[40m[42;31H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[39;156H(0[0m[34m[40mlq[44bk(B(B[m[39;49m[37m[40m[40;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[41;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[42;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[43;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[44;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[45;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[46;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[47;156H(0[0m[34m[40mx(B[0m[34m[40m[45X[202G(0[0m[34m[40mx(B(B[m[39;49m[37m[40m[48;156H(0[0m[34m[40mmq[44b[?7lj[?7h(B(B[m[39;49m[37m[40m[39;156H(0[0m[34m[40m(B(B[m[39;49m[37m[40m[41;160H[34m[40m__     _[6b _   _ ____  _____ ____[42;160H\ \   / /_   _| | | | __ )| ____|  _ \[43;161H\ \ / /  | | | | | |  _ \|  _| | |_) |[44;162H\ V /   | | | |_| | |_) | |___|  _ <[45;163H\_/    |_|  \___/|____/|_____|_| \_\(B[m[39;49m[37m[40m[34;2H(0[0m[33m[40mlq[93b(B[0m[33m[40mRESERVATION STATION(0[0m[33m[40mq[84bk(B(B[m[39;49m[37m[40m[35;2H(0[0m[33m[40mx(B[0m[33m[40m[180X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[36;2H(0[0m[33m[40mx(B[0m[33m[40m[180X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[37;2H(0[0m[33m[40mx(B[0m[33m[40m[180X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[38;2H(0[0m[33m[40mx(B[0m[33m[40m[180X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[39;2H(0[0m[33m[40mx(B[0m[33m[40m[198X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[40;2H(0[0m[33m[40mx(B[0m[33m[40m[198X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[41;2H(0[0m[33m[40mx(B[0m[33m[40m[198X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[42;2H(0[0m[33m[40mx(B[0m[33m[40m[198X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[43;2H(0[0m[33m[40mx(B[0m[33m[40m[29X[43;55H[146X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[44;2H(0[0m[33m[40mx(B[0m[33m[40m[29X[44;55H[146X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[45;2H(0[0m[33m[40mx(B[0m[33m[40m[29X[45;55H[146X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[46;2H(0[0m[33m[40mx(B[0m[33m[40m[29X[46;55H[146X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[47;2H(0[0m[33m[40mx(B[0m[33m[40m[29X[47;55H[146X[201G(0[0m[33m[40mx(B(B[m[39;49m[37m[40m[48;2H(0[0m[33m[40mm(B(B[m[39;49m[37m[40m[48;30H(0[0m[33m[40mqq(B(B[m[39;49m[37m[40m[48;55H(0[0m[33m[40mq[145bj(B(B[m[39;49m[37m[40m[34;116H(0[0m[33m[40m(B(B[m[39;49m[37m[40m[H[12;2H[33m[40mIF:: (B[m[39;49m[37m[40m[43;32H[33m[40mCDB_valid: (B[m[39;49m[37m[40m[44;32H[33m[40mCDB_T: (B[m[39;49m[37m[40m[45;32H[33m[40mCDB_V: (B[m[39;49m[37m[40m[10;32H[33m[40mebug_RS[0]:: (B[m[39;49m[37m[40m[33m[40m: (B[m[39;49m[37m[40m[33m[40m: (B[m[39;49m[37m[40m[33m[40m: (B[m[39;49m[37m[40m[46;32H[33m[40mRS|idx:0: (B[m[39;49m[37m[40m[13;201H[33m[40m2(B[m[39;49m[37m[40m[2;99H(B[0;7m[33m[44mRESET(B[m[39;49m[37m[40m[6;29H[35m[40munknown[6;62Hunknown[6;95Hunknown[6;128Hunknown[6;161Hunknown[7;32HV[7;65HV[7;98HV[7;131HV[7;164HV(B[m[39;49m[37m[40m[16;184H[33m[40m.[7b[17;184H.[7b[18;187Hset f[19;184HinishRes[20;184Hult "".[21;187H# is[22;184Ha tool r[23;184Hunning?.[24;188Hif {[25;185H[ ucliC[26;184Hore::get[27;184HToolPID[28;184H] > 0 }[29;184H{.[30dif {[c[31;184Hheckpoin[32;184Ht::execu[33;184HtionInPa[34;184Hst]} {. [36;187H# We[37;184Hneed to[38;184Hrewind t[39;184Ho active[40;185Hpoint a[41;184Hnd leave[42;185Hread-on[43;184Hly mode.[45;188H# to[46;185Hcorrect[47;184Hly final(B[m[39;49m[37m[40m[9;19H[12;7H[10;51H[9;78H[9;109H[40;19H[40;50H[40;79H[40;109H[43;43H[33m[40mx[44;39H00[45d0[7b(B[m[39;49m[37m[40m[10;201H[33m[40m2(B[m[39;49m[37m[40m[10;191H[33m[40m0(B[m[39;49m[37m[40m[H[39;49m[48d[K[48;1H[?12l[?25h[?1049l[23;0;0t[?1l>
+An unexpected termination has occurred in ./vis_simv due to a signal: Aborted
+Hostname cadpc25
+
+During DPI-C function call Function="initcurses" from test/vtuber_test.sv, 168
+
+Command line: ./vis_simv +MEMORY=programs/copy.mem
+
+--- Stack trace follows:
+
+Dumping VCS Annotated Stack:
+#0  0x000015554b7dfe0b in waitpid () from /lib64/libc.so.6
+#1  0x000015554b733747 in do_system () from /lib64/libc.so.6
+#2  0x000015555474b840 in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313e639d2928478c79b3f673f99203bcf8be64600612100082236bffb2007f1e0ef9 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so
+#3  0x000015555474d39c in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313efba706aab251478fa49e66610e453774633a6c152e7ef778f93045171fb3645d () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so
+#4  0x0000155554745513 in SNPSle_d35ca1ff70d465c2b9b1a72eee90a50630165806651fae96c1bbda5b5d02066c () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so
+#5  0x000015554f78519b in SNPSle_64133461705005bb725549e2e6fa1b3f () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#6  0x000015554f3f6f9d in SNPSle_82244d58c54c18c70d63edc9becab634 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#8  0x000015554b72652f in raise () from /lib64/libc.so.6
+#9  0x000015554b6f9e65 in abort () from /lib64/libc.so.6
+#10 0x000015554b767727 in __libc_message () from /lib64/libc.so.6
+#11 0x000015554b76ea2c in malloc_printerr () from /lib64/libc.so.6
+#12 0x000015554b770ab0 in _int_free () from /lib64/libc.so.6
+#13 0x000015554537961e in asn1_delete_structure2 () from /lib64/libtasn1.so.6
+#14 0x0000155546ebe1f4 in ?? () from /lib64/libgnutls.so.30
+#15 0x000015555532ceee in _dl_fini () at dl-fini.c:141
+#16 0x000015554b728ccc in __run_exit_handlers () from /lib64/libc.so.6
+#17 0x000015554b728e00 in exit () from /lib64/libc.so.6
+#18 0x00000000004124e9 in initcurses ()
+#19 0x0000155554efd2f4 in N_VCSgd_iAVhC () from /homes/user/stud/fall23/nh2804/csee4824/vis_simv.daidir/_3177082_archive_1.so [testbench# test/vtuber_test.sv:168]
+#20 0x0000155554efd0f3 in N_VCSgd_iAVhC () from /homes/user/stud/fall23/nh2804/csee4824/vis_simv.daidir/_3177082_archive_1.so [testbench# test/vtuber_test.sv:19]
+#21 0x000015554f5f5df2 in SNPSle_63c7abb936d47b07d29d61775f9dbe8c1486beb9213552a3 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#22 0x000015554f79dabf in SNPSle_490598bfebcc8e81efcf3d1815066cc9 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#23 0x000015554f7ba4fe in SNPSle_490598bfebcc8e81 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#24 0x000000000041289b in main ()
+BFD: warning: /lib64/libnuma.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libdl.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libpthread.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libm.so.6: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libc.so.6: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/ld-linux-x86-64.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgcc_s.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /usr/lib64/librt.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libnss_files.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libnss_sss.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /usr/lib64/libudev.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libmount.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libblkid.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libuuid.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libselinux.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libpcre2-8.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /usr/lib64/libdbus-glib-1.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libdbus-1.so.3: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgio-2.0.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgobject-2.0.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libglib-2.0.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libsystemd.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgmodule-2.0.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgnutls.so.30: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libpcre.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libz.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libresolv.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/liblzma.so.5: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/liblz4.so.1: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libcap.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgcrypt.so.20: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libp11-kit.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libidn2.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libunistring.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libtasn1.so.6: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libnettle.so.6: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libhogweed.so.4: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgmp.so.10: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libgpg-error.so.0: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+BFD: warning: /lib64/libnss_dns.so.2: unsupported GNU_PROPERTY_TYPE (5) type: 0xc0000002
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+0x000015554b7dfe0b in waitpid () from /lib64/libc.so.6
+#0  0x000015554b7dfe0b in waitpid () from /lib64/libc.so.6
+#1  0x000015554b733747 in do_system () from /lib64/libc.so.6
+#2  0x000015555474b840 in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313e639d2928478c79b3f673f99203bcf8be64600612100082236bffb2007f1e0ef9 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so
+#3  0x000015555474be50 in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313e81c34e9ac4c8988ef4a6e067b3aa9271e9f15440f9e8f69e71727f1bc8d6ddca () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so
+#4  0x000015555474d4d0 in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313efba706aab251478fa49e66610e453774633a6c152e7ef778f93045171fb3645d () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so
+#5  0x0000155554745513 in SNPSle_d35ca1ff70d465c2b9b1a72eee90a50630165806651fae96c1bbda5b5d02066c () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/liberrorinf.so
+#6  0x000015554f78519b in SNPSle_64133461705005bb725549e2e6fa1b3f () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#7  0x000015554f3f6f9d in SNPSle_82244d58c54c18c70d63edc9becab634 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#8  <signal handler called>
+#9  0x000015554b72652f in raise () from /lib64/libc.so.6
+#10 0x000015554b6f9e65 in abort () from /lib64/libc.so.6
+#11 0x000015554b767727 in __libc_message () from /lib64/libc.so.6
+#12 0x000015554b76ea2c in malloc_printerr () from /lib64/libc.so.6
+#13 0x000015554b770ab0 in _int_free () from /lib64/libc.so.6
+#14 0x000015554537961e in asn1_delete_structure2 () from /lib64/libtasn1.so.6
+#15 0x0000155546ebe1f4 in ?? () from /lib64/libgnutls.so.30
+#16 0x000015555532ceee in _dl_fini () at dl-fini.c:141
+#17 0x000015554b728ccc in __run_exit_handlers () from /lib64/libc.so.6
+#18 0x000015554b728e00 in exit () from /lib64/libc.so.6
+#19 0x00000000004124e9 in initcurses ()
+#20 0x0000155554efd2f4 in N_VCSgd_iAVhC () from /homes/user/stud/fall23/nh2804/csee4824/vis_simv.daidir/_3177082_archive_1.so
+#21 0x0000155554efd0f3 in N_VCSgd_iAVhC () from /homes/user/stud/fall23/nh2804/csee4824/vis_simv.daidir/_3177082_archive_1.so
+#22 0x000015554f5f5df2 in SNPSle_63c7abb936d47b07d29d61775f9dbe8c1486beb9213552a3 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#23 0x000015554f79dabf in SNPSle_490598bfebcc8e81efcf3d1815066cc9 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#24 0x000015554f7ba4fe in SNPSle_490598bfebcc8e81 () from /tools/synopsys/vcs/U-2023.03-SP2-1/linux64/lib/libvcsnew.so
+#25 0x000000000041289b in main ()
+
+Process VmPeak: 297464 kb, VmSize: 297428 kb
+System Free Memory: 784640 kb, System Free Swap: 33469436 kb
+
+Completed context dump phase data location*

@@ -1,9 +1,0 @@
-{"vcs1":{"timestamp_begin":1744310849.364044314, "rt":2.36, "ut":0.57, "st":0.23}}
-{"vcselab":{"timestamp_begin":1744310851.770750763, "rt":0.75, "ut":0.24, "st":0.10}}
-{"link":{"timestamp_begin":1744310852.558914897, "rt":1.46, "ut":0.76, "st":0.18}}
-{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1744310848.277222935}
-{"VCS_COMP_START_TIME": 1744310848.277222935}
-{"VCS_COMP_END_TIME": 1744310854.496704437}
-{"VCS_USER_OPTIONS": "-sverilog +vc -Mupdate -line -full64 -kdb -lca -nc -debug_access+all+reverse +warn=noTFIPC +warn=noDEBUG_DEP +warn=noENUMASSIGN +define+CLOCK_PERIOD=350.0 -CFLAGS -I/user/stud/fall24/am6542/.local/include/ncursesw -I/user/stud/fall24/am6542/.local/include/ncursesw -L/user/stud/fall24/am6542/.local/lib -lncursesw -ltinfow verilog/sys_defs.svh verilog/ISA.svh test/vtuber_test.sv test/vtuber.cpp test/mem.sv verilog/pipeline.sv verilog/regfile.sv verilog/icache.sv verilog/d_stage.sv verilog/map_table.sv verilog/rs_stage.sv verilog/func_unit_2.sv verilog/func_unit_3.sv verilog/func_unit_0.sv verilog/func_unit_1.sv verilog/mult.sv verilog/mult_stage.sv verilog/rps4.sv verilog/rob.sv verilog/if_stage.sv -o vis_simv"}
-{"vcs1": {"peak_mem": 551192}}
-{"vcselab": {"peak_mem": 262496}}

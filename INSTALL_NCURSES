@@ -1,0 +1,67 @@
+_How to install ncurses for our project
+======================================
+
+Step 1: Install ncurses locally
+-------------------------------
+cd ~
+wget https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
+tar -xvzf ncurses-6.4.tar.gz
+cd ncurses-6.4
+./configure --prefix=$HOME/.local --with-shared --with-termlib --enable-widec
+make -j
+make install
+
+Step 2: Verify header files
+---------------------------
+ls ~/.local/include/ncursesw/
+
+You should see a list of .h files like:
+  curses.h
+  unctrl.h
+  ncurses_dll.h
+  etc.
+
+Step 3: Fix missing 'ncursesw/curses.h' error
+---------------------------------------------
+If you get an error like:
+  fatal error: ncursesw/curses.h: No such file or directory
+
+Run this script to copy all headers into the subdirectory ncursesw expects:
+
+mkdir -p ~/.local/include/ncursesw/ncursesw
+for f in ~/.local/include/ncursesw/*.h; do
+  dest="$HOME/.local/include/ncursesw/ncursesw/$(basename "$f")"
+  if [ ! -f "$dest" ]; then
+    cp "$f" "$dest"
+  fi
+done
+
+Step 4: Update your Makefile
+----------------------------
+Make sure the Makefile contains this line:
+
+VISFLAGS = -I$(HOME)/.local/include/ncursesw -L$(HOME)/.local/lib -lncursesw -ltinfow
+
+This tells the compiler where to find ncurses headers and libraries.
+
+Step 5: Clean and build
+-----------------------
+Run the following commands to rebuild the visual debugger:
+
+make clean
+make vis_simv
+./vis_simv +vtube
+valgrind --leak-check=full --track-origins=yes ./vis_simv +vtube > valgrind_output.txt 2>&1
+
+
+
+Last note:
+add this to your ~/.bashrc :
+# Add local installation to compiler paths
+export CPLUS_INCLUDE_PATH=$HOME/.local/include:$CPLUS_INCLUDE_PATH
+export C_INCLUDE_PATH=$HOME/.local/include:$C_INCLUDE_PATH
+export LIBRARY_PATH=$HOME/.local/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
+
+then apply with 
+source ~/.bashrc
