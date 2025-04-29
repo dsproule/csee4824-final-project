@@ -1,4 +1,13 @@
 data = 0x1000
 li	x2, data
 sw	x2, 0(x2)
+sw	x2, 0x8(x2)
+sw	x2, 0x10(x2)
+sw	x2, 0x18(x2)
+sw	x2, 0x20(x2)
+sw	x2, 0x28(x2)
+sw	x2, 0x30(x2)
+sw	x2, 0x38(x2)
+sw	x2, 0x40(x2)
+sw	x2, 0x48(x2)
 wfi
