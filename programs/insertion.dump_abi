@@ -1,0 +1,127 @@
+
+programs/insertion.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <start-0x90>:
+   0:	0900006f          	jal	zero,90 <start>
+   4:	00000013          	addi	zero,zero,0
+   8:	00000003          	lb	zero,0(zero) # 0 <start-0x90>
+   c:	0000                	.insn	2, 0x
+   e:	0000                	.insn	2, 0x
+  10:	0001                	.insn	2, 0x0001
+  12:	0000                	.insn	2, 0x
+  14:	0000                	.insn	2, 0x
+  16:	0000                	.insn	2, 0x
+  18:	0004                	.insn	2, 0x0004
+  1a:	0000                	.insn	2, 0x
+  1c:	0000                	.insn	2, 0x
+  1e:	0000                	.insn	2, 0x
+  20:	0001                	.insn	2, 0x0001
+  22:	0000                	.insn	2, 0x
+  24:	0000                	.insn	2, 0x
+  26:	0000                	.insn	2, 0x
+  28:	0005                	.insn	2, 0x0005
+  2a:	0000                	.insn	2, 0x
+  2c:	0000                	.insn	2, 0x
+  2e:	0000                	.insn	2, 0x
+  30:	0009                	.insn	2, 0x0009
+  32:	0000                	.insn	2, 0x
+  34:	0000                	.insn	2, 0x
+  36:	0000                	.insn	2, 0x
+  38:	0002                	.insn	2, 0x0002
+  3a:	0000                	.insn	2, 0x
+  3c:	0000                	.insn	2, 0x
+  3e:	0000                	.insn	2, 0x
+  40:	0006                	.insn	2, 0x0006
+  42:	0000                	.insn	2, 0x
+  44:	0000                	.insn	2, 0x
+  46:	0000                	.insn	2, 0x
+  48:	0005                	.insn	2, 0x0005
+  4a:	0000                	.insn	2, 0x
+  4c:	0000                	.insn	2, 0x
+  4e:	0000                	.insn	2, 0x
+  50:	00000003          	lb	zero,0(zero) # 0 <start-0x90>
+  54:	0000                	.insn	2, 0x
+  56:	0000                	.insn	2, 0x
+  58:	0005                	.insn	2, 0x0005
+  5a:	0000                	.insn	2, 0x
+  5c:	0000                	.insn	2, 0x
+  5e:	0000                	.insn	2, 0x
+  60:	0008                	.insn	2, 0x0008
+  62:	0000                	.insn	2, 0x
+  64:	0000                	.insn	2, 0x
+  66:	0000                	.insn	2, 0x
+  68:	0009                	.insn	2, 0x0009
+  6a:	0000                	.insn	2, 0x
+  6c:	0000                	.insn	2, 0x
+  6e:	0000                	.insn	2, 0x
+  70:	00000007          	.insn	4, 0x0007
+  74:	0000                	.insn	2, 0x
+  76:	0000                	.insn	2, 0x
+  78:	0009                	.insn	2, 0x0009
+  7a:	0000                	.insn	2, 0x
+  7c:	0000                	.insn	2, 0x
+  7e:	0000                	.insn	2, 0x
+  80:	00000003          	lb	zero,0(zero) # 0 <start-0x90>
+  84:	0000                	.insn	2, 0x
+  86:	0000                	.insn	2, 0x
+  88:	00000013          	addi	zero,zero,0
+  8c:	00000013          	addi	zero,zero,0
+
+00000090 <start>:
+  90:	00100313          	addi	t1,zero,1
+  94:	01000513          	addi	a0,zero,16
+
+00000098 <iloop>:
+  98:	00052203          	lw	tp,0(a0)
+  9c:	00030393          	addi	t2,t1,0
+  a0:	00050a13          	addi	s4,a0,0
+  a4:	ff8a0993          	addi	s3,s4,-8
+
+000000a8 <jloop>:
+  a8:	0009a783          	lw	a5,0(s3)
+  ac:	000a2803          	lw	a6,0(s4)
+  b0:	0047b633          	sltu	a2,a5,tp
+  b4:	00061e63          	bne	a2,zero,d0 <ifinish>
+  b8:	00fa2023          	sw	a5,0(s4)
+  bc:	ff898993          	addi	s3,s3,-8
+  c0:	ff8a0a13          	addi	s4,s4,-8
+  c4:	fff38393          	addi	t2,t2,-1
+  c8:	00038463          	beq	t2,zero,d0 <ifinish>
+  cc:	fddff06f          	jal	zero,a8 <jloop>
+
+000000d0 <ifinish>:
+  d0:	004a2023          	sw	tp,0(s4)
+  d4:	00850513          	addi	a0,a0,8
+  d8:	00130313          	addi	t1,t1,1
+  dc:	01033593          	sltiu	a1,t1,16
+  e0:	fa059ce3          	bne	a1,zero,98 <iloop>
+  e4:	10500073          	wfi
+  e8:	00000013          	addi	zero,zero,0
+  ec:	00000013          	addi	zero,zero,0
+	...
+
+Disassembly of section .riscv.attributes:
+
+00000000 <.riscv.attributes>:
+   0:	2b41                	.insn	2, 0x2b41
+   2:	0000                	.insn	2, 0x
+   4:	7200                	.insn	2, 0x7200
+   6:	7369                	.insn	2, 0x7369
+   8:	01007663          	bgeu	zero,a6,14 <start-0x7c>
+   c:	0021                	.insn	2, 0x0021
+   e:	0000                	.insn	2, 0x
+  10:	7205                	.insn	2, 0x7205
+  12:	3376                	.insn	2, 0x3376
+  14:	6932                	.insn	2, 0x6932
+  16:	7032                	.insn	2, 0x7032
+  18:	5f31                	.insn	2, 0x5f31
+  1a:	326d                	.insn	2, 0x326d
+  1c:	3070                	.insn	2, 0x3070
+  1e:	7a5f 6d6d 6c75      	.insn	6, 0x6c756d6d7a5f
+  24:	7031                	.insn	2, 0x7031
+  26:	0030                	.insn	2, 0x0030
+  28:	0108                	.insn	2, 0x0108
+  2a:	0b0a                	.insn	2, 0x0b0a

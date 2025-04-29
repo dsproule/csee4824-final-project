@@ -9,13 +9,14 @@ module BHT(
     input   logic           update_en,
     input   logic [`XLEN-1:0]           update_pc,
     input   logic           update_take_branch,
-    output  logic [1:0]     take_branch
+    output  logic           take_branch
 );
 
     logic [1:0] bht [0:`BHT_BIT-1];
     integer i;
     logic [`BHT_WIDTH-1:0] bhr;
     logic [`BHT_WIDTH-1:0] entry, update_entry;
+    logic [`XLEN-1:0] last_update_pc;
 
     assign entry = pc_index;
     assign update_entry = update_pc[`BHT_WIDTH-1:0];
@@ -26,8 +27,9 @@ module BHT(
                 bht[i] <= 2'b00;
             end
             bhr <= 8'b0;
+            last_update_pc <= 0;
         end
-        else if(update_en) begin
+        else if(update_en && (update_pc != last_update_pc)) begin
             if (update_take_branch && (bht[update_entry] != 2'b11))
                 bht[update_entry] <= bht[update_entry] + 1;
             else if (!update_take_branch && (bht[update_entry] != 2'b00))
@@ -35,6 +37,7 @@ module BHT(
 
             bhr <= {bhr[`BHT_WIDTH-2:0] , update_take_branch};
         end
+        last_update_pc <= update_pc;
     end
 
     always_comb begin
