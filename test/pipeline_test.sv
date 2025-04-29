@@ -347,15 +347,15 @@ endtask
             if (prog_start) begin
                 // print_if;
                 // print_ds;
-                print_rs;
+                // print_rs;
                 // print_mt;
                 // print_cdb;
                 // print_rob;
                 // // print_regs;
                 // // print_sx;
-                print_lsq;
-                print_mem;
-                print_xc;
+                // print_lsq;
+                // print_mem;
+                // print_xc;
                 
                 // print_x_pkt;
             end

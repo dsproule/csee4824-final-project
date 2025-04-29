@@ -22,7 +22,7 @@ lh x6, 2(x4)
 lw x7, 4(x4)
 
 # slight offset past next offset (no change from above)
-lh x6, 2(x4) # nothing to do with offset, what is different here
+lh x6, 3(x4) # nothing to do with offset, what is different here
 lw x7, 6(x4)
 
 # offset to next addr

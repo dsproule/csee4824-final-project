@@ -97,10 +97,12 @@ module lsq(
     LQ_T lq_X_T;
 
     logic sq2Dcache, lq2Dcache, fwd_head;
-    logic update_sq;
+    logic update_sq, update_lq;
     logic sq_older, lq_older; //sq head is older than lq head
+    logic ld_valid, st_valid;
 
-    assign update_sq = store_X && sq[sq_X_T].valid;
+    assign update_sq = store_X && sq[sq_X_T].valid && S_X_store.valid && st_valid;
+    assign update_lq = load_X && lq[lq_X_T].valid && S_X_load.valid && ld_valid;
     assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en)) && 
                         sq[sq_head].addr_valid && sq[sq_head].data_valid && sq_older; //prioritize loads
 
@@ -145,7 +147,7 @@ module lsq(
 
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
             if (sq[i].valid && sq[i].addr_valid && sq[i].data_valid &&
-                    (sq[i].addr == S_X_load_addr) && load_X && lq[lq_X_T].valid && sq[i].T >= best_T_store) begin
+                    (sq[i].addr == S_X_load_addr) && update_lq && sq[i].T >= best_T_store) begin
                 if (((sq[i].T < S_X_load.T ~^ sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap)) && (sq[i].mem_access == mem_access_load_wire)) begin
                     best_T_store = sq[i].T;
                     fwd_packet_wire.T =  sq[i].T;
@@ -162,20 +164,26 @@ module lsq(
 
     // CAMS for lq/sq indices --> can load sq_tail and lq_head into
     // RS to reduce logic but for now using this
+
     always_comb begin
         sq_X_T = 0;
         lq_X_T = 0;
         retire_sq_T = 0;
         store_X_packet = 0;
+        ld_valid = 0;
+        st_valid = 0;
 
         for (int i = 0; i < `LQ_SZ; i++) begin
-            if (S_X_load.T == lq[i].T)
+            if (S_X_load.T == lq[i].T) begin
                 lq_X_T = i;
+                ld_valid = 1;
+            end
         end
 
         for (int i = 0; i < `SQ_SZ; i++) begin
             if (S_X_store.T == sq[i].T) begin
                 sq_X_T = i;
+                st_valid = 1;
             end
             if (retire_T == sq[i].T) begin
                 retire_sq_T = i;
@@ -294,7 +302,7 @@ module lsq(
                 lq_tail_wrap <= (lq_tail == `LQ_SZ - 1) ? ~lq_tail_wrap : lq_tail_wrap; // change here
             end
 
-            if (load_X && lq[lq_X_T].valid) begin
+            if (update_lq) begin
                 lq[lq_X_T].addr <= S_X_load_addr;
                 lq[lq_X_T].addr_valid <= `TRUE;
                 lq[lq_X_T].mem_access <= mem_access_load_wire;
