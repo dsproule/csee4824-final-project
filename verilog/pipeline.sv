@@ -329,6 +329,8 @@ module pipeline (
             end else if (gnt[fu_idx]) begin
                 FU_ready[fu_idx] <= `TRUE;
             end
+            FU_ready[2] <= !lq_full;
+            FU_ready[3] <= !sq_full;
     end
     
     rob rob_inst (
