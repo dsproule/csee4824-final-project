@@ -1,3 +1,4 @@
+
 ##########################
 # ---- Introduction ---- #
 ##########################
@@ -145,9 +146,6 @@ OBJFLAGS   = -SD -M no-aliases
 OBJCFLAGS  = --set-section-flags .bss=contents,alloc,readonly
 OBJDFLAGS  = -SD -M numeric,no-aliases
 DEBUG_FLAG = -g
-
-# Patch for ncursesw for visual debugger
-CFLAGS += -I$(HOME)/.local/include/ncursesw -L$(HOME)/.local/lib -lncursesw -ltinfow
 
 # this is our RISC-V compiler toolchain
 # NOTE: you can use a local riscv install to compile programs by setting CAEN to 0
@@ -609,12 +607,11 @@ VTUBER = test/vtuber_test.sv \
          test/vtuber.cpp \
 		 test/mem.sv
 
-VISFLAGS = -I$(HOME)/.local/include/ncursesw -L$(HOME)/.local/lib -lncursesw -ltinfow
+VISFLAGS = -lncurses
 
 vis_simv: $(HEADERS) $(VTUBER) $(SOURCES)
-
 	@$(call PRINT_COLOR, 5, compiling visual debugger testbench)
-	$(VCS) -CFLAGS "-I$(HOME)/.local/include/ncursesw" $(VISFLAGS) $^ -o vis_simv
+	$(VCS) $(VISFLAGS) $^ -o vis_simv
 	@$(call PRINT_COLOR, 6, finished compiling visual debugger testbench)
 
 %.vis: programs/%.mem vis_simv
