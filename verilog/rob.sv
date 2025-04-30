@@ -6,7 +6,8 @@ module rob(
     input [4:0] r, 
     input ROB_T T1, T2,
     input CDB cdb,
-    input dispatch_valid,
+    input logic dispatch_valid,
+    input logic sq_empty,
     input logic [`XLEN-1:0] NPC,                // used for wb
 
     output ROB_T T, retire_T_out,
@@ -16,6 +17,7 @@ module rob(
     output logic [`XLEN-1:0] V1, V2, regfile_write_data,
     output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out,
     output ROB_T head, tail,
+    output logic tail_wrap,
     output logic [`XLEN-1:0] commit_NPC
 );
     localparam PTR_WIDTH = $clog2(`ROB_SZ);
@@ -28,22 +30,8 @@ module rob(
     assign retire_T_out = (retire) ? retire_T : 0;
     assign regfile_write_idx_out = (retire) ? regfile_write_idx : 0;
 
-    assign commit_NPC = rob_table[head].NPC;
 
-    /* ONLY WORKS IF SIZE IS POWER OF TWO, BUT MORE EFFICIENT AND SIMPLER LOGIC FOR CONTROL BITS/MULTIPLE ISSUES WHEN WE SUPERSCALAR
-
-        Extra bit in big_head or big_tail acts as a wraparound detector. If the MSB of each is equal, they are on the same "wraparound"
-        
-        for example:    initialized fifo big_head=big_tail=0, MSBs are equal --> empty
-                        allocate SIZE entries big_head={1'b0,0} big_tail={1'b1,0} because of wraparound --> full
-                        also tells you which entry is newer
-
-                        ht             h t           h   t           h t           h   t       t  h           th (FULL) 
-                        [0 0 0 0] --> [1 0 0 0] --> [1 2 0 0] --> [0 2 0 0] --> [0 2 3 0] --> [0 2 3 4] --> [5 2 3 4] 
-                        tail=head=1, but big_tail[MSB] == 1 and big_head[MSB] == 0)
-    */
-
-    logic head_wrap, tail_wrap;
+    logic head_wrap;
 
     //outputs // change here
     assign full = (head == tail) && (head_wrap != tail_wrap);
@@ -93,10 +81,12 @@ module rob(
             end
 
             // commit --> retire head/free rob entry [x], write to regfile [x], clear maptable entry if valid, fkush after this if needed
-            if (!empty && rob_table[head].ready) begin
+            if (!empty && rob_table[head].ready && !(rob_table[head].ppln_ctrl.halt && !sq_empty)) begin
+                rob_table[head] <= 0;
                 retire <= 1;
                 regfile_write_idx <= rob_table[head].r; 
                 regfile_write_data <= rob_table[head].V; 
+                commit_NPC <= rob_table[head].NPC;
                 ppln_ctrl <= rob_table[head].ppln_ctrl;
 
                 retire_T <= head;

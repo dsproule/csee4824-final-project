@@ -10,6 +10,8 @@
 
 `include "verilog/sys_defs.svh"
 
+// `define ASSUME_TAKEN
+
 module pipeline (
     input        clock,             // System clock
     input        reset,             // System reset
@@ -65,7 +67,7 @@ module pipeline (
     D_S_PACKET D_S_reg, D_packet;
     logic [1:0] proc2Dmem_command, proc2Imem_command;
     logic [`XLEN-1:0] proc2Imem_addr;
-    logic [`XLEN-1:0] branch_target;
+    logic [`XLEN-1:0] branch_target, branch_pred_target;
 
     // Map table outputs
     MT_ENTRY T1_wire, T2_wire;
@@ -90,6 +92,7 @@ module pipeline (
     logic rob_full, rob_empty, retire;
     logic [`XLEN-1:0] V1_rob, V2_rob, rob_write_data, V1_rob_final, V2_rob_final;
     logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out;
+    logic ROB_tail_wrap;
 
     // Regfile inputs/outputs
     logic regfile_write_en;
@@ -116,6 +119,10 @@ module pipeline (
     logic Dcache_valid_out;
     logic [63:0] proc2Dcache_data, cache2Dmem_data, Dcache_data_out;
     logic wr_proc, wr_valid;
+
+    // lsq
+    logic mem_read_en, mem_write_en;
+    logic sq_empty, sq_full, lq_empty, lq_full;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -144,8 +151,8 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    assign rd_mem = S_X_regs[2].valid;
-    assign wr_mem = S_X_regs[3].valid;
+    assign rd_mem = mem_read_en;
+    assign wr_mem = mem_write_en;
     assign Dmem_req = (wr_mem | rd_mem);
 
     // for all memory vectors, ind0 -> wr and ind1 -> rd
@@ -192,22 +199,46 @@ module pipeline (
         .clock(clock), .reset(reset), 
         .if_valid(~Dmem_req & Icache_valid_out),
         .pipe_stall(rs_stall),
-        .take_branch(take_branch),
-        .branch_target(branch_target),
+        .take_branch(take_branch | branch_pred),
+        .branch_target((branch_pred) ? branch_pred_target : branch_target),
         .Imem2proc_data(Icache_data_out),
 
-        
         .if_packet(IF_packet),
         .proc2Imem_addr(proc2Icache_addr)
     );
 
+`ifdef ASSUME_TAKEN
+    two_bit_pred branch_pred_0(
+        .clock(clock), .reset(reset), 
+        // .update_table(S_X_regs[0].valid & S_X_regs[0].cond_branch),                         // fu0 is processing a branch (should update the state table)
+        // .update_branch_choice(X_packets[0].flush ^ S_X_regs[0].branch_pred),                // if flush, means negate
+        .en(D_packet.cond_branch & ~take_branch & D_packet.valid & ~rs_stall),                          // detects if inst in IF_ID is branch. (To pred jump)
+        .D_packet(D_packet),                                                                // inst info to pred from (inst, PC, NPC, valid)
+
+        .branch_target(branch_pred_target),                                                 // branch addr to jump to
+        .branch_pred(branch_pred)                                                           // to branch or not to branch
+    );
+`else
+    simple_branch_pred branch_pred_1(
+        .clock(clock), .reset(reset), 
+        .update_table(S_X_regs[0].valid & S_X_regs[0].cond_branch),                         // fu0 is processing a branch (should update the state table)
+        .update_pc(S_X_regs[0].PC),
+        .update_branch_choice(X_packets[0].ppln_ctrl.flush ^ S_X_regs[0].branch_pred),      // if flush, means negate
+        .en(D_packet.cond_branch & ~take_branch & D_packet.valid & ~rs_stall),                          // detects if inst in IF_ID is branch. (To pred jump)
+        .D_packet(D_packet),                                                                // inst info to pred from (inst, PC, NPC, valid)
+
+        .branch_target(branch_pred_target),                                                 // branch addr to jump to
+        .branch_pred(branch_pred)                                                           // to branch or not to branch
+    );
+`endif
+
     assign IF_enable = 1'b1 & ~rs_stall;
     always_ff @(posedge clock) begin
-        if (reset | take_branch) begin
+        if (reset | take_branch | branch_pred) begin
             IF_ID_reg <= '0;
         end else if (IF_enable) begin
             IF_ID_reg <= IF_packet;
-        end
+        end 
     end
 
     //////////////////////////////////////////////////
@@ -236,6 +267,7 @@ module pipeline (
         // separated because may need a signal to stall
         end else if (D_enable) begin
             D_S_reg <= D_packet;
+            D_S_reg.branch_pred <= branch_pred;
 
             if (D_packet.valid & (D_packet.rs_idx == 0 || D_packet.rs_idx == 4))
                 alu_fu <= ~alu_fu;
@@ -273,7 +305,7 @@ module pipeline (
     logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
     assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
-    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3] & ~rd_mem, FU_ready[2] & ~wr_mem, FU_ready[1:0]};
+    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3], FU_ready[2], FU_ready[1:0]};
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
@@ -306,9 +338,10 @@ module pipeline (
         .NPC(D_S_reg.PC),
         .cdb(cdb),
         .dispatch_valid(D_S_reg.valid & ~rs_stall), 
+        .sq_empty(sq_empty),
         
         // Outputs
-        .T(rob_T_wire), .retire_T_out(retire_T_wire), 
+        .T(rob_T_wire), .retire_T_out(retire_T_wire), .tail_wrap(ROB_tail_wrap),
         .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), 
         .retire(retire), .regfile_write_idx_out(retire_r_wire), 
         .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
@@ -340,7 +373,7 @@ module pipeline (
 
     always_ff @(posedge clock) begin
         for (S_idx = 0; S_idx < `RS_SZ; S_idx++)
-            if (reset | (gnt[S_idx] & ~S_packets[S_idx].valid)) begin
+            if (reset | (gnt[S_idx] & ~S_packets[S_idx].valid) | take_branch) begin
                 S_X_regs[S_idx] <= 0;            
             end else if (S_packets[S_idx].valid) begin
                 S_X_regs[S_idx] <= S_packets[S_idx];
@@ -372,7 +405,7 @@ module pipeline (
     );
 
     dcache dache_0(
-        .clock(clock), .reset(reset | take_branch),
+        .clock(clock), .reset(reset),
 
         // From memory
         .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
@@ -394,27 +427,71 @@ module pipeline (
         .wr_valid(wr_valid)
     );
 
+    ROB_T store_T_wire, load_T_wire;
+    MEM_ACCESS mem_access_load_wire, mem_access_store_wire;
+    logic [`XLEN-1:0] proc2Dmem_data_wire;
+    X_C_PACKET lsq_fwd_packet, func_unit_2_x_packet;
+    logic dcache_ack_store, dcache_ack_load, sq_free;
+
+    lsq lsq_inst(
+    // inputs
+    .clock(clock), 
+    .reset(reset), .take_branch(take_branch),
+    .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
+    .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
+    .T(rob_T_wire),
+    .ROB_wrap(ROB_tail_wrap),
+    .S_X_store(S_X_regs[3]), 
+    .S_X_load(S_X_regs[2]),
+    .store_X(S_X_regs[3].valid),
+    .load_X(S_X_regs[2].valid),
+    .retire_T(retire_T_wire), 
+    .retire_en(retire),
+    .dcache_ack_store(dcache_ack_store), //prioritize loads for speed
+    .dcache_ack_load(dcache_ack_load),
+
+    // outputs
+    .load_fwd_packet(lsq_fwd_packet),
+    .mem_write_en(mem_write_en), //
+    .proc2Dmem_addr_store(proc2Dmem_addr[0]),
+    .proc2Dmem_data_store(proc2Dmem_data_wire),
+    .mem_access_store(mem_access_store_wire),
+    .store_T(store_T_wire),
+    .proc2Dmem_addr_load(proc2Dmem_addr[1]),
+    .mem_access_load(mem_access_load_wire),
+    .mem_read_en(mem_read_en),
+    .load_T(load_T_wire),
+    .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
+    .sq_free(sq_free),
+    .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
+    
+    );
     assign wr_proc = wr_mem & Dcache_valid_out;
 
     func_unit_2 func_unit_02 (
         .clock(clock), .reset(reset | take_branch), 
         .committed(gnt[2]), .data_valid(Dcache_valid_out & rd_mem),
         .Dmem2proc_data(Dcache_data_out),
-        .S_X_reg(S_X_regs[2]),
+        .T(load_T_wire),
+        .mem_access(mem_access_load_wire),
 
         // output logic mem_load_pend,
-        .proc2Dmem_addr(proc2Dmem_addr[1]),
-        .X_packet(X_packets[2])
+        .X_packet(func_unit_2_x_packet),
+        .dcache_ack_load(dcache_ack_load)
     );
 
-    func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset | take_branch), .committed(gnt[3]), .wr_valid(wr_valid & wr_mem),
-        .Dmem2proc_data(Dcache_data_out),
-        .S_X_reg(S_X_regs[3]),
+    //forwarding from lsq if cdb is valid
+    assign X_packets[2] = (lsq_fwd_packet.valid) ? lsq_fwd_packet : func_unit_2_x_packet;
 
-        .proc2Dmem_addr(proc2Dmem_addr[0]),
+    func_unit_3 func_unit_03(
+        .clock(clock), .reset(reset | take_branch), .wr_valid(wr_valid & wr_mem), .sq_free(sq_free),
+        .Dmem2proc_data(Dcache_data_out),
+        .T(store_T_wire),
+        .mem_access(mem_access_store_wire),
+        .proc2Dmem_data(proc2Dmem_data_wire), //handles masking before storing
+
         .proc2Dcache_data(proc2Dcache_data),
-        .X_packet(X_packets[3])
+        .dcache_ack_store(dcache_ack_store) //throttle sq flow
     );
 
     func_unit_0 func_unit_04(

@@ -58,6 +58,9 @@ module dcache (
 
     assign wr_mem = (wr_proc & Dcache_valid_out);
 
+    logic [63:0] Dcache_data_out_reg;
+    logic Dcache_valid_out_reg;
+
     assign Dcache_data_out = icache_data[current_index].data;
     assign Dcache_valid_out = icache_data[current_index].valid &&
                               (icache_data[current_index].tags == current_tag);
