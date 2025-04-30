@@ -304,7 +304,7 @@ module pipeline (
     logic rs_idx_full;
     logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
-    assign rs_stall = rs_idx_full | sq_full | lq_full;
+    assign rs_stall = rs_idx_full || (sq_full && D_S_reg.rs_idx == 3) || (lq_full && D_S_reg.rs_idx == 2);
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
@@ -336,7 +336,7 @@ module pipeline (
         .r(D_S_reg.r), .T1(T1_wire.T), .T2(T2_wire.T),
         .NPC(D_S_reg.PC),
         .cdb(cdb),
-        .dispatch_valid(D_S_reg.valid & ~rs_stall & ~sq_full & ~lq_full), 
+        .dispatch_valid(D_S_reg.valid & ~rs_stall), 
         .sq_empty(sq_empty),
         
         // Outputs
