@@ -2,7 +2,7 @@ Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detec
 Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
-Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr  7 14:16 2025
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr 12 22:50 2025
 Loading memory file: programs/parallel.mem
 Using writeback output file: output/parallel.wb
 Using pipeline output file: output/parallel.ppln
@@ -53,19 +53,19 @@ Using pipeline output file: output/parallel.ppln
 @@@ mem[ 4208] = 00000000000a6fe0 : 684000
 @@@
 @@@
-@@                791000 : System halted
+@@               3008000 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
-@@  261 cycles / 199 instrs = 1.311558 CPI
+@@  1000 cycles / 199 instrs = 5.025126 CPI
 @@
-@@  780.00 ns total time to execute
+@@  2997.00 ns total time to execute
 @@
 
 $finish called from file "test/pipeline_test.sv", line 296.
-$finish at simulation time               891000
+$finish at simulation time              3108000
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 891000 ps
-CPU Time:      0.180 seconds;       Data structure size:   0.1Mb
-Mon Apr  7 14:16:42 2025
+Time: 3108000 ps
+CPU Time:      0.290 seconds;       Data structure size:   0.1Mb
+Sat Apr 12 22:50:51 2025

@@ -9,6 +9,7 @@ module func_unit_1(
     PPLN_CTRL ppln_ctrl;
     logic [1:0] signs;
     logic [63:0] mult_result;
+    logic [63:0] mcand, mplier;
     logic new_op;
 
     assign X_packet.T = S_X_reg.T;
@@ -29,9 +30,12 @@ module func_unit_1(
     assign signs = ((S_X_reg.alu_func == ALU_MUL) | (S_X_reg.alu_func == ALU_MULH)) ? 2'b11:
                                                    (S_X_reg.alu_func == ALU_MULHSU) ? 2'b10 : 2'b00;
 
+    assign mcand = (signs[0]) ? {{32{S_X_reg.V1[31]}},S_X_reg.V1} : {32'b0, S_X_reg.V1};
+    assign mplier = (signs[1]) ? {{32{S_X_reg.V2[31]}},S_X_reg.V2} : {32'b0, S_X_reg.V2};
+
     mult mult_1(
         .clock(clock), .reset(reset),
-        .mcand({32'b0, S_X_reg.V1}), .mplier({32'b0, S_X_reg.V2}),
+        .mcand(mcand), .mplier(mplier),
         .signs(signs),               //  [1] -> s_mplier, [0] -> s_mcand
         .start(S_X_reg.valid & new_op),
 

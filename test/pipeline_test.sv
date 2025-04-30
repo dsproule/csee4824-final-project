@@ -23,7 +23,7 @@ module testbench;
     logic [31:0] clock_count;
     logic [31:0] instr_count;
     int          wb_fileno;
-    logic [63:0] debug_counter; // counter used for infinite loops, forces termination
+    logic [80:0] debug_counter; // counter used for infinite loops, forces termination
 
     logic [1:0]       proc2mem_command;
     logic [`XLEN-1:0] proc2mem_addr;
@@ -195,15 +195,15 @@ module testbench;
     endtask // print_rs
 
     task print_rob;
-        $display("\n(ROB_TABLE) h: %2d, t: %2d\ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, clock_count);
-        for(n = 1; n < 15; n=n+1)
-            $display("index: %4d   r:%4d   V:%4d", n, rob_table[n].r, rob_table[n].V);
+        $display("\n(ROB_TABLE) h: %2d, t: %2d empty: %1h full: %1h \ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, core.rob_empty, core.rob_full, clock_count);
+        for(n = 1; n < 32; n=n+1)
+            $display("index: %4d   r:%4d   NPC:%4h    V:%4d    ready:%1b", n, rob_table[n].r, rob_table[n].NPC, rob_table[n].V, rob_table[n].ready);
         $display("\n(RETIRE) valid: %1b, ROB_T: %4d, flush: %0d branch_addr: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, rob_pipeline_control_dbg.flush, core.rob_write_data);
     endtask // print_rob
 
     task print_cdb;
         $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T:%4h\t  V:%4h", cdb_dbg.T, cdb_dbg.V);
+        $display("T:%4h\t  V:%4h valid:%1b", cdb_dbg.T, cdb_dbg.V, cdb_dbg.valid);
         $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
         $display("------------------------------------------");
     endtask // print_cdb
@@ -241,7 +241,7 @@ module testbench;
         if (proc2mem_command != BUS_NONE) begin
             $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
             $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
-            $display("Dmem_gnt: %2b, take_branch: %1b", core.Dmem_gnt, core.take_branch);
+            $display("rd/wr: %2b, take_branch: %1b", {core.rd_mem, core.wr_mem}, core.take_branch);
             $display("------------------------------------------");
         end
     endtask
@@ -278,8 +278,13 @@ module testbench;
     always @(posedge clock) begin
         if (~reset) begin
             // only start printing after first inst arrives
-            if (IF_ID_reg_dbg.valid & (IF_ID_reg_dbg.PC >= `XLEN'h300))
+            // if ((clock_count >= 11607)) begin
+            if (IF_ID_reg_dbg.valid)
                 prog_start <= 1;
+            // if ((clock_count >= 11618)) begin
+                // show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
+                // $finish;
+            // end
 
 
             if (prog_start) begin
@@ -293,9 +298,12 @@ module testbench;
                 // print_sx;
                 // print_mem;
                 // print_xc;
+                // if (IF_ID_reg_dbg.PC == `XLEN'hef8) $display("mayday");
                 
                 // print_x_pkt;
             end
+            // if(clock_count > 500)
+            //     $finish;
         end
     end
 
@@ -375,16 +383,18 @@ module testbench;
             // print register write information to the writeback output file
             if (pipeline_completed_insts > 0) begin
                 if(pipeline_commit_wr_en)
-                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
+                    $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x, T=%d", 
                               pipeline_commit_NPC - 4,
                               pipeline_commit_wr_idx,
-                              pipeline_commit_wr_data);
+                              pipeline_commit_wr_data, clock_count
+                              );
                 else
                     $fdisplay(wb_fileno, "PC=%x, ---", pipeline_commit_NPC - 4);
             end
 
             // deal with any halting conditions
-            if(pipeline_error_status != NO_ERROR || debug_counter > 500000) begin
+            // if(pipeline_error_status != NO_ERROR || debug_counter > 550) begin
+            if(pipeline_error_status != NO_ERROR || debug_counter > 5500000) begin
                 // print_regs;
                 // print_sx;
                 // print_mem;

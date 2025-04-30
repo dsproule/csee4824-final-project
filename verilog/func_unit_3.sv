@@ -1,153 +1,85 @@
 `include "verilog/sys_defs.svh"
 
 module func_unit_3(
-    input clock, reset, 
-    input Dmem_gnt,                 // signal that the memory was listening to this module
-    input retired,                  // the current mem_store has been 
-    input [3:0]  mem2proc_response, mem2proc_tag,
+    input clock, reset, wr_valid, sq_free,
     input [63:0] Dmem2proc_data,
-    input S_X_PACKET S_X_reg,
+    input ROB_T T, //pass through
+    input MEM_ACCESS mem_access, //for shifting
+    input logic [`XLEN-1:0] proc2Dmem_data,
 
-    output logic mem_store_pend,          // the module is attempting to store a value
-    output [`XLEN-1:0] proc2Dmem_addr,
-    output [63:0] proc2Dmem_data, // CHANGE: 64 bits
-    output logic [1:0] proc2Dmem_command,
-    output X_C_PACKET X_packet
+    output [63:0]      proc2Dcache_data,
+    output logic dcache_ack_store
 );
 
-    // then needs to single out part of data to modify
-    // then needs to push it back like before
-
     logic [`XLEN-1:0] rawDmem_addr;
-    logic [3:0]       nextDmem_tag, line_offset;
-    logic [5:0]       shift, size_offset;
-    logic [63:0]      rawDmem_data, Dmem_data;
-    mem_proc_states   fetchDmem_state, storeDmem_state;
-    logic             fetchDmem_valid;
-
-    // should be word-aligned. If a value is invalid proc_resp will be 0
-    assign rawDmem_addr   = S_X_reg.V1 + S_X_reg.mem_offset;
-    assign proc2Dmem_addr = {rawDmem_addr[`XLEN-1:3], 3'b0};
-    assign line_offset    = rawDmem_addr[2:0];
-
-    always_ff @(posedge clock) begin
-        if (reset) begin
-            nextDmem_tag    <= '0;
-            fetchDmem_state <= MEM_WAIT_FOR_ADDR;
-            mem_store_pend <= `FALSE;
-        end else begin
-            case (fetchDmem_state)
-                MEM_WAIT_FOR_ADDR: begin
-                    fetchDmem_valid <= `FALSE;
-                    // waits here for a mem req to hit S_X_reg
-                    if (S_X_reg.valid) begin
-                        mem_store_pend  <= `TRUE;
-                        fetchDmem_state   <= MEM_NEW_ADDR;
-                        proc2Dmem_command <= BUS_LOAD;
-                    end
-                end
-                MEM_NEW_ADDR: begin
-                    // saves every  seen tag and when we know the tag corresp to current req, move to next state
-                    nextDmem_tag <= mem2proc_response;
-                    if (Dmem_gnt & (nextDmem_tag != 0)) begin
-                        fetchDmem_state <= MEM_WAIT_FOR_TAG;
-                        proc2Dmem_command <= BUS_NONE;
-                    end
-                end
-                MEM_WAIT_FOR_TAG: begin
-                    // if the memory is responding to us, save it and wait to be retired
-                    if (mem2proc_tag == nextDmem_tag) begin
-                        // triggers the next state machine
-                        rawDmem_data <= Dmem2proc_data;
-                        fetchDmem_valid <= `TRUE;
-
-                        nextDmem_tag <= '0;
-                        fetchDmem_state <= MEM_NONE;
-                    end
-                end
-                MEM_NONE: begin
-                    fetchDmem_valid <= `FALSE;
-                    proc2Dmem_command <= BUS_STORE;
-                    
-                    if (retired) begin
-                        fetchDmem_state <= MEM_WAIT_FOR_ADDR;
-                        proc2Dmem_command <= BUS_NONE;
-                        mem_store_pend <= `FALSE;
-                    end
-                end
-            endcase
-        end
-    end    
+    logic [3:0]       line_offset;
+    logic [5:0]       shift;
+    logic [63:0]      Dmem_data;
+    mem_proc_states   mem_state;
 
     always_comb begin
-        Dmem_data = rawDmem_data;
-        case (S_X_reg.mem_size)
+        Dmem_data = Dmem2proc_data;
+        case (mem_access.mem_size)
             BYTE: begin
-                shift = (line_offset) << 3;
+                shift = (mem_access.line_offset) << 3;
                 case (shift)
-                    0: Dmem_data[7:0] = S_X_reg.V2[7:0];
-                    8: Dmem_data[15:8] = S_X_reg.V2[7:0];
-                    16: Dmem_data[23:16] = S_X_reg.V2[7:0];
-                    24: Dmem_data[31:24] = S_X_reg.V2[7:0];
-                    32: Dmem_data[39:32] = S_X_reg.V2[7:0];
-                    40: Dmem_data[47:40] = S_X_reg.V2[7:0];
-                    48: Dmem_data[55:48] = S_X_reg.V2[7:0];
-                    56: Dmem_data[63:56] = S_X_reg.V2[7:0];
+                    0: Dmem_data[7:0] = proc2Dmem_data[7:0];
+                    8: Dmem_data[15:8] = proc2Dmem_data[7:0];
+                    16: Dmem_data[23:16] = proc2Dmem_data[7:0];
+                    24: Dmem_data[31:24] = proc2Dmem_data[7:0];
+                    32: Dmem_data[39:32] = proc2Dmem_data[7:0];
+                    40: Dmem_data[47:40] = proc2Dmem_data[7:0];
+                    48: Dmem_data[55:48] = proc2Dmem_data[7:0];
+                    56: Dmem_data[63:56] = proc2Dmem_data[7:0];
                 endcase
             end
             HALF: begin
-                shift = (line_offset >> 1) << 4;
+                shift = (mem_access.line_offset >> 1) << 4;
                 case (shift)
-                    0: Dmem_data[15:0] = S_X_reg.V2[15:0];
-                    16: Dmem_data[31:16] = S_X_reg.V2[15:0];
-                    32: Dmem_data[47:32] = S_X_reg.V2[15:0];
-                    48: Dmem_data[63:48] = S_X_reg.V2[15:0];
+                    0: Dmem_data[15:0] = proc2Dmem_data[15:0];
+                    16: Dmem_data[31:16] = proc2Dmem_data[15:0];
+                    32: Dmem_data[47:32] = proc2Dmem_data[15:0];
+                    48: Dmem_data[63:48] = proc2Dmem_data[15:0];
                 endcase
             end
             WORD: begin
-                shift = (line_offset[2] << 2) << 3;
+                shift = (mem_access.line_offset[2] << 2) << 3;
                 case (shift)
-                    0: Dmem_data[31:0] = S_X_reg.V2[31:0];
-                    32: Dmem_data[63:32] = S_X_reg.V2[31:0];
+                    0: Dmem_data[31:0] = proc2Dmem_data[31:0];
+                    32: Dmem_data[63:32] = proc2Dmem_data[31:0];
                 endcase
             end
             default: begin
                 shift = '0;
-                size_offset = '0;
             end
         endcase
     end
 
-    assign proc2Dmem_data = Dmem_data;
+    assign proc2Dcache_data = Dmem_data;
 
-    // state machine enforces one memory load 
+     // state machine to handle loads
     always_ff @(posedge clock) begin
         if (reset) begin
-            storeDmem_state <= MEM_WAIT_FOR_ADDR;
-            X_packet <= 0;
+            dcache_ack_store  <= 0;
+            mem_state <= MEM_WAIT_FOR_TAG;
         end else begin
-            case (storeDmem_state)
-                MEM_WAIT_FOR_ADDR:
-                    if (fetchDmem_valid) begin
-                        storeDmem_state <= MEM_NEW_ADDR;
-                    end
-                MEM_NEW_ADDR:
-                    if (Dmem_gnt) begin
-                        storeDmem_state <= MEM_NONE;
-                        X_packet.T <= S_X_reg.T;
-                        X_packet.result <= '0;
-                        
-                        X_packet.ppln_ctrl <= '0;
-                        X_packet.ppln_ctrl.is_store <= `TRUE;
-                        X_packet.valid <= `TRUE;
+            case (mem_state) 
+                // if valid pass to X_packet
+                MEM_WAIT_FOR_TAG:
+                    if (wr_valid) begin
+                        dcache_ack_store <= `TRUE;
+                        mem_state <= MEM_NONE;
                     end
                 MEM_NONE: begin
-                    X_packet <= 0;
-                    if (retired) 
-                        storeDmem_state <= MEM_WAIT_FOR_ADDR;
+                    // if committed, return back to state waiting to give to X_packet
+                    dcache_ack_store <= `FALSE;
+                    if (sq_free)
+                        mem_state <= MEM_WAIT_FOR_TAG;
                 end
+                default: ;
+
             endcase
         end
-    end
+    end    
 
 endmodule   // func_unit_3

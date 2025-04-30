@@ -190,6 +190,7 @@ endmodule // decoder
 
 module d_stage (
     input IF_ID_PACKET IF_ID_reg,
+    input alu_fu, mult_fu,
 
     output D_S_PACKET D_packet
 );
@@ -210,7 +211,7 @@ module d_stage (
 
     // mem details
     assign D_packet.mem_offset = (rd_mem) ? `RV32_signext_Iimm(IF_ID_reg.inst) : 
-	    			 (wr_mem) ? `RV32_signext_Simm(IF_ID_reg.inst) : '0;
+	    			             (wr_mem) ? `RV32_signext_Simm(IF_ID_reg.inst) : '0;
     assign D_packet.rd_unsigned  = IF_ID_reg.inst.r.funct3[2]; // 1 if unsigned, 0 if signed
     assign D_packet.mem_size     = MEM_SIZE'(IF_ID_reg.inst.r.funct3[1:0]);
     
@@ -223,10 +224,10 @@ module d_stage (
         else if (wr_mem)
             D_packet.rs_idx = `NUM_FU_STORE;
         else if (D_packet.alu_func == ALU_MUL    | D_packet.alu_func == ALU_MULHSU |
-                 D_packet.alu_func == ALU_MULHSU | D_packet.alu_func == ALU_MULHU)
-            D_packet.rs_idx = `NUM_FU_MULT;
+                 D_packet.alu_func == ALU_MULH | D_packet.alu_func == ALU_MULHU)
+            D_packet.rs_idx = (mult_fu) ? 5 : `NUM_FU_MULT;
         else
-            D_packet.rs_idx = `NUM_FU_ALU;
+            D_packet.rs_idx = (alu_fu & ~D_packet.cond_branch) ? 4 : `NUM_FU_ALU;   // fu0 always handles branches
     end
 
     decoder decoder_0 (

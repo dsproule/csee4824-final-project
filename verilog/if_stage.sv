@@ -11,72 +11,42 @@
 `include "verilog/sys_defs.svh"
 
 module if_stage (
-    input             clock, reset, stall, Imem_gnt,
-    input             take_branch,
-    input [`XLEN-1:0] branch_target,
-    input [63:0]      Imem2proc_data,
-    input [3:0]       Imem2proc_response, Imem2proc_tag,
+    input             clock,          // system clock
+    input             reset,          // system reset
+    input             pipe_stall,
+    input             if_valid,       // only go to next PC when true
+    input             take_branch,    // taken-branch signal
+    input [`XLEN-1:0] branch_target,  // target pc: use if take_branch is TRUE
+    input [63:0]      Imem2proc_data, // data coming back from Instruction memory
 
-    output logic mem_req,
-    output IF_ID_PACKET IF_packet,
-    output logic [1:0]  proc2Imem_command,
-    output logic [`XLEN-1:0] proc2Imem_addr
-);  
-    logic [`XLEN-1:0] PC_reg;
-    logic [3:0]  nextImem_tag;
-    mem_proc_states IF_state;
+    output IF_ID_PACKET      if_packet,
+    output logic [`XLEN-1:0] proc2Imem_addr // address sent to Instruction memory
+);
 
-    // logic [31:0] if_data;
-    IF_ID_PACKET nextIF_packet;
-    // logic mem_req_done;
+    logic [`XLEN-1:0] PC_reg; // PC we are currently fetching
 
-    // word-aligned mem
+    // synopsys sync_set_reset "reset"
+    always_ff @(posedge clock) begin
+        if (reset) begin
+            PC_reg <= 0;             // initial PC value is 0 (the memory address where our program starts)
+        end else if (take_branch) begin
+            PC_reg <= branch_target; // update to a taken branch (does not depend on valid bit)
+        end else if (if_valid & ~pipe_stall) begin
+            PC_reg <= PC_reg + 4;    // or transition to next PC if valid
+        end
+    end
+
+    // address of the instruction we're fetching (64 bit memory lines)
+    // mem always gives us 8=2^3 bytes, so ignore the last 3 bits
     assign proc2Imem_addr = {PC_reg[`XLEN-1:3], 3'b0};
 
-    always_ff @(posedge clock) begin
-        if (reset | take_branch) begin
-            // place initial request
-            PC_reg <= (take_branch) ? branch_target : `XLEN'h0;
-            proc2Imem_command <= BUS_LOAD;
-            mem_req <= `TRUE;
-            IF_state <= MEM_NEW_ADDR;
-        end else begin
-            IF_packet.inst <= `NOP;
-            IF_packet.valid <= `FALSE;
+    // this mux is because the Imem gives us 64 bits not 32 bits
+    assign if_packet.inst = (~if_valid) ? `NOP :
+                            PC_reg[2] ? Imem2proc_data[63:32] : Imem2proc_data[31:0];
 
-            case (IF_state)
-                MEM_NEW_ADDR: begin
-                    nextImem_tag <= Imem2proc_response;
-                    if (Imem_gnt & Imem2proc_response != 0) begin
-                        mem_req <= `FALSE;
-                        proc2Imem_command <= BUS_NONE;
-                        IF_state <= MEM_WAIT_FOR_TAG;
-                    end
-                end
-                MEM_WAIT_FOR_TAG: begin
-                    if (Imem2proc_tag == nextImem_tag) begin 
-                        nextIF_packet <= {
-                                (PC_reg[2]) ? Imem2proc_data[63:32] : Imem2proc_data[31:0], 
-                                PC_reg,
-                                PC_reg + 4,
-                                `TRUE
-                            };
-                        IF_state <= MEM_WAIT_FOR_ADDR;
-                    end
-                end
-                MEM_WAIT_FOR_ADDR: begin
-                    // if stall reset ourselves to MEM_NEW_ADDR and put nextIF_packet
-                    if (~stall) begin
-                        PC_reg <= PC_reg + 4;
-                        mem_req <= `TRUE;
-                        proc2Imem_command <= BUS_LOAD;
-                        IF_state <= MEM_NEW_ADDR;
-                        IF_packet <= nextIF_packet;
-                    end
-                end
-                default: ;
-            endcase
-        end
-    end    
+    assign if_packet.PC  = PC_reg;
+    assign if_packet.NPC = PC_reg + 4; // pass PC+4 down pipeline w/instruction
 
-endmodule // if_stage
+    assign if_packet.valid = if_valid;
+
+endmodule // stage_if

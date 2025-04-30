@@ -1,0 +1,75 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Feb 28 02:33 2025
+Loading memory file: programs/struct_hazard.mem
+Using writeback output file: output/struct_hazard.wb
+Using pipeline output file: output/struct_hazard.ppln
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  6000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  9000 : System STILL at reset, can't show anything
+@@
+@@                 11500  Deasserting System reset......
+@@
+@@
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 0020011300100093 : 9008380371796115
+@@@ mem[    8] = 0040021300300193 : 18016679140262291
+@@@ mem[   16] = 0610222300500293 : 436886697579381395
+@@@ mem[   24] = 123026230c202423 : 1310589423533958179
+@@@ mem[   32] = 1e502a2318402823 : 2184292149493770275
+@@@ mem[   40] = 0c80238306402303 : 900758971126653699
+@@@ mem[   48] = 1900248312c02403 : 1801479996322096131
+@@@ mem[   56] = 06602c231f402503 : 459415691351565571
+@@@ mem[   64] = 0a80202308702623 : 756640072235755043
+@@@ mem[   72] = 0ca024230a902a23 : 909766857648515619
+@@@ mem[   80] = 0000000010500073 : 273678451
+@@@
+@@@ mem[   96] = 0000000100000000 : 4294967296
+@@@
+@@@ mem[  120] = 0000000000000001 : 1
+@@@
+@@@ mem[  136] = 0000000200000000 : 8589934592
+@@@
+@@@ mem[  160] = 0000000000000003 : 3
+@@@
+@@@ mem[  176] = 0000000400000000 : 17179869184
+@@@
+@@@ mem[  200] = 0000000000000005 : 5
+@@@
+@@@ mem[  296] = 0000000300000000 : 12884901888
+@@@
+@@@ mem[  400] = 0000000000000004 : 4
+@@@
+@@@ mem[  496] = 0000000500000000 : 21474836480
+@@@
+@@@
+@@                323000 : System halted
+@@
+@@@ System halted on WFI instruction
+@@@
+@@
+@@  105 cycles / 20 instrs = 5.250000 CPI
+@@
+@@  312.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 296.
+$finish at simulation time               423000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 423000 ps
+CPU Time:      0.150 seconds;       Data structure size:   0.1Mb
+Fri Feb 28 02:33:48 2025

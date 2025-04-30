@@ -25,12 +25,13 @@
 
 // sizes
 `define ROB_SZ 32
-`define RS_SZ 4
+`define RS_SZ 6
 `define PHYS_REG_SZ (32 + `ROB_SZ)
 
 // worry about these later
 `define BRANCH_PRED_SZ xx
-`define LSQ_SZ xx
+`define SQ_SZ 6 //15-20% of ROB
+`define LQ_SZ 8 //20-30% of ROB
 
 // functional units (you should decide if you want more or fewer types of FUs)
 `define NUM_FU_ALU 0
@@ -40,6 +41,10 @@
 
 // number of mult stages (2, 4, or 8)
 `define MULT_STAGES 4
+
+// width of Branch Prediction Table
+`define BHT_BIT     256
+`define BHT_WIDTH   8
 
 ///////////////////////////////
 // ---- Basic Constants ---- //
@@ -105,6 +110,13 @@ typedef enum logic [1:0] {
     BUS_LOAD   = 2'h1,
     BUS_STORE  = 2'h2
 } BUS_COMMAND;
+
+// Memory bus commands
+typedef enum logic [1:0] {
+    NONE   = 2'h0,
+    LOAD   = 2'h1,
+    STORE  = 2'h2
+} MEM_OP;
 
 ///////////////////////////////
 // ---- Exception Codes ---- //
@@ -303,6 +315,7 @@ typedef struct packed {
 
     logic cond_branch;
     logic uncond_branch;
+    logic branch_pred;
 
     ALU_FUNC alu_func;      // ALU function select (ALU_xxx *)
     
@@ -323,6 +336,9 @@ typedef struct packed {
 } D_S_PACKET;
 
 typedef logic [$clog2(`ROB_SZ)-1:0] ROB_T;
+typedef logic [$clog2(`LQ_SZ)-1:0] LQ_T;
+typedef logic [$clog2(`SQ_SZ)-1:0] SQ_T;
+
 
 typedef struct packed {
     logic flush;
@@ -359,10 +375,49 @@ typedef struct packed {
     logic [4:0] r;
     logic [`XLEN-1:0] V;
     PPLN_CTRL ppln_ctrl;
-    logic [`XLEN-1:0] NPC; //hex
+    logic [`XLEN-1:0] NPC;
     
     logic ready;
 } ROB_ENTRY;
+
+typedef struct packed { //used to keep track of needed parts of S_X for mem access
+    logic [3:0]       line_offset;
+    logic             rd_unsigned;
+    MEM_SIZE          mem_size;
+} MEM_ACCESS;
+
+typedef enum logic [1:0] {
+    LQ_NONE  = 2'h0,
+    DATA_READY  = 2'h1,
+    WAITING   = 2'h2,
+    FORWARDED = 2'h3
+} LQ_FLAG;
+
+typedef struct packed {
+    logic valid;                         // Entry is in use
+    logic [`XLEN-1:0] addr;              // Effective address (if known)
+    logic [`XLEN-1:0] data;              // Loaded data (if forwarded)
+    ROB_T T;
+    logic ROB_wrap;                       // Tag for tracking commit order
+    logic addr_valid;                   // Address is computed
+    LQ_FLAG state;
+    SQ_T dep_sq_T;
+    MEM_ACCESS mem_access;              
+} LQ_ENTRY;
+
+typedef struct packed {
+    logic valid;                         // Entry is in use
+    logic [`XLEN-1:0] addr;              // Effective address (if known)
+    logic [`XLEN-1:0] data;              // Data to store (if known)
+    ROB_T T;
+    logic ROB_wrap;                            // Tag to ensure in-order commit
+    logic addr_valid;                   // Address is computed
+    logic data_valid;                   // Data is ready (i.e., value from reg/CDB)
+    logic retired;                    // Set when ROB retires this store
+    MEM_ACCESS mem_access;          // relevant addressing and masking info
+    logic dirty;                    // used to indicate the signal should be flushed
+} SQ_ENTRY;
+
 
 
 typedef struct packed {
@@ -374,7 +429,7 @@ typedef struct packed {
 
     logic cond_branch;
     logic uncond_branch;
-    logic has_dest;
+    logic branch_pred;
 
     ALU_OPA_SELECT opa_select;
     ALU_OPB_SELECT opb_select;
@@ -385,6 +440,7 @@ typedef struct packed {
     logic             rd_unsigned; // Whether proc2Dmem_data is signed or unsigned
     MEM_SIZE          mem_size;
     
+    logic has_dest;
     /* P6-microarchitecture specific */
 
     ROB_T T;

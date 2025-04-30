@@ -69,7 +69,7 @@ module func_unit_0 (
 );
     logic [`XLEN-1:0] opa_mux_out, opb_mux_out, alu_result;
     PPLN_CTRL ppln_ctrl;
-    logic take_conditional;
+    logic take_conditional, branch_mispred;
 
     // Pass-throughs
     assign X_packet.T = S_X_reg.T;
@@ -77,9 +77,13 @@ module func_unit_0 (
     assign X_packet.result = (S_X_reg.uncond_branch) ? S_X_reg.NPC : alu_result;
 
     // pipeline control
-    assign ppln_ctrl.flush       = S_X_reg.uncond_branch || (S_X_reg.cond_branch && take_conditional);
+    assign branch_mispred        = (take_conditional != S_X_reg.branch_pred) & S_X_reg.cond_branch;
+
+    // unconditional can still jump
+    assign ppln_ctrl.flush       = S_X_reg.uncond_branch || (branch_mispred);
     assign ppln_ctrl.is_branch   = S_X_reg.uncond_branch | S_X_reg.cond_branch;
-    assign ppln_ctrl.branch_addr = alu_result;
+    assign ppln_ctrl.branch_addr = (branch_mispred & S_X_reg.branch_pred) ? S_X_reg.NPC : alu_result;
+
     assign ppln_ctrl.has_dest    = S_X_reg.has_dest;
     
     assign ppln_ctrl.is_store = `FALSE;
@@ -88,7 +92,7 @@ module func_unit_0 (
 
     assign X_packet.ppln_ctrl = ppln_ctrl;
 
-        // ALU opA mux
+    // ALU opA mux
     always_comb begin
         case (S_X_reg.opa_select)
             OPA_IS_RS1:  opa_mux_out = S_X_reg.V1;
