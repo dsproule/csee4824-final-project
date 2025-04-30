@@ -555,7 +555,7 @@ module pipeline (
         .req(FU_req), 
         .en(1'b1), 
         
-        .gnt(gnt), .req_up(cdb_valid)
+        .gnt_out(gnt), .req_up(cdb_valid)
     );
 
     //////////////////////////////////////////////////

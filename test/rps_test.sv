@@ -29,12 +29,12 @@ module testbench;
         @(negedge clock);
         reset = 0;
         
-        FU_ready[5] = 1;
-        FU_ready[4] = 1;
         @(negedge clock);
-        FU_ready = '0;
-        FU_ready[0] = 1;
-        repeat (10) @(negedge clock);
+        FU_ready = 6'b011001;
+        @(negedge clock);
+        @(negedge clock);
+        @(negedge clock);
+
 
         $finish;
     end
