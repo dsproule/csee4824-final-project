@@ -121,7 +121,7 @@ module pipeline (
     logic wr_proc, wr_valid;
 
     // lsq
-    logic mem_read_en, mem_write_en;
+    logic mem_read_en, mem_write_en, wfi;
     logic sq_empty, sq_full, lq_empty, lq_full;
 
     // debug outputs
@@ -342,7 +342,7 @@ module pipeline (
         
         // Outputs
         .T(rob_T_wire), .retire_T_out(retire_T_wire), .tail_wrap(ROB_tail_wrap),
-        .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), 
+        .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), .wfi(wfi),
         .retire(retire), .regfile_write_idx_out(retire_r_wire), 
         .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
         .V1(V1_rob), .V2(V2_rob),
@@ -436,7 +436,7 @@ module pipeline (
     lsq lsq_inst(
     // inputs
     .clock(clock), 
-    .reset(reset), .take_branch(take_branch),
+    .reset(reset), .take_branch(take_branch | wfi),
     .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
     .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
     .T(rob_T_wire),

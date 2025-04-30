@@ -240,12 +240,12 @@ module testbench;
      task print_sq;
     $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
     $display("--------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired | Dirty");
     $display("--------------------------------------------------------------------------------");
     for (int i = 0; i < `SQ_SZ; i++) begin
-      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b",
+      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b   |  %1b  ",
                i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
-               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired);
+               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired, core.lsq_inst.sq[i].dirty);
     end
     $display("--------------------------------------------------------------------------------\n");
   endtask
@@ -336,21 +336,21 @@ endtask
         if (~reset) begin
             // only start printing after first inst arrives
             // if ((clock_count >= 11607)) begin
-            if (IF_ID_reg_dbg.valid && (clock_count >= 700000))
+            if (IF_ID_reg_dbg.valid && (clock_count >= 0))
                 prog_start <= 1;
-            if ((clock_count >= 750000)) begin
-                show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
-                $finish;
-            end
+            // if ((clock_count >= 738000)) begin
+            //     show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
+            //     $finish;
+            // end
 
 
             if (prog_start) begin
-                print_if;
+                // print_if;
                 // print_ds;
-                print_rs;
+                // print_rs;
                 // print_mt;
                 // print_cdb;
-                print_rob;
+                // print_rob;
                 // // print_regs;
                 // // print_sx;
                 // print_lsq;
