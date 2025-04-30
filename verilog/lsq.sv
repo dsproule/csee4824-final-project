@@ -148,7 +148,7 @@ module lsq(
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
             if (sq[i].valid && sq[i].addr_valid && sq[i].data_valid &&
                     (sq[i].addr == S_X_load_addr) && update_lq && sq[i].T >= best_T_store) begin
-                if (((sq[i].T < S_X_load.T ~^ sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap)) && (sq[i].mem_access == mem_access_load_wire)) begin
+                if (((sq[i].T < S_X_load.T ~^ sq[i].ROB_wrap == lq[lq_X_T].ROB_wrap))) begin
                     best_T_store = sq[i].T;
                     fwd_packet_wire.T =  sq[i].T;
                     fwd_packet_wire.result = sq[i].data;
@@ -161,7 +161,7 @@ module lsq(
                         else if (mem_access_load_wire.mem_size == HALF) fwd_packet_wire.result[`XLEN-1:16] = {(`XLEN-16){sq[i].data[15]}};
                     end
 
-                    fwd_packet_wire.valid = `TRUE;
+                    fwd_packet_wire.valid = (sq[i].mem_access == mem_access_load_wire);
                     fwd_match[i] = 1;
                 end 
             end
@@ -263,7 +263,7 @@ module lsq(
 
             // SQ
             //dispatch alloc on decode, record current lq_tail in rs station as store position
-            if (sq_alloc  && !sq_full) begin
+            if (sq_alloc && !sq_full) begin
                 sq[sq_tail] <= 0;
                 sq[sq_tail].valid <= `TRUE;
                 sq[sq_tail].T <= T;

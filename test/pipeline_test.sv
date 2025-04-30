@@ -336,9 +336,9 @@ endtask
         if (~reset) begin
             // only start printing after first inst arrives
             // if ((clock_count >= 11607)) begin
-            if (IF_ID_reg_dbg.valid && (clock_count >= 2500))
+            if (IF_ID_reg_dbg.valid && (clock_count >= 0))
                 prog_start <= 1;
-            // if ((clock_count >= 3000)) begin
+            // if ((clock_count >= 300)) begin
             //     show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
             //     $finish;
             // end
@@ -352,7 +352,7 @@ endtask
                 // print_cdb;
                 // print_rob;
                 // // print_regs;
-                // // print_sx;
+                // print_sx;
                 // print_lsq;
                 // print_mem;
                 // print_xc;
