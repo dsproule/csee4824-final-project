@@ -1,0 +1,60 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Feb 19 17:30 2025
+Loading memory file: programs/struct_hazard.mem
+Using writeback output file: output/struct_hazard.wb
+Using pipeline output file: output/struct_hazard.ppln
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  6000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  9000 : System STILL at reset, can't show anything
+@@
+@@                 11500  Deasserting System reset......
+@@
+@@
+"test/mem.sv", 143: testbench.memory.unnamed$$_0.unnamed$$_4: started at 81000ps failed at 81000ps
+	Offending '(proc2mem_addr[1:0] == 2'b0)'
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 0020011300000001 : 9008380370747393
+@@@ mem[    8] = 0040021300800193 : 18016679145505171
+@@@ mem[   16] = 001000930010a023 : 4504230988652579
+@@@ mem[   24] = 0080019300200113 : 36030527892881683
+@@@ mem[   32] = 0050629300400213 : 22626381640761875
+@@@ mem[   40] = 0000001300000013 : 81604378643
+@@@ mem[   48] = 00000013002081b3 : 81606508979
+@@@ mem[   56] = 0000001300000013 : 81604378643
+@@@ mem[   64] = 0630222300000013 : 445893896828878867
+@@@ mem[   72] = 0000000010500073 : 273678451
+@@@
+@@@ mem[   96] = 0000000300000000 : 12884901888
+@@@
+@@@
+@@                293000 : System halted
+@@
+@@@ System halted on WFI instruction
+@@@
+@@
+@@  95 cycles / 18 instrs = 5.277778 CPI
+@@
+@@  282.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 296.
+$finish at simulation time               393000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 393000 ps
+CPU Time:      0.150 seconds;       Data structure size:   0.1Mb
+Wed Feb 19 17:30:01 2025

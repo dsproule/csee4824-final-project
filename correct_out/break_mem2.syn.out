@@ -1,0 +1,56 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Feb 28 14:39 2025
+Loading memory file: programs/break_mem2.mem
+Using writeback output file: output/break_mem2.syn.wb
+Using pipeline output file: output/break_mem2.syn.ppln
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  6000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  9000 : System STILL at reset, can't show anything
+@@
+@@                 11500  Deasserting System reset......
+@@
+@@
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 00112623ff010113 : 4827010648047891
+@@@ mem[    8] = 0010029300a12423 : 4506430021379107
+@@@ mem[   16] = fff5051302a2d063 : 18443653428172476515
+@@@ mem[   24] = 00812303fe9ff0ef : 36348772059443439
+@@@ mem[   32] = 00c1208302a30533 : 54360417562199347
+@@@ mem[   40] = 0000806701010113 : 141179886829843
+@@@ mem[   48] = 00c1208300100513 : 54360417519011091
+@@@ mem[   56] = 0000806701010113 : 141179886829843
+@@@ mem[   64] = fbdff0ef00500513 : 18149489932619482387
+@@@ mem[   72] = 0000000010500073 : 273678451
+@@@
+@@@
+@@                 26000 : System halted
+@@
+@@@ System halted on memory error
+@@@
+@@
+@@  6 cycles / 1 instrs = 6.000000 CPI
+@@
+@@  15.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 296.
+$finish at simulation time               126000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 126000 ps
+CPU Time:      0.160 seconds;       Data structure size:   2.2Mb
+Fri Feb 28 14:39:16 2025
