@@ -1,4 +1,3 @@
-
 ##########################
 # ---- Introduction ---- #
 ##########################
@@ -610,11 +609,12 @@ VTUBER = test/vtuber_test.sv \
          test/vtuber.cpp \
 		 test/mem.sv
 
-VISFLAGS = -lncurses
+VISFLAGS = -I$(HOME)/.local/include/ncursesw -L$(HOME)/.local/lib -lncursesw -ltinfow
 
 vis_simv: $(HEADERS) $(VTUBER) $(SOURCES)
+
 	@$(call PRINT_COLOR, 5, compiling visual debugger testbench)
-	$(VCS) $(VISFLAGS) $^ -o vis_simv
+	$(VCS) -CFLAGS "-I$(HOME)/.local/include/ncursesw" $(VISFLAGS) $^ -o vis_simv
 	@$(call PRINT_COLOR, 6, finished compiling visual debugger testbench)
 
 %.vis: programs/%.mem vis_simv
@@ -654,7 +654,7 @@ clean_exe:
 
 clean_run_files:
 	@$(call PRINT_COLOR, 3, removing per-run outputs)
-	rm -rf output/*.out output/*.wb output/*.ppln
+	rm -rf output/*.out output/*.wb output/*.ppln program.out
 
 clean_synth:
 	@$(call PRINT_COLOR, 1, removing synthesis files)
@@ -662,7 +662,7 @@ clean_synth:
 
 clean_output:
 	@$(call PRINT_COLOR, 1, removing entire output directory)
-	rm -rf output/
+	rm -rf output/ scoreboard.log
 
 clean_programs:
 	@$(call PRINT_COLOR, 3, removing program memory files)
