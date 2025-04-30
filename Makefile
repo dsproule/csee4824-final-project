@@ -147,7 +147,7 @@ OBJDFLAGS  = -SD -M numeric,no-aliases
 DEBUG_FLAG = -g
 
 # Patch for ncursesw for visual debugger
-CFLAGS += -I$(HOME)/.local/include/ncursesw -L$(HOME)/.local/lib -lncursesw -ltinfow
+CFLAGS += -I$(HOME)/.local/include/ncursesw
 
 # this is our RISC-V compiler toolchain
 # NOTE: you can use a local riscv install to compile programs by setting CAEN to 0
