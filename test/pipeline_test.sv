@@ -161,147 +161,147 @@ module testbench;
         end
     endtask // task show_clk_count
 
-    task print_if;
-        if (IF_ID_reg_dbg.valid) begin
-            $display("====================================================================================");
-            $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
-            $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
-            $display("------------------------------------------");
-        end
-    endtask
+//     task print_if;
+//         if (IF_ID_reg_dbg.valid) begin
+//             $display("====================================================================================");
+//             $display("\n(IF_ID_reg)\ttime: %d\n------------------------------------------", clock_count);
+//             $display("PC: %2h, INST: %8h", IF_ID_reg_dbg.PC, IF_ID_reg_dbg.inst); 
+//             $display("------------------------------------------");
+//         end
+//     endtask
 
-    task print_ds;
-        if (D_S_reg_dbg.valid) begin
-            $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
-            $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
-                    D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
-            $display("------------------------------------------");
-        end
-    endtask
+//     task print_ds;
+//         if (D_S_reg_dbg.valid) begin
+//             $display("\n(D_S_reg)\ttime: %d\n------------------------------------------", clock_count);
+//             $display("INST: %0h\nPC: %0h\nNPC: %0h\nr: %0h\nr1: %0h\nr2: %0h\nopa_select: %0h\nopb_select: %0h\ncond_branch: %0b, uncond_branch: %0b, alu_func: %0h\nrs_idx: %0h\nhalt: %0b, illegal: %0b, csr_op: %0b, valid: %0b\n", 
+//                     D_S_reg_dbg.inst, D_S_reg_dbg.PC, D_S_reg_dbg.NPC, D_S_reg_dbg.r, D_S_reg_dbg.r1, D_S_reg_dbg.r2, D_S_reg_dbg.opa_select, D_S_reg_dbg.opb_select, D_S_reg_dbg.cond_branch,D_S_reg_dbg.uncond_branch,D_S_reg_dbg.alu_func, D_S_reg_dbg.rs_idx, D_S_reg_dbg.halt, D_S_reg_dbg.illegal, D_S_reg_dbg.csr_op, D_S_reg_dbg.valid);
+//             $display("------------------------------------------");
+//         end
+//     endtask
 
-    task print_mt;
-        $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T1:%4d       T2:%4d", core.T1_wire, core.T2_wire);
-        for(l = 1; l < 20; l=l+1)
-            $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
-        $display("------------------------------------------");
-    endtask // print_mt
+//     task print_mt;
+//         $display("\n(MAP_TABLE)\ttime: %d\n------------------------------------------", clock_count);
+//         $display("T1:%4d       T2:%4d", core.T1_wire, core.T2_wire);
+//         for(l = 1; l < 20; l=l+1)
+//             $display("index: %4d   T:%4d\t  plus:%4d", l, mt_table[l].T, mt_table[l].plus);
+//         $display("------------------------------------------");
+//     endtask // print_mt
 
-    task print_rs;
-        $display("\n(RS_TABLE)\tstall: %1b time: %d\n------------------------------------------", core.rs_stall, clock_count);
-        for(j = 0; j < `RS_SZ; j=j+1)
-            $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table_dbg[j].T, rs_table_dbg[j].T1, rs_table_dbg[j].T2, $signed(rs_table_dbg[j].V1), $signed(rs_table_dbg[j].V2), busy_dbg[j], rs_table_dbg[j].ready);
-        $display("------------------------------------------");
-    endtask // print_rs
+//     task print_rs;
+//         $display("\n(RS_TABLE)\tstall: %1b time: %d\n------------------------------------------", core.rs_stall, clock_count);
+//         for(j = 0; j < `RS_SZ; j=j+1)
+//             $display("index: %4d   T:%4d   T1:%4d   T2:%4d   V1:%4d   V2:%4d   busy:   %b   ready:%b", j, rs_table_dbg[j].T, rs_table_dbg[j].T1, rs_table_dbg[j].T2, $signed(rs_table_dbg[j].V1), $signed(rs_table_dbg[j].V2), busy_dbg[j], rs_table_dbg[j].ready);
+//         $display("------------------------------------------");
+//     endtask // print_rs
 
-    task print_rob;
-        $display("\n(ROB_TABLE) h: %2d, t: %2d empty: %1h full: %1h \ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, core.rob_empty, core.rob_full, clock_count);
-        for(n = 1; n < 32; n=n+1)
-            $display("index: %4d   r:%4d   NPC:%4h    V:%4d    ready:%1b", n, rob_table[n].r, rob_table[n].NPC, rob_table[n].V, rob_table[n].ready);
-        $display("\n(RETIRE) valid: %1b, ROB_T: %4d, r: %d, flush: %0d data: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, pipeline_commit_wr_idx, rob_pipeline_control_dbg.flush, core.rob_write_data);
-    endtask // print_rob
+//     task print_rob;
+//         $display("\n(ROB_TABLE) h: %2d, t: %2d empty: %1h full: %1h \ttime: %d\n------------------------------------------", rob_head_dbg, rob_tail_dbg, core.rob_empty, core.rob_full, clock_count);
+//         for(n = 1; n < 32; n=n+1)
+//             $display("index: %4d   r:%4d   NPC:%4h    V:%4d    ready:%1b", n, rob_table[n].r, rob_table[n].NPC, rob_table[n].V, rob_table[n].ready);
+//         $display("\n(RETIRE) valid: %1b, ROB_T: %4d, r: %d, flush: %0d data: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, pipeline_commit_wr_idx, rob_pipeline_control_dbg.flush, core.rob_write_data);
+//     endtask // print_rob
 
-    task print_cdb;
-        $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T:%4h\t  V:%4h valid:%1b", cdb_dbg.T, cdb_dbg.V, cdb_dbg.valid);
-        $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
-        $display("------------------------------------------");
-    endtask // print_cdb
+//     task print_cdb;
+//         $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
+//         $display("T:%4h\t  V:%4h valid:%1b", cdb_dbg.T, cdb_dbg.V, cdb_dbg.valid);
+//         $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
+//         $display("------------------------------------------");
+//     endtask // print_cdb
 
-    task print_xc;
-        $display("\n(X_C_Regs)\ttime: %d\n------------------------------------------", clock_count);
-        for(j = 0; j < `RS_SZ; j=j+1)
-            $display("index: %4d T: %2h, result: %h, valid: %1h", j,  X_C_regs_dbg[j].T, X_C_regs_dbg[j].result, X_C_regs_dbg[j].valid);
-        $display("------------------------------------------");
-    endtask
+//     task print_xc;
+//         $display("\n(X_C_Regs)\ttime: %d\n------------------------------------------", clock_count);
+//         for(j = 0; j < `RS_SZ; j=j+1)
+//             $display("index: %4d T: %2h, result: %h, valid: %1h", j,  X_C_regs_dbg[j].T, X_C_regs_dbg[j].result, X_C_regs_dbg[j].valid);
+//         $display("------------------------------------------");
+//     endtask
 
-    task print_x_pkt;
-        $display("\n(X_Packet)\ttime: %d\n------------------------------------------", clock_count);
-        for(j = 0; j < `RS_SZ; j=j+1)
-            $display("index: %4d T: %2h, result: %h, valid: %1h", j,  core.X_packets[j].T, core.X_packets[j].result, core.X_packets[j].valid);
-        $display("------------------------------------------");
-    endtask
+//     task print_x_pkt;
+//         $display("\n(X_Packet)\ttime: %d\n------------------------------------------", clock_count);
+//         for(j = 0; j < `RS_SZ; j=j+1)
+//             $display("index: %4d T: %2h, result: %h, valid: %1h", j,  core.X_packets[j].T, core.X_packets[j].result, core.X_packets[j].valid);
+//         $display("------------------------------------------");
+//     endtask
 
-    task print_sx;
-        $display("\n(S_X_Regs)\ttime: %d\n------------------------------------------", clock_count);
-        for(p = 0; p <`RS_SZ; p++)
-            $display("index: %4d PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
-                        p, S_X_regs_dbg[p].PC, S_X_regs_dbg[p].inst, S_X_regs_dbg[p].T, S_X_regs_dbg[p].V1, S_X_regs_dbg[p].V2, S_X_regs_dbg[p].halt, S_X_regs_dbg[p].valid);
-        $display("------------------------------------------");
-    endtask
+//     task print_sx;
+//         $display("\n(S_X_Regs)\ttime: %d\n------------------------------------------", clock_count);
+//         for(p = 0; p <`RS_SZ; p++)
+//             $display("index: %4d PC: %2h, INST: %8h, T: %0h, V1: %0h, V2: %0h, halt: %b, valid: %b",
+//                         p, S_X_regs_dbg[p].PC, S_X_regs_dbg[p].inst, S_X_regs_dbg[p].T, S_X_regs_dbg[p].V1, S_X_regs_dbg[p].V2, S_X_regs_dbg[p].halt, S_X_regs_dbg[p].valid);
+//         $display("------------------------------------------");
+//     endtask
 
-    task print_regs;
-        $display("\n(Regs)\ttime: %d\n------------------------------------------", clock_count);
-        for(q = 0; q < 32; q++)
-            $display("r[%2d]: %8h", q, core.regfile_inst.registers[q]);
-        $display("------------------------------------------");
-    endtask
+//     task print_regs;
+//         $display("\n(Regs)\ttime: %d\n------------------------------------------", clock_count);
+//         for(q = 0; q < 32; q++)
+//             $display("r[%2d]: %8h", q, core.regfile_inst.registers[q]);
+//         $display("------------------------------------------");
+//     endtask
 
-     task print_sq;
-    $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
-    $display("--------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired | Dirty");
-    $display("--------------------------------------------------------------------------------");
-    for (int i = 0; i < `SQ_SZ; i++) begin
-      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b   |  %1b  ",
-               i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
-               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired, core.lsq_inst.sq[i].dirty);
-    end
-    $display("--------------------------------------------------------------------------------\n");
-  endtask
+//      task print_sq;
+//     $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
+//     $display("--------------------------------------------------------------------------------");
+//     $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired | Dirty");
+//     $display("--------------------------------------------------------------------------------");
+//     for (int i = 0; i < `SQ_SZ; i++) begin
+//       $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b   |  %1b  ",
+//                i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
+//                core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired, core.lsq_inst.sq[i].dirty);
+//     end
+//     $display("--------------------------------------------------------------------------------\n");
+//   endtask
 
-task print_lq;
-    $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", 
-             core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.lq_tail, clock_count);
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Line_Ofs | Size | Unsigned | Dep_SQ_T");
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-    for (int i = 0; i < `LQ_SZ; i++) begin
-        string state_str;
-        case (core.lsq_inst.lq[i].state)
-            NONE:      state_str = "NONE";
-            DATA_READY:state_str = "DATA_READY";
-            WAITING:   state_str = "WAITING";
-            FORWARDED: state_str = "FORWARDED";
-            default:   state_str = "???";
-        endcase
-        $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %1d     |   %1d  |     %1d    |   %2d",
-                 i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, 
-                 core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
-                 core.lsq_inst.lq[i].addr_valid, state_str,
-                 core.lsq_inst.lq[i].mem_access.line_offset,
-                 core.lsq_inst.lq[i].mem_access.mem_size,
-                 core.lsq_inst.lq[i].mem_access.rd_unsigned,
-                 core.lsq_inst.lq[i].dep_sq_T);
-    end
+// task print_lq;
+//     $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", 
+//              core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.lq_tail, clock_count);
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+//     $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Line_Ofs | Size | Unsigned | Dep_SQ_T");
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+//     for (int i = 0; i < `LQ_SZ; i++) begin
+//         string state_str;
+//         case (core.lsq_inst.lq[i].state)
+//             NONE:      state_str = "NONE";
+//             DATA_READY:state_str = "DATA_READY";
+//             WAITING:   state_str = "WAITING";
+//             FORWARDED: state_str = "FORWARDED";
+//             default:   state_str = "???";
+//         endcase
+//         $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %1d     |   %1d  |     %1d    |   %2d",
+//                  i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, 
+//                  core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
+//                  core.lsq_inst.lq[i].addr_valid, state_str,
+//                  core.lsq_inst.lq[i].mem_access.line_offset,
+//                  core.lsq_inst.lq[i].mem_access.mem_size,
+//                  core.lsq_inst.lq[i].mem_access.rd_unsigned,
+//                  core.lsq_inst.lq[i].dep_sq_T);
+//     end
 
-    $display("Current load_X: %1b | mem_access_load_wire: Line_Ofs: %0d Size: %0d Unsigned: %0d", 
-             core.lsq_inst.load_X, 
-             core.lsq_inst.mem_access_load_wire.line_offset, 
-             core.lsq_inst.mem_access_load_wire.mem_size, 
-             core.lsq_inst.mem_access_load_wire.rd_unsigned);
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-endtask
+//     $display("Current load_X: %1b | mem_access_load_wire: Line_Ofs: %0d Size: %0d Unsigned: %0d", 
+//              core.lsq_inst.load_X, 
+//              core.lsq_inst.mem_access_load_wire.line_offset, 
+//              core.lsq_inst.mem_access_load_wire.mem_size, 
+//              core.lsq_inst.mem_access_load_wire.rd_unsigned);
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+// endtask
 
 
 
-  task print_lsq;
-    print_lq();
-    print_sq();
-    $display("mem_read_en: %b mem_write_en: %d", core.rd_mem, core.wr_mem);
-    $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b funcunit2_T %d funcunit2_valid %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache, core.func_unit_2_x_packet.T, core.func_unit_2_x_packet.valid);
-    $display("----------------------------------------------------------------------------------------------------------\n");
-  endtask
+//   task print_lsq;
+//     print_lq();
+//     print_sq();
+//     $display("mem_read_en: %b mem_write_en: %d", core.rd_mem, core.wr_mem);
+//     $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b funcunit2_T %d funcunit2_valid %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache, core.func_unit_2_x_packet.T, core.func_unit_2_x_packet.valid);
+//     $display("----------------------------------------------------------------------------------------------------------\n");
+//   endtask
 
-    task print_mem;
-        if (proc2mem_command != BUS_NONE) begin
-            $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
-            $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
-            $display("rd/wr: %2b, take_branch: %1b", {core.rd_mem, core.wr_mem}, core.take_branch);
-            $display("------------------------------------------");
-        end
-    endtask
+//     task print_mem;
+//         if (proc2mem_command != BUS_NONE) begin
+//             $display("\n(Mem)\ttime: %d\n------------------------------------------", clock_count);
+//             $display("mem_addr: %8h, mem_command: %1d, mem_response: %2d, mem_tag: %2d, mem_data: %8h", proc2mem_addr, proc2mem_command, mem2proc_response, mem2proc_tag, mem2proc_data);
+//             $display("rd/wr: %2b, take_branch: %1b", {core.rd_mem, core.wr_mem}, core.take_branch);
+//             $display("------------------------------------------");
+//         end
+//     endtask
 
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;

@@ -2,11 +2,11 @@ Magic 271485
 Revision Verdi_U-2023.03-SP2-1
 
 ; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
-viewPort 0 25 677 183 100 65
+viewPort 0 25 725 313 100 65
 
 ; File list:
 ; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
-openDirFile -d / "" "/workdir/yd2770_csee4824/p4.fsdb"
+openDirFile -d / "" "/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/inter.fsdb"
 
 ; file time scale:
 ; fileTimeScale ### s|ms|us|ns|ps
@@ -16,8 +16,8 @@ signalSpacing 5
 
 ; windowTimeUnit is used for zoom, cursor & marker
 ; waveform viewport range
-zoom 1020.000000 2020.000000
-cursor 2000.000000
+zoom 11497.435897 27497.435897
+cursor 22750.000000
 marker 0.000000
 
 ; user define markers
@@ -25,7 +25,7 @@ marker 0.000000
 ; visible top row signal index
 top 0
 ; marker line index
-markerPos 1
+markerPos 11
 
 ; event list
 ; addEvent event_name event_expression
@@ -45,9 +45,19 @@ COMPLEX_EVENT_END
 curSTATUS ByChange
 
 
-addGroup "G1"
-activeDirFile "" "/workdir/yd2770_csee4824/p4.fsdb"
-addSignal -h 15 /testbench/clock
+addGroup "dcache_0"
+activeDirFile "" "/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/inter.fsdb"
+addSignal -h 15 /testbench/dcache_0/clock
+addSignal -h 15 /testbench/dcache_0/reset
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/Dmem2proc_response[3:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/Dmem2proc_data[63:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/Dmem2proc_tag[3:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dcache_addr[31:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dcache_command[1:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dmem_command[1:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dmem_addr[31:0]
+addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/Dcache_data_out[63:0]
+addSignal -h 15 /testbench/dcache_0/Dcache_valid_out
 addGroup "G2"
 
 ; getSignalForm Scope Hierarchy Status

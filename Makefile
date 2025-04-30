@@ -99,7 +99,7 @@
 
 # this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
 # this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
-export CLOCK_PERIOD = 350.0
+export CLOCK_PERIOD = 350
 
 # Path variables
 export RISCV32_HOME = /homes/user/fac/tk3070/tmp/riscv-gcc/riscv-32/bin
@@ -178,7 +178,7 @@ GREP = grep -E --color=auto
 # - with dependencies: 'rob.simv', 'rob.cov', and 'synth/rob.vg'
 
 TESTBENCH = lsq_test
-MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv ./verilog/lsq.sv
+MODULES = ./verilog/rs_stage.sv ./verilog/map_table.sv ./verilog/rob.sv ./verilog/regfile.sv ./verilog/lsq.sv verilog/dcache_nb.sv
 OUTPUT_DIR = ./output
 SIMV = $(TESTBENCH).simv
 SIM_OUT = $(OUTPUT_DIR)/$(TESTBENCH).out
@@ -208,7 +208,7 @@ $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
 # TODO: add more modules here
-TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps lsq  
+TESTED_MODULES = multi_module if_stage d_stage rs_stage func_unit_1 func_unit_3 func_unit_2 rps lsq dcache_nb
 
 MODULE = pipeline
 
@@ -233,6 +233,8 @@ $(call DEPS,multi_module): $(MULTI_MODULE_DEPS)
 
 IF_STAGE_DEPS = verilog/icache.sv verilog/d_stage.sv
 $(call DEPS,if_stage): $(IF_STAGE_DEPS) $(MEM_DEPS)
+
+$(call DEPS,dcache_nb): test/mem.sv
 
 # This allows you to use the following make targets:
 # make <module>.pass   <- greps for "@@@ Passed" or "@@@ Incorrect" in the output
@@ -372,7 +374,10 @@ SOURCES = verilog/pipeline.sv \
 		  verilog/map_table.sv \
 		  verilog/regfile.sv \
 		  verilog/rs_stage.sv \
-		  verilog/func_unit_*.sv \
+		  verilog/func_unit_0.sv \
+		  verilog/func_unit_1.sv \
+		  verilog/func_unit_2.sv \
+		  verilog/func_unit_3.sv \
           verilog/mult.sv \
           verilog/mult_stage.sv \
 		  verilog/rps.sv \
