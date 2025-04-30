@@ -2,7 +2,7 @@ Magic 271485
 Revision Verdi_U-2023.03-SP2-1
 
 ; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
-viewPort 0 25 725 313 100 65
+viewPort 0 25 673 300 100 150
 
 ; File list:
 ; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
@@ -16,16 +16,16 @@ signalSpacing 5
 
 ; windowTimeUnit is used for zoom, cursor & marker
 ; waveform viewport range
-zoom 11497.435897 27497.435897
-cursor 22750.000000
+zoom 22511.305518 54511.305518
+cursor 43750.000000
 marker 0.000000
 
 ; user define markers
 ; userMarker time_pos marker_name color linestyle
 ; visible top row signal index
-top 0
+top 37
 ; marker line index
-markerPos 11
+markerPos 44
 
 ; event list
 ; addEvent event_name event_expression
@@ -58,6 +58,39 @@ addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dmem_command[1:0]
 addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dmem_addr[31:0]
 addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/Dcache_data_out[63:0]
 addSignal -h 15 /testbench/dcache_0/Dcache_valid_out
+addSignal -expanded -h 15 /testbench/dcache_0/dcache_data[31:0]
+addSignal -h 15 /testbench/dcache_0/dcache_data[31]
+addSignal -h 15 /testbench/dcache_0/dcache_data[30]
+addSignal -h 15 /testbench/dcache_0/dcache_data[29]
+addSignal -h 15 /testbench/dcache_0/dcache_data[28]
+addSignal -h 15 /testbench/dcache_0/dcache_data[27]
+addSignal -h 15 /testbench/dcache_0/dcache_data[26]
+addSignal -h 15 /testbench/dcache_0/dcache_data[25]
+addSignal -h 15 /testbench/dcache_0/dcache_data[24]
+addSignal -h 15 /testbench/dcache_0/dcache_data[23]
+addSignal -h 15 /testbench/dcache_0/dcache_data[22]
+addSignal -h 15 /testbench/dcache_0/dcache_data[21]
+addSignal -h 15 /testbench/dcache_0/dcache_data[20]
+addSignal -h 15 /testbench/dcache_0/dcache_data[19]
+addSignal -h 15 /testbench/dcache_0/dcache_data[18]
+addSignal -h 15 /testbench/dcache_0/dcache_data[17]
+addSignal -h 15 /testbench/dcache_0/dcache_data[16]
+addSignal -h 15 /testbench/dcache_0/dcache_data[15]
+addSignal -h 15 /testbench/dcache_0/dcache_data[14]
+addSignal -h 15 /testbench/dcache_0/dcache_data[13]
+addSignal -h 15 /testbench/dcache_0/dcache_data[12]
+addSignal -h 15 /testbench/dcache_0/dcache_data[11]
+addSignal -h 15 /testbench/dcache_0/dcache_data[10]
+addSignal -h 15 /testbench/dcache_0/dcache_data[9]
+addSignal -h 15 /testbench/dcache_0/dcache_data[8]
+addSignal -h 15 /testbench/dcache_0/dcache_data[7]
+addSignal -h 15 /testbench/dcache_0/dcache_data[6]
+addSignal -h 15 /testbench/dcache_0/dcache_data[5]
+addSignal -h 15 /testbench/dcache_0/dcache_data[4]
+addSignal -h 15 /testbench/dcache_0/dcache_data[3]
+addSignal -h 15 /testbench/dcache_0/dcache_data[2]
+addSignal -h 15 /testbench/dcache_0/dcache_data[1]
+addSignal -h 15 /testbench/dcache_0/dcache_data[0]
 addGroup "G2"
 
 ; getSignalForm Scope Hierarchy Status

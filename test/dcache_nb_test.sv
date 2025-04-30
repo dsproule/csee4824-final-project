@@ -84,13 +84,15 @@ module testbench;
         reset = 0;
         show_mem_with_decimal(0, 12);
         
-        proc2Dcache_addr = `XLEN'h0;
-        proc2Dcache_command = BUS_LOAD;
+        proc2Dcache_addr <= `XLEN'h0;
+        proc2Dcache_command <= BUS_LOAD;
+        @(posedge clock);
+        proc2Dcache_addr <= `XLEN'h8;
+        @(posedge clock);
+        proc2Dcache_command <= BUS_NONE;
         @(posedge Dcache_valid_out);
         $display("\n\n\tmem: %8h", Dcache_data_out);
-        @(posedge clock);
-        proc2Dcache_addr = `XLEN'h8;
-        repeat (2) @(posedge clock);
+        repeat (5) @(posedge clock);
 
         $finish;
     end
