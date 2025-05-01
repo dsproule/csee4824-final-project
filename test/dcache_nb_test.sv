@@ -26,7 +26,7 @@ module testbench;
         end
     endtask // task show_mem_with_decimal
 
-    logic [63:0] proc2mem_data, mem2proc_data, Dcache_data_out;
+    logic [63:0] proc2mem_data, mem2proc_data, Dcache_data_out, proc2Dcache_data;
     logic [3:0] mem2proc_tag, mem2proc_response;
     logic [1:0] proc2mem_command, proc2Dcache_command;
     logic [`XLEN-1:0] proc2mem_addr, proc2Dcache_addr;
@@ -56,10 +56,12 @@ module testbench;
         // From fetch stage
         .proc2Dcache_addr(proc2Dcache_addr),
         .proc2Dcache_command(proc2Dcache_command),
+        .proc2Dcache_data(proc2Dcache_data),
 
         // To memory
         .proc2Dmem_command(proc2mem_command),
         .proc2Dmem_addr(proc2mem_addr),
+        .proc2Dmem_data(proc2mem_data),
 
         // To fetch stage
         .Dcache_data_out(Dcache_data_out),
@@ -82,7 +84,6 @@ module testbench;
         memory.unified_memory[3] = 64'h0103229300130313;
         @(negedge clock);
         reset = 0;
-        show_mem_with_decimal(0, 12);
         
         proc2Dcache_addr <= `XLEN'h0;
         proc2Dcache_command <= BUS_LOAD;
@@ -93,7 +94,12 @@ module testbench;
         @(posedge Dcache_valid_out);
         $display("\n\n\tmem: %8h", Dcache_data_out);
         repeat (5) @(posedge clock);
+        proc2Dcache_addr <= `XLEN'd32;
+        proc2Dcache_command <= BUS_STORE;
+        proc2Dcache_data    <= 64'hdeadface;
+        repeat (10) @(posedge clock);
 
+        show_mem_with_decimal(0, 12);
         $finish;
     end
 
