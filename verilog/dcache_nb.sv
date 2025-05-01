@@ -165,13 +165,9 @@ module dcache_nb (
         end else begin
             // if slot is empty and the req address is not present, allocate it
             if (~mshr[mshr_next_idx].valid & wr_mem) begin 
-            //     (Dcache_valid_out & (proc2Dcache_command == BUS_STORE) & (dcache_data[current_index].data != proc2Dcache_data))) begin
-            //     // free the dcache entry to allow 
-            //     dcache_data[current_index].data     <= proc2Dcache_data;    
                 dcache_data[current_index].wr_cache <= 0;    
-            //     dcache_data[current_index].valid    <= 1;
-
-            //     // alloc the memory write in the mshr
+            
+                // alloc the memory write in the mshr
                 mshr[mshr_next_idx].addr        <= proc2Dcache_addr[`XLEN-1:3];
                 mshr[mshr_next_idx].cache_tag   <= current_tag;
                 mshr[mshr_next_idx].cache_index <= current_index;

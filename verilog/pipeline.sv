@@ -150,9 +150,10 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
+    wire dcache_action = (cache2Dmem_command != BUS_NONE);
     assign rd_mem = mem_read_en;
     assign wr_mem = mem_write_en;
-    assign Dmem_req = (wr_mem | rd_mem);
+    assign Dmem_req = (wr_mem | rd_mem | dcache_action);
 
     // for all memory vectors, ind0 -> wr and ind1 -> rd
 
@@ -403,7 +404,7 @@ module pipeline (
     );
 
     wire [1:0] Dmem_command = (wr_mem) ? BUS_STORE :
-                       (rd_mem) ? BUS_LOAD : BUS_NONE;
+                              (rd_mem) ? BUS_LOAD : BUS_NONE;
     dcache_nb dache_0(
         .clock(clock), .reset(reset),
 

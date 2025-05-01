@@ -201,12 +201,12 @@ module testbench;
 //         $display("\n(RETIRE) valid: %1b, ROB_T: %4d, r: %d, flush: %0d data: %0h\n------------------------------------------", rob_retire_dbg, retire_T_wire_dbg, pipeline_commit_wr_idx, rob_pipeline_control_dbg.flush, core.rob_write_data);
 //     endtask // print_rob
 
-    task print_cdb;
-        $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
-        $display("T:%4h\t  V:%4h valid:%1b", cdb_dbg.T, cdb_dbg.V, cdb_dbg.valid);
-        $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
-        $display("------------------------------------------");
-    endtask // print_cdb
+    // task print_cdb;
+    //     $display("\n(CDB)\ttime: %d\n------------------------------------------", clock_count);
+    //     $display("T:%4h\t  V:%4h valid:%1b", cdb_dbg.T, cdb_dbg.V, cdb_dbg.valid);
+    //     $display("FU_ready:%b\t  FU_req:%b\t    gnt:%b", FU_ready_dbg, FU_req_dbg, gnt_dbg);
+    //     $display("------------------------------------------");
+    // endtask // print_cdb
 
 //     task print_xc;
 //         $display("\n(X_C_Regs)\ttime: %d\n------------------------------------------", clock_count);
@@ -237,62 +237,62 @@ module testbench;
 //         $display("------------------------------------------");
 //     endtask
 
-     task print_sq;
-    $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
-    $display("--------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired | Dirty");
-    $display("--------------------------------------------------------------------------------");
-    for (int i = 0; i < `SQ_SZ; i++) begin
-      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b   |  %1b  ",
-               i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
-               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired, core.lsq_inst.sq[i].dirty);
-    end
-    $display("--------------------------------------------------------------------------------\n");
-  endtask
+//      task print_sq;
+//     $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
+//     $display("--------------------------------------------------------------------------------");
+//     $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired | Dirty");
+//     $display("--------------------------------------------------------------------------------");
+//     for (int i = 0; i < `SQ_SZ; i++) begin
+//       $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b   |  %1b  ",
+//                i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
+//                core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired, core.lsq_inst.sq[i].dirty);
+//     end
+//     $display("--------------------------------------------------------------------------------\n");
+//   endtask
 
-    task print_lq;
-    $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", 
-             core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.lq_tail, clock_count);
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Line_Ofs | Size | Unsigned | Dep_SQ_T");
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-    for (int i = 0; i < `LQ_SZ; i++) begin
-        string state_str;
-        case (core.lsq_inst.lq[i].state)
-            NONE:      state_str = "NONE";
-            DATA_READY:state_str = "DATA_READY";
-            WAITING:   state_str = "WAITING";
-            FORWARDED: state_str = "FORWARDED";
-            default:   state_str = "???";
-        endcase
-        $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %1d     |   %1d  |     %1d    |   %2d",
-                 i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, 
-                 core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
-                 core.lsq_inst.lq[i].addr_valid, state_str,
-                 core.lsq_inst.lq[i].mem_access.line_offset,
-                 core.lsq_inst.lq[i].mem_access.mem_size,
-                 core.lsq_inst.lq[i].mem_access.rd_unsigned,
-                 core.lsq_inst.lq[i].dep_sq_T);
-    end
+//     task print_lq;
+//     $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", 
+//              core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.lq_tail, clock_count);
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+//     $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Line_Ofs | Size | Unsigned | Dep_SQ_T");
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+//     for (int i = 0; i < `LQ_SZ; i++) begin
+//         string state_str;
+//         case (core.lsq_inst.lq[i].state)
+//             NONE:      state_str = "NONE";
+//             DATA_READY:state_str = "DATA_READY";
+//             WAITING:   state_str = "WAITING";
+//             FORWARDED: state_str = "FORWARDED";
+//             default:   state_str = "???";
+//         endcase
+//         $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %1d     |   %1d  |     %1d    |   %2d",
+//                  i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, 
+//                  core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
+//                  core.lsq_inst.lq[i].addr_valid, state_str,
+//                  core.lsq_inst.lq[i].mem_access.line_offset,
+//                  core.lsq_inst.lq[i].mem_access.mem_size,
+//                  core.lsq_inst.lq[i].mem_access.rd_unsigned,
+//                  core.lsq_inst.lq[i].dep_sq_T);
+//     end
 
-    $display("Current load_X: %1b | mem_access_load_wire: Line_Ofs: %0d Size: %0d Unsigned: %0d", 
-             core.lsq_inst.load_X, 
-             core.lsq_inst.mem_access_load_wire.line_offset, 
-             core.lsq_inst.mem_access_load_wire.mem_size, 
-             core.lsq_inst.mem_access_load_wire.rd_unsigned);
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-endtask
+//     $display("Current load_X: %1b | mem_access_load_wire: Line_Ofs: %0d Size: %0d Unsigned: %0d", 
+//              core.lsq_inst.load_X, 
+//              core.lsq_inst.mem_access_load_wire.line_offset, 
+//              core.lsq_inst.mem_access_load_wire.mem_size, 
+//              core.lsq_inst.mem_access_load_wire.rd_unsigned);
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+//     $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+// endtask
 
 
 
-  task print_lsq;
-    print_lq();
-    print_sq();
-    $display("mem_read_en: %b mem_write_en: %d", core.rd_mem, core.wr_mem);
-    $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b funcunit2_T %d funcunit2_valid %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache, core.func_unit_2_x_packet.T, core.func_unit_2_x_packet.valid);
-    $display("----------------------------------------------------------------------------------------------------------\n");
-  endtask
+//   task print_lsq;
+//     print_lq();
+//     print_sq();
+//     $display("mem_read_en: %b mem_write_en: %d", core.rd_mem, core.wr_mem);
+//     $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b funcunit2_T %d funcunit2_valid %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache, core.func_unit_2_x_packet.T, core.func_unit_2_x_packet.valid);
+//     $display("----------------------------------------------------------------------------------------------------------\n");
+//   endtask
 
 //     task print_mem;
 //         if (proc2mem_command != BUS_NONE) begin
@@ -338,10 +338,6 @@ endtask
             // if ((clock_count >= 11607)) begin
             if (IF_ID_reg_dbg.valid && (clock_count >= 0))
                 prog_start <= 1;
-            if ((clock_count >= 4000)) begin
-                show_mem_with_decimal(0,`MEM_64BIT_LINES - 1);
-                $finish;
-            end
 
 
             if (prog_start) begin
@@ -353,7 +349,7 @@ endtask
                 // print_rob;
                 // // print_regs;
                 // print_sx;
-                print_lsq;
+                // print_lsq;
                 // print_mem;
                 // print_xc;
                 

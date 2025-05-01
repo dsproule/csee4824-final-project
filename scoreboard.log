@@ -1,7 +1,7 @@
 
 ================== SCOREBOARD ==================
-Test Run: Thu May  1 16:55:21 EDT 2025
+Test Run: Thu May  1 18:27:16 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
-store_tests          | FAIL       | FAIL       | 2.944444   | WFI instruction               
+dfs                  | PASS       | PASS       | 3.323901   | WFI instruction               
 ==========================================================================================
