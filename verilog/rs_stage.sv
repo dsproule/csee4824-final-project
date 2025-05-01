@@ -48,7 +48,6 @@ module RS_ALLOC(
             // Clear entries when marked free
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++) begin
                 if (rs_free[busy_reset_idx]) begin
-                    $display(">>> RS[%0d] cleared at time %0t", busy_reset_idx, $time);
                     rs_table[busy_reset_idx] <= '0;
                     busy[busy_reset_idx]     <= `FALSE;
                     next_busy[busy_reset_idx] <= `FALSE;
@@ -65,7 +64,6 @@ module RS_ALLOC(
 
                 // T1 logic
                 if (cdb.valid && next_re.T1 == cdb.T) begin
-                    $display(">>> [DISPATCH+CDB] RS[%0d] matched T1 = %0d, setting V1 = %0d", rs_update_idx, cdb.T, cdb.V);
                     rs_table[rs_update_idx].T1      <= 0;
                     rs_table[rs_update_idx].V1      <= cdb.V;
                     rs_table[rs_update_idx].ready[0]<= `TRUE;
@@ -77,7 +75,6 @@ module RS_ALLOC(
 
                 // T2 logic
                 if (cdb.valid && next_re.T2 == cdb.T) begin
-                    $display(">>> [DISPATCH+CDB] RS[%0d] matched T2 = %0d, setting V2 = %0d", rs_update_idx, cdb.T, cdb.V);
                     rs_table[rs_update_idx].T2      <= 0;
                     rs_table[rs_update_idx].V2      <= cdb.V;
                     rs_table[rs_update_idx].ready[1]<= `TRUE;
@@ -85,9 +82,6 @@ module RS_ALLOC(
                     rs_table[rs_update_idx].T2      <= next_re.T2;
                     rs_table[rs_update_idx].V2      <= next_re.V2;
                     rs_table[rs_update_idx].ready[1]<= next_re.ready[1];
-                    if (rs_update_idx == 1 && next_re.T2 == 4) begin
-                        $display(">>> DISPATCH: RS[1] assigned T2=4 at time %0t", $time);
-                    end
                 end
 
                 next_re_valid <= `FALSE;
@@ -169,11 +163,8 @@ module RS_ALLOC(
             // if a CDB line came in 
             if (cdb.valid) 
                 for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
-                    $display(">>> [CDB] Checked RS[%0d] T2=%0d against cdb.T=%0d", cdb_idx, rs_table[cdb_idx].T2, cdb.T);
 
                     if (rs_table[cdb_idx].T1 == cdb.T) begin
-                        $display(">>> [CDB] RS[%0d] T1 matched T=%0d, setting V1=%0d", cdb_idx, cdb.T, cdb.V);
-                        $display(">>> [CDB] Valid: %b T=%0d V=%0d", cdb.valid, cdb.T, cdb.V);
 
                         rs_table[cdb_idx].V1 <= cdb.V;
                         rs_table[cdb_idx].T1 <= 0;
@@ -181,16 +172,9 @@ module RS_ALLOC(
                     end
 
                     if (rs_table[cdb_idx].T2 == cdb.T) begin
-                         $display(">>> [CDB] RS[%0d] T2 matched T=%0d, setting V2=%0d", cdb_idx, cdb.T, cdb.V);
-                         $display(">>> [CDB] Valid: %b T=%0d V=%0d", cdb.valid, cdb.T, cdb.V);
-
                         rs_table[cdb_idx].V2 <= cdb.V;
                         rs_table[cdb_idx].T2 <= 0;
                         rs_table[cdb_idx].ready[1] <= `TRUE;
-                        $display(">>> CDB UPDATE: RS[%0d] T2 matched T=%0d, V2=%0d at time %0t", cdb_idx, cdb.T, cdb.V, $time);
-                        if (cdb_idx == 1) begin
-                            $display(">>> CDB HIT: RS[1] accepted broadcast T=4 at time %0t", $time);
-                        end;
                     end
                 end
         end
