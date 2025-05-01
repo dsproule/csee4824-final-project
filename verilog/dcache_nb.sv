@@ -14,7 +14,7 @@
 `define CACHE_LINES 32
 `define CACHE_LINE_BITS $clog2(`CACHE_LINES)
 // how many outstanding misses to handle at a time
-`define MSHR_SLOTS 5
+`define MSHR_SLOTS 8
 
 typedef struct packed {
     logic [63:0]                  data;
@@ -152,7 +152,8 @@ module dcache_nb (
             dcache_data    <= 0; // Set all cache data to 0 (including valid bits)
         end else begin
             // if slot is empty and the req address is not present, allocate it
-            if (~mshr[mshr_next_idx].valid & dcache_data[current_index].wr_cache) begin
+            if ((~mshr[mshr_next_idx].valid & dcache_data[current_index].wr_cache) | 
+                (Dcache_valid_out & (proc2Dcache_command == BUS_STORE))) begin
                 // free the dcache entry to allow 
                 dcache_data[current_index].data     <= proc2Dcache_data;    
                 dcache_data[current_index].wr_cache <= 0;    
