@@ -45,15 +45,6 @@ module RS_ALLOC(
             rs_free_latched <= '0;
             rs_free_latched_prev <= '0;
         end else begin  
-            // Latch rs_free from RS_VALUE output
-            // Latch rs_free from RS_VALUE output (FIXED LOCATION)
-            rs_free_latched_prev <= rs_free_latched;
-            rs_free_latched <= rs_free;  
- 
-            // busy handling
-            if (!rs_free[rs_update_idx]) begin
-                busy[rs_update_idx] <= next_busy[rs_update_idx];
-            end
             // Clear entries when marked free
             for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++) begin
                 if (rs_free[busy_reset_idx]) begin
@@ -63,8 +54,11 @@ module RS_ALLOC(
                     next_busy[busy_reset_idx] <= `FALSE;
                 end
             end
-
-                    
+            // Latch rs_free from RS_VALUE output
+            // Latch rs_free from RS_VALUE output (FIXED LOCATION)
+            rs_free_latched_prev <= rs_free_latched;
+            rs_free_latched <= rs_free;  
+ 
             if (next_re_valid) begin
                 rs_table[rs_update_idx].T         <= next_re.T;
                 rs_table[rs_update_idx].D_S_reg   <= next_re.D_S_reg;
@@ -91,6 +85,9 @@ module RS_ALLOC(
                     rs_table[rs_update_idx].T2      <= next_re.T2;
                     rs_table[rs_update_idx].V2      <= next_re.V2;
                     rs_table[rs_update_idx].ready[1]<= next_re.ready[1];
+                    if (rs_update_idx == 1 && next_re.T2 == 4) begin
+                        $display(">>> DISPATCH: RS[1] assigned T2=4 at time %0t", $time);
+                    end
                 end
 
                 next_re_valid <= `FALSE;
@@ -116,7 +113,7 @@ module RS_ALLOC(
             */
 
             // if RS entry is empty, allocate it
-             if ((~busy[rs_idx] | rs_free_latched[rs_idx]) & en) begin
+             if ((~busy[rs_idx] & ~rs_free[rs_idx]) & en) begin
                 next_busy[rs_idx] <= `TRUE;
                 busy[rs_idx] <= `TRUE;
                 
@@ -172,6 +169,8 @@ module RS_ALLOC(
             // if a CDB line came in 
             if (cdb.valid) 
                 for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
+                    $display(">>> [CDB] Checked RS[%0d] T2=%0d against cdb.T=%0d", cdb_idx, rs_table[cdb_idx].T2, cdb.T);
+
                     if (rs_table[cdb_idx].T1 == cdb.T) begin
                         $display(">>> [CDB] RS[%0d] T1 matched T=%0d, setting V1=%0d", cdb_idx, cdb.T, cdb.V);
                         $display(">>> [CDB] Valid: %b T=%0d V=%0d", cdb.valid, cdb.T, cdb.V);
@@ -188,6 +187,10 @@ module RS_ALLOC(
                         rs_table[cdb_idx].V2 <= cdb.V;
                         rs_table[cdb_idx].T2 <= 0;
                         rs_table[cdb_idx].ready[1] <= `TRUE;
+                        $display(">>> CDB UPDATE: RS[%0d] T2 matched T=%0d, V2=%0d at time %0t", cdb_idx, cdb.T, cdb.V, $time);
+                        if (cdb_idx == 1) begin
+                            $display(">>> CDB HIT: RS[1] accepted broadcast T=4 at time %0t", $time);
+                        end;
                     end
                 end
         end
@@ -240,6 +243,7 @@ module RS_VALUE(
                     S_packet[s_idx].has_dest      = rs_table[s_idx].D_S_reg.has_dest;
                     
                     rs_free[s_idx] = 1'b1;
+                    if (s_idx == 3) $display(">>> RS_VALUE: RS[3] issued at time %0t", $time);
                 end else begin
                     S_packet[s_idx] = 0;
                     rs_free[s_idx] = 0;
