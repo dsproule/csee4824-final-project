@@ -2,7 +2,7 @@ Magic 271485
 Revision Verdi_U-2023.03-SP2-1
 
 ; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
-viewPort 0 25 916 365 166 65
+viewPort 0 25 1009 415 162 65
 
 ; File list:
 ; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
@@ -16,16 +16,16 @@ signalSpacing 5
 
 ; windowTimeUnit is used for zoom, cursor & marker
 ; waveform viewport range
-zoom 36412.017641 67944.864356
-cursor 47250.000000
+zoom 50510.459427 70835.202020
+cursor 71750.000000
 marker 0.000000
 
 ; user define markers
 ; userMarker time_pos marker_name color linestyle
 ; visible top row signal index
-top 12
+top 6
 ; marker line index
-markerPos 15
+markerPos 20
 
 ; event list
 ; addEvent event_name event_expression
@@ -60,19 +60,14 @@ addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dmem_addr[31:0]
 addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/proc2Dmem_data[63:0]
 addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/Dcache_data_out[63:0]
 addSignal -h 15 /testbench/dcache_0/Dcache_valid_out
-addSignal -expanded -h 15 /testbench/dcache_0/mshr[4]
-addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/mshr[4].addr[31:3]
-addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/mshr[4].cache_tag[7:0]
-addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/mshr[4].cache_index[4:0]
-addSignal -h 15 /testbench/dcache_0/mshr[4].wr
-addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/mshr[4].mem_tag[3:0]
-addSignal -h 15 -UNSIGNED -HEX /testbench/dcache_0/mshr[4].mem_command[1:0]
-addSignal -h 15 /testbench/dcache_0/mshr[4].valid
 addSignal -h 15 /testbench/dcache_0/mshr[3]
 addSignal -h 15 /testbench/dcache_0/mshr[2]
 addSignal -h 15 /testbench/dcache_0/mshr[1]
 addSignal -h 15 /testbench/dcache_0/mshr[0]
 addGroup "G2"
+addSignal -h 15 /testbench/dcache_0/cache_need_wr
+addSignal -h 15 /testbench/dcache_0/wr_mem
+addGroup "G3"
 
 ; getSignalForm Scope Hierarchy Status
 ; active file of getSignalForm

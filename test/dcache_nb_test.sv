@@ -162,7 +162,7 @@ module testbench;
         $display("Store on cache hit works.");
 
 
-        repeat (2) @(posedge clock);
+        repeat (15) @(posedge clock);
         show_mem_with_decimal(0, 20);
         $display("Passed!");
         $finish;

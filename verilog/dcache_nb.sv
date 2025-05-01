@@ -14,7 +14,7 @@
 `define CACHE_LINES 32
 `define CACHE_LINE_BITS $clog2(`CACHE_LINES)
 // how many outstanding misses to handle at a time
-`define MSHR_SLOTS 8
+`define MSHR_SLOTS 4
 
 typedef struct packed {
     logic [63:0]                  data;
@@ -74,17 +74,17 @@ module dcache_nb (
     logic [`CACHE_LINE_BITS - 1:0] current_index;
     logic mem_forward;
 
-    logic current_in_cache;
-    
     // ---- MSHR non-blocking logic ---- // 
 
     assign {current_tag, current_index} = proc2Dcache_addr[15:3];
 
     // forwarding logic to squeeze data out of cache a cycle sooner
-    assign current_in_cache = dcache_data[current_index].valid &&
+    wire current_in_cache = dcache_data[current_index].valid &&
                             (dcache_data[current_index].tags == current_tag);
+    wire cache_need_wr = (proc2Dcache_command == BUS_STORE) & (dcache_data[current_index].data != proc2Dcache_data);
+
     assign Dcache_data_out = dcache_data[current_index].data;
-    assign Dcache_valid_out = current_in_cache;
+    assign Dcache_valid_out = current_in_cache & ~cache_need_wr;
 
     logic [$clog2(`MSHR_SLOTS)-1:0] mshr_next_idx;
     logic current_in_mshr;
@@ -136,6 +136,18 @@ module dcache_nb (
         {resp_tag, resp_index} = mshr[mshr_resp_idx].addr[15:3];
     end
 
+    logic [`CACHE_LINE_BITS-1:0] wr_idx;
+    logic wr_mem;
+    always_comb begin
+        wr_mem = 0;
+        for (logic [`CACHE_LINE_BITS:0] cache_wr_idx = 0; cache_wr_idx < `CACHE_LINES; cache_wr_idx++) begin
+            if (dcache_data[cache_wr_idx].wr_cache) begin
+                wr_idx = cache_wr_idx;
+                wr_mem = 1;
+            end
+        end
+    end
+
     assign mem_forward = (proc2Dcache_addr[`XLEN-1:3] == mshr[mshr_resp_idx].addr) & (got_mem_data);
 
     // ---- Memory access logic ---- //
@@ -152,19 +164,19 @@ module dcache_nb (
             dcache_data    <= 0; // Set all cache data to 0 (including valid bits)
         end else begin
             // if slot is empty and the req address is not present, allocate it
-            if ((~mshr[mshr_next_idx].valid & dcache_data[current_index].wr_cache) | 
-                (Dcache_valid_out & (proc2Dcache_command == BUS_STORE) & (dcache_data[current_index].data != proc2Dcache_data))) begin
-                // free the dcache entry to allow 
-                dcache_data[current_index].data     <= proc2Dcache_data;    
+            if (~mshr[mshr_next_idx].valid & wr_mem) begin 
+            //     (Dcache_valid_out & (proc2Dcache_command == BUS_STORE) & (dcache_data[current_index].data != proc2Dcache_data))) begin
+            //     // free the dcache entry to allow 
+            //     dcache_data[current_index].data     <= proc2Dcache_data;    
                 dcache_data[current_index].wr_cache <= 0;    
-                dcache_data[current_index].valid    <= 1;
+            //     dcache_data[current_index].valid    <= 1;
 
-                // alloc the memory write in the mshr
+            //     // alloc the memory write in the mshr
                 mshr[mshr_next_idx].addr        <= proc2Dcache_addr[`XLEN-1:3];
                 mshr[mshr_next_idx].cache_tag   <= current_tag;
                 mshr[mshr_next_idx].cache_index <= current_index;
 
-                mshr[mshr_next_idx].wr          <= 0;
+            //     mshr[mshr_next_idx].wr          <= 0;
 
                 mshr[mshr_next_idx].mem_tag     <= 0;
                 mshr[mshr_next_idx].mem_command <= BUS_STORE;
@@ -176,9 +188,6 @@ module dcache_nb (
                 mshr[mshr_next_idx].cache_tag   <= current_tag;
                 mshr[mshr_next_idx].cache_index <= current_index;
                 
-                // store has to get marked first
-                mshr[mshr_next_idx].wr          <= (proc2Dcache_command == BUS_STORE);
-
                 mshr[mshr_next_idx].mem_tag     <= 0;
                 mshr[mshr_next_idx].mem_command <= BUS_LOAD;
 
@@ -193,15 +202,19 @@ module dcache_nb (
                     mshr[mshr_req_idx] <= 0;
             end
 
+            if (cache_need_wr & current_in_cache) begin
+                dcache_data[current_index].data     <= proc2Dcache_data;    
+                dcache_data[current_index].wr_cache <= 1;    
+            end
+
             // if memory tag corresponds with a mshr entry, save the value and free the slot
             if (got_mem_data) begin
                 dcache_data[resp_index].data  <= Dmem2proc_data;
                 dcache_data[resp_index].tags  <= resp_tag;
 
                 // push to dcache if is a store command
-                dcache_data[resp_index].wr_cache <= mshr[mshr_resp_idx].wr;
-
-                dcache_data[resp_index].valid <= ~mshr[mshr_resp_idx].wr;
+                dcache_data[resp_index].wr_cache <= 0;
+                dcache_data[resp_index].valid <= 1;
 
                 mshr[mshr_resp_idx] <= 0;
             end
