@@ -1,0 +1,5 @@
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1746075807.760792110}
+{"VCS_COMP_START_TIME": 1746075807.760792110}
+{"VCS_COMP_END_TIME": 1746076136.124645192}
+{"VCS_USER_OPTIONS": "-sverilog +vc -Mupdate -line -full64 -kdb -lca -nc -debug_access+all+reverse +warn=noTFIPC +warn=noDEBUG_DEP +warn=noENUMASSIGN +define+CLOCK_PERIOD=350.0 test/rs_stage_test.sv verilog/rs_stage.sv -o rs_stage.simv"}
+{"vcs1": {"peak_mem": 551092}}

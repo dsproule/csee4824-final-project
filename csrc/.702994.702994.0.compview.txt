@@ -1,0 +1,7 @@
+Command exited with non-zero status 255
+{"vcs1":{"timestamp_begin":1746074854.780465809, "rt":9.99, "ut":0.14, "st":0.14}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1746074854.150485620}
+{"VCS_COMP_START_TIME": 1746074854.150485620}
+{"VCS_COMP_END_TIME": 1746076136.127653333}
+{"VCS_USER_OPTIONS": "-sverilog +vc -Mupdate -line -full64 -kdb -lca -nc -debug_access+all+reverse +warn=noTFIPC +warn=noDEBUG_DEP +warn=noENUMASSIGN +define+CLOCK_PERIOD=350.0 test/rs_stage_test.sv verilog/rs_stage.sv -o rs_stage.simv"}
+{"vcs1": {"peak_mem": 551100}}

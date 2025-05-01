@@ -1,0 +1,238 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  May  1 01:04 2025
+
+(RS_TABLE) cycle 0 - Initialization
+------------------------------------------
+idx:0 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+idx:1 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+idx:2 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+idx:3 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+------------------------------------------
+
+(RS_TABLE) cycle 1 - Reset
+------------------------------------------
+idx:0 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+idx:1 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+idx:2 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+idx:3 T:x T1:x T2:x V1:x V2:x busy:x ready:xx
+------------------------------------------
+
+(RS_TABLE) cycle 1 - Reset
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+------------------------------------------
+
+(RS_TABLE) cycle 2 - Load to RS[1]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+------------------------------------------
+
+(RS_TABLE) cycle 2 - Load to RS[1]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:0 T1:0 T2:0 V1:0 V2:0 busy:1 ready:00
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+------------------------------------------
+
+(RS_TABLE) cycle 3 - Load to RS[1]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+------------------------------------------
+
+(RS_TABLE) cycle 3 - Multiply to RS[3]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+------------------------------------------
+
+(RS_TABLE) cycle 4 - Multiply to RS[3]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:0 T1:0 T2:0 V1:0 V2:0 busy:1 ready:00
+------------------------------------------
+
+(RS_TABLE) cycle 4 - Multiply to RS[3]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 5 - Store to RS[2]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 5 - Store to RS[2]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:0 T1:0 T2:0 V1:0 V2:0 busy:1 ready:00
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 5 - Store to RS[2]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 6 - Store to RS[2]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 6 - ADDI to RS[0]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:0 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 7 - ADDI to RS[0]
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:1 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 7 - ADDI to RS[0]
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 7 - ADDI to RS[0]
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+>>> Monitor: rs_free[0] at cycle 16
+
+(RS_TABLE) cycle 8 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 8 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:0 T1:0 T2:0 V1:0 V2:0 busy:1 ready:00
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 9 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 9 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 10 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 10 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 11 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 11 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 12 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 12 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+
+(RS_TABLE) cycle 13 - Free ADDI with FU ready
+------------------------------------------
+idx:0 T:4 T1:0 T2:0 V1:8 V2:0 busy:1 ready:11
+idx:1 T:1 T1:0 T2:0 V1:0 V2:8 busy:1 ready:11
+idx:2 T:3 T1:2 T2:0 V1:0 V2:8 busy:1 ready:10
+idx:3 T:2 T1:0 T2:1 V1:5 V2:0 busy:1 ready:01
+------------------------------------------
+@@@ Failed at cycle 13 (FREE expected) - Free ADDI with FU ready
+@@@ Expected idx:0 to be free (busy=0), but busy=1
+$finish called from file "test/rs_stage_test.sv", line 104.
+$finish at simulation time                91000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 9100000 ps
+CPU Time:      0.270 seconds;       Data structure size:   0.0Mb
+Thu May  1 01:04:46 2025

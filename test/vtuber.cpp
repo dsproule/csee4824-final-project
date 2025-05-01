@@ -117,7 +117,7 @@ void parse_register(char* readbuf, int reg_num, char*** contents, char** reg_nam
 int get_time();
 
 int rs_width = 63;           
-int rs_height = 9;             
+int rs_height = 10;             
 
 char entry_text[80];
 
@@ -229,29 +229,29 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
 
     int ds_width = 35;
     int ds_height = ds_regs + 2;
-    int ds_starty = LINES - 37+ num_if_regs + 3;
+    int ds_starty = 4 + num_if_regs + 2;
     int ds_startx = 0;
 
-    int rs_starty = ds_starty + ds_height + 1;  
+    int rs_starty = ds_starty + ds_height;  
     int rs_startx = 0;  
 
     int if_height = num_if_regs + 2;
     int if_startx = 17;
-    int if_starty = LINES - 37;
+    int if_starty = 4;
  
-    int cdb_height = 7;
+    int cdb_height = 5;
     int cdb_width = 27; 
     int cdb_starty = ds_starty; 
     int cdb_startx = rs_startx + rs_width - cdb_width;
 
     int rob_width = 33; 
     int rob_height = rob_regs + 4;
-    int rob_starty = LINES - 37; 
+    int rob_starty = 4; 
     int rob_startx = rs_startx + rs_width + 2;
 
     int mt_width = 30; 
     int mt_height = mt_regs + 4;
-    int mt_starty = LINES - 37; 
+    int mt_starty = 4; 
     int mt_startx = rob_startx + rob_width + 2;
 
     int xc_width = 27; 
@@ -260,7 +260,7 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     int xc_startx = rs_startx + rs_width - xc_width;
 
     int sx_width = rs_width; 
-    int sx_height = sx_regs + 3;
+    int sx_height = sx_regs + 2;
     int sx_starty = rs_starty + rs_height; 
     int sx_startx = 0;
 
@@ -273,17 +273,17 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     wrefresh(title_win);
 
     // instantiate time window at right hand side of screen
-    time_win = create_newwin(3,15,LINES- 37,COLS-15,7);
+    time_win = create_newwin(3,15,4,COLS-15,7);
     mvwprintw(time_win,0,3,"TIME");
     wrefresh(time_win);
 
     // instantiate a sim time window which states the actual simlator time
-    sim_time_win = create_newwin(3,15,LINES- 34,COLS-15,7);
+    sim_time_win = create_newwin(3,15,7,COLS-15,7);
     mvwprintw(sim_time_win,0,1,"SIM TIME");
     wrefresh(sim_time_win);
 
     // instantiate a window to show which clock edge this is
-    clock_win = create_newwin(6,15,LINES- 37,COLS-30,7);
+    clock_win = create_newwin(6,15,4,COLS-30,7);
     mvwprintw(clock_win,0,5,"CLOCK");
     mvwprintw(clock_win,1,1,"cycle:");
     update_clock(0);
@@ -330,7 +330,7 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     wrefresh(sx_win);
 
     // instantiate an instructional window to help out the user some
-    instr_win = create_newwin(7,30,LINES-30,COLS-30,7);
+    instr_win = create_newwin(7,30,12,COLS-30,7);
     mvwprintw(instr_win,0,9,"INSTRUCTIONS");
     wattron(instr_win,COLOR_PAIR(5));
     mvwaddstr(instr_win,1,1,"'n'   -> Next clock edge");
