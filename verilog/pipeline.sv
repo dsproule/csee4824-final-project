@@ -360,7 +360,9 @@ module pipeline (
         .X_packet(X_packets[1])
     );
 
-    dcache dache_0(
+    wire [1:0] Dmem_command = (wr_mem) ? BUS_STORE :
+                       (rd_mem) ? BUS_LOAD : BUS_NONE;
+    dcache_nb dache_0(
         .clock(clock), .reset(reset | take_branch),
 
         // From memory
@@ -370,7 +372,7 @@ module pipeline (
         // From FU stage
         .proc2Dcache_addr((wr_mem) ? proc2Dmem_addr[0] : proc2Dmem_addr[1]),
         .proc2Dcache_data(proc2Dcache_data),
-        .wr_proc(wr_proc),
+        .proc2Dcache_command(Dmem_command),
 
         // To memory
         .proc2Dmem_command(cache2Dmem_command),
@@ -379,11 +381,10 @@ module pipeline (
 
         // To fetch stage
         .Dcache_data_out(Dcache_data_out),
-        .Dcache_valid_out(Dcache_valid_out),
-        .wr_valid(wr_valid)
+        .Dcache_valid_out(Dcache_valid_out)
     );
 
-    assign wr_proc = wr_mem & Dcache_valid_out;
+    // assign wr_proc = wr_mem & Dcache_valid_out;
 
     func_unit_2 func_unit_02 (
         .clock(clock), .reset(reset | take_branch), 
@@ -397,7 +398,7 @@ module pipeline (
     );
 
     func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset | take_branch), .committed(gnt[3]), .wr_valid(wr_valid & wr_mem),
+        .clock(clock), .reset(reset | take_branch), .committed(gnt[3]), .wr_valid(Dcache_valid_out & wr_mem),
         .Dmem2proc_data(Dcache_data_out),
         .S_X_reg(S_X_regs[3]),
 

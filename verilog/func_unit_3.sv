@@ -7,7 +7,7 @@ module func_unit_3(
 
     output [`XLEN-1:0] proc2Dmem_addr,
     output [63:0]      proc2Dcache_data,
-    output X_C_PACKET X_packet
+    output X_C_PACKET  X_packet
 );
 
     logic [`XLEN-1:0] rawDmem_addr;
@@ -61,35 +61,17 @@ module func_unit_3(
 
     assign proc2Dcache_data = Dmem_data;
 
-     // state machine to handle loads
-    always_ff @(posedge clock) begin
-        if (reset) begin
-            X_packet  <= '0;
-            mem_state <= MEM_WAIT_FOR_TAG;
+    always_comb begin
+        if (wr_valid) begin
+            X_packet.T         = S_X_reg.T;
+            X_packet.result    = '0;
+            
+            X_packet.ppln_ctrl = '0;
+            X_packet.valid     = `TRUE;
+            X_packet.ppln_ctrl.is_store = `TRUE;
         end else begin
-            case (mem_state) 
-                // if valid pass to X_packet
-                MEM_WAIT_FOR_TAG:
-                    if (wr_valid) begin
-                        X_packet.T         <= S_X_reg.T;
-                        X_packet.result    <= '0;
-                        
-                        X_packet.ppln_ctrl <= '0;
-                        X_packet.valid     <= `TRUE;
-                        X_packet.ppln_ctrl.is_store <= `TRUE;
-
-                        mem_state <= MEM_NONE;
-                    end
-                MEM_NONE: begin
-                    // if committed, return back to state waiting to give to X_packet
-                    X_packet <= '0;
-                    if (committed)
-                        mem_state <= MEM_WAIT_FOR_TAG;
-                end
-                default: ;
-
-            endcase
+            X_packet           = '0;
         end
-    end    
+    end
 
 endmodule   // func_unit_3

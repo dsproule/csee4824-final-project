@@ -41,34 +41,16 @@ module func_unit_2(
         shifted_result = Dmem_data[`XLEN-1:0];
     end
 
-    // state machine to handle loads
-    always_ff @(posedge clock) begin
-        if (reset) begin
-            X_packet  <= '0;
-            mem_state <= MEM_WAIT_FOR_TAG;
+    always_comb begin
+        if (data_valid) begin
+            X_packet.T         = S_X_reg.T;
+            X_packet.result    = shifted_result;
+            X_packet.ppln_ctrl = '0;
+            X_packet.ppln_ctrl.has_dest = `TRUE;
+            X_packet.valid     = `TRUE;
         end else begin
-            case (mem_state) 
-                // if valid pass to X_packet
-                MEM_WAIT_FOR_TAG:
-                    if (data_valid) begin
-                        X_packet.T         <= S_X_reg.T;
-                        X_packet.result    <= shifted_result;
-                        X_packet.ppln_ctrl <= '0;
-                        X_packet.ppln_ctrl.has_dest <= `TRUE;
-                        X_packet.valid     <= `TRUE;
-
-                        mem_state <= MEM_NONE;
-                    end
-                MEM_NONE: begin
-                    // if committed, return back to state waiting to give to X_packet
-                    X_packet <= '0;
-                    if (committed)
-                        mem_state <= MEM_WAIT_FOR_TAG;
-                end
-                default: ;
-
-            endcase
+            X_packet           = 0;
         end
-    end    
+    end
 
 endmodule
