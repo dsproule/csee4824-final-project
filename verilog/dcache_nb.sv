@@ -36,7 +36,7 @@ typedef struct packed {
     logic [1:0] mem_command;
 
     logic valid;
-} MSHR_ENTRY;
+} MSHR_ENTRY_D;
 
 module dcache_nb (
     input clock,
@@ -65,7 +65,7 @@ module dcache_nb (
     // ---- Cache data ---- //
 
     DCACHE_ENTRY [`CACHE_LINES-1:0] dcache_data;
-    MSHR_ENTRY [`MSHR_SLOTS-1:0] mshr;
+    MSHR_ENTRY_D [`MSHR_SLOTS-1:0] mshr;
 
     // ---- Addresses and final outputs ---- //
 
@@ -153,7 +153,7 @@ module dcache_nb (
         end else begin
             // if slot is empty and the req address is not present, allocate it
             if ((~mshr[mshr_next_idx].valid & dcache_data[current_index].wr_cache) | 
-                (Dcache_valid_out & (proc2Dcache_command == BUS_STORE))) begin
+                (Dcache_valid_out & (proc2Dcache_command == BUS_STORE) & (dcache_data[current_index].data != proc2Dcache_data))) begin
                 // free the dcache entry to allow 
                 dcache_data[current_index].data     <= proc2Dcache_data;    
                 dcache_data[current_index].wr_cache <= 0;    
@@ -170,7 +170,8 @@ module dcache_nb (
                 mshr[mshr_next_idx].mem_command <= BUS_STORE;
 
                 mshr[mshr_next_idx].valid   <= `TRUE;
-            end else if (~mshr[mshr_next_idx].valid & ~current_in_mshr & ~current_in_cache & (proc2Dcache_command != BUS_NONE)) begin
+            end else if (~mshr[mshr_next_idx].valid & ~current_in_mshr & 
+                            ~current_in_cache & (proc2Dcache_command != BUS_NONE)) begin
                 mshr[mshr_next_idx].addr        <= proc2Dcache_addr[`XLEN-1:3];
                 mshr[mshr_next_idx].cache_tag   <= current_tag;
                 mshr[mshr_next_idx].cache_index <= current_index;

@@ -164,6 +164,7 @@ module testbench;
 
         repeat (2) @(posedge clock);
         show_mem_with_decimal(0, 20);
+        $display("Passed!");
         $finish;
     end
 

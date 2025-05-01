@@ -28,7 +28,7 @@ typedef struct packed {
     logic [3:0] mem_tag;
 
     logic valid;
-} MSHR_ENTRY;
+} MSHR_ENTRY_I;
 
 module icache (
     input clock,
@@ -54,7 +54,7 @@ module icache (
     // ---- Cache data ---- //
 
     ICACHE_ENTRY [`CACHE_LINES-1:0] icache_data;
-    MSHR_ENTRY [`MSHR_SLOTS-1:0] mshr;
+    MSHR_ENTRY_I [`MSHR_SLOTS-1:0] mshr;
 
     // ---- Addresses and final outputs ---- //
 

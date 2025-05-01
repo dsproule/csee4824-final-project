@@ -18,7 +18,8 @@ module lsq(
     input logic retire_en,
 
     //Dcache received
-    input logic Dcache_valid_out,
+    input logic dcache_ack_store,
+    input logic dcache_ack_load,
 
     //forwarding outputs
     output X_C_PACKET load_fwd_packet,
@@ -36,33 +37,21 @@ module lsq(
     output logic [`XLEN-1:0] proc2Dmem_addr_load,
     output MEM_ACCESS mem_access_load,
     output ROB_T load_T,
+    output logic sq_free,
 
     //control signals for structural hazards
     output logic sq_full, sq_empty, lq_full, lq_empty
 );
 
     /*
-
-    Out of Order:
     Load/store queue (LSQ) Functionality
     • Completed stores write to LSQ
     • When store retires, head of LSQ written to D$
     • When loads execute, access LSQ and D$ in parallel
     • Forward from LSQ if older store with matching address
-    
-    HOWEVER:
-    This LSQ is inorder - as in each load keeps track of dependent stores
-    once those store addresses are resolved, the older of the two heads is sent to
-    the dcache. This forwards from stores to loads when a sq or lq address is updated and
-    there is a match. This lsq uses FU3 and FU2 as the memory controllers with the D$, outputting
-    the addr/data/mem_write_en, mem_read_en, as well as some memory access pass throughs.
-
-    To make this out of order, adjust the load_fwd_packet signal to output on update_lq,
-    and in the for loop around line 300, do not forward, as this would detect an 
-    address ordering violation, set an exception bit that resets the relevant data structures.
-
-    As our dcache is nonblocking for loads, it frees the lq_head as soon as it is valid,
-    but it must wait for pending stores before making loads valid.
+    */
+    /*
+    TODO insert control signals into pipeline
     */
 
     // address calculation
@@ -89,7 +78,6 @@ module lsq(
         mem_access_store_wire.mem_size = S_X_store.mem_size;
     end
 
-    // Queue Regs/Wires
 
     LQ_ENTRY lq[`LQ_SZ-1:0];
     LQ_T lq_head, lq_tail;
@@ -105,11 +93,8 @@ module lsq(
     assign sq_full = (sq_head == sq_tail) && (sq_head_wrap != sq_tail_wrap);
     assign sq_empty = (sq_head == sq_tail) && (sq_head_wrap == sq_tail_wrap);
     
-    // CAM indices
     SQ_T sq_X_T, retire_sq_T;
     LQ_T lq_X_T;
-
-    // control signals
 
     logic sq2Dcache, lq2Dcache, fwd_head;
     logic update_sq, update_lq;
@@ -118,21 +103,18 @@ module lsq(
 
     assign update_sq = store_X && sq[sq_X_T].valid && S_X_store.valid && st_valid;
     assign update_lq = load_X && lq[lq_X_T].valid && S_X_load.valid && ld_valid;
-
-    // send store to dcache
     assign sq2Dcache = !sq_empty && (sq[sq_head].retired || (sq_head == retire_sq_T && retire_en && retire_valid)) && 
-                        sq[sq_head].addr_valid && sq[sq_head].data_valid && sq_older;
+                        sq[sq_head].addr_valid && sq[sq_head].data_valid && sq_older; //prioritize loads
 
-    // send load to cdb instead of dcache
     assign fwd_head = store_X && sq[sq_X_T].valid && ((sq_X_T == lq[lq_head].dep_sq_T) && (lq[lq_head].state == FORWARDED));
 
-    //send load to dcache if head valid and (ready or forward)
     assign lq2Dcache = !lq_empty && lq[lq_head].addr_valid && lq_older && lq[lq_head].valid && ((lq[lq_head].state == LQ_NONE) || (lq[lq_head].state == DATA_READY) || fwd_head);
 
-    // determines which head is older
+    assign sq_free = sq2Dcache && dcache_ack_store;
+
     assign sq_older = sq[sq_head].valid && (!lq[lq_head].valid || (lq[lq_head].valid && ((sq[sq_head].T < lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap))));
+
     assign lq_older = lq[lq_head].valid && (!sq[sq_head].valid || sq[sq_head].dirty || (sq[sq_head].valid && (sq[sq_head].T > lq[lq_head].T ~^ sq[sq_head].ROB_wrap == lq[lq_head].ROB_wrap)));
-    
     //forwarding unit - youngest store older than load forwards to load
     X_C_PACKET fwd_packet_wire;
 
@@ -156,10 +138,12 @@ module lsq(
 
     // loop temp logic that gets compiled out, can be optimized with a prediction
     ROB_T best_T_store;
+    logic [`SQ_SZ-1:0] fwd_match;
     always_comb begin
         // Forwarding logic
         best_T_store = 0;
         fwd_packet_wire = 0;
+        fwd_match = 0;
 
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
             if (sq[i].valid && sq[i].addr_valid && sq[i].data_valid &&
@@ -178,9 +162,13 @@ module lsq(
                     end
 
                     fwd_packet_wire.valid = (sq[i].mem_access == mem_access_load_wire);
+                    fwd_match[i] = 1;
                 end 
             end
         end
+
+        // if the tag hits the store on execute, there are no other later stores, can forward
+        // safely
     end
 
     // CAMS for lq/sq indices --> can load sq_tail and lq_head into
@@ -228,9 +216,11 @@ module lsq(
 
         proc2Dmem_addr_load = lq[lq_head].addr;
         mem_access_load = lq[lq_head].mem_access;
+        mem_read_en = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && lq[lq_head].state == LQ_NONE && lq_older && !dcache_ack_load;
         load_T = lq[lq_head].T;
-        mem_read_en = !lq_empty && lq[lq_head].addr_valid && lq[lq_head].valid && lq[lq_head].state == LQ_NONE && lq_older;
     end
+
+    // TODO flush unit --> sets data to not ready if collision 
 
     always_ff @(posedge clock) begin
         if (reset) begin
@@ -327,9 +317,8 @@ module lsq(
                 sq[retire_sq_T].retired <= `TRUE;
             end
 
-
             // Write address/data from SQ head to D$, free SQ head
-            if(sq2Dcache && (Dcache_valid_out && mem_write_en) || sq[sq_head].dirty) begin
+            if(sq2Dcache && dcache_ack_store || sq[sq_head].dirty) begin
                 sq[sq_head] <= 0;
                 sq_head <= (sq_head == `SQ_SZ - 1) ? 0 : sq_head + 1; // change here
                 sq_head_wrap <= (sq_head == `SQ_SZ - 1) ? ~sq_head_wrap : sq_head_wrap; // change here
@@ -369,8 +358,9 @@ module lsq(
                 load_fwd_packet.result <= lq[lq_head].data;
                 load_fwd_packet.ppln_ctrl.has_dest <= `TRUE;
 
+
                 //making mem request if no dependencies
-                if ((Dcache_valid_out && mem_read_en) || lq[lq_head].state == DATA_READY || fwd_head ) begin
+                if (dcache_ack_load || lq[lq_head].state == DATA_READY || fwd_head ) begin
                     lq[lq_head] <= 0;
                     lq_head <= (lq_head == `LQ_SZ - 1) ? 0 : (lq_head + 1);
                     lq_head_wrap <= (lq_head == `LQ_SZ - 1) ? ~lq_head_wrap : lq_head_wrap;

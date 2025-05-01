@@ -98,7 +98,6 @@
 # there should be no need to change anything for project 3
 
 # this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
-# this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
 export CLOCK_PERIOD = 350
 
 # Path variables
@@ -220,7 +219,7 @@ DEPS = $(1).simv $(1).cov synth/$(1).vg
 MULT_DEPS = verilog/mult_stage.sv verilog/mult.sv
 $(call DEPS,func_unit_1): $(MULT_DEPS)
 
-MEM_DEPS = test/mem.sv verilog/dcache.sv
+MEM_DEPS = test/mem.sv verilog/dcache_nb.sv
 $(call DEPS,func_unit_3): $(MEM_DEPS)
 $(call DEPS,func_unit_2): $(MEM_DEPS)
 
@@ -384,7 +383,7 @@ SOURCES = verilog/pipeline.sv \
 		  verilog/rob.sv \
 		  verilog/if_stage.sv \
 		  verilog/lsq.sv \
-		  verilog/dcache.sv \
+		  verilog/dcache_nb.sv \
 		  verilog/two_bit_pred.sv \
 		  verilog/branch_pred.sv
 

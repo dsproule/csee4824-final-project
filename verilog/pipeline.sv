@@ -118,7 +118,6 @@ module pipeline (
     logic [1:0] cache2Dmem_command;
     logic Dcache_valid_out;
     logic [63:0] proc2Dcache_data, cache2Dmem_data, Dcache_data_out;
-    logic wr_proc, wr_valid;
 
     // lsq
     logic mem_read_en, mem_write_en, wfi;
@@ -403,17 +402,20 @@ module pipeline (
         .X_packet(X_packets[1])
     );
 
-    dcache dache_0(
+    wire [1:0] Dmem_command = (wr_mem) ? BUS_STORE :
+                       (rd_mem) ? BUS_LOAD : BUS_NONE;
+    dcache_nb dache_0(
         .clock(clock), .reset(reset),
 
         // From memory
-        .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
+        .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), 
+        .Dmem2proc_tag(mem2proc_tag),
         .Dmem2proc_data(mem2proc_data),
 
         // From FU stage
         .proc2Dcache_addr((wr_mem) ? proc2Dmem_addr[0] : proc2Dmem_addr[1]),
         .proc2Dcache_data(proc2Dcache_data),
-        .wr_proc(wr_proc),
+        .proc2Dcache_command(Dmem_command),
 
         // To memory
         .proc2Dmem_command(cache2Dmem_command),
@@ -422,15 +424,13 @@ module pipeline (
 
         // To fetch stage
         .Dcache_data_out(Dcache_data_out),
-        .Dcache_valid_out(Dcache_valid_out),
-        .wr_valid(wr_valid)
+        .Dcache_valid_out(Dcache_valid_out)
     );
 
     ROB_T store_T_wire, load_T_wire;
     MEM_ACCESS mem_access_load_wire, mem_access_store_wire;
     logic [`XLEN-1:0] proc2Dmem_data_wire;
     X_C_PACKET lsq_fwd_packet, func_unit_2_x_packet;
-    logic dcache_ack_store, dcache_ack_load, sq_free;
 
     lsq lsq_inst(
     // inputs
@@ -446,8 +446,7 @@ module pipeline (
     .load_X(S_X_regs[2].valid),
     .retire_T(retire_T_wire), 
     .retire_en(retire),
-    .dcache_ack_store(dcache_ack_store), //prioritize loads for speed
-    .dcache_ack_load(dcache_ack_load),
+    .Dcache_valid_out(Dcache_valid_out), //prioritize loads for speed
 
     // outputs
     .load_fwd_packet(lsq_fwd_packet),
@@ -461,36 +460,30 @@ module pipeline (
     .mem_read_en(mem_read_en),
     .load_T(load_T_wire),
     .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
-    .sq_free(sq_free),
     .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
     
     );
-    assign wr_proc = wr_mem & Dcache_valid_out;
 
     func_unit_2 func_unit_02 (
         .clock(clock), .reset(reset | take_branch), 
-        .committed(gnt[2]), .data_valid(Dcache_valid_out & rd_mem),
+        .data_valid(Dcache_valid_out & rd_mem),
         .Dmem2proc_data(Dcache_data_out),
         .T(load_T_wire),
         .mem_access(mem_access_load_wire),
 
         // output logic mem_load_pend,
-        .X_packet(func_unit_2_x_packet),
-        .dcache_ack_load(dcache_ack_load)
+        .X_packet(func_unit_2_x_packet)
     );
 
     //forwarding from lsq if cdb is valid
     assign X_packets[2] = (lsq_fwd_packet.valid) ? lsq_fwd_packet : func_unit_2_x_packet;
 
-    func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset | take_branch), .wr_valid(wr_valid & wr_mem), .sq_free(sq_free),
+    func_unit_3 func_unit_03( // literally just addr shifting now, timing handled by lsq
         .Dmem2proc_data(Dcache_data_out),
-        .T(store_T_wire),
         .mem_access(mem_access_store_wire),
         .proc2Dmem_data(proc2Dmem_data_wire), //handles masking before storing
 
-        .proc2Dcache_data(proc2Dcache_data),
-        .dcache_ack_store(dcache_ack_store) //throttle sq flow
+        .proc2Dcache_data(proc2Dcache_data)
     );
 
     func_unit_0 func_unit_04(
