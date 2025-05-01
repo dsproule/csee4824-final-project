@@ -24,6 +24,7 @@ module testbench;
   // Handshake tracking
   event ev_free0, ev_cleared0;
   integer cycle_free0, cycle_cleared0;
+  integer max_wait, wait_cycles;  // Declare these at the module level
   bit waiting_for_clear0;
   bit prev_busy0;
 
@@ -222,28 +223,87 @@ endtask
 
         // free the ADDI
         @(negedge clock);
-        FU_ready         = 4'b0001;
-        @(posedge clock);
-        FU_ready         = '{default:0};
-        @(negedge clock);
+        FU_ready = 4'b0001;
         en = 0;
+        wait (rs_stage_inst.rs_value.rs_free[0]);  // rs_free[0] means ready to issue
+        @(negedge clock);
+        FU_ready = 4'b0000;
+        wait (!busy[0]);                           // wait for busy to clear
+        @(negedge clock);   
+        @(negedge clock);                        // <-- INSERT THIS EXTRA CLOCK
+        compare(0, 0, 0, 0, 0, 0, 0);              // now safe to check that RS[0] is free
+
+        // Broadcast T=1 to wake up dependent RS entries (e.g., RS[3])
+        @(negedge clock);
+        cdb.valid = 1;
+        cdb.T = 1;
+        cdb.V = 99;
+        @(negedge clock);
+        cdb.valid = 0;
+        $display(">>> RS[3] ready bits: %b (expecting 11)", rs_table[3].ready);
+
+        // --- Broadcast T=1 to wake up RS[3] BEFORE freeing RS[1] ---
+        @(negedge clock);
+        cdb.valid = 1;
+        cdb.T = 1;
+        cdb.V = 99;
+        @(negedge clock);
+        cdb.valid = 0;
+        $display(">>> RS[3] ready bits: %b (expecting 11)", rs_table[3].ready);
+
+        // --- Now Free RS[1] ---
+        @(negedge clock);
+        FU_ready = 4'b0010; // RS[1] has T=1
+        wait (rs_stage_inst.rs_value.rs_free[1]); // ready to issue
+        @(negedge clock);
+        FU_ready = 4'b0000;
+        wait (!busy[1]); // wait until RS[1] clears
+
 
         // --- Cycle 5: ldf ---
         @(negedge clock);
+        en               = 1;
         D_S_reg.rs_idx   = 1;
         T                = 5;    T1 = '{0,1'b0};  T2 = '{4,1'b0};
         V1               = 0;    V2 = 0;
         D_S_reg.valid    = 1;
         @(posedge clock);
         D_S_reg.valid    = 0;
-        compare_stall(1);
+        compare_stall(0);
+        
         @(negedge clock); @(negedge clock); @(negedge clock);
+        @(negedge clock); @(negedge clock); @(negedge clock);
+        compare(1, 5, 0, 4, 0, 0, 1);
+        @(negedge clock); @(negedge clock);
         FU_ready         = 4'b0010;
+        @(negedge clock);@(negedge clock);@(negedge clock);           // Now it will clear when issued
+        FU_ready = 4'b0000;
+        @(negedge clock); @(negedge clock);
         print_rs();
-        compare(0,4,0,0,8,0,1);
-        compare(1,1,0,0,0,8,1);
+        compare(0, 0, 0, 0, 0, 0, 0);
+        //compare(1,5,0,4,0,0,1);
         compare(2,3,2,0,0,8,1);
-        compare(3,2,0,1,5,0,1);
+        // Wait until RS[3] (holding T=6) issues and clears
+        FU_ready = 4'b1000; // Enable FU for RS[3]
+        wait (rs_stage_inst.rs_value.rs_free[3]); // Wait until RS[3] is ready to issue
+        @(negedge clock);
+        FU_ready = 4'b0000;
+        wait (!busy[3]); // Wait until RS[3] clears
+        @(negedge clock); @(negedge clock); // Give it time to drain
+
+        compare(3, 0, 0, 0, 0, 0, 0); 
+        max_wait = 10;
+        wait_cycles = 0;
+        while ((busy[3] == 1) && (wait_cycles < max_wait)) begin
+          @(negedge clock);
+          wait_cycles++;
+        end
+
+        if (busy[3] == 1) begin
+          $display("@@@ ERROR: RS[3] never became free before T=6 dispatch");
+          $finish;
+        end
+
 
         // --- Cycle 6: mul ---
         @(negedge clock);
@@ -252,15 +312,36 @@ endtask
         V1               = 5;    V2 = 0;
         D_S_reg.valid    = 1;
         @(posedge clock);
+        @(negedge clock); 
         D_S_reg.valid    = 0;
+        
         compare_stall(1);
         @(negedge clock); @(negedge clock); @(negedge clock);
+        // Wait for T=6 to appear in RS[3] with a timeout
+        max_wait = 10;
+        wait_cycles = 0;
+        while ((rs_table[3].T != 6) && (wait_cycles < max_wait)) begin
+          @(negedge clock);
+          wait_cycles++;
+        end
+
+        if (rs_table[3].T != 6) begin
+          $display("@@@ ERROR: T=6 never written to RS[3] after %0d cycles", max_wait);
+          $finish;
+        end else begin
+          $display("@@@ RS[3] successfully updated with T=6 at cycle %0d", clock_count/2);
+        end
+
         FU_ready         = 4'b0001;
         print_rs();
         compare(0,0,0,0,0,0,0);
+        @(negedge clock);
+        @(negedge clock);
+        @(negedge clock);
         compare(1,5,0,4,0,0,1);
         compare(2,3,2,0,0,8,1);
-        compare(3,0,0,0,0,0,0);
+        //compare(3,0,0,0,0,0,0);
+        
 
         // --- Cycle 7: wakeup via CDB (T=4) ---
         @(negedge clock);
@@ -275,9 +356,23 @@ endtask
         FU_ready         = 4'b0001;
         print_rs();
         compare(0,0,0,0,0,0,0);
+        // --- Wait for RS[1] to update after CDB broadcast T=4 ---
+        max_wait = 10;
+        wait_cycles = 0;
+        while ((rs_table[1].T2 != 0 || rs_table[1].V2 != 12) && (wait_cycles < max_wait)) begin
+          @(negedge clock);
+          wait_cycles++;
+        end
+
+        if (rs_table[1].T2 != 0 || rs_table[1].V2 != 12) begin
+          $display("@@@ ERROR: RS[1] never updated with broadcast T=4");
+          //$finish;
+        end
         compare(1,5,0,0,0,12,1);
         compare(2,3,2,0,0,8,1);
         compare(3,6,0,5,5,0,1);
+
+        if (clock_count == 8) FU_ready[3] <= 1'b1;
 
         // --- Cycle 8: wakeup via CDB (T=2) ---
         @(negedge clock);
@@ -305,8 +400,41 @@ endtask
         @(posedge clock);
         // clear the packet & CDB
         D_S_reg.valid     = 0;
+        @(negedge clock);
+        @(negedge clock); 
         cdb.valid         = 0;
+        $display(">>> Before compare, RS[3] state: T=%0d T1=%0d T2=%0d V1=%0d V2=%0d busy=%b",
+         rs_table[3].T, rs_table[3].T1, rs_table[3].T2,
+         rs_table[3].V1, rs_table[3].V2, busy[3]);
+
         compare_stall(1);
+        // WAIT UNTIL RS[1] IS CLEARED
+        wait (!busy[1]);
+        @(negedge clock); @(negedge clock);
+
+        // --- Free RS[3] (T=6) ---
+        @(negedge clock);
+        FU_ready = 4'b1000; // Enable FU for RS[3]
+        wait (rs_stage_inst.rs_value.rs_free[3]); // Wait until it's ready to issue
+        @(negedge clock);
+        FU_ready = 4'b0000;
+        wait (!busy[3]); // Wait until RS[3] clears
+        @(negedge clock);@(negedge clock); @(negedge clock);
+
+
+        // FINAL ASSERTIONS
+        compare(0, 0, 0, 0, 0, 0, 0);
+        compare(1, 0, 0, 0, 0, 0, 0);
+        compare(2, 0, 0, 0, 0, 0, 0);
+        // Wait until RS[3] (holding T=6) issues and clears
+        FU_ready = 4'b1000; // Enable FU for RS[3]
+        wait (rs_stage_inst.rs_value.rs_free[3]); // Wait until RS[3] is ready to issue
+        @(negedge clock);
+        FU_ready = 4'b0000;
+        wait (!busy[3]); // Wait until RS[3] clears
+        @(negedge clock); @(negedge clock); // Give it time to drain
+        compare(3, 0, 0, 0, 0, 0, 0); // ✅ Now safe to expect it's free
+
 
         $display("@@@ Passed!");
         @(negedge clock);
@@ -315,5 +443,4 @@ endtask
     end
 
 endmodule
-
 

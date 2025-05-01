@@ -26,8 +26,10 @@ module RS_ALLOC(
     RS_ENTRY next_re;
     logic next_re_valid;
 
+    logic [`RS_SZ-1:0] rs_free_latched, rs_free_latched_prev;
+
     assign rs_idx = D_S_reg.rs_idx;
-    assign rs_idx_full = (rs_free[rs_idx]) ? 0 : busy[rs_idx];
+    assign rs_idx_full = (rs_free_latched_prev[rs_idx]) ? 0 : busy[rs_idx];
 
     always_ff @(posedge clock) begin
         if (reset) begin
@@ -40,44 +42,81 @@ module RS_ALLOC(
             next_re <= '0;
             next_re_valid <= `FALSE;
             rs_update_idx <= 0;
+            rs_free_latched <= '0;
+            rs_free_latched_prev <= '0;
         end else begin  
+            // Latch rs_free from RS_VALUE output
+            // Latch rs_free from RS_VALUE output (FIXED LOCATION)
+            rs_free_latched_prev <= rs_free_latched;
+            rs_free_latched <= rs_free;  
+ 
             // busy handling
-            busy[rs_update_idx] <= next_busy[rs_update_idx];
-            for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++)
-                if (((busy_reset_idx != rs_update_idx) | ~next_re_valid) & (rs_free[busy_reset_idx])) begin
+            if (!rs_free[rs_update_idx]) begin
+                busy[rs_update_idx] <= next_busy[rs_update_idx];
+            end
+            // Clear entries when marked free
+            for (busy_reset_idx = 0; busy_reset_idx < `RS_SZ; busy_reset_idx++) begin
+                if (rs_free[busy_reset_idx]) begin
+                    $display(">>> RS[%0d] cleared at time %0t", busy_reset_idx, $time);
+                    rs_table[busy_reset_idx] <= '0;
+                    busy[busy_reset_idx]     <= `FALSE;
                     next_busy[busy_reset_idx] <= `FALSE;
-                    busy[busy_reset_idx] <= `FALSE;
                 end
-            
+            end
+
+                    
             if (next_re_valid) begin
-                if(cdb.valid & (next_re.T1 == cdb.T)) begin
-                    rs_table[rs_update_idx].T <= next_re.T;
-                    rs_table[rs_update_idx].T1 <= 0;
-                    rs_table[rs_update_idx].T2 <= next_re.T2;
-                    rs_table[rs_update_idx].V1 <= cdb.V;
-                    rs_table[rs_update_idx].V2 <= next_re.V2;
-                    rs_table[rs_update_idx].D_S_reg <= next_re.D_S_reg;
-                    rs_table[rs_update_idx].ready[0] <= `TRUE;
-                    rs_table[rs_update_idx].ready[1] <= next_re.ready[1];
+                rs_table[rs_update_idx].T         <= next_re.T;
+                rs_table[rs_update_idx].D_S_reg   <= next_re.D_S_reg;
+
+                // T1 logic
+                if (cdb.valid && next_re.T1 == cdb.T) begin
+                    $display(">>> [DISPATCH+CDB] RS[%0d] matched T1 = %0d, setting V1 = %0d", rs_update_idx, cdb.T, cdb.V);
+                    rs_table[rs_update_idx].T1      <= 0;
+                    rs_table[rs_update_idx].V1      <= cdb.V;
+                    rs_table[rs_update_idx].ready[0]<= `TRUE;
+                end else begin
+                    rs_table[rs_update_idx].T1      <= next_re.T1;
+                    rs_table[rs_update_idx].V1      <= next_re.V1;
+                    rs_table[rs_update_idx].ready[0]<= next_re.ready[0];
                 end
-                else if(cdb.valid & (next_re.T2 == cdb.T)) begin
-                    rs_table[rs_update_idx].T <= next_re.T;
-                    rs_table[rs_update_idx].T1 <= next_re.T1;
-                    rs_table[rs_update_idx].T2 <= 0;
-                    rs_table[rs_update_idx].V1 <= next_re.V1;
-                    rs_table[rs_update_idx].V2 <= cdb.V;
-                    rs_table[rs_update_idx].D_S_reg <= next_re.D_S_reg;
-                    rs_table[rs_update_idx].ready[1] <= `TRUE;
-                    rs_table[rs_update_idx].ready[0] <= next_re.ready[0];
+
+                // T2 logic
+                if (cdb.valid && next_re.T2 == cdb.T) begin
+                    $display(">>> [DISPATCH+CDB] RS[%0d] matched T2 = %0d, setting V2 = %0d", rs_update_idx, cdb.T, cdb.V);
+                    rs_table[rs_update_idx].T2      <= 0;
+                    rs_table[rs_update_idx].V2      <= cdb.V;
+                    rs_table[rs_update_idx].ready[1]<= `TRUE;
+                end else begin
+                    rs_table[rs_update_idx].T2      <= next_re.T2;
+                    rs_table[rs_update_idx].V2      <= next_re.V2;
+                    rs_table[rs_update_idx].ready[1]<= next_re.ready[1];
                 end
-                else begin
-                    rs_table[rs_update_idx] <= next_re;
-                end
+
                 next_re_valid <= `FALSE;
             end
 
+            // Ensure CDB updates apply after dispatch
+            /*
+            if (cdb.valid) begin
+                for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
+                    if (rs_table[cdb_idx].T1 == cdb.T) begin
+                        rs_table[cdb_idx].V1 <= cdb.V;
+                        rs_table[cdb_idx].T1 <= 0;
+                        rs_table[cdb_idx].ready[0] <= `TRUE;
+                    end
+                    if (rs_table[cdb_idx].T2 == cdb.T) begin
+                        $display(">>> RS[%0d] matched T2 = %0d with CDB.T = %0d", cdb_idx, rs_table[cdb_idx].T2, cdb.T);
+                        rs_table[cdb_idx].V2 <= cdb.V;
+                        rs_table[cdb_idx].T2 <= 0;
+                        rs_table[cdb_idx].ready[1] <= `TRUE;
+                    end
+                end
+            end
+            */
+
             // if RS entry is empty, allocate it
-            if ((~busy[rs_idx] | rs_free[rs_idx]) & en) begin
+             if ((~busy[rs_idx] | rs_free_latched[rs_idx]) & en) begin
                 next_busy[rs_idx] <= `TRUE;
                 busy[rs_idx] <= `TRUE;
                 
@@ -89,10 +128,14 @@ module RS_ALLOC(
                 rs_update_idx <= rs_idx;
 
                 // checks if we can put just the value in or if we need the tag for t1
-                if (MT_T1 == 0 | MT_T1.plus | (cdb.T == MT_T1.T && cdb.valid)) begin
-                    // value exists somewhere
-                    next_re.V1 <= (cdb.T == MT_T1.T && cdb.valid) ? cdb.V : V1;
+                // --- T1 handling with CDB forwarding ---
+                if (MT_T1 == 0 || MT_T1.plus) begin
                     next_re.T1 <= 0;
+                    next_re.V1 <= V1;
+                    next_re.ready[0] <= `TRUE;
+                end else if (cdb.valid && cdb.T == MT_T1.T) begin
+                    next_re.T1 <= 0;
+                    next_re.V1 <= cdb.V;
                     next_re.ready[0] <= `TRUE;
                 end else begin
                     next_re.T1 <= MT_T1.T;
@@ -100,22 +143,26 @@ module RS_ALLOC(
                     next_re.ready[0] <= `FALSE;
                 end
 
-                // change these to LD/ST in pipeline. Like this for the tbs
-                if (MT_T2 == 0 | MT_T2.plus | (cdb.T == MT_T2.T && cdb.valid)) begin
-                    // value exists somewhere
-                    next_re.V2 <= (cdb.T == MT_T2.T && cdb.valid) ? cdb.V : V2;
+                // --- T2 handling with CDB forwarding ---
+                if (MT_T2 == 0 || MT_T2.plus) begin
                     next_re.T2 <= 0;
+                    next_re.V2 <= V2;
+                    next_re.ready[1] <= `TRUE;
+                end else if (cdb.valid && cdb.T == MT_T2.T) begin
+                    next_re.T2 <= 0;
+                    next_re.V2 <= cdb.V;
                     next_re.ready[1] <= `TRUE;
                 end else begin
                     next_re.T2 <= MT_T2.T;
                     next_re.V2 <= 0;
                     next_re.ready[1] <= `FALSE;
                 end
+
                 
-            end else begin
-                next_re <= '0;
-                next_re_valid <= `FALSE;
-            end
+            end //else begin
+                //next_re <= '0;
+                //next_re_valid <= `FALSE;
+           // end
 
             // free a line that isn't about to be allocated (should be handled by above)
             for (rs_free_idx = 0; rs_free_idx < `RS_SZ; rs_free_idx++)
@@ -126,12 +173,18 @@ module RS_ALLOC(
             if (cdb.valid) 
                 for (cdb_idx = 0; cdb_idx < `RS_SZ; cdb_idx++) begin
                     if (rs_table[cdb_idx].T1 == cdb.T) begin
+                        $display(">>> [CDB] RS[%0d] T1 matched T=%0d, setting V1=%0d", cdb_idx, cdb.T, cdb.V);
+                        $display(">>> [CDB] Valid: %b T=%0d V=%0d", cdb.valid, cdb.T, cdb.V);
+
                         rs_table[cdb_idx].V1 <= cdb.V;
                         rs_table[cdb_idx].T1 <= 0;
                         rs_table[cdb_idx].ready[0] <= `TRUE;
                     end
 
                     if (rs_table[cdb_idx].T2 == cdb.T) begin
+                         $display(">>> [CDB] RS[%0d] T2 matched T=%0d, setting V2=%0d", cdb_idx, cdb.T, cdb.V);
+                         $display(">>> [CDB] Valid: %b T=%0d V=%0d", cdb.valid, cdb.T, cdb.V);
+
                         rs_table[cdb_idx].V2 <= cdb.V;
                         rs_table[cdb_idx].T2 <= 0;
                         rs_table[cdb_idx].ready[1] <= `TRUE;
