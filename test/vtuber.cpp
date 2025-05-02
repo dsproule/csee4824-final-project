@@ -265,6 +265,15 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     int instr_startx =  mt_startx + mt_width + 2;
     int instr_starty = 4;
 
+    int clock_startx =  instr_startx + 32;
+    int clock_starty = 4;
+
+    int time_startx =  clock_startx + 16;
+    int time_starty = 4;
+
+    int simtime_startx =  clock_startx + 16;
+    int simtime_starty = 7;
+
     int xc_width = 27; 
     int xc_height = xc_regs + 2;
     int xc_starty = ds_starty + ds_height - xc_height; 
@@ -294,17 +303,17 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     wrefresh(title_win);
 
     // instantiate time window at right hand side of screen
-    time_win = create_newwin(3,15,4,COLS-15,7);
+    time_win = create_newwin(3,15,time_starty,time_startx,7);
     mvwprintw(time_win,0,3,"TIME");
     wrefresh(time_win);
 
     // instantiate a sim time window which states the actual simlator time
-    sim_time_win = create_newwin(3,15,7,COLS-15,7);
+    sim_time_win = create_newwin(3,15,simtime_starty,simtime_startx,7);
     mvwprintw(sim_time_win,0,1,"SIM TIME");
     wrefresh(sim_time_win);
 
     // instantiate a window to show which clock edge this is
-    clock_win = create_newwin(6,15,4,COLS-30,7);
+    clock_win = create_newwin(6,15,clock_starty,clock_startx,7);
     mvwprintw(clock_win,0,5,"CLOCK");
     mvwprintw(clock_win,1,1,"cycle:");
     update_clock(0);
@@ -371,7 +380,7 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     mvwaddstr(instr_win,5,1,"'q'   -> Quit Simulator");
     wrefresh(instr_win);
 
-    vtuber_win = create_newwin(10, 47, vtuber_starty, lq_startx + lq_width/8, 8);
+    vtuber_win = create_newwin(10, 47, lq_starty + lq_height, lq_startx + lq_width/8, 8);
     mvwaddstr(vtuber_win, 2, 4, "__     _______ _   _ ____  _____ ____");
     mvwaddstr(vtuber_win, 3, 4, "\\ \\   / /_   _| | | | __ )| ____|  _ \\");
     mvwaddstr(vtuber_win, 4, 4, " \\ \\ / /  | | | | | |  _ \\|  _| | |_) |");
