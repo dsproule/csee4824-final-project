@@ -38,6 +38,8 @@ module pipeline (
     output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg,
     output LQ_ENTRY [`LQ_SZ-1:0] lq_dbg,
     output SQ_ENTRY [`SQ_SZ-1:0] sq_dbg,
+    output LQ_T lq_head_dbg, lq_tail_dbg,
+    output SQ_T sq_head_dbg, sq_tail_dbg,
     
     output X_C_PACKET [`RS_SZ-1:0] X_C_regs_dbg,
     output S_X_PACKET [`RS_SZ-1:0] S_X_regs_dbg,
@@ -125,6 +127,8 @@ module pipeline (
     // lsq
     logic mem_read_en, mem_write_en;
     logic sq_empty, sq_full, lq_empty, lq_full;
+    LQ_T lq_head, lq_tail;
+    SQ_T sq_head, sq_tail;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -144,6 +148,12 @@ module pipeline (
     
     assign rob_retire_dbg    = retire; 
     assign retire_T_wire_dbg = retire_T_wire;
+
+    assign lq_head_dbg = lq_head;
+    assign lq_tail_dbg = lq_tail;
+
+    assign sq_head_dbg = sq_head;
+    assign sq_tail_dbg = sq_tail;
 
     assign rob_pipeline_control_dbg = pipeline_control;
 

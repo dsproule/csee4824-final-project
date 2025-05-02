@@ -51,6 +51,8 @@ module testbench;
     S_X_PACKET [`RS_SZ-1:0] S_X_regs_dbg;
     LQ_ENTRY [`LQ_SZ-1:0] lq_dbg;
     SQ_ENTRY [`SQ_SZ-1:0] sq_dbg;
+    LQ_T lq_head_dbg, lq_tail_dbg;
+    SQ_T sq_head_dbg, sq_tail_dbg;
 
 `ifndef CACHE_MODE
     MEM_SIZE          proc2mem_size;
@@ -100,7 +102,11 @@ module testbench;
         .S_X_regs_dbg(S_X_regs_dbg),
         .X_C_regs_dbg(X_C_regs_dbg),
         .lq_dbg(lq_dbg),
-        .sq_dbg(sq_dbg)
+        .sq_dbg(sq_dbg),
+        .lq_tail_dbg(lq_tail_dbg),
+        .lq_head_dbg(lq_head_dbg),
+        .sq_tail_dbg(sq_tail_dbg),
+        .sq_head_dbg(sq_head_dbg)
     );
 
 
@@ -299,6 +305,8 @@ module testbench;
         end
 
         // Store Queue — prefix 'q'
+        $display("qhead %h", sq_head_dbg);
+        $display("qtail %h", sq_tail_dbg);
         for (int i = 0; i < `SQ_SZ; i++) begin
         if (sq_dbg[i].valid) begin
             $display( "qSQ %0d %b %0d %h %h %b", i, sq_dbg[i].valid, sq_dbg[i].T, sq_dbg[i].addr, sq_dbg[i].data, sq_dbg[i].addr_valid);
@@ -306,6 +314,8 @@ module testbench;
         end
 
         // Load Queue — prefix 'l'
+        $display("lhead %h", lq_head_dbg);
+        $display("ltail %h", lq_tail_dbg);
         for (int i = 0; i < `LQ_SZ; i++) begin
         if (lq_dbg[i].valid) begin
             $display( "lLQ %0d %b %0d %h %h %b %0d", i, lq_dbg[i].valid, lq_dbg[i].T, lq_dbg[i].addr, lq_dbg[i].data, lq_dbg[i].addr_valid, lq_dbg[i].state);

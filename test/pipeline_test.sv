@@ -357,7 +357,7 @@ endtask
                 // print_rs;
                 // print_mt;
                 // print_cdb;
-                print_lsq;
+                // print_lsq;
                 // print_rob;
                 // print_regs;
                 // print_sx;

@@ -278,12 +278,12 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     int vtuber_starty = mt_starty + mt_height - 10;
 
     int sq_width = 60; 
-    int sq_height = 8;
-    int sq_starty = instr_starty + 8; 
+    int sq_height = 10;
+    int sq_starty = instr_starty + 7; 
     int sq_startx = mt_startx + mt_width + 4;
 
     int lq_width = 60; 
-    int lq_height = 10;
+    int lq_height = 12;
     int lq_starty = sq_starty + sq_height; 
     int lq_startx = mt_startx + mt_width + 4;
 
@@ -390,6 +390,10 @@ void parsedata(int history_num_in) {
     static int old_history_num_in=0;
     static int old_head_position=0;
     static int old_tail_position=0;
+    static int old_sq_head_position=0;
+    static int old_sq_tail_position=0;
+    static int old_lq_head_position=0;
+    static int old_lq_tail_position=0;
     int i=0;
     int data_counter=0;
     char *opcode;
@@ -622,9 +626,22 @@ void parsedata(int history_num_in) {
     wrefresh(sx_win);
 
     // SQ window
+    // Head & tail
+    if (old_sq_head_position != atoi(sq_contents[history_num_in][0])) {
+        wattron(sq_win, A_REVERSE);
+    } else wattroff(sq_win, A_REVERSE);
+    mvwprintw(sq_win, 1, 1, "Head: %s", sq_contents[history_num_in][0]);
+    old_sq_head_position = atoi(sq_contents[history_num_in][0]);
+
+    if (old_sq_tail_position != atoi(sq_contents[history_num_in][1])) {
+        wattron(sq_win, A_REVERSE);
+    } else wattroff(sq_win, A_REVERSE);
+    mvwprintw(sq_win, 2, 1, "Tail: %s", sq_contents[history_num_in][1]);
+    old_sq_tail_position = atoi(sq_contents[history_num_in][1]);
+
     for (i = 0; i < num_sq_regs; i++) {
-        char *cur = sq_contents[history_num_in][i];
-        char *old = sq_contents[old_history_num_in][i];
+        char *cur = sq_contents[history_num_in][i+2];
+        char *old = sq_contents[old_history_num_in][i+2];
 
         if (strcmp(cur, old) != 0)
             wattron(sq_win, A_REVERSE);
@@ -632,16 +649,29 @@ void parsedata(int history_num_in) {
             wattroff(sq_win, A_REVERSE);
 
         int inside_w = getmaxx(sq_win) - 2;
-        mvwprintw(sq_win, i+1, 1, "%-*s", inside_w, "");
-        mvwprintw(sq_win, i+1, 1, "SQ%02d | %s", i, cur);
+        mvwprintw(sq_win, i+3, 1, "%-*s", inside_w, "");
+        mvwprintw(sq_win, i+3, 1, "SQ%02d | %s", i, cur);
         wattroff(sq_win, A_REVERSE);
     }
     wrefresh(sq_win);
 
     // LQ window
+    // Head & tail
+    if (old_lq_head_position != atoi(lq_contents[history_num_in][0])) {
+        wattron(lq_win, A_REVERSE);
+    } else wattroff(lq_win, A_REVERSE);
+    mvwprintw(lq_win, 1, 1, "Head: %s", lq_contents[history_num_in][0]);
+    old_lq_head_position = atoi(lq_contents[history_num_in][0]);
+
+    if (old_lq_tail_position != atoi(lq_contents[history_num_in][1])) {
+        wattron(lq_win, A_REVERSE);
+    } else wattroff(lq_win, A_REVERSE);
+    mvwprintw(lq_win, 2, 1, "Tail: %s", lq_contents[history_num_in][1]);
+    old_lq_tail_position = atoi(lq_contents[history_num_in][1]);
+    
     for (i = 0; i < num_lq_regs; i++) {
-        char *cur = lq_contents[history_num_in][i];
-        char *old = lq_contents[old_history_num_in][i];
+        char *cur = lq_contents[history_num_in][i+2];
+        char *old = lq_contents[old_history_num_in][i+2];
 
         if (strcmp(cur, old) != 0)
             wattron(lq_win, A_REVERSE);
@@ -649,8 +679,8 @@ void parsedata(int history_num_in) {
             wattroff(lq_win, A_REVERSE);
 
         int inside_w = getmaxx(lq_win) - 2;
-        mvwprintw(lq_win, i+1, 1, "%-*s", inside_w, "");
-        mvwprintw(lq_win, i+1, 1, "LQ%02d | %s", i, cur);
+        mvwprintw(lq_win, i+3, 1, "%-*s", inside_w, "");
+        mvwprintw(lq_win, i+3, 1, "LQ%02d | %s", i, cur);
         wattroff(lq_win, A_REVERSE);
     }
     wrefresh(lq_win);
@@ -879,33 +909,58 @@ int processinput() {
         }
         return 0;
 
-        // SQ entries 
-        } else if (strncmp(readbuffer, "qSQ", 3) == 0) {
-            int idx;
-            char valid;
-            unsigned T, addr, data;
-            char addr_valid;
-            if (sscanf(readbuffer, "qSQ %d %c %u %x %x %c", &idx, &valid, &T, &addr, &data, &addr_valid) == 6) {
-                char buf[64];
-                snprintf(buf, sizeof(buf), "%V:%c T:%u A:%08x D:%08x Av:%c", valid, T, addr, data, addr_valid);
-                strcpy(sq_contents[history_num][idx], buf);
-            }
-            return 0;
+        // SQ 
+    } else if (strncmp(readbuffer, "qhead", 5) == 0) {
+        // We are getting SQ head
+        char v[32];
+        sscanf(readbuffer, "qhead %s", v);
+        strcpy(sq_contents[history_num][0], v);
+        return 0;
+    }  else if (strncmp(readbuffer, "qtail", 5) == 0) {
+        // We are getting SQ tail
+        char v[32];
+        sscanf(readbuffer, "qtail %s", v);
+        strcpy(sq_contents[history_num][1], v);
+        return 0;
+        // Entries
+    } else if (strncmp(readbuffer, "qSQ", 3) == 0) {
+        int idx;
+        char valid;
+        unsigned T, addr, data;
+        char addr_valid;
+        if (sscanf(readbuffer, "qSQ %d %c %u %x %x %c", &idx, &valid, &T, &addr, &data, &addr_valid) == 6) {
+            char buf[64];
+            snprintf(buf, sizeof(buf), "V:%c T:%u A:%08x D:%08x Av:%c", valid, T, addr, data, addr_valid);
+            strcpy(sq_contents[history_num][idx + 2], buf);
+        }
+        return 0;
 
         // LQ
-        } else if (strncmp(readbuffer, "lLQ", 3) == 0) {
-            int idx;
-            char valid;
-            unsigned T, addr, data;
-            char addr_valid;
-            int state;
-            if (sscanf(readbuffer, "lLQ %d %c %u %x %x %c %d", &idx, &valid, &T, &addr, &data, &addr_valid, &state) == 7) {
-                char buf[64];
-                snprintf(buf, sizeof(buf), "V:%c T:%u A:%08x D:%08x Av:%c S:%d", valid, T, addr, data, addr_valid, state);
-                strcpy(lq_contents[history_num][idx], buf);
-            }
-            return 0;
-
+    } else if (strncmp(readbuffer, "lhead", 5) == 0) {
+        // We are getting LQ head
+        char v[32];
+        sscanf(readbuffer, "lhead %s", v);
+        strcpy(lq_contents[history_num][0], v);
+        return 0;
+    }  else if (strncmp(readbuffer, "ltail", 5) == 0) {
+        // We are getting LQ tail
+        char v[32];
+        sscanf(readbuffer, "ltail %s", v);
+        strcpy(lq_contents[history_num][1], v);
+        return 0;
+        // Entries
+    } else if (strncmp(readbuffer, "lLQ", 3) == 0) {
+        int idx;
+        char valid;
+        unsigned T, addr, data;
+        char addr_valid;
+        int state;
+        if (sscanf(readbuffer, "lLQ %d %c %u %x %x %c %d", &idx, &valid, &T, &addr, &data, &addr_valid, &state) == 7) {
+            char buf[64];
+            snprintf(buf, sizeof(buf), "V:%c T:%u A:%08x D:%08x Av:%c State:%d", valid, T, addr, data, addr_valid, state);
+            strcpy(lq_contents[history_num][idx + 2], buf);
+        }
+        return 0;
 
         // Break
     } else if (strncmp(readbuffer,"break",4) == 0) {
@@ -962,33 +1017,51 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
         inst_contents     = (char**) malloc(NUM_HISTORY*sizeof(char*));
         int i=0;
 
-        if_contents = (char***) malloc(NUM_HISTORY*sizeof(char**));
-        rs_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        cdb_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        mt_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        rob_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        ds_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        xc_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        sx_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        sq_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
-        lq_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            if_contents = (char***) malloc(NUM_HISTORY*sizeof(char**));
+            rs_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            cdb_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            mt_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            rob_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            ds_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            xc_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            sx_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+                
+            // after you have assigned num_sq_regs and num_lq_regs…
+            int sq_ptrs = 2 + num_sq_regs;
+            int lq_ptrs = 2 + num_lq_regs;
 
-        for (int i = 0; i < NUM_HISTORY; i++) {
-            sq_contents[i] = (char **)malloc(num_sq_regs * sizeof(char *));
-            for (int j = 0; j < num_sq_regs; j++) {
-              sq_contents[i][j] = (char *)malloc(64);
-              sq_contents[i][j][0] = '\0';
+            // Allocate the outer pointer arrays
+            // sq_contents = malloc(NUM_HISTORY * sizeof(char**));
+            // lq_contents = malloc(NUM_HISTORY * sizeof(char**));
+            
+            sq_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+            lq_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+
+            for (int h = 0; h < NUM_HISTORY; h++) {
+                // ① Allocate the per‐history row
+                sq_contents[h] = (char**)malloc(sq_ptrs * sizeof(char*));
+                lq_contents[h] = (char**)malloc(lq_ptrs * sizeof(char*));
+
+                // ② Head and tail initialize to “0”
+                for (int j = 0; j < 2; j++) {
+                    sq_contents[h][j] = (char*)malloc(64);
+                    sprintf(sq_contents[h][j], "%d", 0);
+
+                    lq_contents[h][j] = (char*)malloc(64);
+                    sprintf(lq_contents[h][j], "%d", 0);
+                }
+
+                // ③ The rest start empty
+                for (int j = 2; j < sq_ptrs; j++) {
+                    sq_contents[h][j] = (char*)malloc(64);
+                    sq_contents[h][j][0] = '\0';
+                }
+                for (int j = 2; j < lq_ptrs; j++) {
+                    lq_contents[h][j] = (char*)malloc(64);
+                    lq_contents[h][j][0] = '\0';
+                }
             }
-          }
 
-        lq_contents = (char ***)malloc(NUM_HISTORY * sizeof(char **));
-        for (int i = 0; i < NUM_HISTORY; i++) {
-        lq_contents[i] = (char **)malloc(num_lq_regs * sizeof(char *));
-        for (int j = 0; j < num_lq_regs; j++) {
-            lq_contents[i][j] = (char *)malloc(64);
-            lq_contents[i][j][0] = '\0';
-        }
-        }
 
         timebuffer        = (char**) malloc(NUM_HISTORY*sizeof(char*));
         cycles            = (char**) malloc(NUM_HISTORY*sizeof(char*));
@@ -1101,16 +1174,38 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
             }
 
             // SQ
-            sq_contents[i] = (char**)malloc(num_sq_regs * sizeof(char*));
-            for (int j = 0; j < num_sq_regs; j++) 
-              sq_contents[i][j] = (char*)malloc(64);
-              sq_contents[i][j][0] = '\0';
+            sq_contents[i] = (char**)malloc(sq_ptrs * sizeof(char*));
+            
+            // SQ head
+            sq_contents[i][0] = (char*)malloc(32); 
+            strcpy(sq_contents[i][0],"0");
+
+            // SQ tail
+            sq_contents[i][1] = (char*)malloc(32); 
+            strcpy(sq_contents[i][1],"0");
+
+            // SQ Entries
+            for (int j = 2; j < sq_ptrs; j++) {
+                sq_contents[i][j] = (char*)malloc(64);
+                sq_contents[i][j][0] = '\0';
+            }
             
             // LQ
-            lq_contents[i] = (char**)malloc(num_lq_regs * sizeof(char*));
-            for (int j = 0; j < num_lq_regs; j++) 
-              lq_contents[i][j] = (char*)malloc(64);
-              lq_contents[i][j][0] = '\0';
+            lq_contents[i] = (char**)malloc(lq_ptrs * sizeof(char*));
+            
+            // LQ head
+            lq_contents[i][0] = (char*)malloc(32); 
+            strcpy(lq_contents[i][0],"0");
+
+            // LQ tail
+            lq_contents[i][1] = (char*)malloc(32); 
+            strcpy(lq_contents[i][1],"0");
+
+            // LQ Entries
+            for (int j = 2; j < lq_ptrs; j++){
+                lq_contents[i][j] = (char*)malloc(64);
+                lq_contents[i][j][0] = '\0';
+            }
 
           }
           
