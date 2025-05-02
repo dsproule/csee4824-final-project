@@ -4,6 +4,10 @@ echo "Comparing ground truth outputs to new processor"
 
 LOG_FILE="scoreboard.log"
 
+# Extract CLOCK_PERIOD in picoseconds and convert to microseconds
+CLOCK_PS=$(grep -oP 'export CLOCK_PERIOD\s*=\s*\K[0-9]+' Makefile)
+CLOCK_US=$(echo "scale=6; $CLOCK_PS / 1000" | bc)
+
 file_ext=""
 while getopts "sc" opt; do
     case $opt in
@@ -36,6 +40,8 @@ declare -A scoreboard_reg
 declare -A scoreboard_mem
 declare -A halt_messages
 declare -A cpi_values
+declare -A cycles
+declare -A time_values
 
 # Process each source file
 for source_file in "${sources[@]}"; do
@@ -45,9 +51,9 @@ for source_file in "${sources[@]}"; do
     program=$(basename "$source_file" | cut -d '.' -f1)
     echo -e "\nRunning $program"
 
-    make $program.syn.out
-    
-    # if ! timeout 360s make "$program.syn.out"; then
+    make simulate_all_syn -j$(nproc)
+
+    # if ! timeout 36000000s make "$program.syn.out"; then
     #     echo -e "\033[33m⚠️  Skipping $program (INFINITE LOOP DETECTED)\033[0m"
     #     scoreboard_reg["$program"]="SKIPPED"
     #     scoreboard_mem["$program"]="SKIPPED"
@@ -71,6 +77,15 @@ for source_file in "${sources[@]}"; do
     ### CPI EXTRACT
     cpi=$(grep -oP '@@.*=\s*\K[0-9.]+(?=\s*CPI)' output/"$program".syn.out)
     cpi_values["$program"]="${cpi:-N/A}"
+    cycles=$(grep -oP '@@.*?(\d+)\s+cycles' output/"$program".out | grep -oP '\d+')
+    cycles["$program"]="${cycles:-N/A}"
+
+    if [[ -n "$cycles" && -n "$CLOCK_US" ]]; then
+        exec_time=$(echo "scale=3; $cycles * $CLOCK_US" | bc)
+        time_values["$program"]=$(printf "%.1f" "$exec_time")
+    else
+        time_values["$program"]="N/A"
+    fi
 
     ### SYSTEM HALT MESSAGE
     expected_halt=$(grep '@@@ System halted' correct_out/"$program".out | sed 's/@@@ System halted on //')
@@ -101,35 +116,37 @@ done
 
 # Start the log file with a timestamp
 {
-    echo -e "\n================== SCOREBOARD =================="
-    echo "Test Run: $(date)"
-    printf "%-20s | %-10s | %-10s | %-10s | %-30s\n" "Program" "RegCheck" "MemCheck" "CPI" "System Halt"
-    echo "------------------------------------------------------------------------------------------"
+    echo -e "\n============================================== SCOREBOARD ============================================="
+    echo "Test Run: $(date)                        Clock Period: $CLOCK_PS ps = $CLOCK_US µs"
+    printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s | %-30s\n" "Program" "RegCheck" "MemCheck" "Cycles" "Time (µs)" "CPI" "System Halt"
+    echo "-------------------------------------------------------------------------------------------------------"
 } | tee "$LOG_FILE"
 
 cpi_sum=0
 num_program=0
 
 for program in "${!scoreboard_reg[@]}"; do
+
     # Terminal output with color
     printf "%-20s | " "$program"
     echo -ne "   ${scoreboard_reg[$program]}   "
     echo -n " | "
     echo -ne "   ${scoreboard_mem[$program]}   "
     echo -n " | "
-    printf "%-10s | " "${cpi_values[$program]}"
+    printf "%-10s | %-10s | %-10s | " "${cycles[$program]}" "${time_values[$program]}" "${cpi_values[$program]}"
     echo -ne "${halt_messages[$program]}"
-    echo ""    
+    echo ""
 
     # Strip ANSI codes for log file
     reg_plain=$(echo -e "${scoreboard_reg[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
     mem_plain=$(echo -e "${scoreboard_mem[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
     halt_plain=$(echo -e "${halt_messages[$program]}" | sed 's/\x1b\[[0-9;]*m//g')
 
+
     # Log plain output aligned
-    printf "%-20s | %-10s | %-10s | %-10s | %-30s\n" \
-        "$program" "$reg_plain" "$mem_plain" "${cpi_values[$program]}" "$halt_plain" >> "$LOG_FILE"
-    
+    printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s | %-30s\n" \
+        "$program" "$reg_plain" "$mem_plain" "${cycles[$program]}" "${time_values[$program]}" "${cpi_values[$program]}" "$halt_plain" >> "$LOG_FILE"
+
     if [[ "${cpi_values[$program]}" != "N/A" ]]; then
         cpi_sum=$(echo "$cpi_sum + ${cpi_values[$program]}" | bc)
         ((num_program += 1))
@@ -137,9 +154,9 @@ for program in "${!scoreboard_reg[@]}"; do
 done
 
 if (( num_program > 0 )); then
-    echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)"
+    echo "Average CPI = $(echo "scale=2; $cpi_sum / $num_program" | bc)         Average Time = $(echo "scale=3; ($cpi_sum / $num_program) * $CLOCK_US" | bc) µs"
 else
-    echo "Average CPI = N/A"
+    echo "Average CPI = N/A         Average Time = N/A"
 fi
 
 echo "==========================================================================================" | tee -a "$LOG_FILE"
