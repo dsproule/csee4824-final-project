@@ -40,6 +40,8 @@ module lsq(
     output logic sq_free,
     output LQ_ENTRY [`LQ_SZ-1:0] lq,
     output SQ_ENTRY [`SQ_SZ-1:0] sq,
+    output LQ_T lq_head, lq_tail,
+    output SQ_T sq_head, sq_tail,
 
     //control signals for structural hazards
     output logic sq_full, sq_empty, lq_full, lq_empty
@@ -79,14 +81,14 @@ module lsq(
 
 
     
-    LQ_T lq_head, lq_tail;
+    
     logic lq_head_wrap, lq_tail_wrap;
 
     assign lq_full = (lq_head == lq_tail) && (lq_head_wrap != lq_tail_wrap);
     assign lq_empty = (lq_head == lq_tail) && (lq_head_wrap == lq_tail_wrap);
 
 
-    SQ_T sq_head, sq_tail;
+    
     logic sq_head_wrap, sq_tail_wrap;
 
     assign sq_full = (sq_head == sq_tail) && (sq_head_wrap != sq_tail_wrap);

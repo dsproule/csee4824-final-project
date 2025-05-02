@@ -1,3 +1,0 @@
-*design* DebussyLib (btIdent Verdi_U-2023.03-SP2-1)
-Command arguments:  -lib  /homes/user/stud/fall24/am6542/Documents/am6542/comp_arch/csee4824-final-project/vis_simv.daidir/work  -saveLevel  -elab  /homes/user/stud/fall24/am6542/Documents/am6542/comp_arch/csee4824-final-project/vis_simv.daidir/kdb  -simflow  -simdir  /homes/user/stud/fall24/am6542/Documents/am6542/comp_arch/csee4824-final-project/vis_simv.daidir/kdb_libs  -topfile  /homes/user/stud/fall24/am6542/Documents/am6542/comp_arch/csee4824-final-project/vis_simv.daidir/.elabcomTopFile  -ssv  -ssy  -Lf  work  +disable_message+C00380+C00381  +disable_message+C00388+C00389  -SNPS_ELABCOM  -saveElab 
-Total	0 error(s),   0 warning(s)

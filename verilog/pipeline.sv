@@ -477,6 +477,7 @@ module pipeline (
     .sq_free(sq_free),
     .sq(sq_dbg),
     .lq(lq_dbg),
+    .sq_head(sq_head), .sq_tail(sq_tail), .lq_head(lq_head), .lq_tail(lq_tail),
     .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
     
     );

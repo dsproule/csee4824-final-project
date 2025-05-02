@@ -65,6 +65,8 @@ module testbench;
     ROB_ENTRY rob_table [`ROB_SZ:1];
     LQ_ENTRY [`LQ_SZ-1:0] lq_dbg;
     SQ_ENTRY [`SQ_SZ-1:0] sq_dbg;
+    LQ_T lq_head_dbg, lq_tail_dbg;
+    SQ_T sq_head_dbg, sq_tail_dbg;
 
     integer i, j, k, l, m, n, o, p, q;
 
@@ -97,6 +99,7 @@ module testbench;
         .rs_table_dbg(rs_table_dbg),
         .lq_dbg(lq_dbg),
         .sq_dbg(sq_dbg),
+        .lq_head_dbg(lq_head_dbg), .lq_tail_dbg(lq_tail_dbg), .sq_head_dbg(sq_head_dbg), .sq_tail_dbg(sq_tail_dbg),
         .cdb_dbg(cdb_dbg),
         .busy_dbg(busy_dbg),
         .IF_ID_reg_dbg(IF_ID_reg_dbg),
