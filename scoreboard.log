@@ -1,6 +1,6 @@
 
 ================== SCOREBOARD ==================
-Test Run: Thu May  1 21:16:27 EDT 2025
+Test Run: Thu May  1 22:16:41 EDT 2025
 Program              | RegCheck   | MemCheck   | CPI        | System Halt                   
 ------------------------------------------------------------------------------------------
 evens_long           | PASS       | PASS       | 2.200000   | WFI instruction               

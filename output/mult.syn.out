@@ -2,7 +2,7 @@ Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detec
 Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
-Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  May  1 19:48 2025
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  May  1 21:39 2025
 Loading memory file: programs/mult.mem
 Using writeback output file: output/mult.syn.wb
 @@
@@ -12,15 +12,15 @@ Using writeback output file: output/mult.syn.wb
 @@                     0 : System STILL at reset, can't show anything
 @@
 @@
-@@                150000 : System STILL at reset, can't show anything
+@@                130000 : System STILL at reset, can't show anything
 @@
 @@
-@@                300000 : System STILL at reset, can't show anything
+@@                260000 : System STILL at reset, can't show anything
 @@
 @@
-@@                450000 : System STILL at reset, can't show anything
+@@                390000 : System STILL at reset, can't show anything
 @@
-@@                525100  Deasserting System reset......
+@@                455100  Deasserting System reset......
 @@
 @@
 @@@ Unified Memory contents hex on left, decimal on right: 
@@ -107,19 +107,19 @@ Using writeback output file: output/mult.syn.wb
 @@@ mem[ 4600] = 00000000b863b9c8 : 3093543368
 @@@
 @@@
-@@             192900200 : System halted
+@@             167180200 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
 @@  1283 cycles / 325 instrs = 3.947692 CPI
 @@
-@@  1923000.00 ns total time to execute
+@@  1666600.00 ns total time to execute
 @@
 
 $finish called from file "test/pipeline_test.sv", line 478.
-$finish at simulation time            192910200
+$finish at simulation time            167190200
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 1929102000 ps
-CPU Time:      1.250 seconds;       Data structure size:  12.6Mb
-Thu May  1 19:49:00 2025
+Time: 1671902000 ps
+CPU Time:      3.150 seconds;       Data structure size:  12.5Mb
+Thu May  1 21:40:05 2025

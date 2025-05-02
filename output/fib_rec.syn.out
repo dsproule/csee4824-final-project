@@ -2,7 +2,7 @@ Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detec
 Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
 Chronologic VCS simulator copyright 1991-2023
 Contains Synopsys proprietary information.
-Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  May  1 19:47 2025
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  May  1 21:39 2025
 Loading memory file: programs/fib_rec.mem
 Using writeback output file: output/fib_rec.syn.wb
 @@
@@ -12,15 +12,15 @@ Using writeback output file: output/fib_rec.syn.wb
 @@                     0 : System STILL at reset, can't show anything
 @@
 @@
-@@                150000 : System STILL at reset, can't show anything
+@@                130000 : System STILL at reset, can't show anything
 @@
 @@
-@@                300000 : System STILL at reset, can't show anything
+@@                260000 : System STILL at reset, can't show anything
 @@
 @@
-@@                450000 : System STILL at reset, can't show anything
+@@                390000 : System STILL at reset, can't show anything
 @@
-@@                525100  Deasserting System reset......
+@@                455100  Deasserting System reset......
 @@
 @@
 @@@ Unified Memory contents hex on left, decimal on right: 
@@ -95,19 +95,19 @@ Using writeback output file: output/fib_rec.syn.wb
 @@@ mem[ 4088] = 0000000000000010 : 16
 @@@
 @@@
-@@            8776650200 : System halted
+@@            7606430200 : System halted
 @@
 @@@ System halted on WFI instruction
 @@@
 @@
 @@  58508 cycles / 11957 instrs = 4.893201 CPI
 @@
-@@  87760500.00 ns total time to execute
+@@  76059100.00 ns total time to execute
 @@
 
 $finish called from file "test/pipeline_test.sv", line 478.
-$finish at simulation time           8776660200
+$finish at simulation time           7606440200
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 87766602000 ps
-CPU Time:     45.930 seconds;       Data structure size:  12.6Mb
-Thu May  1 19:48:37 2025
+Time: 76064402000 ps
+CPU Time:    147.390 seconds;       Data structure size:  12.5Mb
+Thu May  1 21:42:43 2025

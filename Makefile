@@ -98,7 +98,7 @@
 # there should be no need to change anything for project 3
 
 # this is a global clock period variable used in the tcl script and referenced in testbenches (ps)
-export CLOCK_PERIOD = 1500
+export CLOCK_PERIOD = 1300
 
 # Path variables
 export RISCV32_HOME = /homes/user/fac/tk3070/tmp/riscv-gcc/riscv-32/bin
