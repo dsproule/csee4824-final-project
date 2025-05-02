@@ -8,6 +8,7 @@ module testbench;
     logic [4:0] r, r1, r2, retire_r;
     CDB cdb;
     logic en;
+    logic has_dest;
     ROB_T T, retire_T;
     logic [$bits(MT_ENTRY)*32-1:0] mt_table_out;
     MT_ENTRY mt_table [31:0];
@@ -19,6 +20,7 @@ module testbench;
         .clock(clock),
         .reset(reset),
         .en(en),
+        .has_dest(has_dest),
         .r(r),
         .r1(r1),
         .r2(r2),
@@ -60,7 +62,7 @@ module testbench;
         reset = 1;
 
         @(negedge clock); reset = 0;
-        @(negedge clock);
+        @(negedge clock); @(negedge clock);
         for (int i = 0; i < 32; i++) begin
                 if (mt_table[i] !== 0) begin
                     $display("@@@ Failed reset! Expected all 0. Got T1=%0d, T2=%0d", T1.T, T2.T);
@@ -68,10 +70,18 @@ module testbench;
             end
         end
 
+        has_dest = 1;
+
         // Set tags for r1, r2, r3
         r = 1; T = 9;  @(negedge clock);
         r = 2; T = 8;  @(negedge clock);
         r = 3; T = 7;  @(negedge clock);
+
+        // Wait one cycle to allow tag writes to commit before reading
+        r = 0; T = 0; en = 0;
+        @(negedge clock); 
+        en = 0;
+        @(negedge clock);
 
         // Read r1 and r3 while setting r4
         r = 0; r1 = 1; r2 = 3; @(negedge clock);
@@ -90,10 +100,17 @@ module testbench;
             exit_on_error();
         end else $display("@@@ Passed retire check!");
 
-        // Retire while setting
+        /* Retire while setting
         r = 1; T = 8; @(negedge clock);
         r = 1; T = 9; retire_r = 1; retire_T = 8; @(negedge clock);
         r = 0; r1 = 1; r2 = 0; @(negedge clock);
+*/
+        r = 1; T = 8; has_dest = 1; en = 1; @(negedge clock);
+        retire_r = 1; retire_T = 8; r = 1; T = 9; has_dest = 1; en = 1; @(negedge clock);
+        retire_r = 0; retire_T = 0; // clear retire
+        r = 0; has_dest = 0; en = 0;
+        r1 = 1; r2 = 0; @(negedge clock);
+
         if (T1.T !== 9) begin
             $display("@@@ Failed retire while setting check! Expected T1=9. Got T1=%0d", T1.T);
             exit_on_error();
@@ -108,8 +125,10 @@ module testbench;
         end else $display("@@@ Passed CDB broadcast check!");
 
         // WAW Hazard test
+        has_dest = 1; en = 1;
         r = 5; T = 11; @(negedge clock);
         r = 5; T = 12; @(negedge clock);
+        en = 0; has_dest = 0;  // Stop writing
         r1 = 5; @(negedge clock);
         if (T1.T !== 12) begin
             $display("@@@ Failed WAW hazard test! Expected T1=12. Got T1=%0d", T1.T);
