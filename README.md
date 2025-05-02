@@ -1,14 +1,36 @@
-# Milestone 1
-Finish Reservation Station
-```
-rs_stage.out
-rs_stage.syn.out
-```
-Finish Map Table
-```
-map_table.out
-map_table.syn.out
-```
+# Project Summary
+
+This is our Out of Order full pipeline based on the Pentium VI architecture. It implements nonblocking dcache and icache, prefetching in
+the icache, a forwarding split queue in-order LSQ, and an advanced branch predictor. 
+
+## Verification
+
+In addition, we have implemented a visual debugger that
+can be used to step through clock cycles and see the output of each data structure. For example, for **program.c:** run `make program.vis`
+
+Debugging can also be done by creating/uncommenting relevant print tasks in **pipeline_test.sv**  and running `make program.out`
+
+And the print tasks will output to the .out files, with clock cycle timestamps. 
+
+To investigate the waveforms for a testbench run `make program.verdi`
+
+### Verification Scripts 
+
+To recompile and check for correctness, place a correct .out and .wb file in the **correct_out** folder, and run `./run_sim_tests.sh [program1.s] [program2.c] [program3.s] ...`, where no arguments run all files in the **programs** folder, the `-s` option runs all **assembly (.s)** files and the `-c`option runs all **.c** files.
+
+As synthesis takes a long time, `./run_syn_tests.sh` uses **make -j $(nproc) simulate_syn_all** under the hood to run all jobs in parallel, then does the comparison for the indicated files (.syn.out and .syn.wb), same as for ./run_sim_tests.sh. So check output with the previous script first.
+
+The result of the scripts is written to the terminal and **scoreboard.log**, the current syn output for the finished processor is shown below:
+
+
+![Synthesis results of working OoO processor](./syn_results.png "Syn Comparison Table")
+
+### Vtuber Debugger
+To run the Vtuber, read the INSTALL_NCURSES file for a tutorial. It displays the processor’s internal state cycle-by-cycle, including the ROB, Reservation Station, and functional units.
+
+An example run of the vtuber:
+
+![Vtuber example for alexnet.vis](./vtuber_example.png "Vtuber Visual Debugger")
 
 # EECS 470 Final Project
 
@@ -19,9 +41,6 @@ synthesizable, RISC-V processor with advanced features.
 
 See the [Project Specification](https://drive.google.com/file/d/1z8MC70pnj0iMrgUmu1rYOlS5uGNltmwG/view?usp=drive_link)
 for more details on deadlines and the overall structure of the project.
-
-This README has information on changes from project 3 and specific
-requirements on your processor for submitting to the autograder.
 
 ### Autograder Submission
 
@@ -62,37 +81,12 @@ memory output instead of the value from memory. This will require
 exposing your cache at the top level and editing the `show_mem` task in
 `test/pipeline_test.sv`.
 
-## Getting Started
-
-Start the project by working on your first module, either the ReOrder
-Buffer (ROB) or the Reservation Station (RS). Implement the modules in
-files in the `verilog/` folder, and write testbenches for them in the
-`test/` folder. If you're writing the ROB, name these like:
-`verilog/rob.sv` and `test/rob_test.sv` which implement and test the
-module named `rob`.
-
-Once you have something written, try running the new Makefile targets.
-Add `rob` to the TESTED_MODULES variable in the Maekefile, then run
-`make rob.pass` to compile, run, and check the testbench. Do the same
-for synthesis with `make rob.syn.pass`. And finally, check your
-testbench's coverage with `make rob.coverage.`
-
-After you have the first module written and tested, keep going and work
-towards a full processor. Plan to pass the `mult_no_lsq` program for the
-second milestone (verify with the .wb file).
-
-## Changes from Project 3
-
-Many of the files from project 3 are still present or kept the same,
-but there are a number of notable changes:
+## General Files
 
 ### The Makefile
 
-The final project requires writing many modules, so we've added a new
-section to the Makefile to compile arbitrary modules and testbenches.
-
 To make it work for a module `mod`, create the files `verilog/mod.sv`
-and `test/mod_test.sv` which implement and test the module. If you
+and sv testbench `test/mod_test.sv` which implement and test the module. If you
 update the `TESTED_MODULES` variable in the Makefile, then it will
 be able to link the new targets below.
 
@@ -125,17 +119,11 @@ make <module>_cov_report  <- run urg to create human readable coverage reports
 
 ### `verilog/sys_defs.svh`
 
-`sys_defs` has received a few changes to prepare the final project:
+`sys_defs` contains parameters and structs used throughout the processor.
 
-1.  We've defined `CACHE_MODE`, affecting `test/mem.sv` and changing
-    the way the processor interacts with memory.
+1.  There is a simulated memory latency of 100ns, so memory is handled with caching for substantial cpi improvements.
 
-2.  We've added a memory latency of 100ns, so memory is now much
-    slower, and handling it with caching is necessary.
-
-3.  There is a new 'Parameters' section giving you a starting point
-    for some common macros that will likely need to be decided on like
-    the size of the ROB, the number of functional units, etc.
+2.  Various data structure sizes are parametrized, particularly the sq, lq, and rob sizes can be changed at will without other changes needed.
 
 ### Pipeline Files
 
@@ -143,33 +131,6 @@ The two files `verilog/pipeline.sv` and `test/pipeline_test.sv` have
 been edited to comment-out or remove project 3 specific code, so you
 should be able to re-use them when you want to start integrating your
 modules into a full processor again.
-
-## New Files
-
-We've added an `icache` module in `verilog/icache.sv`. That file has
-more comments explaining how it works, but the idea is it stores
-memory's response tag until memory returns that tag with the data. More
-about how our processor's memory works will be presented in the final
-lab section.
-
-The file `psel_gen.sv` implements an incredibly efficient parameterized
-priority selector (remember project 1?!). many tasks in superscalar
-processors come down to priority selection, so instead of writing
-manual for-loops, try to use this module. It is faster than any
-priority selector the instructors are aware of (as far as my last
-conversation about it with Brehob).
-
-As promised, we've also copied the multiplier from project 2 and moved
-the `` `STAGES`` definition to `sys_defs.svh` as `` `MULT_STAGES``.
-This is set to 4 to start, but you can change it to 2 or 8 depending on
-your processor's clock period.
-
-### `verilog/p3` and the `decoder.sv`
-
-The project 3 files are no longer relevant to your final processor, but
-they are still good references, so project 3's starter verilog source
-files have been moved to `verilog/p3/`. Notably, the decoder has been
-pulled out as a new file `verilog/decoder.sv`.
 
 ## P3 Makefile Target Reference
 
@@ -232,5 +193,3 @@ make vis_simv          <- compile the vtuber executable from VTUBER and SOURCES
 make clean            <- remove per-run files and compiled executable files
 make nuke             <- remove all files created from make rules
 ```
-## Vtuber Debugger
-To run the Vtuber, follow the INSTALL_NCURSES tutorial. It displays the processor’s internal state cycle-by-cycle, including the ROB, Reservation Station, and functional units.

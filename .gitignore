@@ -1,2 +1,12 @@
 *correct_out/*
 *scoreboard.log
+.nf*
+vis_sim*
+simv*
+synth
+csrc
+output
+*.mem
+*.elf
+output
+program.out

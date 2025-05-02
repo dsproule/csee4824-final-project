@@ -1,7 +1,7 @@
 `include "verilog/sys_defs.svh"
 
 module func_unit_2(
-    input clock, reset, data_valid,
+    input data_valid,
     input [63:0] Dmem2proc_data,
     input ROB_T T,
     input MEM_ACCESS mem_access,

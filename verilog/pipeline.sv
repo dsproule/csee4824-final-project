@@ -485,7 +485,6 @@ module pipeline (
     );
 
     func_unit_2 func_unit_02 (
-        .clock(clock), .reset(reset | take_branch), 
         .data_valid(Dcache_valid_out & rd_mem),
         .Dmem2proc_data(Dcache_data_out),
         .T(load_T_wire),
