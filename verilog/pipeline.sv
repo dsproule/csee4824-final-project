@@ -8,6 +8,11 @@
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
+// cpi
+// assume taken: 3.95
+// branch_predictor: 3.99
+// assum not taken: 4.16
+
 `include "verilog/sys_defs.svh"
 
 // `define ASSUME_TAKEN

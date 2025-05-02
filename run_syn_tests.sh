@@ -45,14 +45,16 @@ for source_file in "${sources[@]}"; do
     program=$(basename "$source_file" | cut -d '.' -f1)
     echo -e "\nRunning $program"
 
-    if ! timeout 360s make "$program.syn.out"; then
-        echo -e "\033[33m⚠️  Skipping $program (INFINITE LOOP DETECTED)\033[0m"
-        scoreboard_reg["$program"]="SKIPPED"
-        scoreboard_mem["$program"]="SKIPPED"
-        cpi_values["$program"]="N/A"
-        halt_messages["$program"]="N/A"
-        continue
-    fi
+    make $program.syn.out
+    
+    # if ! timeout 360s make "$program.syn.out"; then
+    #     echo -e "\033[33m⚠️  Skipping $program (INFINITE LOOP DETECTED)\033[0m"
+    #     scoreboard_reg["$program"]="SKIPPED"
+    #     scoreboard_mem["$program"]="SKIPPED"
+    #     cpi_values["$program"]="N/A"
+    #     halt_messages["$program"]="N/A"
+    #     continue
+    # fi
 
     ### REG CHECK
     diff -y --suppress-common-lines \

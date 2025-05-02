@@ -10,7 +10,7 @@ module two_bit_pred(
     output branch_pred
 );
     // set right now to "assume branch taken"
-    assign branch_pred   = 0;
+    assign branch_pred   = en;
     assign branch_target = D_packet.PC + `RV32_signext_Bimm(D_packet.inst);
 
 endmodule
