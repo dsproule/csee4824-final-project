@@ -64,6 +64,11 @@ module testbench;
     MT_ENTRY mt_table [31:0];
     ROB_ENTRY rob_table [`ROB_SZ:1];
 
+    LQ_ENTRY [`LQ_SZ-1:0] lq_dbg;
+    SQ_ENTRY [`SQ_SZ-1:0] sq_dbg;
+    LQ_T lq_head_dbg, lq_tail_dbg;
+    SQ_T sq_head_dbg, sq_tail_dbg;
+
     integer i, j, k, l, m, n, o, p, q;
 
     // Instantiate the Pipeline
@@ -106,7 +111,13 @@ module testbench;
         .rob_tail_dbg(rob_tail_dbg),
         .rob_retire_dbg(rob_retire_dbg),
         .rob_pipeline_control_dbg(rob_pipeline_control_dbg),
-        .retire_T_wire_dbg(retire_T_wire_dbg)
+        .retire_T_wire_dbg(retire_T_wire_dbg),
+        .lq_dbg(lq_dbg),
+        .sq_dbg(sq_dbg),
+        .lq_tail_dbg(lq_tail_dbg),
+        .lq_head_dbg(lq_head_dbg),
+        .sq_tail_dbg(sq_tail_dbg),
+        .sq_head_dbg(sq_head_dbg)
     );
 
     // Instantiate the Data Memory

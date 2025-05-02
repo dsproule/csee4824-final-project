@@ -9,7 +9,7 @@
 
 `include "verilog/sys_defs.svh"
 
-extern void initcurses(int,int,int,int,int,int,int,int); //count = 8
+extern void initcurses(int,int,int,int,int,int,int,int, int, int); //count = 10
 extern void flushpipe();
 extern void waitforresponse();
 extern void initmem();
@@ -49,6 +49,10 @@ module testbench;
     D_S_PACKET              D_S_reg_dbg;
     X_C_PACKET [`RS_SZ-1:0] X_C_regs_dbg;
     S_X_PACKET [`RS_SZ-1:0] S_X_regs_dbg;
+    LQ_ENTRY [`LQ_SZ-1:0] lq_dbg;
+    SQ_ENTRY [`SQ_SZ-1:0] sq_dbg;
+    LQ_T lq_head_dbg, lq_tail_dbg;
+    SQ_T sq_head_dbg, sq_tail_dbg;
 
 `ifndef CACHE_MODE
     MEM_SIZE          proc2mem_size;
@@ -93,11 +97,16 @@ module testbench;
         .rob_head_dbg (rob_head_dbg),
         .rob_tail_dbg (rob_tail_dbg),
         .rob_retire_dbg(rob_retire_dbg),
-        // .rob_pipeline_control_dbg(rob_pipeline_control_dbg),
         .retire_T_wire_dbg(retire_T_wire_dbg),
         .D_S_reg_dbg(D_S_reg_dbg),
         .S_X_regs_dbg(S_X_regs_dbg),
-        .X_C_regs_dbg(X_C_regs_dbg)
+        .X_C_regs_dbg(X_C_regs_dbg),
+        .lq_dbg(lq_dbg),
+        .sq_dbg(sq_dbg),
+        .lq_tail_dbg(lq_tail_dbg),
+        .lq_head_dbg(lq_head_dbg),
+        .sq_tail_dbg(sq_tail_dbg),
+        .sq_head_dbg(sq_head_dbg)
     );
 
 
@@ -146,7 +155,7 @@ module testbench;
         // Call to initialize visual debugger
         // Note that after this, all stdout output goes to visual debugger
         // each argument is number of registers/signals for the group
-        initcurses( // count = 8
+        initcurses( // count = 10
             2,  // IF
             `RS_SZ,  // Reservation Station
             3,  // CDB
@@ -154,7 +163,9 @@ module testbench;
             `ROB_SZ,  // ROB
             12, //D_S
             `RS_SZ, // X_C
-            `RS_SZ  // S_X
+            `RS_SZ, // S_X
+            `SQ_SZ, // SQ
+            `LQ_SZ // LQ
         );
 
         // Pulse the reset signal
@@ -292,6 +303,25 @@ module testbench;
         sx = S_X_regs_dbg[i];
         $display("ySX %0d %h %8h %0h %0h %0h %b %b", i, sx.PC, sx.inst, sx.T, sx.V1, sx.V2, sx.halt, sx.valid);
         end
+
+        // Store Queue — prefix 'q'
+        $display("qhead %h", sq_head_dbg);
+        $display("qtail %h", sq_tail_dbg);
+        for (int i = 0; i < `SQ_SZ; i++) begin
+        if (sq_dbg[i].valid) begin
+            $display( "qSQ %0d %b %0d %h %h %b", i, sq_dbg[i].valid, sq_dbg[i].T, sq_dbg[i].addr, sq_dbg[i].data, sq_dbg[i].addr_valid);
+        end
+        end
+
+        // Load Queue — prefix 'l'
+        $display("lhead %h", lq_head_dbg);
+        $display("ltail %h", lq_tail_dbg);
+        for (int i = 0; i < `LQ_SZ; i++) begin
+        if (lq_dbg[i].valid) begin
+            $display( "lLQ %0d %b %0d %h %h %b %0d", i, lq_dbg[i].valid, lq_dbg[i].T, lq_dbg[i].addr, lq_dbg[i].data, lq_dbg[i].addr_valid, lq_dbg[i].state);
+        end
+        end
+
 
         // must come last
         $display("break");

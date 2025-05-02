@@ -54,7 +54,11 @@ module pipeline (
     output ROB_T rob_head_dbg, rob_tail_dbg,
     output logic rob_retire_dbg,
     output PPLN_CTRL rob_pipeline_control_dbg,
-    output ROB_T retire_T_wire_dbg 
+    output ROB_T retire_T_wire_dbg,
+    output LQ_ENTRY [`LQ_SZ-1:0] lq_dbg,
+    output SQ_ENTRY [`SQ_SZ-1:0] sq_dbg,
+    output LQ_T lq_head_dbg, lq_tail_dbg,
+    output SQ_T sq_head_dbg, sq_tail_dbg 
 );
 
     //////////////////////////////////////////////////
@@ -127,6 +131,10 @@ module pipeline (
     // lsq
     logic mem_read_en, mem_write_en, wfi;
     logic sq_empty, sq_full, lq_empty, lq_full;
+    LQ_ENTRY [`LQ_SZ-1:0] lq_dbg;
+    SQ_ENTRY [`SQ_SZ-1:0] sq_dbg;
+    LQ_T lq_head_dbg, lq_tail_dbg;
+    SQ_T sq_head_dbg, sq_tail_dbg;
 
     // debug outputs
     assign IF_ID_reg_dbg     = IF_ID_reg;
@@ -466,6 +474,12 @@ module pipeline (
     .mem_read_en(mem_read_en),
     .load_T(load_T_wire),
     .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
+    .lq(lq_dbg),
+    .sq(sq_dbg),
+    .lq_tail(lq_tail_dbg),
+    .lq_head(lq_head_dbg),
+    .sq_tail(sq_tail_dbg),
+    .sq_head(sq_head_dbg),
     .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
     
     );

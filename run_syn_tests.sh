@@ -51,7 +51,7 @@ for source_file in "${sources[@]}"; do
     program=$(basename "$source_file" | cut -d '.' -f1)
     echo -e "\nRunning $program"
 
-    # make simulate_all_syn -j$(nproc)
+    make simulate_all_syn -j$(nproc)
 
     # if ! timeout 36000000s make "$program.syn.out"; then
     #     echo -e "\033[33m⚠️  Skipping $program (INFINITE LOOP DETECTED)\033[0m"
