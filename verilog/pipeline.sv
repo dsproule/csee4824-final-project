@@ -36,6 +36,8 @@ module pipeline (
     output logic [$bits(ROB_ENTRY)*`ROB_SZ-1:0] rob_table_out_dbg,
     output logic [$bits(MT_ENTRY)*32-1:0] mt_table_out_dbg,
     output RS_ENTRY [`RS_SZ-1:0] rs_table_dbg,
+    output LQ_ENTRY [`LQ_SZ-1:0] lq_dbg,
+    output SQ_ENTRY [`SQ_SZ-1:0] sq_dbg,
     
     output X_C_PACKET [`RS_SZ-1:0] X_C_regs_dbg,
     output S_X_PACKET [`RS_SZ-1:0] S_X_regs_dbg,
@@ -463,6 +465,8 @@ module pipeline (
     .load_T(load_T_wire),
     .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
     .sq_free(sq_free),
+    .sq(sq_dbg),
+    .lq(lq_dbg),
     .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
     
     );

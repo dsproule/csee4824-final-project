@@ -63,6 +63,8 @@ module testbench;
     // logging
     MT_ENTRY mt_table [31:0];
     ROB_ENTRY rob_table [`ROB_SZ:1];
+    LQ_ENTRY [`LQ_SZ-1:0] lq_dbg;
+    SQ_ENTRY [`SQ_SZ-1:0] sq_dbg;
 
     integer i, j, k, l, m, n, o, p, q;
 
@@ -93,6 +95,8 @@ module testbench;
         .rob_table_out_dbg(rob_table_out_dbg),
         .mt_table_out_dbg(mt_table_out_dbg),
         .rs_table_dbg(rs_table_dbg),
+        .lq_dbg(lq_dbg),
+        .sq_dbg(sq_dbg),
         .cdb_dbg(cdb_dbg),
         .busy_dbg(busy_dbg),
         .IF_ID_reg_dbg(IF_ID_reg_dbg),
@@ -123,6 +127,9 @@ module testbench;
         // Outputs
         .mem2proc_response (mem2proc_response),
         .mem2proc_data     (mem2proc_data),
+
+
+        
         .mem2proc_tag      (mem2proc_tag)
     );
 
@@ -246,6 +253,63 @@ module testbench;
         end
     endtask
 
+    task print_sq;
+    $display("\n(SQ_TABLE) full: %1b empty: %1b head: %d tail: %d \ttime: %0d", core.lsq_inst.sq_full, core.lsq_inst.sq_empty, core.lsq_inst.sq_head, core.lsq_inst.sq_tail, clock_count);
+    $display("--------------------------------------------------------------------------------");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid | Data_Valid | MEM_ACC  | Retired | Dirty");
+    $display("--------------------------------------------------------------------------------");
+    for (int i = 0; i < `SQ_SZ; i++) begin
+      $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      |     %1b      |    %d     |   %1b   |  %1b  ",
+               i, core.lsq_inst.sq[i].valid, core.lsq_inst.sq[i].T, core.lsq_inst.sq[i].addr, core.lsq_inst.sq[i].data,
+               core.lsq_inst.sq[i].addr_valid, core.lsq_inst.sq[i].data_valid, core.lsq_inst.sq[i].mem_access, core.lsq_inst.sq[i].retired, core.lsq_inst.sq[i].dirty);
+    end
+    $display("--------------------------------------------------------------------------------\n");
+  endtask
+
+    task print_lq;
+    $display("\n(LQ_TABLE) full: %1b empty: %1b head: %d tail: %d  \ttime: %0d", 
+             core.lsq_inst.lq_full, core.lsq_inst.lq_empty, core.lsq_inst.lq_head, core.lsq_inst.lq_tail, clock_count);
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+    $display("Idx | Valid |   T   |     Addr     |     Data     | Addr_Valid |     State     | Line_Ofs | Size | Unsigned | Dep_SQ_T");
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+    for (int i = 0; i < `LQ_SZ; i++) begin
+        string state_str;
+        case (core.lsq_inst.lq[i].state)
+            NONE:      state_str = "NONE";
+            DATA_READY:state_str = "DATA_READY";
+            WAITING:   state_str = "WAITING";
+            FORWARDED: state_str = "FORWARDED";
+            default:   state_str = "???";
+        endcase
+        $display("%3d |   %1b   | %4d  |   %h   |   %h   |     %1b      | %11s   |    %1d     |   %1d  |     %1d    |   %2d",
+                 i, core.lsq_inst.lq[i].valid, core.lsq_inst.lq[i].T, 
+                 core.lsq_inst.lq[i].addr, core.lsq_inst.lq[i].data,
+                 core.lsq_inst.lq[i].addr_valid, state_str,
+                 core.lsq_inst.lq[i].mem_access.line_offset,
+                 core.lsq_inst.lq[i].mem_access.mem_size,
+                 core.lsq_inst.lq[i].mem_access.rd_unsigned,
+                 core.lsq_inst.lq[i].dep_sq_T);
+    end
+
+    $display("Current load_X: %1b | mem_access_load_wire: Line_Ofs: %0d Size: %0d Unsigned: %0d", 
+             core.lsq_inst.load_X, 
+             core.lsq_inst.mem_access_load_wire.line_offset, 
+             core.lsq_inst.mem_access_load_wire.mem_size, 
+             core.lsq_inst.mem_access_load_wire.rd_unsigned);
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+    $display("-----------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+endtask
+
+
+
+  task print_lsq;
+    print_lq();
+    print_sq();
+    $display("mem_read_en: %b mem_write_en: %d", core.rd_mem, core.wr_mem);
+    $display("sq_older: %b sq2dcache: %b lq_older: %b lq2dcache %b funcunit2_T %d funcunit2_valid %b", core.lsq_inst.sq_older, core.lsq_inst.sq2Dcache, core.lsq_inst.lq_older, core.lsq_inst.lq2Dcache, core.func_unit_2_x_packet.T, core.func_unit_2_x_packet.valid);
+    $display("----------------------------------------------------------------------------------------------------------\n");
+  endtask
+
     // Show contents of a range of Unified Memory, in both hex and decimal
     task show_mem_with_decimal;
         input [31:0] start_addr;
@@ -293,6 +357,7 @@ module testbench;
                 // print_rs;
                 // print_mt;
                 // print_cdb;
+                print_lsq;
                 // print_rob;
                 // print_regs;
                 // print_sx;

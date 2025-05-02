@@ -38,6 +38,8 @@ module lsq(
     output MEM_ACCESS mem_access_load,
     output ROB_T load_T,
     output logic sq_free,
+    output LQ_ENTRY [`LQ_SZ-1:0] lq,
+    output SQ_ENTRY [`SQ_SZ-1:0] sq,
 
     //control signals for structural hazards
     output logic sq_full, sq_empty, lq_full, lq_empty
@@ -49,9 +51,6 @@ module lsq(
     • When store retires, head of LSQ written to D$
     • When loads execute, access LSQ and D$ in parallel
     • Forward from LSQ if older store with matching address
-    */
-    /*
-    TODO insert control signals into pipeline
     */
 
     // address calculation
@@ -79,14 +78,14 @@ module lsq(
     end
 
 
-    LQ_ENTRY lq[`LQ_SZ-1:0];
+    
     LQ_T lq_head, lq_tail;
     logic lq_head_wrap, lq_tail_wrap;
 
     assign lq_full = (lq_head == lq_tail) && (lq_head_wrap != lq_tail_wrap);
     assign lq_empty = (lq_head == lq_tail) && (lq_head_wrap == lq_tail_wrap);
 
-    SQ_ENTRY sq[`SQ_SZ-1:0];
+
     SQ_T sq_head, sq_tail;
     logic sq_head_wrap, sq_tail_wrap;
 

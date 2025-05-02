@@ -65,14 +65,16 @@ WINDOW *instr_win;
 WINDOW *clock_win;
 WINDOW *pipe_win;
 WINDOW *if_win;
-WINDOW *ds_win; //changed
+WINDOW *ds_win; 
 WINDOW *vtuber_win;
-WINDOW *rs_win; //changed
-WINDOW *cdb_win; // changed
-WINDOW *rob_win; // changed
-WINDOW *mt_win; // changed
-WINDOW *xc_win; // changed
-WINDOW *sx_win; //changed
+WINDOW *rs_win; 
+WINDOW *cdb_win; 
+WINDOW *rob_win; 
+WINDOW *mt_win; 
+WINDOW *xc_win; 
+WINDOW *sx_win; 
+WINDOW *sq_win; 
+WINDOW *lq_win; 
 
 // arrays for register contents and names
 int history_num=0;
@@ -85,6 +87,8 @@ int num_rob_regs = 0;
 int num_mt_regs = 0;
 int num_xc_regs = 0;
 int num_sx_regs = 0;
+int num_sq_regs = 0;
+int num_lq_regs = 0;
 
 char readbuffer[1024];
 char **timebuffer;
@@ -101,6 +105,8 @@ char ***rob_contents;  // Reorder Buffer
 char ***ds_contents;   // D_S
 char ***xc_contents;   // X_C
 char ***sx_contents;   // S_X
+char ***sq_contents;   // SQ
+char ***lq_contents;   // LQ
 
 
 char **if_reg_names;
@@ -111,6 +117,8 @@ char **rob_reg_names;
 char **ds_reg_names;
 char **xc_reg_names;
 char **sx_reg_names;
+char **sq_reg_names;
+char **lq_reg_names;
 
 char *get_opcode_str(int inst, int valid_inst);
 void parse_register(char* readbuf, int reg_num, char*** contents, char** reg_names);
@@ -206,7 +214,7 @@ void update_clock(char clock_val) {
 
 // Function to create and initialize the gui
 
-void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, int ds_regs, int xc_regs, int sx_regs) {
+void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, int ds_regs, int xc_regs, int sx_regs, int sq_regs, int lq_regs) {
     initscr();
     if (has_colors()) {
         start_color();
@@ -247,12 +255,15 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     int rob_width = 33; 
     int rob_height = rob_regs + 4;
     int rob_starty = 4; 
-    int rob_startx = rs_startx + rs_width + 2;
+    int rob_startx = rs_startx + rs_width + 4;
 
     int mt_width = 30; 
     int mt_height = mt_regs + 4;
     int mt_starty = 4; 
-    int mt_startx = rob_startx + rob_width + 2;
+    int mt_startx = rob_startx + rob_width + 4;
+
+    int instr_startx =  mt_startx + mt_width + 2;
+    int instr_starty = 4;
 
     int xc_width = 27; 
     int xc_height = xc_regs + 2;
@@ -265,6 +276,16 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     int sx_startx = 0;
 
     int vtuber_starty = mt_starty + mt_height - 10;
+
+    int sq_width = 60; 
+    int sq_height = 8;
+    int sq_starty = instr_starty + 8; 
+    int sq_startx = mt_startx + mt_width + 4;
+
+    int lq_width = 60; 
+    int lq_height = 10;
+    int lq_starty = sq_starty + sq_height; 
+    int lq_startx = mt_startx + mt_width + 4;
 
     // instantiate the title window at top of screen
     title_win = create_newwin(3,COLS,0,0,4);
@@ -329,8 +350,18 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     mvwprintw(sx_win, 0, (sx_width - 4) / 2, "S_X");
     wrefresh(sx_win);
 
+    // instantiate a window to visualize SQ
+    sq_win = create_newwin(sq_height, sq_width, sq_starty, sq_startx, 1);
+    mvwprintw(sq_win, 0, (sq_width) / 2, "SQ");
+    wrefresh(sq_win);
+
+    // instantiate a window to visualize LQ
+    lq_win = create_newwin(lq_height, lq_width, lq_starty, lq_startx, 1);
+    mvwprintw(lq_win, 0, (lq_width) / 2, "LQ");
+    wrefresh(lq_win);
+
     // instantiate an instructional window to help out the user some
-    instr_win = create_newwin(7,30,12,COLS-30,7);
+    instr_win = create_newwin(7,30,instr_starty, instr_startx,7);
     mvwprintw(instr_win,0,9,"INSTRUCTIONS");
     wattron(instr_win,COLOR_PAIR(5));
     mvwaddstr(instr_win,1,1,"'n'   -> Next clock edge");
@@ -340,7 +371,7 @@ void setup_gui(FILE *fp, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, i
     mvwaddstr(instr_win,5,1,"'q'   -> Quit Simulator");
     wrefresh(instr_win);
 
-    vtuber_win = create_newwin(10, 47, vtuber_starty, COLS-47, 8);
+    vtuber_win = create_newwin(10, 47, vtuber_starty, lq_startx + lq_width/8, 8);
     mvwaddstr(vtuber_win, 2, 4, "__     _______ _   _ ____  _____ ____");
     mvwaddstr(vtuber_win, 3, 4, "\\ \\   / /_   _| | | | __ )| ____|  _ \\");
     mvwaddstr(vtuber_win, 4, 4, " \\ \\ / /  | | | | | |  _ \\|  _| | |_) |");
@@ -411,17 +442,15 @@ void parsedata(int history_num_in) {
         else
             wattroff(if_win, A_REVERSE);
     
-        // Print "PC: " or "inst: " before the value depending on index
         if (i == 0) {
             mvwprintw(if_win, i + 1, 1, "PC:  %s", if_contents[history_num_in][i]);
         } else if (i == 1) {
             mvwprintw(if_win, i + 1, 1, "inst:  %s", if_contents[history_num_in][i]);
         } else {
-            // fallback: print raw value if there's ever more
             mvwprintw(if_win, i + 1, 1, "%s", if_contents[history_num_in][i]);
         }
     }
-    wattroff(if_win, A_REVERSE);  // safety: ensure reverse is offn
+    wattroff(if_win, A_REVERSE); 
     wrefresh(if_win);
 
     // update the time window
@@ -443,9 +472,7 @@ void parsedata(int history_num_in) {
         if (i == 0) {
             mvwprintw(rs_win, 1, 5, "Busy: %s", busy_cur ? "1" : "0");
         }
-        // now the fields T, T1, T2, V1, V2, ready
         int base = 1 + i*6;
-        /* clear old contents, width = window_width-4 */
         mvwprintw(rs_win, i+3, 2, "%*s", getmaxx(rs_win)-4, "");
         mvwprintw(rs_win, i+3, 2,
             "RS%1d-> T:%-4s T1:%-4s T2:%-4s V1:%-4s V2:%-4s Ready:%-4s",
@@ -461,7 +488,6 @@ void parsedata(int history_num_in) {
     wrefresh(rs_win);
 
     // CDB
-    // We have three lines: valid, tag, value
     if (strcmp(cdb_contents[history_num_in][0], cdb_contents[old_history_num_in][0]) != 0)
         wattron(cdb_win, A_REVERSE);
     else wattroff(cdb_win, A_REVERSE);
@@ -502,7 +528,6 @@ void parsedata(int history_num_in) {
         wattroff(rob_win, A_REVERSE);
 
     mvwprintw(rob_win, 3, 1, "Retire: %s", retire_str);
-
 
     // Entries
     for (i = 0; i < num_rob_regs; i++) {
@@ -548,11 +573,11 @@ void parsedata(int history_num_in) {
         } else if (i == 2) {
             mvwprintw(ds_win, i + 1, 1, "NPC->  %s", ds_contents[history_num_in][i]);
         } else if (i == 3) {
-            mvwprintw(ds_win, i + 1, 1, "r->  %s", ds_contents[history_num_in][i]);
+            mvwprintw(ds_win, i + 1, 1, "r->  %02s", ds_contents[history_num_in][i]);
         } else if (i == 4) {
-            mvwprintw(ds_win, i + 1, 1, "r1->  %s", ds_contents[history_num_in][i]);
+            mvwprintw(ds_win, i + 1, 1, "r1->  %02s", ds_contents[history_num_in][i]);
         } else if (i == 5) {
-            mvwprintw(ds_win, i + 1, 1, "r2->  %s", ds_contents[history_num_in][i]);
+            mvwprintw(ds_win, i + 1, 1, "r2->  %02s", ds_contents[history_num_in][i]);
         } else if (i == 6) {
             mvwprintw(ds_win, i + 1, 1, "opA->  %s", ds_contents[history_num_in][i]);
         } else if (i == 7) {
@@ -596,6 +621,39 @@ void parsedata(int history_num_in) {
     }
     wrefresh(sx_win);
 
+    // SQ window
+    for (i = 0; i < num_sq_regs; i++) {
+        char *cur = sq_contents[history_num_in][i];
+        char *old = sq_contents[old_history_num_in][i];
+
+        if (strcmp(cur, old) != 0)
+            wattron(sq_win, A_REVERSE);
+        else
+            wattroff(sq_win, A_REVERSE);
+
+        int inside_w = getmaxx(sq_win) - 2;
+        mvwprintw(sq_win, i+1, 1, "%-*s", inside_w, "");
+        mvwprintw(sq_win, i+1, 1, "SQ%02d | %s", i, cur);
+        wattroff(sq_win, A_REVERSE);
+    }
+    wrefresh(sq_win);
+
+    // LQ window
+    for (i = 0; i < num_lq_regs; i++) {
+        char *cur = lq_contents[history_num_in][i];
+        char *old = lq_contents[old_history_num_in][i];
+
+        if (strcmp(cur, old) != 0)
+            wattron(lq_win, A_REVERSE);
+        else
+            wattroff(lq_win, A_REVERSE);
+
+        int inside_w = getmaxx(lq_win) - 2;
+        mvwprintw(lq_win, i+1, 1, "%-*s", inside_w, "");
+        mvwprintw(lq_win, i+1, 1, "LQ%02d | %s", i, cur);
+        wattroff(lq_win, A_REVERSE);
+    }
+    wrefresh(lq_win);
         
     // save the old history index to check for changes later
     old_history_num_in = history_num_in;
@@ -610,7 +668,6 @@ int processinput() {
     char name_buf[32];
     char val_buf[32];
 
-    // get rid of newline character
     readbuffer[strlen(readbuffer)-1] = 0;
 
     // CDB
@@ -822,6 +879,34 @@ int processinput() {
         }
         return 0;
 
+        // SQ entries 
+        } else if (strncmp(readbuffer, "qSQ", 3) == 0) {
+            int idx;
+            char valid;
+            unsigned T, addr, data;
+            char addr_valid;
+            if (sscanf(readbuffer, "qSQ %d %c %u %x %x %c", &idx, &valid, &T, &addr, &data, &addr_valid) == 6) {
+                char buf[64];
+                snprintf(buf, sizeof(buf), "%V:%c T:%u A:%08x D:%08x Av:%c", valid, T, addr, data, addr_valid);
+                strcpy(sq_contents[history_num][idx], buf);
+            }
+            return 0;
+
+        // LQ
+        } else if (strncmp(readbuffer, "lLQ", 3) == 0) {
+            int idx;
+            char valid;
+            unsigned T, addr, data;
+            char addr_valid;
+            int state;
+            if (sscanf(readbuffer, "lLQ %d %c %u %x %x %c %d", &idx, &valid, &T, &addr, &data, &addr_valid, &state) == 7) {
+                char buf[64];
+                snprintf(buf, sizeof(buf), "V:%c T:%u A:%08x D:%08x Av:%c S:%d", valid, T, addr, data, addr_valid, state);
+                strcpy(lq_contents[history_num][idx], buf);
+            }
+            return 0;
+
+
         // Break
     } else if (strncmp(readbuffer,"break",4) == 0) {
         // If this is the first time through, indicate that we've setup all of
@@ -842,12 +927,9 @@ int processinput() {
     return(0);
 }
 
-// extern "C" void initcurses(int if_regs, int if_id_regs, int id_regs, int id_ex_regs, int ex_regs,
-//     int ex_mem_regs, int mem_regs, int mem_wb_regs, int wb_regs,
-//     int misc_regs, int rs_regs, int cdb_regs, int mt_regs, int rob_regs) { // count =14
 
 // this initializes a ncurses window and sets up the arrays for exchanging reg information
-extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, int ds_regs, int xc_regs, int sx_regs) { // count = 8
+extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, int rob_regs, int ds_regs, int xc_regs, int sx_regs, int sq_regs, int lq_regs) { // count = 10
     int nbytes;
     int ready_val;
 
@@ -862,6 +944,8 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
     num_ds_regs = ds_regs;
     num_xc_regs = xc_regs;
     num_sx_regs = sx_regs;
+    num_sq_regs = sq_regs;
+    num_lq_regs = lq_regs;
 
     pid_t childpid;
     pipe(readpipe);
@@ -886,6 +970,25 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
         ds_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
         xc_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
         sx_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+        sq_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+        lq_contents = (char***)malloc(NUM_HISTORY * sizeof(char**));
+
+        for (int i = 0; i < NUM_HISTORY; i++) {
+            sq_contents[i] = (char **)malloc(num_sq_regs * sizeof(char *));
+            for (int j = 0; j < num_sq_regs; j++) {
+              sq_contents[i][j] = (char *)malloc(64);
+              sq_contents[i][j][0] = '\0';
+            }
+          }
+
+        lq_contents = (char ***)malloc(NUM_HISTORY * sizeof(char **));
+        for (int i = 0; i < NUM_HISTORY; i++) {
+        lq_contents[i] = (char **)malloc(num_lq_regs * sizeof(char *));
+        for (int j = 0; j < num_lq_regs; j++) {
+            lq_contents[i][j] = (char *)malloc(64);
+            lq_contents[i][j][0] = '\0';
+        }
+        }
 
         timebuffer        = (char**) malloc(NUM_HISTORY*sizeof(char*));
         cycles            = (char**) malloc(NUM_HISTORY*sizeof(char*));
@@ -907,6 +1010,8 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
         ds_reg_names = (char**) malloc(num_ds_regs*sizeof(char*));
         xc_reg_names = (char**) malloc(num_xc_regs*sizeof(char*));
         sx_reg_names = (char**) malloc(num_sx_regs*sizeof(char*));
+        sq_reg_names = (char**) malloc(num_sq_regs*sizeof(char*));
+        lq_reg_names = (char**) malloc(num_lq_regs*sizeof(char*));
 
         int j=0;
 
@@ -994,9 +1099,22 @@ extern "C" void initcurses(int if_regs, int rs_regs, int cdb_regs, int mt_regs, 
               sx_contents[i][j] = (char*)malloc(128);
               sx_contents[i][j][0] = '\0';
             }
+
+            // SQ
+            sq_contents[i] = (char**)malloc(num_sq_regs * sizeof(char*));
+            for (int j = 0; j < num_sq_regs; j++) 
+              sq_contents[i][j] = (char*)malloc(64);
+              sq_contents[i][j][0] = '\0';
+            
+            // LQ
+            lq_contents[i] = (char**)malloc(num_lq_regs * sizeof(char*));
+            for (int j = 0; j < num_lq_regs; j++) 
+              lq_contents[i][j] = (char*)malloc(64);
+              lq_contents[i][j][0] = '\0';
+
           }
           
-        setup_gui(fp, rs_regs, cdb_regs, mt_regs, rob_regs, ds_regs, xc_regs, sx_regs);
+        setup_gui(fp, rs_regs, cdb_regs, mt_regs, rob_regs, ds_regs, xc_regs, sx_regs, sq_regs, lq_regs);
 
         // Main loop for retrieving data and taking commands from user
         char quit_flag = 0;
