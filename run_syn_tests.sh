@@ -51,7 +51,7 @@ for source_file in "${sources[@]}"; do
     program=$(basename "$source_file" | cut -d '.' -f1)
     echo -e "\nRunning $program"
 
-    make simulate_all_syn -j$(nproc)
+    # make simulate_all_syn -j$(nproc)
 
     # if ! timeout 36000000s make "$program.syn.out"; then
     #     echo -e "\033[33m⚠️  Skipping $program (INFINITE LOOP DETECTED)\033[0m"
@@ -77,7 +77,7 @@ for source_file in "${sources[@]}"; do
     ### CPI EXTRACT
     cpi=$(grep -oP '@@.*=\s*\K[0-9.]+(?=\s*CPI)' output/"$program".syn.out)
     cpi_values["$program"]="${cpi:-N/A}"
-    cycles=$(grep -oP '@@.*?(\d+)\s+cycles' output/"$program".out | grep -oP '\d+')
+    cycles=$(grep -oP '@@.*?(\d+)\s+cycles' output/"$program".syn.out | grep -oP '\d+')
     cycles["$program"]="${cycles:-N/A}"
 
     if [[ -n "$cycles" && -n "$CLOCK_US" ]]; then
