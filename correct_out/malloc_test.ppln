@@ -1,0 +1,1231 @@
+                                                                            D-MEM Bus &
+Cycle:      IF      |     ID      |     EX      |     MEM     |     WB      Reg Result
+    0:    8:-       |   4:nop     |   0:-       |   0:-       |   0:-       BUS_LOAD  MEM[0] accepted 1
+    1:    8:-       |   8:-       |   4:nop     |   0:-       |   0:-       BUS_LOAD  MEM[0] accepted 1
+    2:    8:-       |   8:-       |   8:-       |   4:nop     |   0:-       BUS_LOAD  MEM[0] accepted 1
+    3:    8:-       |   8:-       |   8:-       |   8:-       |   4:nop     BUS_LOAD  MEM[0] accepted 1
+    4:    8:auipc   |   8:-       |   8:-       |   8:-       |   8:-       BUS_LOAD  MEM[0] accepted 1
+    5:   12:-       |   8:auipc   |   8:-       |   8:-       |   8:-       BUS_LOAD  MEM[8] accepted 1
+    6:   12:-       |  12:-       |   8:auipc   |   8:-       |   8:-       BUS_LOAD  MEM[8] accepted 1
+    7:   12:-       |  12:-       |  12:-       |   8:auipc   |   8:-       BUS_LOAD  MEM[8] accepted 1
+    8:   12:-       |  12:-       |  12:-       |  12:-       |   8:auipc   r1=4  BUS_LOAD  MEM[8] accepted 1
+    9:   12:addi    |  12:-       |  12:-       |  12:-       |  12:-       BUS_LOAD  MEM[8] accepted 1
+   10:   16:-       |  12:addi    |  12:-       |  12:-       |  12:-       BUS_LOAD  MEM[8] accepted 1
+   11:   16:-       |  16:-       |  12:addi    |  12:-       |  12:-       BUS_LOAD  MEM[8] accepted 1
+   12:   16:-       |  16:-       |  16:-       |  12:addi    |  12:-       BUS_LOAD  MEM[8] accepted 1
+   13:   16:-       |  16:-       |  16:-       |  16:-       |  12:addi    r1=144  BUS_LOAD  MEM[8] accepted 1
+   14:   16:auipc   |  16:-       |  16:-       |  16:-       |  16:-       BUS_LOAD  MEM[8] accepted 1
+   15:   20:-       |  16:auipc   |  16:-       |  16:-       |  16:-       BUS_LOAD  MEM[16] accepted 1
+   16:   20:-       |  20:-       |  16:auipc   |  16:-       |  16:-       BUS_LOAD  MEM[16] accepted 1
+   17:   20:-       |  20:-       |  20:-       |  16:auipc   |  16:-       BUS_LOAD  MEM[16] accepted 1
+   18:   20:-       |  20:-       |  20:-       |  20:-       |  16:auipc   r2=65548  BUS_LOAD  MEM[16] accepted 1
+   19:   20:addi    |  20:-       |  20:-       |  20:-       |  20:-       BUS_LOAD  MEM[16] accepted 1
+   20:   24:-       |  20:addi    |  20:-       |  20:-       |  20:-       BUS_LOAD  MEM[16] accepted 1
+   21:   24:-       |  24:-       |  20:addi    |  20:-       |  20:-       BUS_LOAD  MEM[16] accepted 1
+   22:   24:-       |  24:-       |  24:-       |  20:addi    |  20:-       BUS_LOAD  MEM[16] accepted 1
+   23:   24:-       |  24:-       |  24:-       |  24:-       |  20:addi    r2=65536  BUS_LOAD  MEM[16] accepted 1
+   24:   24:addi    |  24:-       |  24:-       |  24:-       |  24:-       BUS_LOAD  MEM[16] accepted 1
+   25:   28:-       |  24:addi    |  24:-       |  24:-       |  24:-       BUS_LOAD  MEM[24] accepted 1
+   26:   28:-       |  28:-       |  24:addi    |  24:-       |  24:-       BUS_LOAD  MEM[24] accepted 1
+   27:   28:-       |  28:-       |  28:-       |  24:addi    |  24:-       BUS_LOAD  MEM[24] accepted 1
+   28:   28:-       |  28:-       |  28:-       |  28:-       |  24:addi    r8=65536  BUS_LOAD  MEM[24] accepted 1
+   29:   28:auipc   |  28:-       |  28:-       |  28:-       |  28:-       BUS_LOAD  MEM[24] accepted 1
+   30:   32:-       |  28:auipc   |  28:-       |  28:-       |  28:-       BUS_LOAD  MEM[24] accepted 1
+   31:   32:-       |  32:-       |  28:auipc   |  28:-       |  28:-       BUS_LOAD  MEM[24] accepted 1
+   32:   32:-       |  32:-       |  32:-       |  28:auipc   |  28:-       BUS_LOAD  MEM[24] accepted 1
+   33:   32:-       |  32:-       |  32:-       |  32:-       |  28:auipc   r3=4120  BUS_LOAD  MEM[24] accepted 1
+   34:   32:addi    |  32:-       |  32:-       |  32:-       |  32:-       BUS_LOAD  MEM[24] accepted 1
+   35:   36:-       |  32:addi    |  32:-       |  32:-       |  32:-       BUS_LOAD  MEM[32] accepted 1
+   36:   36:-       |  36:-       |  32:addi    |  32:-       |  32:-       BUS_LOAD  MEM[32] accepted 1
+   37:   36:-       |  36:-       |  36:-       |  32:addi    |  32:-       BUS_LOAD  MEM[32] accepted 1
+   38:   36:-       |  36:-       |  36:-       |  36:-       |  32:addi    r3=3616  BUS_LOAD  MEM[32] accepted 1
+   39:   36:addi    |  36:-       |  36:-       |  36:-       |  36:-       BUS_LOAD  MEM[32] accepted 1
+   40:   40:-       |  36:addi    |  36:-       |  36:-       |  36:-       BUS_LOAD  MEM[32] accepted 1
+   41:   40:-       |  40:-       |  36:addi    |  36:-       |  36:-       BUS_LOAD  MEM[32] accepted 1
+   42:   40:-       |  40:-       |  40:-       |  36:addi    |  36:-       BUS_LOAD  MEM[32] accepted 1
+   43:   40:-       |  40:-       |  40:-       |  40:-       |  36:addi    r4=0  BUS_LOAD  MEM[32] accepted 1
+   44:   40:addi    |  40:-       |  40:-       |  40:-       |  40:-       BUS_LOAD  MEM[32] accepted 1
+   45:   44:-       |  40:addi    |  40:-       |  40:-       |  40:-       BUS_LOAD  MEM[40] accepted 1
+   46:   44:-       |  44:-       |  40:addi    |  40:-       |  40:-       BUS_LOAD  MEM[40] accepted 1
+   47:   44:-       |  44:-       |  44:-       |  40:addi    |  40:-       BUS_LOAD  MEM[40] accepted 1
+   48:   44:-       |  44:-       |  44:-       |  44:-       |  40:addi    r5=0  BUS_LOAD  MEM[40] accepted 1
+   49:   44:addi    |  44:-       |  44:-       |  44:-       |  44:-       BUS_LOAD  MEM[40] accepted 1
+   50:   48:-       |  44:addi    |  44:-       |  44:-       |  44:-       BUS_LOAD  MEM[40] accepted 1
+   51:   48:-       |  48:-       |  44:addi    |  44:-       |  44:-       BUS_LOAD  MEM[40] accepted 1
+   52:   48:-       |  48:-       |  48:-       |  44:addi    |  44:-       BUS_LOAD  MEM[40] accepted 1
+   53:   48:-       |  48:-       |  48:-       |  48:-       |  44:addi    r6=0  BUS_LOAD  MEM[40] accepted 1
+   54:   48:addi    |  48:-       |  48:-       |  48:-       |  48:-       BUS_LOAD  MEM[40] accepted 1
+   55:   52:-       |  48:addi    |  48:-       |  48:-       |  48:-       BUS_LOAD  MEM[48] accepted 1
+   56:   52:-       |  52:-       |  48:addi    |  48:-       |  48:-       BUS_LOAD  MEM[48] accepted 1
+   57:   52:-       |  52:-       |  52:-       |  48:addi    |  48:-       BUS_LOAD  MEM[48] accepted 1
+   58:   52:-       |  52:-       |  52:-       |  52:-       |  48:addi    r7=0  BUS_LOAD  MEM[48] accepted 1
+   59:   52:addi    |  52:-       |  52:-       |  52:-       |  52:-       BUS_LOAD  MEM[48] accepted 1
+   60:   56:-       |  52:addi    |  52:-       |  52:-       |  52:-       BUS_LOAD  MEM[48] accepted 1
+   61:   56:-       |  56:-       |  52:addi    |  52:-       |  52:-       BUS_LOAD  MEM[48] accepted 1
+   62:   56:-       |  56:-       |  56:-       |  52:addi    |  52:-       BUS_LOAD  MEM[48] accepted 1
+   63:   56:-       |  56:-       |  56:-       |  56:-       |  52:addi    r9=0  BUS_LOAD  MEM[48] accepted 1
+   64:   56:addi    |  56:-       |  56:-       |  56:-       |  56:-       BUS_LOAD  MEM[48] accepted 1
+   65:   60:-       |  56:addi    |  56:-       |  56:-       |  56:-       BUS_LOAD  MEM[56] accepted 1
+   66:   60:-       |  60:-       |  56:addi    |  56:-       |  56:-       BUS_LOAD  MEM[56] accepted 1
+   67:   60:-       |  60:-       |  60:-       |  56:addi    |  56:-       BUS_LOAD  MEM[56] accepted 1
+   68:   60:-       |  60:-       |  60:-       |  60:-       |  56:addi    r10=0  BUS_LOAD  MEM[56] accepted 1
+   69:   60:addi    |  60:-       |  60:-       |  60:-       |  60:-       BUS_LOAD  MEM[56] accepted 1
+   70:   64:-       |  60:addi    |  60:-       |  60:-       |  60:-       BUS_LOAD  MEM[56] accepted 1
+   71:   64:-       |  64:-       |  60:addi    |  60:-       |  60:-       BUS_LOAD  MEM[56] accepted 1
+   72:   64:-       |  64:-       |  64:-       |  60:addi    |  60:-       BUS_LOAD  MEM[56] accepted 1
+   73:   64:-       |  64:-       |  64:-       |  64:-       |  60:addi    r11=0  BUS_LOAD  MEM[56] accepted 1
+   74:   64:addi    |  64:-       |  64:-       |  64:-       |  64:-       BUS_LOAD  MEM[56] accepted 1
+   75:   68:-       |  64:addi    |  64:-       |  64:-       |  64:-       BUS_LOAD  MEM[64] accepted 1
+   76:   68:-       |  68:-       |  64:addi    |  64:-       |  64:-       BUS_LOAD  MEM[64] accepted 1
+   77:   68:-       |  68:-       |  68:-       |  64:addi    |  64:-       BUS_LOAD  MEM[64] accepted 1
+   78:   68:-       |  68:-       |  68:-       |  68:-       |  64:addi    r12=0  BUS_LOAD  MEM[64] accepted 1
+   79:   68:addi    |  68:-       |  68:-       |  68:-       |  68:-       BUS_LOAD  MEM[64] accepted 1
+   80:   72:-       |  68:addi    |  68:-       |  68:-       |  68:-       BUS_LOAD  MEM[64] accepted 1
+   81:   72:-       |  72:-       |  68:addi    |  68:-       |  68:-       BUS_LOAD  MEM[64] accepted 1
+   82:   72:-       |  72:-       |  72:-       |  68:addi    |  68:-       BUS_LOAD  MEM[64] accepted 1
+   83:   72:-       |  72:-       |  72:-       |  72:-       |  68:addi    r13=0  BUS_LOAD  MEM[64] accepted 1
+   84:   72:addi    |  72:-       |  72:-       |  72:-       |  72:-       BUS_LOAD  MEM[64] accepted 1
+   85:   76:-       |  72:addi    |  72:-       |  72:-       |  72:-       BUS_LOAD  MEM[72] accepted 1
+   86:   76:-       |  76:-       |  72:addi    |  72:-       |  72:-       BUS_LOAD  MEM[72] accepted 1
+   87:   76:-       |  76:-       |  76:-       |  72:addi    |  72:-       BUS_LOAD  MEM[72] accepted 1
+   88:   76:-       |  76:-       |  76:-       |  76:-       |  72:addi    r14=0  BUS_LOAD  MEM[72] accepted 1
+   89:   76:addi    |  76:-       |  76:-       |  76:-       |  76:-       BUS_LOAD  MEM[72] accepted 1
+   90:   80:-       |  76:addi    |  76:-       |  76:-       |  76:-       BUS_LOAD  MEM[72] accepted 1
+   91:   80:-       |  80:-       |  76:addi    |  76:-       |  76:-       BUS_LOAD  MEM[72] accepted 1
+   92:   80:-       |  80:-       |  80:-       |  76:addi    |  76:-       BUS_LOAD  MEM[72] accepted 1
+   93:   80:-       |  80:-       |  80:-       |  80:-       |  76:addi    r15=0  BUS_LOAD  MEM[72] accepted 1
+   94:   80:addi    |  80:-       |  80:-       |  80:-       |  80:-       BUS_LOAD  MEM[72] accepted 1
+   95:   84:-       |  80:addi    |  80:-       |  80:-       |  80:-       BUS_LOAD  MEM[80] accepted 1
+   96:   84:-       |  84:-       |  80:addi    |  80:-       |  80:-       BUS_LOAD  MEM[80] accepted 1
+   97:   84:-       |  84:-       |  84:-       |  80:addi    |  80:-       BUS_LOAD  MEM[80] accepted 1
+   98:   84:-       |  84:-       |  84:-       |  84:-       |  80:addi    r16=0  BUS_LOAD  MEM[80] accepted 1
+   99:   84:addi    |  84:-       |  84:-       |  84:-       |  84:-       BUS_LOAD  MEM[80] accepted 1
+  100:   88:-       |  84:addi    |  84:-       |  84:-       |  84:-       BUS_LOAD  MEM[80] accepted 1
+  101:   88:-       |  88:-       |  84:addi    |  84:-       |  84:-       BUS_LOAD  MEM[80] accepted 1
+  102:   88:-       |  88:-       |  88:-       |  84:addi    |  84:-       BUS_LOAD  MEM[80] accepted 1
+  103:   88:-       |  88:-       |  88:-       |  88:-       |  84:addi    r17=0  BUS_LOAD  MEM[80] accepted 1
+  104:   88:addi    |  88:-       |  88:-       |  88:-       |  88:-       BUS_LOAD  MEM[80] accepted 1
+  105:   92:-       |  88:addi    |  88:-       |  88:-       |  88:-       BUS_LOAD  MEM[88] accepted 1
+  106:   92:-       |  92:-       |  88:addi    |  88:-       |  88:-       BUS_LOAD  MEM[88] accepted 1
+  107:   92:-       |  92:-       |  92:-       |  88:addi    |  88:-       BUS_LOAD  MEM[88] accepted 1
+  108:   92:-       |  92:-       |  92:-       |  92:-       |  88:addi    r18=0  BUS_LOAD  MEM[88] accepted 1
+  109:   92:addi    |  92:-       |  92:-       |  92:-       |  92:-       BUS_LOAD  MEM[88] accepted 1
+  110:   96:-       |  92:addi    |  92:-       |  92:-       |  92:-       BUS_LOAD  MEM[88] accepted 1
+  111:   96:-       |  96:-       |  92:addi    |  92:-       |  92:-       BUS_LOAD  MEM[88] accepted 1
+  112:   96:-       |  96:-       |  96:-       |  92:addi    |  92:-       BUS_LOAD  MEM[88] accepted 1
+  113:   96:-       |  96:-       |  96:-       |  96:-       |  92:addi    r19=0  BUS_LOAD  MEM[88] accepted 1
+  114:   96:addi    |  96:-       |  96:-       |  96:-       |  96:-       BUS_LOAD  MEM[88] accepted 1
+  115:  100:-       |  96:addi    |  96:-       |  96:-       |  96:-       BUS_LOAD  MEM[96] accepted 1
+  116:  100:-       | 100:-       |  96:addi    |  96:-       |  96:-       BUS_LOAD  MEM[96] accepted 1
+  117:  100:-       | 100:-       | 100:-       |  96:addi    |  96:-       BUS_LOAD  MEM[96] accepted 1
+  118:  100:-       | 100:-       | 100:-       | 100:-       |  96:addi    r20=0  BUS_LOAD  MEM[96] accepted 1
+  119:  100:addi    | 100:-       | 100:-       | 100:-       | 100:-       BUS_LOAD  MEM[96] accepted 1
+  120:  104:-       | 100:addi    | 100:-       | 100:-       | 100:-       BUS_LOAD  MEM[96] accepted 1
+  121:  104:-       | 104:-       | 100:addi    | 100:-       | 100:-       BUS_LOAD  MEM[96] accepted 1
+  122:  104:-       | 104:-       | 104:-       | 100:addi    | 100:-       BUS_LOAD  MEM[96] accepted 1
+  123:  104:-       | 104:-       | 104:-       | 104:-       | 100:addi    r21=0  BUS_LOAD  MEM[96] accepted 1
+  124:  104:addi    | 104:-       | 104:-       | 104:-       | 104:-       BUS_LOAD  MEM[96] accepted 1
+  125:  108:-       | 104:addi    | 104:-       | 104:-       | 104:-       BUS_LOAD  MEM[104] accepted 1
+  126:  108:-       | 108:-       | 104:addi    | 104:-       | 104:-       BUS_LOAD  MEM[104] accepted 1
+  127:  108:-       | 108:-       | 108:-       | 104:addi    | 104:-       BUS_LOAD  MEM[104] accepted 1
+  128:  108:-       | 108:-       | 108:-       | 108:-       | 104:addi    r22=0  BUS_LOAD  MEM[104] accepted 1
+  129:  108:addi    | 108:-       | 108:-       | 108:-       | 108:-       BUS_LOAD  MEM[104] accepted 1
+  130:  112:-       | 108:addi    | 108:-       | 108:-       | 108:-       BUS_LOAD  MEM[104] accepted 1
+  131:  112:-       | 112:-       | 108:addi    | 108:-       | 108:-       BUS_LOAD  MEM[104] accepted 1
+  132:  112:-       | 112:-       | 112:-       | 108:addi    | 108:-       BUS_LOAD  MEM[104] accepted 1
+  133:  112:-       | 112:-       | 112:-       | 112:-       | 108:addi    r23=0  BUS_LOAD  MEM[104] accepted 1
+  134:  112:addi    | 112:-       | 112:-       | 112:-       | 112:-       BUS_LOAD  MEM[104] accepted 1
+  135:  116:-       | 112:addi    | 112:-       | 112:-       | 112:-       BUS_LOAD  MEM[112] accepted 1
+  136:  116:-       | 116:-       | 112:addi    | 112:-       | 112:-       BUS_LOAD  MEM[112] accepted 1
+  137:  116:-       | 116:-       | 116:-       | 112:addi    | 112:-       BUS_LOAD  MEM[112] accepted 1
+  138:  116:-       | 116:-       | 116:-       | 116:-       | 112:addi    r24=0  BUS_LOAD  MEM[112] accepted 1
+  139:  116:addi    | 116:-       | 116:-       | 116:-       | 116:-       BUS_LOAD  MEM[112] accepted 1
+  140:  120:-       | 116:addi    | 116:-       | 116:-       | 116:-       BUS_LOAD  MEM[112] accepted 1
+  141:  120:-       | 120:-       | 116:addi    | 116:-       | 116:-       BUS_LOAD  MEM[112] accepted 1
+  142:  120:-       | 120:-       | 120:-       | 116:addi    | 116:-       BUS_LOAD  MEM[112] accepted 1
+  143:  120:-       | 120:-       | 120:-       | 120:-       | 116:addi    r25=0  BUS_LOAD  MEM[112] accepted 1
+  144:  120:addi    | 120:-       | 120:-       | 120:-       | 120:-       BUS_LOAD  MEM[112] accepted 1
+  145:  124:-       | 120:addi    | 120:-       | 120:-       | 120:-       BUS_LOAD  MEM[120] accepted 1
+  146:  124:-       | 124:-       | 120:addi    | 120:-       | 120:-       BUS_LOAD  MEM[120] accepted 1
+  147:  124:-       | 124:-       | 124:-       | 120:addi    | 120:-       BUS_LOAD  MEM[120] accepted 1
+  148:  124:-       | 124:-       | 124:-       | 124:-       | 120:addi    r26=0  BUS_LOAD  MEM[120] accepted 1
+  149:  124:addi    | 124:-       | 124:-       | 124:-       | 124:-       BUS_LOAD  MEM[120] accepted 1
+  150:  128:-       | 124:addi    | 124:-       | 124:-       | 124:-       BUS_LOAD  MEM[120] accepted 1
+  151:  128:-       | 128:-       | 124:addi    | 124:-       | 124:-       BUS_LOAD  MEM[120] accepted 1
+  152:  128:-       | 128:-       | 128:-       | 124:addi    | 124:-       BUS_LOAD  MEM[120] accepted 1
+  153:  128:-       | 128:-       | 128:-       | 128:-       | 124:addi    r27=0  BUS_LOAD  MEM[120] accepted 1
+  154:  128:addi    | 128:-       | 128:-       | 128:-       | 128:-       BUS_LOAD  MEM[120] accepted 1
+  155:  132:-       | 128:addi    | 128:-       | 128:-       | 128:-       BUS_LOAD  MEM[128] accepted 1
+  156:  132:-       | 132:-       | 128:addi    | 128:-       | 128:-       BUS_LOAD  MEM[128] accepted 1
+  157:  132:-       | 132:-       | 132:-       | 128:addi    | 128:-       BUS_LOAD  MEM[128] accepted 1
+  158:  132:-       | 132:-       | 132:-       | 132:-       | 128:addi    r28=0  BUS_LOAD  MEM[128] accepted 1
+  159:  132:addi    | 132:-       | 132:-       | 132:-       | 132:-       BUS_LOAD  MEM[128] accepted 1
+  160:  136:-       | 132:addi    | 132:-       | 132:-       | 132:-       BUS_LOAD  MEM[128] accepted 1
+  161:  136:-       | 136:-       | 132:addi    | 132:-       | 132:-       BUS_LOAD  MEM[128] accepted 1
+  162:  136:-       | 136:-       | 136:-       | 132:addi    | 132:-       BUS_LOAD  MEM[128] accepted 1
+  163:  136:-       | 136:-       | 136:-       | 136:-       | 132:addi    r29=0  BUS_LOAD  MEM[128] accepted 1
+  164:  136:addi    | 136:-       | 136:-       | 136:-       | 136:-       BUS_LOAD  MEM[128] accepted 1
+  165:  140:-       | 136:addi    | 136:-       | 136:-       | 136:-       BUS_LOAD  MEM[136] accepted 1
+  166:  140:-       | 140:-       | 136:addi    | 136:-       | 136:-       BUS_LOAD  MEM[136] accepted 1
+  167:  140:-       | 140:-       | 140:-       | 136:addi    | 136:-       BUS_LOAD  MEM[136] accepted 1
+  168:  140:-       | 140:-       | 140:-       | 140:-       | 136:addi    r30=0  BUS_LOAD  MEM[136] accepted 1
+  169:  140:addi    | 140:-       | 140:-       | 140:-       | 140:-       BUS_LOAD  MEM[136] accepted 1
+  170:  144:-       | 140:addi    | 140:-       | 140:-       | 140:-       BUS_LOAD  MEM[136] accepted 1
+  171:  144:-       | 144:-       | 140:addi    | 140:-       | 140:-       BUS_LOAD  MEM[136] accepted 1
+  172:  144:-       | 144:-       | 144:-       | 140:addi    | 140:-       BUS_LOAD  MEM[136] accepted 1
+  173:  144:-       | 144:-       | 144:-       | 144:-       | 140:addi    r31=0  BUS_LOAD  MEM[136] accepted 1
+  174:  144:jal     | 144:-       | 144:-       | 144:-       | 144:-       BUS_LOAD  MEM[136] accepted 1
+  175:  148:-       | 144:jal     | 144:-       | 144:-       | 144:-       BUS_LOAD  MEM[144] accepted 1
+  176:  148:-       | 148:-       | 144:jal     | 144:-       | 144:-       BUS_LOAD  MEM[144] accepted 1
+  177:  148:-       | 148:-       | 148:-       | 144:jal     | 144:-       BUS_LOAD  MEM[144] accepted 1
+  178: 1236:-       | 148:-       | 148:-       | 148:-       | 144:jal     BUS_LOAD  MEM[1232] accepted 1
+  179: 1236:addi    |1236:-       | 148:-       | 148:-       | 148:-       BUS_LOAD  MEM[1232] accepted 1
+  180: 1240:-       |1236:addi    |1236:-       | 148:-       | 148:-       BUS_LOAD  MEM[1232] accepted 1
+  181: 1240:-       |1240:-       |1236:addi    |1236:-       | 148:-       BUS_LOAD  MEM[1232] accepted 1
+  182: 1240:-       |1240:-       |1240:-       |1236:addi    |1236:-       BUS_LOAD  MEM[1232] accepted 1
+  183: 1240:-       |1240:-       |1240:-       |1240:-       |1236:addi    r2=65504  BUS_LOAD  MEM[1232] accepted 1
+  184: 1240:sw      |1240:-       |1240:-       |1240:-       |1240:-       BUS_LOAD  MEM[1232] accepted 1
+  185: 1244:-       |1240:sw      |1240:-       |1240:-       |1240:-       BUS_LOAD  MEM[1240] accepted 1
+  186: 1244:-       |1244:-       |1240:sw      |1240:-       |1240:-       BUS_LOAD  MEM[1240] accepted 1
+  187: 1244:-       |1244:-       |1244:-       |1240:sw      |1240:-       BUS_STORE MEM[65532] = 144 accepted 1
+  188: 1244:-       |1244:-       |1244:-       |1244:-       |1240:sw      BUS_LOAD  MEM[1240] accepted 1
+  189: 1244:sw      |1244:-       |1244:-       |1244:-       |1244:-       BUS_LOAD  MEM[1240] accepted 1
+  190: 1248:-       |1244:sw      |1244:-       |1244:-       |1244:-       BUS_LOAD  MEM[1240] accepted 1
+  191: 1248:-       |1248:-       |1244:sw      |1244:-       |1244:-       BUS_LOAD  MEM[1240] accepted 1
+  192: 1248:-       |1248:-       |1248:-       |1244:sw      |1244:-       BUS_STORE MEM[65528] = 65536 accepted 1
+  193: 1248:-       |1248:-       |1248:-       |1248:-       |1244:sw      BUS_LOAD  MEM[1240] accepted 1
+  194: 1248:addi    |1248:-       |1248:-       |1248:-       |1248:-       BUS_LOAD  MEM[1240] accepted 1
+  195: 1252:-       |1248:addi    |1248:-       |1248:-       |1248:-       BUS_LOAD  MEM[1248] accepted 1
+  196: 1252:-       |1252:-       |1248:addi    |1248:-       |1248:-       BUS_LOAD  MEM[1248] accepted 1
+  197: 1252:-       |1252:-       |1252:-       |1248:addi    |1248:-       BUS_LOAD  MEM[1248] accepted 1
+  198: 1252:-       |1252:-       |1252:-       |1252:-       |1248:addi    r8=65536  BUS_LOAD  MEM[1248] accepted 1
+  199: 1252:addi    |1252:-       |1252:-       |1252:-       |1252:-       BUS_LOAD  MEM[1248] accepted 1
+  200: 1256:-       |1252:addi    |1252:-       |1252:-       |1252:-       BUS_LOAD  MEM[1248] accepted 1
+  201: 1256:-       |1256:-       |1252:addi    |1252:-       |1252:-       BUS_LOAD  MEM[1248] accepted 1
+  202: 1256:-       |1256:-       |1256:-       |1252:addi    |1252:-       BUS_LOAD  MEM[1248] accepted 1
+  203: 1256:-       |1256:-       |1256:-       |1256:-       |1252:addi    r10=1  BUS_LOAD  MEM[1248] accepted 1
+  204: 1256:auipc   |1256:-       |1256:-       |1256:-       |1256:-       BUS_LOAD  MEM[1248] accepted 1
+  205: 1260:-       |1256:auipc   |1256:-       |1256:-       |1256:-       BUS_LOAD  MEM[1256] accepted 1
+  206: 1260:-       |1260:-       |1256:auipc   |1256:-       |1256:-       BUS_LOAD  MEM[1256] accepted 1
+  207: 1260:-       |1260:-       |1260:-       |1256:auipc   |1256:-       BUS_LOAD  MEM[1256] accepted 1
+  208: 1260:-       |1260:-       |1260:-       |1260:-       |1256:auipc   r1=1252  BUS_LOAD  MEM[1256] accepted 1
+  209: 1260:jalr    |1260:-       |1260:-       |1260:-       |1260:-       BUS_LOAD  MEM[1256] accepted 1
+  210: 1264:-       |1260:jalr    |1260:-       |1260:-       |1260:-       BUS_LOAD  MEM[1256] accepted 1
+  211: 1264:-       |1264:-       |1260:jalr    |1260:-       |1260:-       BUS_LOAD  MEM[1256] accepted 1
+  212: 1264:-       |1264:-       |1264:-       |1260:jalr    |1260:-       BUS_LOAD  MEM[1256] accepted 1
+  213:  752:-       |1264:-       |1264:-       |1264:-       |1260:jalr    r1=1260  BUS_LOAD  MEM[744] accepted 1
+  214:  752:addi    | 752:-       |1264:-       |1264:-       |1264:-       BUS_LOAD  MEM[744] accepted 1
+  215:  756:-       | 752:addi    | 752:-       |1264:-       |1264:-       BUS_LOAD  MEM[752] accepted 1
+  216:  756:-       | 756:-       | 752:addi    | 752:-       |1264:-       BUS_LOAD  MEM[752] accepted 1
+  217:  756:-       | 756:-       | 756:-       | 752:addi    | 752:-       BUS_LOAD  MEM[752] accepted 1
+  218:  756:-       | 756:-       | 756:-       | 756:-       | 752:addi    r2=65456  BUS_LOAD  MEM[752] accepted 1
+  219:  756:sw      | 756:-       | 756:-       | 756:-       | 756:-       BUS_LOAD  MEM[752] accepted 1
+  220:  760:-       | 756:sw      | 756:-       | 756:-       | 756:-       BUS_LOAD  MEM[752] accepted 1
+  221:  760:-       | 760:-       | 756:sw      | 756:-       | 756:-       BUS_LOAD  MEM[752] accepted 1
+  222:  760:-       | 760:-       | 760:-       | 756:sw      | 756:-       BUS_STORE MEM[65500] = 1260 accepted 1
+  223:  760:-       | 760:-       | 760:-       | 760:-       | 756:sw      BUS_LOAD  MEM[752] accepted 1
+  224:  760:sw      | 760:-       | 760:-       | 760:-       | 760:-       BUS_LOAD  MEM[752] accepted 1
+  225:  764:-       | 760:sw      | 760:-       | 760:-       | 760:-       BUS_LOAD  MEM[760] accepted 1
+  226:  764:-       | 764:-       | 760:sw      | 760:-       | 760:-       BUS_LOAD  MEM[760] accepted 1
+  227:  764:-       | 764:-       | 764:-       | 760:sw      | 760:-       BUS_STORE MEM[65496] = 65536 accepted 1
+  228:  764:-       | 764:-       | 764:-       | 764:-       | 760:sw      BUS_LOAD  MEM[760] accepted 1
+  229:  764:addi    | 764:-       | 764:-       | 764:-       | 764:-       BUS_LOAD  MEM[760] accepted 1
+  230:  768:-       | 764:addi    | 764:-       | 764:-       | 764:-       BUS_LOAD  MEM[760] accepted 1
+  231:  768:-       | 768:-       | 764:addi    | 764:-       | 764:-       BUS_LOAD  MEM[760] accepted 1
+  232:  768:-       | 768:-       | 768:-       | 764:addi    | 764:-       BUS_LOAD  MEM[760] accepted 1
+  233:  768:-       | 768:-       | 768:-       | 768:-       | 764:addi    r8=65504  BUS_LOAD  MEM[760] accepted 1
+  234:  768:sw      | 768:-       | 768:-       | 768:-       | 768:-       BUS_LOAD  MEM[760] accepted 1
+  235:  772:-       | 768:sw      | 768:-       | 768:-       | 768:-       BUS_LOAD  MEM[768] accepted 1
+  236:  772:-       | 772:-       | 768:sw      | 768:-       | 768:-       BUS_LOAD  MEM[768] accepted 1
+  237:  772:-       | 772:-       | 772:-       | 768:sw      | 768:-       BUS_STORE MEM[65468] = 1 accepted 1
+  238:  772:-       | 772:-       | 772:-       | 772:-       | 768:sw      BUS_LOAD  MEM[768] accepted 1
+  239:  772:lw      | 772:-       | 772:-       | 772:-       | 772:-       BUS_LOAD  MEM[768] accepted 1
+  240:  776:-       | 772:lw      | 772:-       | 772:-       | 772:-       BUS_LOAD  MEM[768] accepted 1
+  241:  776:-       | 776:-       | 772:lw      | 772:-       | 772:-       BUS_LOAD  MEM[768] accepted 1
+  242:  776:-       | 776:-       | 776:-       | 772:lw      | 772:-       BUS_LOAD  MEM[65468] accepted 1
+  243:  776:-       | 776:-       | 776:-       | 776:-       | 772:lw      r14=1  BUS_LOAD  MEM[768] accepted 1
+  244:  776:lui     | 776:-       | 776:-       | 776:-       | 776:-       BUS_LOAD  MEM[768] accepted 1
+  245:  780:-       | 776:lui     | 776:-       | 776:-       | 776:-       BUS_LOAD  MEM[776] accepted 1
+  246:  780:-       | 780:-       | 776:lui     | 776:-       | 776:-       BUS_LOAD  MEM[776] accepted 1
+  247:  780:-       | 780:-       | 780:-       | 776:lui     | 776:-       BUS_LOAD  MEM[776] accepted 1
+  248:  780:-       | 780:-       | 780:-       | 780:-       | 776:lui     r15=16384  BUS_LOAD  MEM[776] accepted 1
+  249:  780:bgeu    | 780:-       | 780:-       | 780:-       | 780:-       BUS_LOAD  MEM[776] accepted 1
+  250:  784:-       | 780:bgeu    | 780:-       | 780:-       | 780:-       BUS_LOAD  MEM[776] accepted 1
+  251:  784:-       | 784:-       | 780:bgeu    | 780:-       | 780:-       BUS_LOAD  MEM[776] accepted 1
+  252:  784:-       | 784:-       | 784:-       | 780:bgeu    | 780:-       BUS_LOAD  MEM[776] accepted 1
+  253:  792:-       | 784:-       | 784:-       | 784:-       | 780:bgeu    BUS_LOAD  MEM[784] accepted 1
+  254:  792:lw      | 792:-       | 784:-       | 784:-       | 784:-       BUS_LOAD  MEM[784] accepted 1
+  255:  796:-       | 792:lw      | 792:-       | 784:-       | 784:-       BUS_LOAD  MEM[792] accepted 1
+  256:  796:-       | 796:-       | 792:lw      | 792:-       | 784:-       BUS_LOAD  MEM[792] accepted 1
+  257:  796:-       | 796:-       | 796:-       | 792:lw      | 792:-       BUS_LOAD  MEM[65468] accepted 1
+  258:  796:-       | 796:-       | 796:-       | 796:-       | 792:lw      r15=1  BUS_LOAD  MEM[792] accepted 1
+  259:  796:andi    | 796:-       | 796:-       | 796:-       | 796:-       BUS_LOAD  MEM[792] accepted 1
+  260:  800:-       | 796:andi    | 796:-       | 796:-       | 796:-       BUS_LOAD  MEM[792] accepted 1
+  261:  800:-       | 800:-       | 796:andi    | 796:-       | 796:-       BUS_LOAD  MEM[792] accepted 1
+  262:  800:-       | 800:-       | 800:-       | 796:andi    | 796:-       BUS_LOAD  MEM[792] accepted 1
+  263:  800:-       | 800:-       | 800:-       | 800:-       | 796:andi    r15=1  BUS_LOAD  MEM[792] accepted 1
+  264:  800:beq     | 800:-       | 800:-       | 800:-       | 800:-       BUS_LOAD  MEM[792] accepted 1
+  265:  804:-       | 800:beq     | 800:-       | 800:-       | 800:-       BUS_LOAD  MEM[800] accepted 1
+  266:  804:-       | 804:-       | 800:beq     | 800:-       | 800:-       BUS_LOAD  MEM[800] accepted 1
+  267:  804:-       | 804:-       | 804:-       | 800:beq     | 800:-       BUS_LOAD  MEM[800] accepted 1
+  268:  804:-       | 804:-       | 804:-       | 804:-       | 800:beq     BUS_LOAD  MEM[800] accepted 1
+  269:  804:lw      | 804:-       | 804:-       | 804:-       | 804:-       BUS_LOAD  MEM[800] accepted 1
+  270:  808:-       | 804:lw      | 804:-       | 804:-       | 804:-       BUS_LOAD  MEM[800] accepted 1
+  271:  808:-       | 808:-       | 804:lw      | 804:-       | 804:-       BUS_LOAD  MEM[800] accepted 1
+  272:  808:-       | 808:-       | 808:-       | 804:lw      | 804:-       BUS_LOAD  MEM[65468] accepted 1
+  273:  808:-       | 808:-       | 808:-       | 808:-       | 804:lw      r15=1  BUS_LOAD  MEM[800] accepted 1
+  274:  808:andi    | 808:-       | 808:-       | 808:-       | 808:-       BUS_LOAD  MEM[800] accepted 1
+  275:  812:-       | 808:andi    | 808:-       | 808:-       | 808:-       BUS_LOAD  MEM[808] accepted 1
+  276:  812:-       | 812:-       | 808:andi    | 808:-       | 808:-       BUS_LOAD  MEM[808] accepted 1
+  277:  812:-       | 812:-       | 812:-       | 808:andi    | 808:-       BUS_LOAD  MEM[808] accepted 1
+  278:  812:-       | 812:-       | 812:-       | 812:-       | 808:andi    r15=0  BUS_LOAD  MEM[808] accepted 1
+  279:  812:addi    | 812:-       | 812:-       | 812:-       | 812:-       BUS_LOAD  MEM[808] accepted 1
+  280:  816:-       | 812:addi    | 812:-       | 812:-       | 812:-       BUS_LOAD  MEM[808] accepted 1
+  281:  816:-       | 816:-       | 812:addi    | 812:-       | 812:-       BUS_LOAD  MEM[808] accepted 1
+  282:  816:-       | 816:-       | 816:-       | 812:addi    | 812:-       BUS_LOAD  MEM[808] accepted 1
+  283:  816:-       | 816:-       | 816:-       | 816:-       | 812:addi    r15=4  BUS_LOAD  MEM[808] accepted 1
+  284:  816:sw      | 816:-       | 816:-       | 816:-       | 816:-       BUS_LOAD  MEM[808] accepted 1
+  285:  820:-       | 816:sw      | 816:-       | 816:-       | 816:-       BUS_LOAD  MEM[816] accepted 1
+  286:  820:-       | 820:-       | 816:sw      | 816:-       | 816:-       BUS_LOAD  MEM[816] accepted 1
+  287:  820:-       | 820:-       | 820:-       | 816:sw      | 816:-       BUS_STORE MEM[65468] = 4 accepted 1
+  288:  820:-       | 820:-       | 820:-       | 820:-       | 816:sw      BUS_LOAD  MEM[816] accepted 1
+  289:  820:lw      | 820:-       | 820:-       | 820:-       | 820:-       BUS_LOAD  MEM[816] accepted 1
+  290:  824:-       | 820:lw      | 820:-       | 820:-       | 820:-       BUS_LOAD  MEM[816] accepted 1
+  291:  824:-       | 824:-       | 820:lw      | 820:-       | 820:-       BUS_LOAD  MEM[816] accepted 1
+  292:  824:-       | 824:-       | 824:-       | 820:lw      | 820:-       BUS_LOAD  MEM[65468] accepted 1
+  293:  824:-       | 824:-       | 824:-       | 824:-       | 820:lw      r15=4  BUS_LOAD  MEM[816] accepted 1
+  294:  824:addi    | 824:-       | 824:-       | 824:-       | 824:-       BUS_LOAD  MEM[816] accepted 1
+  295:  828:-       | 824:addi    | 824:-       | 824:-       | 824:-       BUS_LOAD  MEM[824] accepted 1
+  296:  828:-       | 828:-       | 824:addi    | 824:-       | 824:-       BUS_LOAD  MEM[824] accepted 1
+  297:  828:-       | 828:-       | 828:-       | 824:addi    | 824:-       BUS_LOAD  MEM[824] accepted 1
+  298:  828:-       | 828:-       | 828:-       | 828:-       | 824:addi    r15=12  BUS_LOAD  MEM[824] accepted 1
+  299:  828:sw      | 828:-       | 828:-       | 828:-       | 828:-       BUS_LOAD  MEM[824] accepted 1
+  300:  832:-       | 828:sw      | 828:-       | 828:-       | 828:-       BUS_LOAD  MEM[824] accepted 1
+  301:  832:-       | 832:-       | 828:sw      | 828:-       | 828:-       BUS_LOAD  MEM[824] accepted 1
+  302:  832:-       | 832:-       | 832:-       | 828:sw      | 828:-       BUS_STORE MEM[65476] = 12 accepted 1
+  303:  832:-       | 832:-       | 832:-       | 832:-       | 828:sw      BUS_LOAD  MEM[824] accepted 1
+  304:  832:lui     | 832:-       | 832:-       | 832:-       | 832:-       BUS_LOAD  MEM[824] accepted 1
+  305:  836:-       | 832:lui     | 832:-       | 832:-       | 832:-       BUS_LOAD  MEM[832] accepted 1
+  306:  836:-       | 836:-       | 832:lui     | 832:-       | 832:-       BUS_LOAD  MEM[832] accepted 1
+  307:  836:-       | 836:-       | 836:-       | 832:lui     | 832:-       BUS_LOAD  MEM[832] accepted 1
+  308:  836:-       | 836:-       | 836:-       | 836:-       | 832:lui     r15=16384  BUS_LOAD  MEM[832] accepted 1
+  309:  836:lw      | 836:-       | 836:-       | 836:-       | 836:-       BUS_LOAD  MEM[832] accepted 1
+  310:  840:-       | 836:lw      | 836:-       | 836:-       | 836:-       BUS_LOAD  MEM[832] accepted 1
+  311:  840:-       | 840:-       | 836:lw      | 836:-       | 836:-       BUS_LOAD  MEM[832] accepted 1
+  312:  840:-       | 840:-       | 840:-       | 836:lw      | 836:-       BUS_LOAD  MEM[18024] accepted 1
+  313:  840:-       | 840:-       | 840:-       | 840:-       | 836:lw      r15=0  BUS_LOAD  MEM[832] accepted 1
+  314:  840:sw      | 840:-       | 840:-       | 840:-       | 840:-       BUS_LOAD  MEM[832] accepted 1
+  315:  844:-       | 840:sw      | 840:-       | 840:-       | 840:-       BUS_LOAD  MEM[840] accepted 1
+  316:  844:-       | 844:-       | 840:sw      | 840:-       | 840:-       BUS_LOAD  MEM[840] accepted 1
+  317:  844:-       | 844:-       | 844:-       | 840:sw      | 840:-       BUS_STORE MEM[65480] = 0 accepted 1
+  318:  844:-       | 844:-       | 844:-       | 844:-       | 840:sw      BUS_LOAD  MEM[840] accepted 1
+  319:  844:lw      | 844:-       | 844:-       | 844:-       | 844:-       BUS_LOAD  MEM[840] accepted 1
+  320:  848:-       | 844:lw      | 844:-       | 844:-       | 844:-       BUS_LOAD  MEM[840] accepted 1
+  321:  848:-       | 848:-       | 844:lw      | 844:-       | 844:-       BUS_LOAD  MEM[840] accepted 1
+  322:  848:-       | 848:-       | 848:-       | 844:lw      | 844:-       BUS_LOAD  MEM[65480] accepted 1
+  323:  848:-       | 848:-       | 848:-       | 848:-       | 844:lw      r15=0  BUS_LOAD  MEM[840] accepted 1
+  324:  848:bne     | 848:-       | 848:-       | 848:-       | 848:-       BUS_LOAD  MEM[840] accepted 1
+  325:  852:-       | 848:bne     | 848:-       | 848:-       | 848:-       BUS_LOAD  MEM[848] accepted 1
+  326:  852:-       | 852:-       | 848:bne     | 848:-       | 848:-       BUS_LOAD  MEM[848] accepted 1
+  327:  852:-       | 852:-       | 852:-       | 848:bne     | 848:-       BUS_LOAD  MEM[848] accepted 1
+  328:  852:-       | 852:-       | 852:-       | 852:-       | 848:bne     BUS_LOAD  MEM[848] accepted 1
+  329:  852:lui     | 852:-       | 852:-       | 852:-       | 852:-       BUS_LOAD  MEM[848] accepted 1
+  330:  856:-       | 852:lui     | 852:-       | 852:-       | 852:-       BUS_LOAD  MEM[848] accepted 1
+  331:  856:-       | 856:-       | 852:lui     | 852:-       | 852:-       BUS_LOAD  MEM[848] accepted 1
+  332:  856:-       | 856:-       | 856:-       | 852:lui     | 852:-       BUS_LOAD  MEM[848] accepted 1
+  333:  856:-       | 856:-       | 856:-       | 856:-       | 852:lui     r15=16384  BUS_LOAD  MEM[848] accepted 1
+  334:  856:addi    | 856:-       | 856:-       | 856:-       | 856:-       BUS_LOAD  MEM[848] accepted 1
+  335:  860:-       | 856:addi    | 856:-       | 856:-       | 856:-       BUS_LOAD  MEM[856] accepted 1
+  336:  860:-       | 860:-       | 856:addi    | 856:-       | 856:-       BUS_LOAD  MEM[856] accepted 1
+  337:  860:-       | 860:-       | 860:-       | 856:addi    | 856:-       BUS_LOAD  MEM[856] accepted 1
+  338:  860:-       | 860:-       | 860:-       | 860:-       | 856:addi    r15=18016  BUS_LOAD  MEM[856] accepted 1
+  339:  860:sw      | 860:-       | 860:-       | 860:-       | 860:-       BUS_LOAD  MEM[856] accepted 1
+  340:  864:-       | 860:sw      | 860:-       | 860:-       | 860:-       BUS_LOAD  MEM[856] accepted 1
+  341:  864:-       | 864:-       | 860:sw      | 860:-       | 860:-       BUS_LOAD  MEM[856] accepted 1
+  342:  864:-       | 864:-       | 864:-       | 860:sw      | 860:-       BUS_STORE MEM[65480] = 18016 accepted 1
+  343:  864:-       | 864:-       | 864:-       | 864:-       | 860:sw      BUS_LOAD  MEM[856] accepted 1
+  344:  864:lui     | 864:-       | 864:-       | 864:-       | 864:-       BUS_LOAD  MEM[856] accepted 1
+  345:  868:-       | 864:lui     | 864:-       | 864:-       | 864:-       BUS_LOAD  MEM[864] accepted 1
+  346:  868:-       | 868:-       | 864:lui     | 864:-       | 864:-       BUS_LOAD  MEM[864] accepted 1
+  347:  868:-       | 868:-       | 868:-       | 864:lui     | 864:-       BUS_LOAD  MEM[864] accepted 1
+  348:  868:-       | 868:-       | 868:-       | 868:-       | 864:lui     r15=16384  BUS_LOAD  MEM[864] accepted 1
+  349:  868:lw      | 868:-       | 868:-       | 868:-       | 868:-       BUS_LOAD  MEM[864] accepted 1
+  350:  872:-       | 868:lw      | 868:-       | 868:-       | 868:-       BUS_LOAD  MEM[864] accepted 1
+  351:  872:-       | 872:-       | 868:lw      | 868:-       | 868:-       BUS_LOAD  MEM[864] accepted 1
+  352:  872:-       | 872:-       | 872:-       | 868:lw      | 868:-       BUS_LOAD  MEM[65480] accepted 1
+  353:  872:-       | 872:-       | 872:-       | 872:-       | 868:lw      r14=18016  BUS_LOAD  MEM[864] accepted 1
+  354:  872:sw      | 872:-       | 872:-       | 872:-       | 872:-       BUS_LOAD  MEM[864] accepted 1
+  355:  876:-       | 872:sw      | 872:-       | 872:-       | 872:-       BUS_LOAD  MEM[872] accepted 1
+  356:  876:-       | 876:-       | 872:sw      | 872:-       | 872:-       BUS_LOAD  MEM[872] accepted 1
+  357:  876:-       | 876:-       | 876:-       | 872:sw      | 872:-       BUS_STORE MEM[18024] = 18016 accepted 1
+  358:  876:-       | 876:-       | 876:-       | 876:-       | 872:sw      BUS_LOAD  MEM[872] accepted 1
+  359:  876:lui     | 876:-       | 876:-       | 876:-       | 876:-       BUS_LOAD  MEM[872] accepted 1
+  360:  880:-       | 876:lui     | 876:-       | 876:-       | 876:-       BUS_LOAD  MEM[872] accepted 1
+  361:  880:-       | 880:-       | 876:lui     | 876:-       | 876:-       BUS_LOAD  MEM[872] accepted 1
+  362:  880:-       | 880:-       | 880:-       | 876:lui     | 876:-       BUS_LOAD  MEM[872] accepted 1
+  363:  880:-       | 880:-       | 880:-       | 880:-       | 876:lui     r15=16384  BUS_LOAD  MEM[872] accepted 1
+  364:  880:lw      | 880:-       | 880:-       | 880:-       | 880:-       BUS_LOAD  MEM[872] accepted 1
+  365:  884:-       | 880:lw      | 880:-       | 880:-       | 880:-       BUS_LOAD  MEM[880] accepted 1
+  366:  884:-       | 884:-       | 880:lw      | 880:-       | 880:-       BUS_LOAD  MEM[880] accepted 1
+  367:  884:-       | 884:-       | 884:-       | 880:lw      | 880:-       BUS_LOAD  MEM[18024] accepted 1
+  368:  884:-       | 884:-       | 884:-       | 884:-       | 880:lw      r14=18016  BUS_LOAD  MEM[880] accepted 1
+  369:  884:lui     | 884:-       | 884:-       | 884:-       | 884:-       BUS_LOAD  MEM[880] accepted 1
+  370:  888:-       | 884:lui     | 884:-       | 884:-       | 884:-       BUS_LOAD  MEM[880] accepted 1
+  371:  888:-       | 888:-       | 884:lui     | 884:-       | 884:-       BUS_LOAD  MEM[880] accepted 1
+  372:  888:-       | 888:-       | 888:-       | 884:lui     | 884:-       BUS_LOAD  MEM[880] accepted 1
+  373:  888:-       | 888:-       | 888:-       | 888:-       | 884:lui     r15=16384  BUS_LOAD  MEM[880] accepted 1
+  374:  888:addi    | 888:-       | 888:-       | 888:-       | 888:-       BUS_LOAD  MEM[880] accepted 1
+  375:  892:-       | 888:addi    | 888:-       | 888:-       | 888:-       BUS_LOAD  MEM[888] accepted 1
+  376:  892:-       | 892:-       | 888:addi    | 888:-       | 888:-       BUS_LOAD  MEM[888] accepted 1
+  377:  892:-       | 892:-       | 892:-       | 888:addi    | 888:-       BUS_LOAD  MEM[888] accepted 1
+  378:  892:-       | 892:-       | 892:-       | 892:-       | 888:addi    r15=18016  BUS_LOAD  MEM[888] accepted 1
+  379:  892:sw      | 892:-       | 892:-       | 892:-       | 892:-       BUS_LOAD  MEM[888] accepted 1
+  380:  896:-       | 892:sw      | 892:-       | 892:-       | 892:-       BUS_LOAD  MEM[888] accepted 1
+  381:  896:-       | 896:-       | 892:sw      | 892:-       | 892:-       BUS_LOAD  MEM[888] accepted 1
+  382:  896:-       | 896:-       | 896:-       | 892:sw      | 892:-       BUS_STORE MEM[18016] = 18016 accepted 1
+  383:  896:-       | 896:-       | 896:-       | 896:-       | 892:sw      BUS_LOAD  MEM[888] accepted 1
+  384:  896:lui     | 896:-       | 896:-       | 896:-       | 896:-       BUS_LOAD  MEM[888] accepted 1
+  385:  900:-       | 896:lui     | 896:-       | 896:-       | 896:-       BUS_LOAD  MEM[896] accepted 1
+  386:  900:-       | 900:-       | 896:lui     | 896:-       | 896:-       BUS_LOAD  MEM[896] accepted 1
+  387:  900:-       | 900:-       | 900:-       | 896:lui     | 896:-       BUS_LOAD  MEM[896] accepted 1
+  388:  900:-       | 900:-       | 900:-       | 900:-       | 896:lui     r15=16384  BUS_LOAD  MEM[896] accepted 1
+  389:  900:addi    | 900:-       | 900:-       | 900:-       | 900:-       BUS_LOAD  MEM[896] accepted 1
+  390:  904:-       | 900:addi    | 900:-       | 900:-       | 900:-       BUS_LOAD  MEM[896] accepted 1
+  391:  904:-       | 904:-       | 900:addi    | 900:-       | 900:-       BUS_LOAD  MEM[896] accepted 1
+  392:  904:-       | 904:-       | 904:-       | 900:addi    | 900:-       BUS_LOAD  MEM[896] accepted 1
+  393:  904:-       | 904:-       | 904:-       | 904:-       | 900:addi    r15=18016  BUS_LOAD  MEM[896] accepted 1
+  394:  904:sw      | 904:-       | 904:-       | 904:-       | 904:-       BUS_LOAD  MEM[896] accepted 1
+  395:  908:-       | 904:sw      | 904:-       | 904:-       | 904:-       BUS_LOAD  MEM[904] accepted 1
+  396:  908:-       | 908:-       | 904:sw      | 904:-       | 904:-       BUS_LOAD  MEM[904] accepted 1
+  397:  908:-       | 908:-       | 908:-       | 904:sw      | 904:-       BUS_STORE MEM[18020] = 0 accepted 1
+  398:  908:-       | 908:-       | 908:-       | 908:-       | 904:sw      BUS_LOAD  MEM[904] accepted 1
+  399:  908:lw      | 908:-       | 908:-       | 908:-       | 908:-       BUS_LOAD  MEM[904] accepted 1
+  400:  912:-       | 908:lw      | 908:-       | 908:-       | 908:-       BUS_LOAD  MEM[904] accepted 1
+  401:  912:-       | 912:-       | 908:lw      | 908:-       | 908:-       BUS_LOAD  MEM[904] accepted 1
+  402:  912:-       | 912:-       | 912:-       | 908:lw      | 908:-       BUS_LOAD  MEM[65480] accepted 1
+  403:  912:-       | 912:-       | 912:-       | 912:-       | 908:lw      r15=18016  BUS_LOAD  MEM[904] accepted 1
+  404:  912:lw      | 912:-       | 912:-       | 912:-       | 912:-       BUS_LOAD  MEM[904] accepted 1
+  405:  916:-       | 912:lw      | 912:-       | 912:-       | 912:-       BUS_LOAD  MEM[912] accepted 1
+  406:  916:-       | 916:-       | 912:lw      | 912:-       | 912:-       BUS_LOAD  MEM[912] accepted 1
+  407:  916:-       | 916:-       | 916:-       | 912:lw      | 912:-       BUS_LOAD  MEM[18016] accepted 1
+  408:  916:-       | 916:-       | 916:-       | 916:-       | 912:lw      r15=18016  BUS_LOAD  MEM[912] accepted 1
+  409:  916:sw      | 916:-       | 916:-       | 916:-       | 916:-       BUS_LOAD  MEM[912] accepted 1
+  410:  920:-       | 916:sw      | 916:-       | 916:-       | 916:-       BUS_LOAD  MEM[912] accepted 1
+  411:  920:-       | 920:-       | 916:sw      | 916:-       | 916:-       BUS_LOAD  MEM[912] accepted 1
+  412:  920:-       | 920:-       | 920:-       | 916:sw      | 916:-       BUS_STORE MEM[65484] = 18016 accepted 1
+  413:  920:-       | 920:-       | 920:-       | 920:-       | 916:sw      BUS_LOAD  MEM[912] accepted 1
+  414:  920:lw      | 920:-       | 920:-       | 920:-       | 920:-       BUS_LOAD  MEM[912] accepted 1
+  415:  924:-       | 920:lw      | 920:-       | 920:-       | 920:-       BUS_LOAD  MEM[920] accepted 1
+  416:  924:-       | 924:-       | 920:lw      | 920:-       | 920:-       BUS_LOAD  MEM[920] accepted 1
+  417:  924:-       | 924:-       | 924:-       | 920:lw      | 920:-       BUS_LOAD  MEM[65484] accepted 1
+  418:  924:-       | 924:-       | 924:-       | 924:-       | 920:lw      r15=18016  BUS_LOAD  MEM[920] accepted 1
+  419:  924:lw      | 924:-       | 924:-       | 924:-       | 924:-       BUS_LOAD  MEM[920] accepted 1
+  420:  928:-       | 924:lw      | 924:-       | 924:-       | 924:-       BUS_LOAD  MEM[920] accepted 1
+  421:  928:-       | 928:-       | 924:lw      | 924:-       | 924:-       BUS_LOAD  MEM[920] accepted 1
+  422:  928:-       | 928:-       | 928:-       | 924:lw      | 924:-       BUS_LOAD  MEM[18020] accepted 1
+  423:  928:-       | 928:-       | 928:-       | 928:-       | 924:lw      r15=0  BUS_LOAD  MEM[920] accepted 1
+  424:  928:lw      | 928:-       | 928:-       | 928:-       | 928:-       BUS_LOAD  MEM[920] accepted 1
+  425:  932:-       | 928:lw      | 928:-       | 928:-       | 928:-       BUS_LOAD  MEM[928] accepted 1
+  426:  932:-       | 932:-       | 928:lw      | 928:-       | 928:-       BUS_LOAD  MEM[928] accepted 1
+  427:  932:-       | 932:-       | 932:-       | 928:lw      | 928:-       BUS_LOAD  MEM[65468] accepted 1
+  428:  932:-       | 932:-       | 932:-       | 932:-       | 928:lw      r14=4  BUS_LOAD  MEM[928] accepted 1
+  429:  932:bltu    | 932:-       | 932:-       | 932:-       | 932:-       BUS_LOAD  MEM[928] accepted 1
+  430:  936:-       | 932:bltu    | 932:-       | 932:-       | 932:-       BUS_LOAD  MEM[928] accepted 1
+  431:  936:-       | 936:-       | 932:bltu    | 932:-       | 932:-       BUS_LOAD  MEM[928] accepted 1
+  432:  936:-       | 936:-       | 936:-       | 932:bltu    | 932:-       BUS_LOAD  MEM[928] accepted 1
+  433: 1064:-       | 936:-       | 936:-       | 936:-       | 932:bltu    BUS_LOAD  MEM[1056] accepted 1
+  434: 1064:lui     |1064:-       | 936:-       | 936:-       | 936:-       BUS_LOAD  MEM[1056] accepted 1
+  435: 1068:-       |1064:lui     |1064:-       | 936:-       | 936:-       BUS_LOAD  MEM[1064] accepted 1
+  436: 1068:-       |1068:-       |1064:lui     |1064:-       | 936:-       BUS_LOAD  MEM[1064] accepted 1
+  437: 1068:-       |1068:-       |1068:-       |1064:lui     |1064:-       BUS_LOAD  MEM[1064] accepted 1
+  438: 1068:-       |1068:-       |1068:-       |1068:-       |1064:lui     r15=16384  BUS_LOAD  MEM[1064] accepted 1
+  439: 1068:lw      |1068:-       |1068:-       |1068:-       |1068:-       BUS_LOAD  MEM[1064] accepted 1
+  440: 1072:-       |1068:lw      |1068:-       |1068:-       |1068:-       BUS_LOAD  MEM[1064] accepted 1
+  441: 1072:-       |1072:-       |1068:lw      |1068:-       |1068:-       BUS_LOAD  MEM[1064] accepted 1
+  442: 1072:-       |1072:-       |1072:-       |1068:lw      |1068:-       BUS_LOAD  MEM[18024] accepted 1
+  443: 1072:-       |1072:-       |1072:-       |1072:-       |1068:lw      r15=18016  BUS_LOAD  MEM[1064] accepted 1
+  444: 1072:lw      |1072:-       |1072:-       |1072:-       |1072:-       BUS_LOAD  MEM[1064] accepted 1
+  445: 1076:-       |1072:lw      |1072:-       |1072:-       |1072:-       BUS_LOAD  MEM[1072] accepted 1
+  446: 1076:-       |1076:-       |1072:lw      |1072:-       |1072:-       BUS_LOAD  MEM[1072] accepted 1
+  447: 1076:-       |1076:-       |1076:-       |1072:lw      |1072:-       BUS_LOAD  MEM[65484] accepted 1
+  448: 1076:-       |1076:-       |1076:-       |1076:-       |1072:lw      r14=18016  BUS_LOAD  MEM[1072] accepted 1
+  449: 1076:bne     |1076:-       |1076:-       |1076:-       |1076:-       BUS_LOAD  MEM[1072] accepted 1
+  450: 1080:-       |1076:bne     |1076:-       |1076:-       |1076:-       BUS_LOAD  MEM[1072] accepted 1
+  451: 1080:-       |1080:-       |1076:bne     |1076:-       |1076:-       BUS_LOAD  MEM[1072] accepted 1
+  452: 1080:-       |1080:-       |1080:-       |1076:bne     |1076:-       BUS_LOAD  MEM[1072] accepted 1
+  453: 1080:-       |1080:-       |1080:-       |1080:-       |1076:bne     BUS_LOAD  MEM[1072] accepted 1
+  454: 1080:lw      |1080:-       |1080:-       |1080:-       |1080:-       BUS_LOAD  MEM[1072] accepted 1
+  455: 1084:-       |1080:lw      |1080:-       |1080:-       |1080:-       BUS_LOAD  MEM[1080] accepted 1
+  456: 1084:-       |1084:-       |1080:lw      |1080:-       |1080:-       BUS_LOAD  MEM[1080] accepted 1
+  457: 1084:-       |1084:-       |1084:-       |1080:lw      |1080:-       BUS_LOAD  MEM[65476] accepted 1
+  458: 1084:-       |1084:-       |1084:-       |1084:-       |1080:lw      r10=12  BUS_LOAD  MEM[1080] accepted 1
+  459: 1084:auipc   |1084:-       |1084:-       |1084:-       |1084:-       BUS_LOAD  MEM[1080] accepted 1
+  460: 1088:-       |1084:auipc   |1084:-       |1084:-       |1084:-       BUS_LOAD  MEM[1080] accepted 1
+  461: 1088:-       |1088:-       |1084:auipc   |1084:-       |1084:-       BUS_LOAD  MEM[1080] accepted 1
+  462: 1088:-       |1088:-       |1088:-       |1084:auipc   |1084:-       BUS_LOAD  MEM[1080] accepted 1
+  463: 1088:-       |1088:-       |1088:-       |1088:-       |1084:auipc   r1=1080  BUS_LOAD  MEM[1080] accepted 1
+  464: 1088:jalr    |1088:-       |1088:-       |1088:-       |1088:-       BUS_LOAD  MEM[1080] accepted 1
+  465: 1092:-       |1088:jalr    |1088:-       |1088:-       |1088:-       BUS_LOAD  MEM[1088] accepted 1
+  466: 1092:-       |1092:-       |1088:jalr    |1088:-       |1088:-       BUS_LOAD  MEM[1088] accepted 1
+  467: 1092:-       |1092:-       |1092:-       |1088:jalr    |1088:-       BUS_LOAD  MEM[1088] accepted 1
+  468:  580:-       |1092:-       |1092:-       |1092:-       |1088:jalr    r1=1088  BUS_LOAD  MEM[576] accepted 1
+  469:  580:addi    | 580:-       |1092:-       |1092:-       |1092:-       BUS_LOAD  MEM[576] accepted 1
+  470:  584:-       | 580:addi    | 580:-       |1092:-       |1092:-       BUS_LOAD  MEM[576] accepted 1
+  471:  584:-       | 584:-       | 580:addi    | 580:-       |1092:-       BUS_LOAD  MEM[576] accepted 1
+  472:  584:-       | 584:-       | 584:-       | 580:addi    | 580:-       BUS_LOAD  MEM[576] accepted 1
+  473:  584:-       | 584:-       | 584:-       | 584:-       | 580:addi    r2=65408  BUS_LOAD  MEM[576] accepted 1
+  474:  584:sw      | 584:-       | 584:-       | 584:-       | 584:-       BUS_LOAD  MEM[576] accepted 1
+  475:  588:-       | 584:sw      | 584:-       | 584:-       | 584:-       BUS_LOAD  MEM[584] accepted 1
+  476:  588:-       | 588:-       | 584:sw      | 584:-       | 584:-       BUS_LOAD  MEM[584] accepted 1
+  477:  588:-       | 588:-       | 588:-       | 584:sw      | 584:-       BUS_STORE MEM[65452] = 1088 accepted 1
+  478:  588:-       | 588:-       | 588:-       | 588:-       | 584:sw      BUS_LOAD  MEM[584] accepted 1
+  479:  588:sw      | 588:-       | 588:-       | 588:-       | 588:-       BUS_LOAD  MEM[584] accepted 1
+  480:  592:-       | 588:sw      | 588:-       | 588:-       | 588:-       BUS_LOAD  MEM[584] accepted 1
+  481:  592:-       | 592:-       | 588:sw      | 588:-       | 588:-       BUS_LOAD  MEM[584] accepted 1
+  482:  592:-       | 592:-       | 592:-       | 588:sw      | 588:-       BUS_STORE MEM[65448] = 65504 accepted 1
+  483:  592:-       | 592:-       | 592:-       | 592:-       | 588:sw      BUS_LOAD  MEM[584] accepted 1
+  484:  592:addi    | 592:-       | 592:-       | 592:-       | 592:-       BUS_LOAD  MEM[584] accepted 1
+  485:  596:-       | 592:addi    | 592:-       | 592:-       | 592:-       BUS_LOAD  MEM[592] accepted 1
+  486:  596:-       | 596:-       | 592:addi    | 592:-       | 592:-       BUS_LOAD  MEM[592] accepted 1
+  487:  596:-       | 596:-       | 596:-       | 592:addi    | 592:-       BUS_LOAD  MEM[592] accepted 1
+  488:  596:-       | 596:-       | 596:-       | 596:-       | 592:addi    r8=65456  BUS_LOAD  MEM[592] accepted 1
+  489:  596:sw      | 596:-       | 596:-       | 596:-       | 596:-       BUS_LOAD  MEM[592] accepted 1
+  490:  600:-       | 596:sw      | 596:-       | 596:-       | 596:-       BUS_LOAD  MEM[592] accepted 1
+  491:  600:-       | 600:-       | 596:sw      | 596:-       | 596:-       BUS_LOAD  MEM[592] accepted 1
+  492:  600:-       | 600:-       | 600:-       | 596:sw      | 596:-       BUS_STORE MEM[65420] = 12 accepted 1
+  493:  600:-       | 600:-       | 600:-       | 600:-       | 596:sw      BUS_LOAD  MEM[592] accepted 1
+  494:  600:lui     | 600:-       | 600:-       | 600:-       | 600:-       BUS_LOAD  MEM[592] accepted 1
+  495:  604:-       | 600:lui     | 600:-       | 600:-       | 600:-       BUS_LOAD  MEM[600] accepted 1
+  496:  604:-       | 604:-       | 600:lui     | 600:-       | 600:-       BUS_LOAD  MEM[600] accepted 1
+  497:  604:-       | 604:-       | 604:-       | 600:lui     | 600:-       BUS_LOAD  MEM[600] accepted 1
+  498:  604:-       | 604:-       | 604:-       | 604:-       | 600:lui     r15=0  BUS_LOAD  MEM[600] accepted 1
+  499:  604:lw      | 604:-       | 604:-       | 604:-       | 604:-       BUS_LOAD  MEM[600] accepted 1
+  500:  608:-       | 604:lw      | 604:-       | 604:-       | 604:-       BUS_LOAD  MEM[600] accepted 1
+  501:  608:-       | 608:-       | 604:lw      | 604:-       | 604:-       BUS_LOAD  MEM[600] accepted 1
+  502:  608:-       | 608:-       | 608:-       | 604:lw      | 604:-       BUS_LOAD  MEM[1604] accepted 1
+  503:  608:-       | 608:-       | 608:-       | 608:-       | 604:lw      r15=16384  BUS_LOAD  MEM[600] accepted 1
+  504:  608:lw      | 608:-       | 608:-       | 608:-       | 608:-       BUS_LOAD  MEM[600] accepted 1
+  505:  612:-       | 608:lw      | 608:-       | 608:-       | 608:-       BUS_LOAD  MEM[608] accepted 1
+  506:  612:-       | 612:-       | 608:lw      | 608:-       | 608:-       BUS_LOAD  MEM[608] accepted 1
+  507:  612:-       | 612:-       | 612:-       | 608:lw      | 608:-       BUS_LOAD  MEM[65420] accepted 1
+  508:  612:-       | 612:-       | 612:-       | 612:-       | 608:lw      r14=12  BUS_LOAD  MEM[608] accepted 1
+  509:  612:bgeu    | 612:-       | 612:-       | 612:-       | 612:-       BUS_LOAD  MEM[608] accepted 1
+  510:  616:-       | 612:bgeu    | 612:-       | 612:-       | 612:-       BUS_LOAD  MEM[608] accepted 1
+  511:  616:-       | 616:-       | 612:bgeu    | 612:-       | 612:-       BUS_LOAD  MEM[608] accepted 1
+  512:  616:-       | 616:-       | 616:-       | 612:bgeu    | 612:-       BUS_LOAD  MEM[608] accepted 1
+  513:  624:-       | 616:-       | 616:-       | 616:-       | 612:bgeu    BUS_LOAD  MEM[616] accepted 1
+  514:  624:lui     | 624:-       | 616:-       | 616:-       | 616:-       BUS_LOAD  MEM[616] accepted 1
+  515:  628:-       | 624:lui     | 624:-       | 616:-       | 616:-       BUS_LOAD  MEM[624] accepted 1
+  516:  628:-       | 628:-       | 624:lui     | 624:-       | 616:-       BUS_LOAD  MEM[624] accepted 1
+  517:  628:-       | 628:-       | 628:-       | 624:lui     | 624:-       BUS_LOAD  MEM[624] accepted 1
+  518:  628:-       | 628:-       | 628:-       | 628:-       | 624:lui     r15=0  BUS_LOAD  MEM[624] accepted 1
+  519:  628:lw      | 628:-       | 628:-       | 628:-       | 628:-       BUS_LOAD  MEM[624] accepted 1
+  520:  632:-       | 628:lw      | 628:-       | 628:-       | 628:-       BUS_LOAD  MEM[624] accepted 1
+  521:  632:-       | 632:-       | 628:lw      | 628:-       | 628:-       BUS_LOAD  MEM[624] accepted 1
+  522:  632:-       | 632:-       | 632:-       | 628:lw      | 628:-       BUS_LOAD  MEM[1600] accepted 1
+  523:  632:-       | 632:-       | 632:-       | 632:-       | 628:lw      r15=1632  BUS_LOAD  MEM[624] accepted 1
+  524:  632:sw      | 632:-       | 632:-       | 632:-       | 632:-       BUS_LOAD  MEM[624] accepted 1
+  525:  636:-       | 632:sw      | 632:-       | 632:-       | 632:-       BUS_LOAD  MEM[632] accepted 1
+  526:  636:-       | 636:-       | 632:sw      | 632:-       | 632:-       BUS_LOAD  MEM[632] accepted 1
+  527:  636:-       | 636:-       | 636:-       | 632:sw      | 632:-       BUS_STORE MEM[65436] = 1632 accepted 1
+  528:  636:-       | 636:-       | 636:-       | 636:-       | 632:sw      BUS_LOAD  MEM[632] accepted 1
+  529:  636:lui     | 636:-       | 636:-       | 636:-       | 636:-       BUS_LOAD  MEM[632] accepted 1
+  530:  640:-       | 636:lui     | 636:-       | 636:-       | 636:-       BUS_LOAD  MEM[632] accepted 1
+  531:  640:-       | 640:-       | 636:lui     | 636:-       | 636:-       BUS_LOAD  MEM[632] accepted 1
+  532:  640:-       | 640:-       | 640:-       | 636:lui     | 636:-       BUS_LOAD  MEM[632] accepted 1
+  533:  640:-       | 640:-       | 640:-       | 640:-       | 636:lui     r15=0  BUS_LOAD  MEM[632] accepted 1
+  534:  640:lw      | 640:-       | 640:-       | 640:-       | 640:-       BUS_LOAD  MEM[632] accepted 1
+  535:  644:-       | 640:lw      | 640:-       | 640:-       | 640:-       BUS_LOAD  MEM[640] accepted 1
+  536:  644:-       | 644:-       | 640:lw      | 640:-       | 640:-       BUS_LOAD  MEM[640] accepted 1
+  537:  644:-       | 644:-       | 644:-       | 640:lw      | 640:-       BUS_LOAD  MEM[1600] accepted 1
+  538:  644:-       | 644:-       | 644:-       | 644:-       | 640:lw      r14=1632  BUS_LOAD  MEM[640] accepted 1
+  539:  644:lw      | 644:-       | 644:-       | 644:-       | 644:-       BUS_LOAD  MEM[640] accepted 1
+  540:  648:-       | 644:lw      | 644:-       | 644:-       | 644:-       BUS_LOAD  MEM[640] accepted 1
+  541:  648:-       | 648:-       | 644:lw      | 644:-       | 644:-       BUS_LOAD  MEM[640] accepted 1
+  542:  648:-       | 648:-       | 648:-       | 644:lw      | 644:-       BUS_LOAD  MEM[65420] accepted 1
+  543:  648:-       | 648:-       | 648:-       | 648:-       | 644:lw      r15=12  BUS_LOAD  MEM[640] accepted 1
+  544:  648:add     | 648:-       | 648:-       | 648:-       | 648:-       BUS_LOAD  MEM[640] accepted 1
+  545:  652:-       | 648:add     | 648:-       | 648:-       | 648:-       BUS_LOAD  MEM[648] accepted 1
+  546:  652:-       | 652:-       | 648:add     | 648:-       | 648:-       BUS_LOAD  MEM[648] accepted 1
+  547:  652:-       | 652:-       | 652:-       | 648:add     | 648:-       BUS_LOAD  MEM[648] accepted 1
+  548:  652:-       | 652:-       | 652:-       | 652:-       | 648:add     r14=1644  BUS_LOAD  MEM[648] accepted 1
+  549:  652:lui     | 652:-       | 652:-       | 652:-       | 652:-       BUS_LOAD  MEM[648] accepted 1
+  550:  656:-       | 652:lui     | 652:-       | 652:-       | 652:-       BUS_LOAD  MEM[648] accepted 1
+  551:  656:-       | 656:-       | 652:lui     | 652:-       | 652:-       BUS_LOAD  MEM[648] accepted 1
+  552:  656:-       | 656:-       | 656:-       | 652:lui     | 652:-       BUS_LOAD  MEM[648] accepted 1
+  553:  656:-       | 656:-       | 656:-       | 656:-       | 652:lui     r15=0  BUS_LOAD  MEM[648] accepted 1
+  554:  656:sw      | 656:-       | 656:-       | 656:-       | 656:-       BUS_LOAD  MEM[648] accepted 1
+  555:  660:-       | 656:sw      | 656:-       | 656:-       | 656:-       BUS_LOAD  MEM[656] accepted 1
+  556:  660:-       | 660:-       | 656:sw      | 656:-       | 656:-       BUS_LOAD  MEM[656] accepted 1
+  557:  660:-       | 660:-       | 660:-       | 656:sw      | 656:-       BUS_STORE MEM[1600] = 1644 accepted 1
+  558:  660:-       | 660:-       | 660:-       | 660:-       | 656:sw      BUS_LOAD  MEM[656] accepted 1
+  559:  660:lui     | 660:-       | 660:-       | 660:-       | 660:-       BUS_LOAD  MEM[656] accepted 1
+  560:  664:-       | 660:lui     | 660:-       | 660:-       | 660:-       BUS_LOAD  MEM[656] accepted 1
+  561:  664:-       | 664:-       | 660:lui     | 660:-       | 660:-       BUS_LOAD  MEM[656] accepted 1
+  562:  664:-       | 664:-       | 664:-       | 660:lui     | 660:-       BUS_LOAD  MEM[656] accepted 1
+  563:  664:-       | 664:-       | 664:-       | 664:-       | 660:lui     r15=0  BUS_LOAD  MEM[656] accepted 1
+  564:  664:lw      | 664:-       | 664:-       | 664:-       | 664:-       BUS_LOAD  MEM[656] accepted 1
+  565:  668:-       | 664:lw      | 664:-       | 664:-       | 664:-       BUS_LOAD  MEM[664] accepted 1
+  566:  668:-       | 668:-       | 664:lw      | 664:-       | 664:-       BUS_LOAD  MEM[664] accepted 1
+  567:  668:-       | 668:-       | 668:-       | 664:lw      | 664:-       BUS_LOAD  MEM[1604] accepted 1
+  568:  668:-       | 668:-       | 668:-       | 668:-       | 664:lw      r14=16384  BUS_LOAD  MEM[664] accepted 1
+  569:  668:lw      | 668:-       | 668:-       | 668:-       | 668:-       BUS_LOAD  MEM[664] accepted 1
+  570:  672:-       | 668:lw      | 668:-       | 668:-       | 668:-       BUS_LOAD  MEM[664] accepted 1
+  571:  672:-       | 672:-       | 668:lw      | 668:-       | 668:-       BUS_LOAD  MEM[664] accepted 1
+  572:  672:-       | 672:-       | 672:-       | 668:lw      | 668:-       BUS_LOAD  MEM[65420] accepted 1
+  573:  672:-       | 672:-       | 672:-       | 672:-       | 668:lw      r15=12  BUS_LOAD  MEM[664] accepted 1
+  574:  672:sub     | 672:-       | 672:-       | 672:-       | 672:-       BUS_LOAD  MEM[664] accepted 1
+  575:  676:-       | 672:sub     | 672:-       | 672:-       | 672:-       BUS_LOAD  MEM[672] accepted 1
+  576:  676:-       | 676:-       | 672:sub     | 672:-       | 672:-       BUS_LOAD  MEM[672] accepted 1
+  577:  676:-       | 676:-       | 676:-       | 672:sub     | 672:-       BUS_LOAD  MEM[672] accepted 1
+  578:  676:-       | 676:-       | 676:-       | 676:-       | 672:sub     r14=16372  BUS_LOAD  MEM[672] accepted 1
+  579:  676:lui     | 676:-       | 676:-       | 676:-       | 676:-       BUS_LOAD  MEM[672] accepted 1
+  580:  680:-       | 676:lui     | 676:-       | 676:-       | 676:-       BUS_LOAD  MEM[672] accepted 1
+  581:  680:-       | 680:-       | 676:lui     | 676:-       | 676:-       BUS_LOAD  MEM[672] accepted 1
+  582:  680:-       | 680:-       | 680:-       | 676:lui     | 676:-       BUS_LOAD  MEM[672] accepted 1
+  583:  680:-       | 680:-       | 680:-       | 680:-       | 676:lui     r15=0  BUS_LOAD  MEM[672] accepted 1
+  584:  680:sw      | 680:-       | 680:-       | 680:-       | 680:-       BUS_LOAD  MEM[672] accepted 1
+  585:  684:-       | 680:sw      | 680:-       | 680:-       | 680:-       BUS_LOAD  MEM[680] accepted 1
+  586:  684:-       | 684:-       | 680:sw      | 680:-       | 680:-       BUS_LOAD  MEM[680] accepted 1
+  587:  684:-       | 684:-       | 684:-       | 680:sw      | 680:-       BUS_STORE MEM[1604] = 16372 accepted 1
+  588:  684:-       | 684:-       | 684:-       | 684:-       | 680:sw      BUS_LOAD  MEM[680] accepted 1
+  589:  684:lw      | 684:-       | 684:-       | 684:-       | 684:-       BUS_LOAD  MEM[680] accepted 1
+  590:  688:-       | 684:lw      | 684:-       | 684:-       | 684:-       BUS_LOAD  MEM[680] accepted 1
+  591:  688:-       | 688:-       | 684:lw      | 684:-       | 684:-       BUS_LOAD  MEM[680] accepted 1
+  592:  688:-       | 688:-       | 688:-       | 684:lw      | 684:-       BUS_LOAD  MEM[65420] accepted 1
+  593:  688:-       | 688:-       | 688:-       | 688:-       | 684:lw      r15=12  BUS_LOAD  MEM[680] accepted 1
+  594:  688:addi    | 688:-       | 688:-       | 688:-       | 688:-       BUS_LOAD  MEM[680] accepted 1
+  595:  692:-       | 688:addi    | 688:-       | 688:-       | 688:-       BUS_LOAD  MEM[688] accepted 1
+  596:  692:-       | 692:-       | 688:addi    | 688:-       | 688:-       BUS_LOAD  MEM[688] accepted 1
+  597:  692:-       | 692:-       | 692:-       | 688:addi    | 688:-       BUS_LOAD  MEM[688] accepted 1
+  598:  692:-       | 692:-       | 692:-       | 692:-       | 688:addi    r14=4  BUS_LOAD  MEM[688] accepted 1
+  599:  692:lw      | 692:-       | 692:-       | 692:-       | 692:-       BUS_LOAD  MEM[688] accepted 1
+  600:  696:-       | 692:lw      | 692:-       | 692:-       | 692:-       BUS_LOAD  MEM[688] accepted 1
+  601:  696:-       | 696:-       | 692:lw      | 692:-       | 692:-       BUS_LOAD  MEM[688] accepted 1
+  602:  696:-       | 696:-       | 696:-       | 692:lw      | 692:-       BUS_LOAD  MEM[65436] accepted 1
+  603:  696:-       | 696:-       | 696:-       | 696:-       | 692:lw      r15=1632  BUS_LOAD  MEM[688] accepted 1
+  604:  696:sw      | 696:-       | 696:-       | 696:-       | 696:-       BUS_LOAD  MEM[688] accepted 1
+  605:  700:-       | 696:sw      | 696:-       | 696:-       | 696:-       BUS_LOAD  MEM[696] accepted 1
+  606:  700:-       | 700:-       | 696:sw      | 696:-       | 696:-       BUS_LOAD  MEM[696] accepted 1
+  607:  700:-       | 700:-       | 700:-       | 696:sw      | 696:-       BUS_STORE MEM[1636] = 4 accepted 1
+  608:  700:-       | 700:-       | 700:-       | 700:-       | 696:sw      BUS_LOAD  MEM[696] accepted 1
+  609:  700:lw      | 700:-       | 700:-       | 700:-       | 700:-       BUS_LOAD  MEM[696] accepted 1
+  610:  704:-       | 700:lw      | 700:-       | 700:-       | 700:-       BUS_LOAD  MEM[696] accepted 1
+  611:  704:-       | 704:-       | 700:lw      | 700:-       | 700:-       BUS_LOAD  MEM[696] accepted 1
+  612:  704:-       | 704:-       | 704:-       | 700:lw      | 700:-       BUS_LOAD  MEM[65436] accepted 1
+  613:  704:-       | 704:-       | 704:-       | 704:-       | 700:lw      r15=1632  BUS_LOAD  MEM[696] accepted 1
+  614:  704:addi    | 704:-       | 704:-       | 704:-       | 704:-       BUS_LOAD  MEM[696] accepted 1
+  615:  708:-       | 704:addi    | 704:-       | 704:-       | 704:-       BUS_LOAD  MEM[704] accepted 1
+  616:  708:-       | 708:-       | 704:addi    | 704:-       | 704:-       BUS_LOAD  MEM[704] accepted 1
+  617:  708:-       | 708:-       | 708:-       | 704:addi    | 704:-       BUS_LOAD  MEM[704] accepted 1
+  618:  708:-       | 708:-       | 708:-       | 708:-       | 704:addi    r15=1640  BUS_LOAD  MEM[704] accepted 1
+  619:  708:sw      | 708:-       | 708:-       | 708:-       | 708:-       BUS_LOAD  MEM[704] accepted 1
+  620:  712:-       | 708:sw      | 708:-       | 708:-       | 708:-       BUS_LOAD  MEM[704] accepted 1
+  621:  712:-       | 712:-       | 708:sw      | 708:-       | 708:-       BUS_LOAD  MEM[704] accepted 1
+  622:  712:-       | 712:-       | 712:-       | 708:sw      | 708:-       BUS_STORE MEM[65436] = 1640 accepted 1
+  623:  712:-       | 712:-       | 712:-       | 712:-       | 708:sw      BUS_LOAD  MEM[704] accepted 1
+  624:  712:lw      | 712:-       | 712:-       | 712:-       | 712:-       BUS_LOAD  MEM[704] accepted 1
+  625:  716:-       | 712:lw      | 712:-       | 712:-       | 712:-       BUS_LOAD  MEM[712] accepted 1
+  626:  716:-       | 716:-       | 712:lw      | 712:-       | 712:-       BUS_LOAD  MEM[712] accepted 1
+  627:  716:-       | 716:-       | 716:-       | 712:lw      | 712:-       BUS_LOAD  MEM[65436] accepted 1
+  628:  716:-       | 716:-       | 716:-       | 716:-       | 712:lw      r10=1640  BUS_LOAD  MEM[712] accepted 1
+  629:  716:auipc   | 716:-       | 716:-       | 716:-       | 716:-       BUS_LOAD  MEM[712] accepted 1
+  630:  720:-       | 716:auipc   | 716:-       | 716:-       | 716:-       BUS_LOAD  MEM[712] accepted 1
+  631:  720:-       | 720:-       | 716:auipc   | 716:-       | 716:-       BUS_LOAD  MEM[712] accepted 1
+  632:  720:-       | 720:-       | 720:-       | 716:auipc   | 716:-       BUS_LOAD  MEM[712] accepted 1
+  633:  720:-       | 720:-       | 720:-       | 720:-       | 716:auipc   r1=712  BUS_LOAD  MEM[712] accepted 1
+  634:  720:jalr    | 720:-       | 720:-       | 720:-       | 720:-       BUS_LOAD  MEM[712] accepted 1
+  635:  724:-       | 720:jalr    | 720:-       | 720:-       | 720:-       BUS_LOAD  MEM[720] accepted 1
+  636:  724:-       | 724:-       | 720:jalr    | 720:-       | 720:-       BUS_LOAD  MEM[720] accepted 1
+  637:  724:-       | 724:-       | 724:-       | 720:jalr    | 720:-       BUS_LOAD  MEM[720] accepted 1
+  638:  180:-       | 724:-       | 724:-       | 724:-       | 720:jalr    r1=720  BUS_LOAD  MEM[176] accepted 1
+  639:  180:addi    | 180:-       | 724:-       | 724:-       | 724:-       BUS_LOAD  MEM[176] accepted 1
+  640:  184:-       | 180:addi    | 180:-       | 724:-       | 724:-       BUS_LOAD  MEM[176] accepted 1
+  641:  184:-       | 184:-       | 180:addi    | 180:-       | 724:-       BUS_LOAD  MEM[176] accepted 1
+  642:  184:-       | 184:-       | 184:-       | 180:addi    | 180:-       BUS_LOAD  MEM[176] accepted 1
+  643:  184:-       | 184:-       | 184:-       | 184:-       | 180:addi    r2=65360  BUS_LOAD  MEM[176] accepted 1
+  644:  184:sw      | 184:-       | 184:-       | 184:-       | 184:-       BUS_LOAD  MEM[176] accepted 1
+  645:  188:-       | 184:sw      | 184:-       | 184:-       | 184:-       BUS_LOAD  MEM[184] accepted 1
+  646:  188:-       | 188:-       | 184:sw      | 184:-       | 184:-       BUS_LOAD  MEM[184] accepted 1
+  647:  188:-       | 188:-       | 188:-       | 184:sw      | 184:-       BUS_STORE MEM[65404] = 720 accepted 1
+  648:  188:-       | 188:-       | 188:-       | 188:-       | 184:sw      BUS_LOAD  MEM[184] accepted 1
+  649:  188:sw      | 188:-       | 188:-       | 188:-       | 188:-       BUS_LOAD  MEM[184] accepted 1
+  650:  192:-       | 188:sw      | 188:-       | 188:-       | 188:-       BUS_LOAD  MEM[184] accepted 1
+  651:  192:-       | 192:-       | 188:sw      | 188:-       | 188:-       BUS_LOAD  MEM[184] accepted 1
+  652:  192:-       | 192:-       | 192:-       | 188:sw      | 188:-       BUS_STORE MEM[65400] = 65456 accepted 1
+  653:  192:-       | 192:-       | 192:-       | 192:-       | 188:sw      BUS_LOAD  MEM[184] accepted 1
+  654:  192:addi    | 192:-       | 192:-       | 192:-       | 192:-       BUS_LOAD  MEM[184] accepted 1
+  655:  196:-       | 192:addi    | 192:-       | 192:-       | 192:-       BUS_LOAD  MEM[192] accepted 1
+  656:  196:-       | 196:-       | 192:addi    | 192:-       | 192:-       BUS_LOAD  MEM[192] accepted 1
+  657:  196:-       | 196:-       | 196:-       | 192:addi    | 192:-       BUS_LOAD  MEM[192] accepted 1
+  658:  196:-       | 196:-       | 196:-       | 196:-       | 192:addi    r8=65408  BUS_LOAD  MEM[192] accepted 1
+  659:  196:sw      | 196:-       | 196:-       | 196:-       | 196:-       BUS_LOAD  MEM[192] accepted 1
+  660:  200:-       | 196:sw      | 196:-       | 196:-       | 196:-       BUS_LOAD  MEM[192] accepted 1
+  661:  200:-       | 200:-       | 196:sw      | 196:-       | 196:-       BUS_LOAD  MEM[192] accepted 1
+  662:  200:-       | 200:-       | 200:-       | 196:sw      | 196:-       BUS_STORE MEM[65372] = 1640 accepted 1
+  663:  200:-       | 200:-       | 200:-       | 200:-       | 196:sw      BUS_LOAD  MEM[192] accepted 1
+  664:  200:lw      | 200:-       | 200:-       | 200:-       | 200:-       BUS_LOAD  MEM[192] accepted 1
+  665:  204:-       | 200:lw      | 200:-       | 200:-       | 200:-       BUS_LOAD  MEM[200] accepted 1
+  666:  204:-       | 204:-       | 200:lw      | 200:-       | 200:-       BUS_LOAD  MEM[200] accepted 1
+  667:  204:-       | 204:-       | 204:-       | 200:lw      | 200:-       BUS_LOAD  MEM[65372] accepted 1
+  668:  204:-       | 204:-       | 204:-       | 204:-       | 200:lw      r14=1640  BUS_LOAD  MEM[200] accepted 1
+  669:  204:lui     | 204:-       | 204:-       | 204:-       | 204:-       BUS_LOAD  MEM[200] accepted 1
+  670:  208:-       | 204:lui     | 204:-       | 204:-       | 204:-       BUS_LOAD  MEM[200] accepted 1
+  671:  208:-       | 208:-       | 204:lui     | 204:-       | 204:-       BUS_LOAD  MEM[200] accepted 1
+  672:  208:-       | 208:-       | 208:-       | 204:lui     | 204:-       BUS_LOAD  MEM[200] accepted 1
+  673:  208:-       | 208:-       | 208:-       | 208:-       | 204:lui     r15=0  BUS_LOAD  MEM[200] accepted 1
+  674:  208:addi    | 208:-       | 208:-       | 208:-       | 208:-       BUS_LOAD  MEM[200] accepted 1
+  675:  212:-       | 208:addi    | 208:-       | 208:-       | 208:-       BUS_LOAD  MEM[208] accepted 1
+  676:  212:-       | 212:-       | 208:addi    | 208:-       | 208:-       BUS_LOAD  MEM[208] accepted 1
+  677:  212:-       | 212:-       | 212:-       | 208:addi    | 208:-       BUS_LOAD  MEM[208] accepted 1
+  678:  212:-       | 212:-       | 212:-       | 212:-       | 208:addi    r15=1632  BUS_LOAD  MEM[208] accepted 1
+  679:  212:bltu    | 212:-       | 212:-       | 212:-       | 212:-       BUS_LOAD  MEM[208] accepted 1
+  680:  216:-       | 212:bltu    | 212:-       | 212:-       | 212:-       BUS_LOAD  MEM[208] accepted 1
+  681:  216:-       | 216:-       | 212:bltu    | 212:-       | 212:-       BUS_LOAD  MEM[208] accepted 1
+  682:  216:-       | 216:-       | 216:-       | 212:bltu    | 212:-       BUS_LOAD  MEM[208] accepted 1
+  683:  216:-       | 216:-       | 216:-       | 216:-       | 212:bltu    BUS_LOAD  MEM[208] accepted 1
+  684:  216:lui     | 216:-       | 216:-       | 216:-       | 216:-       BUS_LOAD  MEM[208] accepted 1
+  685:  220:-       | 216:lui     | 216:-       | 216:-       | 216:-       BUS_LOAD  MEM[216] accepted 1
+  686:  220:-       | 220:-       | 216:lui     | 216:-       | 216:-       BUS_LOAD  MEM[216] accepted 1
+  687:  220:-       | 220:-       | 220:-       | 216:lui     | 216:-       BUS_LOAD  MEM[216] accepted 1
+  688:  220:-       | 220:-       | 220:-       | 220:-       | 216:lui     r15=16384  BUS_LOAD  MEM[216] accepted 1
+  689:  220:addi    | 220:-       | 220:-       | 220:-       | 220:-       BUS_LOAD  MEM[216] accepted 1
+  690:  224:-       | 220:addi    | 220:-       | 220:-       | 220:-       BUS_LOAD  MEM[216] accepted 1
+  691:  224:-       | 224:-       | 220:addi    | 220:-       | 220:-       BUS_LOAD  MEM[216] accepted 1
+  692:  224:-       | 224:-       | 224:-       | 220:addi    | 220:-       BUS_LOAD  MEM[216] accepted 1
+  693:  224:-       | 224:-       | 224:-       | 224:-       | 220:addi    r15=18016  BUS_LOAD  MEM[216] accepted 1
+  694:  224:lw      | 224:-       | 224:-       | 224:-       | 224:-       BUS_LOAD  MEM[216] accepted 1
+  695:  228:-       | 224:lw      | 224:-       | 224:-       | 224:-       BUS_LOAD  MEM[224] accepted 1
+  696:  228:-       | 228:-       | 224:lw      | 224:-       | 224:-       BUS_LOAD  MEM[224] accepted 1
+  697:  228:-       | 228:-       | 228:-       | 224:lw      | 224:-       BUS_LOAD  MEM[65372] accepted 1
+  698:  228:-       | 228:-       | 228:-       | 228:-       | 224:lw      r14=1640  BUS_LOAD  MEM[224] accepted 1
+  699:  228:bgeu    | 228:-       | 228:-       | 228:-       | 228:-       BUS_LOAD  MEM[224] accepted 1
+  700:  232:-       | 228:bgeu    | 228:-       | 228:-       | 228:-       BUS_LOAD  MEM[224] accepted 1
+  701:  232:-       | 232:-       | 228:bgeu    | 228:-       | 228:-       BUS_LOAD  MEM[224] accepted 1
+  702:  232:-       | 232:-       | 232:-       | 228:bgeu    | 228:-       BUS_LOAD  MEM[224] accepted 1
+  703:  244:-       | 232:-       | 232:-       | 232:-       | 228:bgeu    BUS_LOAD  MEM[240] accepted 1
+  704:  244:lw      | 244:-       | 232:-       | 232:-       | 232:-       BUS_LOAD  MEM[240] accepted 1
+  705:  248:-       | 244:lw      | 244:-       | 232:-       | 232:-       BUS_LOAD  MEM[240] accepted 1
+  706:  248:-       | 248:-       | 244:lw      | 244:-       | 232:-       BUS_LOAD  MEM[240] accepted 1
+  707:  248:-       | 248:-       | 248:-       | 244:lw      | 244:-       BUS_LOAD  MEM[65372] accepted 1
+  708:  248:-       | 248:-       | 248:-       | 248:-       | 244:lw      r15=1640  BUS_LOAD  MEM[240] accepted 1
+  709:  248:addi    | 248:-       | 248:-       | 248:-       | 248:-       BUS_LOAD  MEM[240] accepted 1
+  710:  252:-       | 248:addi    | 248:-       | 248:-       | 248:-       BUS_LOAD  MEM[248] accepted 1
+  711:  252:-       | 252:-       | 248:addi    | 248:-       | 248:-       BUS_LOAD  MEM[248] accepted 1
+  712:  252:-       | 252:-       | 252:-       | 248:addi    | 248:-       BUS_LOAD  MEM[248] accepted 1
+  713:  252:-       | 252:-       | 252:-       | 252:-       | 248:addi    r15=1632  BUS_LOAD  MEM[248] accepted 1
+  714:  252:sw      | 252:-       | 252:-       | 252:-       | 252:-       BUS_LOAD  MEM[248] accepted 1
+  715:  256:-       | 252:sw      | 252:-       | 252:-       | 252:-       BUS_LOAD  MEM[248] accepted 1
+  716:  256:-       | 256:-       | 252:sw      | 252:-       | 252:-       BUS_LOAD  MEM[248] accepted 1
+  717:  256:-       | 256:-       | 256:-       | 252:sw      | 252:-       BUS_STORE MEM[65384] = 1632 accepted 1
+  718:  256:-       | 256:-       | 256:-       | 256:-       | 252:sw      BUS_LOAD  MEM[248] accepted 1
+  719:  256:lui     | 256:-       | 256:-       | 256:-       | 256:-       BUS_LOAD  MEM[248] accepted 1
+  720:  260:-       | 256:lui     | 256:-       | 256:-       | 256:-       BUS_LOAD  MEM[256] accepted 1
+  721:  260:-       | 260:-       | 256:lui     | 256:-       | 256:-       BUS_LOAD  MEM[256] accepted 1
+  722:  260:-       | 260:-       | 260:-       | 256:lui     | 256:-       BUS_LOAD  MEM[256] accepted 1
+  723:  260:-       | 260:-       | 260:-       | 260:-       | 256:lui     r15=16384  BUS_LOAD  MEM[256] accepted 1
+  724:  260:lw      | 260:-       | 260:-       | 260:-       | 260:-       BUS_LOAD  MEM[256] accepted 1
+  725:  264:-       | 260:lw      | 260:-       | 260:-       | 260:-       BUS_LOAD  MEM[256] accepted 1
+  726:  264:-       | 264:-       | 260:lw      | 260:-       | 260:-       BUS_LOAD  MEM[256] accepted 1
+  727:  264:-       | 264:-       | 264:-       | 260:lw      | 260:-       BUS_LOAD  MEM[18024] accepted 1
+  728:  264:-       | 264:-       | 264:-       | 264:-       | 260:lw      r15=18016  BUS_LOAD  MEM[256] accepted 1
+  729:  264:sw      | 264:-       | 264:-       | 264:-       | 264:-       BUS_LOAD  MEM[256] accepted 1
+  730:  268:-       | 264:sw      | 264:-       | 264:-       | 264:-       BUS_LOAD  MEM[264] accepted 1
+  731:  268:-       | 268:-       | 264:sw      | 264:-       | 264:-       BUS_LOAD  MEM[264] accepted 1
+  732:  268:-       | 268:-       | 268:-       | 264:sw      | 264:-       BUS_STORE MEM[65388] = 18016 accepted 1
+  733:  268:-       | 268:-       | 268:-       | 268:-       | 264:sw      BUS_LOAD  MEM[264] accepted 1
+  734:  268:jal     | 268:-       | 268:-       | 268:-       | 268:-       BUS_LOAD  MEM[264] accepted 1
+  735:  272:-       | 268:jal     | 268:-       | 268:-       | 268:-       BUS_LOAD  MEM[264] accepted 1
+  736:  272:-       | 272:-       | 268:jal     | 268:-       | 268:-       BUS_LOAD  MEM[264] accepted 1
+  737:  272:-       | 272:-       | 272:-       | 268:jal     | 268:-       BUS_LOAD  MEM[264] accepted 1
+  738:  328:-       | 272:-       | 272:-       | 272:-       | 268:jal     BUS_LOAD  MEM[320] accepted 1
+  739:  328:lw      | 328:-       | 272:-       | 272:-       | 272:-       BUS_LOAD  MEM[320] accepted 1
+  740:  332:-       | 328:lw      | 328:-       | 272:-       | 272:-       BUS_LOAD  MEM[328] accepted 1
+  741:  332:-       | 332:-       | 328:lw      | 328:-       | 272:-       BUS_LOAD  MEM[328] accepted 1
+  742:  332:-       | 332:-       | 332:-       | 328:lw      | 328:-       BUS_LOAD  MEM[65384] accepted 1
+  743:  332:-       | 332:-       | 332:-       | 332:-       | 328:lw      r14=1632  BUS_LOAD  MEM[328] accepted 1
+  744:  332:lw      | 332:-       | 332:-       | 332:-       | 332:-       BUS_LOAD  MEM[328] accepted 1
+  745:  336:-       | 332:lw      | 332:-       | 332:-       | 332:-       BUS_LOAD  MEM[328] accepted 1
+  746:  336:-       | 336:-       | 332:lw      | 332:-       | 332:-       BUS_LOAD  MEM[328] accepted 1
+  747:  336:-       | 336:-       | 336:-       | 332:lw      | 332:-       BUS_LOAD  MEM[65388] accepted 1
+  748:  336:-       | 336:-       | 336:-       | 336:-       | 332:lw      r15=18016  BUS_LOAD  MEM[328] accepted 1
+  749:  336:bgeu    | 336:-       | 336:-       | 336:-       | 336:-       BUS_LOAD  MEM[328] accepted 1
+  750:  340:-       | 336:bgeu    | 336:-       | 336:-       | 336:-       BUS_LOAD  MEM[336] accepted 1
+  751:  340:-       | 340:-       | 336:bgeu    | 336:-       | 336:-       BUS_LOAD  MEM[336] accepted 1
+  752:  340:-       | 340:-       | 340:-       | 336:bgeu    | 336:-       BUS_LOAD  MEM[336] accepted 1
+  753:  272:-       | 340:-       | 340:-       | 340:-       | 336:bgeu    BUS_LOAD  MEM[264] accepted 1
+  754:  272:lw      | 272:-       | 340:-       | 340:-       | 340:-       BUS_LOAD  MEM[264] accepted 1
+  755:  276:-       | 272:lw      | 272:-       | 340:-       | 340:-       BUS_LOAD  MEM[272] accepted 1
+  756:  276:-       | 276:-       | 272:lw      | 272:-       | 340:-       BUS_LOAD  MEM[272] accepted 1
+  757:  276:-       | 276:-       | 276:-       | 272:lw      | 272:-       BUS_LOAD  MEM[65388] accepted 1
+  758:  276:-       | 276:-       | 276:-       | 276:-       | 272:lw      r15=18016  BUS_LOAD  MEM[272] accepted 1
+  759:  276:lw      | 276:-       | 276:-       | 276:-       | 276:-       BUS_LOAD  MEM[272] accepted 1
+  760:  280:-       | 276:lw      | 276:-       | 276:-       | 276:-       BUS_LOAD  MEM[272] accepted 1
+  761:  280:-       | 280:-       | 276:lw      | 276:-       | 276:-       BUS_LOAD  MEM[272] accepted 1
+  762:  280:-       | 280:-       | 280:-       | 276:lw      | 276:-       BUS_LOAD  MEM[18016] accepted 1
+  763:  280:-       | 280:-       | 280:-       | 280:-       | 276:lw      r15=18016  BUS_LOAD  MEM[272] accepted 1
+  764:  280:lw      | 280:-       | 280:-       | 280:-       | 280:-       BUS_LOAD  MEM[272] accepted 1
+  765:  284:-       | 280:lw      | 280:-       | 280:-       | 280:-       BUS_LOAD  MEM[280] accepted 1
+  766:  284:-       | 284:-       | 280:lw      | 280:-       | 280:-       BUS_LOAD  MEM[280] accepted 1
+  767:  284:-       | 284:-       | 284:-       | 280:lw      | 280:-       BUS_LOAD  MEM[65388] accepted 1
+  768:  284:-       | 284:-       | 284:-       | 284:-       | 280:lw      r14=18016  BUS_LOAD  MEM[280] accepted 1
+  769:  284:bltu    | 284:-       | 284:-       | 284:-       | 284:-       BUS_LOAD  MEM[280] accepted 1
+  770:  288:-       | 284:bltu    | 284:-       | 284:-       | 284:-       BUS_LOAD  MEM[280] accepted 1
+  771:  288:-       | 288:-       | 284:bltu    | 284:-       | 284:-       BUS_LOAD  MEM[280] accepted 1
+  772:  288:-       | 288:-       | 288:-       | 284:bltu    | 284:-       BUS_LOAD  MEM[280] accepted 1
+  773:  288:-       | 288:-       | 288:-       | 288:-       | 284:bltu    BUS_LOAD  MEM[280] accepted 1
+  774:  288:lw      | 288:-       | 288:-       | 288:-       | 288:-       BUS_LOAD  MEM[280] accepted 1
+  775:  292:-       | 288:lw      | 288:-       | 288:-       | 288:-       BUS_LOAD  MEM[288] accepted 1
+  776:  292:-       | 292:-       | 288:lw      | 288:-       | 288:-       BUS_LOAD  MEM[288] accepted 1
+  777:  292:-       | 292:-       | 292:-       | 288:lw      | 288:-       BUS_LOAD  MEM[65384] accepted 1
+  778:  292:-       | 292:-       | 292:-       | 292:-       | 288:lw      r14=1632  BUS_LOAD  MEM[288] accepted 1
+  779:  292:lw      | 292:-       | 292:-       | 292:-       | 292:-       BUS_LOAD  MEM[288] accepted 1
+  780:  296:-       | 292:lw      | 292:-       | 292:-       | 292:-       BUS_LOAD  MEM[288] accepted 1
+  781:  296:-       | 296:-       | 292:lw      | 292:-       | 292:-       BUS_LOAD  MEM[288] accepted 1
+  782:  296:-       | 296:-       | 296:-       | 292:lw      | 292:-       BUS_LOAD  MEM[65388] accepted 1
+  783:  296:-       | 296:-       | 296:-       | 296:-       | 292:lw      r15=18016  BUS_LOAD  MEM[288] accepted 1
+  784:  296:bltu    | 296:-       | 296:-       | 296:-       | 296:-       BUS_LOAD  MEM[288] accepted 1
+  785:  300:-       | 296:bltu    | 296:-       | 296:-       | 296:-       BUS_LOAD  MEM[296] accepted 1
+  786:  300:-       | 300:-       | 296:bltu    | 296:-       | 296:-       BUS_LOAD  MEM[296] accepted 1
+  787:  300:-       | 300:-       | 300:-       | 296:bltu    | 296:-       BUS_LOAD  MEM[296] accepted 1
+  788:  300:-       | 300:-       | 300:-       | 300:-       | 296:bltu    BUS_LOAD  MEM[296] accepted 1
+  789:  300:lw      | 300:-       | 300:-       | 300:-       | 300:-       BUS_LOAD  MEM[296] accepted 1
+  790:  304:-       | 300:lw      | 300:-       | 300:-       | 300:-       BUS_LOAD  MEM[296] accepted 1
+  791:  304:-       | 304:-       | 300:lw      | 300:-       | 300:-       BUS_LOAD  MEM[296] accepted 1
+  792:  304:-       | 304:-       | 304:-       | 300:lw      | 300:-       BUS_LOAD  MEM[65388] accepted 1
+  793:  304:-       | 304:-       | 304:-       | 304:-       | 300:lw      r15=18016  BUS_LOAD  MEM[296] accepted 1
+  794:  304:lw      | 304:-       | 304:-       | 304:-       | 304:-       BUS_LOAD  MEM[296] accepted 1
+  795:  308:-       | 304:lw      | 304:-       | 304:-       | 304:-       BUS_LOAD  MEM[304] accepted 1
+  796:  308:-       | 308:-       | 304:lw      | 304:-       | 304:-       BUS_LOAD  MEM[304] accepted 1
+  797:  308:-       | 308:-       | 308:-       | 304:lw      | 304:-       BUS_LOAD  MEM[18016] accepted 1
+  798:  308:-       | 308:-       | 308:-       | 308:-       | 304:lw      r15=18016  BUS_LOAD  MEM[304] accepted 1
+  799:  308:lw      | 308:-       | 308:-       | 308:-       | 308:-       BUS_LOAD  MEM[304] accepted 1
+  800:  312:-       | 308:lw      | 308:-       | 308:-       | 308:-       BUS_LOAD  MEM[304] accepted 1
+  801:  312:-       | 312:-       | 308:lw      | 308:-       | 308:-       BUS_LOAD  MEM[304] accepted 1
+  802:  312:-       | 312:-       | 312:-       | 308:lw      | 308:-       BUS_LOAD  MEM[65384] accepted 1
+  803:  312:-       | 312:-       | 312:-       | 312:-       | 308:lw      r14=1632  BUS_LOAD  MEM[304] accepted 1
+  804:  312:bltu    | 312:-       | 312:-       | 312:-       | 312:-       BUS_LOAD  MEM[304] accepted 1
+  805:  316:-       | 312:bltu    | 312:-       | 312:-       | 312:-       BUS_LOAD  MEM[312] accepted 1
+  806:  316:-       | 316:-       | 312:bltu    | 312:-       | 312:-       BUS_LOAD  MEM[312] accepted 1
+  807:  316:-       | 316:-       | 316:-       | 312:bltu    | 312:-       BUS_LOAD  MEM[312] accepted 1
+  808:  356:-       | 316:-       | 316:-       | 316:-       | 312:bltu    BUS_LOAD  MEM[352] accepted 1
+  809:  356:lw      | 356:-       | 316:-       | 316:-       | 316:-       BUS_LOAD  MEM[352] accepted 1
+  810:  360:-       | 356:lw      | 356:-       | 316:-       | 316:-       BUS_LOAD  MEM[352] accepted 1
+  811:  360:-       | 360:-       | 356:lw      | 356:-       | 316:-       BUS_LOAD  MEM[352] accepted 1
+  812:  360:-       | 360:-       | 360:-       | 356:lw      | 356:-       BUS_LOAD  MEM[65384] accepted 1
+  813:  360:-       | 360:-       | 360:-       | 360:-       | 356:lw      r15=1632  BUS_LOAD  MEM[352] accepted 1
+  814:  360:lw      | 360:-       | 360:-       | 360:-       | 360:-       BUS_LOAD  MEM[352] accepted 1
+  815:  364:-       | 360:lw      | 360:-       | 360:-       | 360:-       BUS_LOAD  MEM[360] accepted 1
+  816:  364:-       | 364:-       | 360:lw      | 360:-       | 360:-       BUS_LOAD  MEM[360] accepted 1
+  817:  364:-       | 364:-       | 364:-       | 360:lw      | 360:-       BUS_LOAD  MEM[1636] accepted 1
+  818:  364:-       | 364:-       | 364:-       | 364:-       | 360:lw      r15=4  BUS_LOAD  MEM[360] accepted 1
+  819:  364:slli    | 364:-       | 364:-       | 364:-       | 364:-       BUS_LOAD  MEM[360] accepted 1
+  820:  368:-       | 364:slli    | 364:-       | 364:-       | 364:-       BUS_LOAD  MEM[360] accepted 1
+  821:  368:-       | 368:-       | 364:slli    | 364:-       | 364:-       BUS_LOAD  MEM[360] accepted 1
+  822:  368:-       | 368:-       | 368:-       | 364:slli    | 364:-       BUS_LOAD  MEM[360] accepted 1
+  823:  368:-       | 368:-       | 368:-       | 368:-       | 364:slli    r15=32  BUS_LOAD  MEM[360] accepted 1
+  824:  368:lw      | 368:-       | 368:-       | 368:-       | 368:-       BUS_LOAD  MEM[360] accepted 1
+  825:  372:-       | 368:lw      | 368:-       | 368:-       | 368:-       BUS_LOAD  MEM[368] accepted 1
+  826:  372:-       | 372:-       | 368:lw      | 368:-       | 368:-       BUS_LOAD  MEM[368] accepted 1
+  827:  372:-       | 372:-       | 372:-       | 368:lw      | 368:-       BUS_LOAD  MEM[65384] accepted 1
+  828:  372:-       | 372:-       | 372:-       | 372:-       | 368:lw      r14=1632  BUS_LOAD  MEM[368] accepted 1
+  829:  372:add     | 372:-       | 372:-       | 372:-       | 372:-       BUS_LOAD  MEM[368] accepted 1
+  830:  376:-       | 372:add     | 372:-       | 372:-       | 372:-       BUS_LOAD  MEM[368] accepted 1
+  831:  376:-       | 376:-       | 372:add     | 372:-       | 372:-       BUS_LOAD  MEM[368] accepted 1
+  832:  376:-       | 376:-       | 376:-       | 372:add     | 372:-       BUS_LOAD  MEM[368] accepted 1
+  833:  376:-       | 376:-       | 376:-       | 376:-       | 372:add     r14=1664  BUS_LOAD  MEM[368] accepted 1
+  834:  376:lw      | 376:-       | 376:-       | 376:-       | 376:-       BUS_LOAD  MEM[368] accepted 1
+  835:  380:-       | 376:lw      | 376:-       | 376:-       | 376:-       BUS_LOAD  MEM[376] accepted 1
+  836:  380:-       | 380:-       | 376:lw      | 376:-       | 376:-       BUS_LOAD  MEM[376] accepted 1
+  837:  380:-       | 380:-       | 380:-       | 376:lw      | 376:-       BUS_LOAD  MEM[65388] accepted 1
+  838:  380:-       | 380:-       | 380:-       | 380:-       | 376:lw      r15=18016  BUS_LOAD  MEM[376] accepted 1
+  839:  380:lw      | 380:-       | 380:-       | 380:-       | 380:-       BUS_LOAD  MEM[376] accepted 1
+  840:  384:-       | 380:lw      | 380:-       | 380:-       | 380:-       BUS_LOAD  MEM[376] accepted 1
+  841:  384:-       | 384:-       | 380:lw      | 380:-       | 380:-       BUS_LOAD  MEM[376] accepted 1
+  842:  384:-       | 384:-       | 384:-       | 380:lw      | 380:-       BUS_LOAD  MEM[18016] accepted 1
+  843:  384:-       | 384:-       | 384:-       | 384:-       | 380:lw      r15=18016  BUS_LOAD  MEM[376] accepted 1
+  844:  384:bne     | 384:-       | 384:-       | 384:-       | 384:-       BUS_LOAD  MEM[376] accepted 1
+  845:  388:-       | 384:bne     | 384:-       | 384:-       | 384:-       BUS_LOAD  MEM[384] accepted 1
+  846:  388:-       | 388:-       | 384:bne     | 384:-       | 384:-       BUS_LOAD  MEM[384] accepted 1
+  847:  388:-       | 388:-       | 388:-       | 384:bne     | 384:-       BUS_LOAD  MEM[384] accepted 1
+  848:  444:-       | 388:-       | 388:-       | 388:-       | 384:bne     BUS_LOAD  MEM[440] accepted 1
+  849:  444:lw      | 444:-       | 388:-       | 388:-       | 388:-       BUS_LOAD  MEM[440] accepted 1
+  850:  448:-       | 444:lw      | 444:-       | 388:-       | 388:-       BUS_LOAD  MEM[440] accepted 1
+  851:  448:-       | 448:-       | 444:lw      | 444:-       | 388:-       BUS_LOAD  MEM[440] accepted 1
+  852:  448:-       | 448:-       | 448:-       | 444:lw      | 444:-       BUS_LOAD  MEM[65388] accepted 1
+  853:  448:-       | 448:-       | 448:-       | 448:-       | 444:lw      r15=18016  BUS_LOAD  MEM[440] accepted 1
+  854:  448:lw      | 448:-       | 448:-       | 448:-       | 448:-       BUS_LOAD  MEM[440] accepted 1
+  855:  452:-       | 448:lw      | 448:-       | 448:-       | 448:-       BUS_LOAD  MEM[448] accepted 1
+  856:  452:-       | 452:-       | 448:lw      | 448:-       | 448:-       BUS_LOAD  MEM[448] accepted 1
+  857:  452:-       | 452:-       | 452:-       | 448:lw      | 448:-       BUS_LOAD  MEM[18016] accepted 1
+  858:  452:-       | 452:-       | 452:-       | 452:-       | 448:lw      r14=18016  BUS_LOAD  MEM[448] accepted 1
+  859:  452:lw      | 452:-       | 452:-       | 452:-       | 452:-       BUS_LOAD  MEM[448] accepted 1
+  860:  456:-       | 452:lw      | 452:-       | 452:-       | 452:-       BUS_LOAD  MEM[448] accepted 1
+  861:  456:-       | 456:-       | 452:lw      | 452:-       | 452:-       BUS_LOAD  MEM[448] accepted 1
+  862:  456:-       | 456:-       | 456:-       | 452:lw      | 452:-       BUS_LOAD  MEM[65384] accepted 1
+  863:  456:-       | 456:-       | 456:-       | 456:-       | 452:lw      r15=1632  BUS_LOAD  MEM[448] accepted 1
+  864:  456:sw      | 456:-       | 456:-       | 456:-       | 456:-       BUS_LOAD  MEM[448] accepted 1
+  865:  460:-       | 456:sw      | 456:-       | 456:-       | 456:-       BUS_LOAD  MEM[456] accepted 1
+  866:  460:-       | 460:-       | 456:sw      | 456:-       | 456:-       BUS_LOAD  MEM[456] accepted 1
+  867:  460:-       | 460:-       | 460:-       | 456:sw      | 456:-       BUS_STORE MEM[1632] = 18016 accepted 1
+  868:  460:-       | 460:-       | 460:-       | 460:-       | 456:sw      BUS_LOAD  MEM[456] accepted 1
+  869:  460:lw      | 460:-       | 460:-       | 460:-       | 460:-       BUS_LOAD  MEM[456] accepted 1
+  870:  464:-       | 460:lw      | 460:-       | 460:-       | 460:-       BUS_LOAD  MEM[456] accepted 1
+  871:  464:-       | 464:-       | 460:lw      | 460:-       | 460:-       BUS_LOAD  MEM[456] accepted 1
+  872:  464:-       | 464:-       | 464:-       | 460:lw      | 460:-       BUS_LOAD  MEM[65388] accepted 1
+  873:  464:-       | 464:-       | 464:-       | 464:-       | 460:lw      r15=18016  BUS_LOAD  MEM[456] accepted 1
+  874:  464:lw      | 464:-       | 464:-       | 464:-       | 464:-       BUS_LOAD  MEM[456] accepted 1
+  875:  468:-       | 464:lw      | 464:-       | 464:-       | 464:-       BUS_LOAD  MEM[464] accepted 1
+  876:  468:-       | 468:-       | 464:lw      | 464:-       | 464:-       BUS_LOAD  MEM[464] accepted 1
+  877:  468:-       | 468:-       | 468:-       | 464:lw      | 464:-       BUS_LOAD  MEM[18020] accepted 1
+  878:  468:-       | 468:-       | 468:-       | 468:-       | 464:lw      r15=0  BUS_LOAD  MEM[464] accepted 1
+  879:  468:slli    | 468:-       | 468:-       | 468:-       | 468:-       BUS_LOAD  MEM[464] accepted 1
+  880:  472:-       | 468:slli    | 468:-       | 468:-       | 468:-       BUS_LOAD  MEM[464] accepted 1
+  881:  472:-       | 472:-       | 468:slli    | 468:-       | 468:-       BUS_LOAD  MEM[464] accepted 1
+  882:  472:-       | 472:-       | 472:-       | 468:slli    | 468:-       BUS_LOAD  MEM[464] accepted 1
+  883:  472:-       | 472:-       | 472:-       | 472:-       | 468:slli    r15=0  BUS_LOAD  MEM[464] accepted 1
+  884:  472:lw      | 472:-       | 472:-       | 472:-       | 472:-       BUS_LOAD  MEM[464] accepted 1
+  885:  476:-       | 472:lw      | 472:-       | 472:-       | 472:-       BUS_LOAD  MEM[472] accepted 1
+  886:  476:-       | 476:-       | 472:lw      | 472:-       | 472:-       BUS_LOAD  MEM[472] accepted 1
+  887:  476:-       | 476:-       | 476:-       | 472:lw      | 472:-       BUS_LOAD  MEM[65388] accepted 1
+  888:  476:-       | 476:-       | 476:-       | 476:-       | 472:lw      r14=18016  BUS_LOAD  MEM[472] accepted 1
+  889:  476:add     | 476:-       | 476:-       | 476:-       | 476:-       BUS_LOAD  MEM[472] accepted 1
+  890:  480:-       | 476:add     | 476:-       | 476:-       | 476:-       BUS_LOAD  MEM[472] accepted 1
+  891:  480:-       | 480:-       | 476:add     | 476:-       | 476:-       BUS_LOAD  MEM[472] accepted 1
+  892:  480:-       | 480:-       | 480:-       | 476:add     | 476:-       BUS_LOAD  MEM[472] accepted 1
+  893:  480:-       | 480:-       | 480:-       | 480:-       | 476:add     r15=18016  BUS_LOAD  MEM[472] accepted 1
+  894:  480:lw      | 480:-       | 480:-       | 480:-       | 480:-       BUS_LOAD  MEM[472] accepted 1
+  895:  484:-       | 480:lw      | 480:-       | 480:-       | 480:-       BUS_LOAD  MEM[480] accepted 1
+  896:  484:-       | 484:-       | 480:lw      | 480:-       | 480:-       BUS_LOAD  MEM[480] accepted 1
+  897:  484:-       | 484:-       | 484:-       | 480:lw      | 480:-       BUS_LOAD  MEM[65384] accepted 1
+  898:  484:-       | 484:-       | 484:-       | 484:-       | 480:lw      r14=1632  BUS_LOAD  MEM[480] accepted 1
+  899:  484:bne     | 484:-       | 484:-       | 484:-       | 484:-       BUS_LOAD  MEM[480] accepted 1
+  900:  488:-       | 484:bne     | 484:-       | 484:-       | 484:-       BUS_LOAD  MEM[480] accepted 1
+  901:  488:-       | 488:-       | 484:bne     | 484:-       | 484:-       BUS_LOAD  MEM[480] accepted 1
+  902:  488:-       | 488:-       | 488:-       | 484:bne     | 484:-       BUS_LOAD  MEM[480] accepted 1
+  903:  536:-       | 488:-       | 488:-       | 488:-       | 484:bne     BUS_LOAD  MEM[528] accepted 1
+  904:  536:lw      | 536:-       | 488:-       | 488:-       | 488:-       BUS_LOAD  MEM[528] accepted 1
+  905:  540:-       | 536:lw      | 536:-       | 488:-       | 488:-       BUS_LOAD  MEM[536] accepted 1
+  906:  540:-       | 540:-       | 536:lw      | 536:-       | 488:-       BUS_LOAD  MEM[536] accepted 1
+  907:  540:-       | 540:-       | 540:-       | 536:lw      | 536:-       BUS_LOAD  MEM[65388] accepted 1
+  908:  540:-       | 540:-       | 540:-       | 540:-       | 536:lw      r15=18016  BUS_LOAD  MEM[536] accepted 1
+  909:  540:lw      | 540:-       | 540:-       | 540:-       | 540:-       BUS_LOAD  MEM[536] accepted 1
+  910:  544:-       | 540:lw      | 540:-       | 540:-       | 540:-       BUS_LOAD  MEM[536] accepted 1
+  911:  544:-       | 544:-       | 540:lw      | 540:-       | 540:-       BUS_LOAD  MEM[536] accepted 1
+  912:  544:-       | 544:-       | 544:-       | 540:lw      | 540:-       BUS_LOAD  MEM[65384] accepted 1
+  913:  544:-       | 544:-       | 544:-       | 544:-       | 540:lw      r14=1632  BUS_LOAD  MEM[536] accepted 1
+  914:  544:sw      | 544:-       | 544:-       | 544:-       | 544:-       BUS_LOAD  MEM[536] accepted 1
+  915:  548:-       | 544:sw      | 544:-       | 544:-       | 544:-       BUS_LOAD  MEM[544] accepted 1
+  916:  548:-       | 548:-       | 544:sw      | 544:-       | 544:-       BUS_LOAD  MEM[544] accepted 1
+  917:  548:-       | 548:-       | 548:-       | 544:sw      | 544:-       BUS_STORE MEM[18016] = 1632 accepted 1
+  918:  548:-       | 548:-       | 548:-       | 548:-       | 544:sw      BUS_LOAD  MEM[544] accepted 1
+  919:  548:lui     | 548:-       | 548:-       | 548:-       | 548:-       BUS_LOAD  MEM[544] accepted 1
+  920:  552:-       | 548:lui     | 548:-       | 548:-       | 548:-       BUS_LOAD  MEM[544] accepted 1
+  921:  552:-       | 552:-       | 548:lui     | 548:-       | 548:-       BUS_LOAD  MEM[544] accepted 1
+  922:  552:-       | 552:-       | 552:-       | 548:lui     | 548:-       BUS_LOAD  MEM[544] accepted 1
+  923:  552:-       | 552:-       | 552:-       | 552:-       | 548:lui     r15=16384  BUS_LOAD  MEM[544] accepted 1
+  924:  552:lw      | 552:-       | 552:-       | 552:-       | 552:-       BUS_LOAD  MEM[544] accepted 1
+  925:  556:-       | 552:lw      | 552:-       | 552:-       | 552:-       BUS_LOAD  MEM[552] accepted 1
+  926:  556:-       | 556:-       | 552:lw      | 552:-       | 552:-       BUS_LOAD  MEM[552] accepted 1
+  927:  556:-       | 556:-       | 556:-       | 552:lw      | 552:-       BUS_LOAD  MEM[65388] accepted 1
+  928:  556:-       | 556:-       | 556:-       | 556:-       | 552:lw      r14=18016  BUS_LOAD  MEM[552] accepted 1
+  929:  556:sw      | 556:-       | 556:-       | 556:-       | 556:-       BUS_LOAD  MEM[552] accepted 1
+  930:  560:-       | 556:sw      | 556:-       | 556:-       | 556:-       BUS_LOAD  MEM[552] accepted 1
+  931:  560:-       | 560:-       | 556:sw      | 556:-       | 556:-       BUS_LOAD  MEM[552] accepted 1
+  932:  560:-       | 560:-       | 560:-       | 556:sw      | 556:-       BUS_STORE MEM[18024] = 18016 accepted 1
+  933:  560:-       | 560:-       | 560:-       | 560:-       | 556:sw      BUS_LOAD  MEM[552] accepted 1
+  934:  560:nop     | 560:-       | 560:-       | 560:-       | 560:-       BUS_LOAD  MEM[552] accepted 1
+  935:  564:-       | 560:nop     | 560:-       | 560:-       | 560:-       BUS_LOAD  MEM[560] accepted 1
+  936:  564:-       | 564:-       | 560:nop     | 560:-       | 560:-       BUS_LOAD  MEM[560] accepted 1
+  937:  564:-       | 564:-       | 564:-       | 560:nop     | 560:-       BUS_LOAD  MEM[560] accepted 1
+  938:  564:-       | 564:-       | 564:-       | 564:-       | 560:nop     BUS_LOAD  MEM[560] accepted 1
+  939:  564:lw      | 564:-       | 564:-       | 564:-       | 564:-       BUS_LOAD  MEM[560] accepted 1
+  940:  568:-       | 564:lw      | 564:-       | 564:-       | 564:-       BUS_LOAD  MEM[560] accepted 1
+  941:  568:-       | 568:-       | 564:lw      | 564:-       | 564:-       BUS_LOAD  MEM[560] accepted 1
+  942:  568:-       | 568:-       | 568:-       | 564:lw      | 564:-       BUS_LOAD  MEM[65404] accepted 1
+  943:  568:-       | 568:-       | 568:-       | 568:-       | 564:lw      r1=720  BUS_LOAD  MEM[560] accepted 1
+  944:  568:lw      | 568:-       | 568:-       | 568:-       | 568:-       BUS_LOAD  MEM[560] accepted 1
+  945:  572:-       | 568:lw      | 568:-       | 568:-       | 568:-       BUS_LOAD  MEM[568] accepted 1
+  946:  572:-       | 572:-       | 568:lw      | 568:-       | 568:-       BUS_LOAD  MEM[568] accepted 1
+  947:  572:-       | 572:-       | 572:-       | 568:lw      | 568:-       BUS_LOAD  MEM[65400] accepted 1
+  948:  572:-       | 572:-       | 572:-       | 572:-       | 568:lw      r8=65456  BUS_LOAD  MEM[568] accepted 1
+  949:  572:addi    | 572:-       | 572:-       | 572:-       | 572:-       BUS_LOAD  MEM[568] accepted 1
+  950:  576:-       | 572:addi    | 572:-       | 572:-       | 572:-       BUS_LOAD  MEM[568] accepted 1
+  951:  576:-       | 576:-       | 572:addi    | 572:-       | 572:-       BUS_LOAD  MEM[568] accepted 1
+  952:  576:-       | 576:-       | 576:-       | 572:addi    | 572:-       BUS_LOAD  MEM[568] accepted 1
+  953:  576:-       | 576:-       | 576:-       | 576:-       | 572:addi    r2=65408  BUS_LOAD  MEM[568] accepted 1
+  954:  576:jalr    | 576:-       | 576:-       | 576:-       | 576:-       BUS_LOAD  MEM[568] accepted 1
+  955:  580:-       | 576:jalr    | 576:-       | 576:-       | 576:-       BUS_LOAD  MEM[576] accepted 1
+  956:  580:-       | 580:-       | 576:jalr    | 576:-       | 576:-       BUS_LOAD  MEM[576] accepted 1
+  957:  580:-       | 580:-       | 580:-       | 576:jalr    | 576:-       BUS_LOAD  MEM[576] accepted 1
+  958:  724:-       | 580:-       | 580:-       | 580:-       | 576:jalr    BUS_LOAD  MEM[720] accepted 1
+  959:  724:lui     | 724:-       | 580:-       | 580:-       | 580:-       BUS_LOAD  MEM[720] accepted 1
+  960:  728:-       | 724:lui     | 724:-       | 580:-       | 580:-       BUS_LOAD  MEM[720] accepted 1
+  961:  728:-       | 728:-       | 724:lui     | 724:-       | 580:-       BUS_LOAD  MEM[720] accepted 1
+  962:  728:-       | 728:-       | 728:-       | 724:lui     | 724:-       BUS_LOAD  MEM[720] accepted 1
+  963:  728:-       | 728:-       | 728:-       | 728:-       | 724:lui     r15=16384  BUS_LOAD  MEM[720] accepted 1
+  964:  728:lw      | 728:-       | 728:-       | 728:-       | 728:-       BUS_LOAD  MEM[720] accepted 1
+  965:  732:-       | 728:lw      | 728:-       | 728:-       | 728:-       BUS_LOAD  MEM[728] accepted 1
+  966:  732:-       | 732:-       | 728:lw      | 728:-       | 728:-       BUS_LOAD  MEM[728] accepted 1
+  967:  732:-       | 732:-       | 732:-       | 728:lw      | 728:-       BUS_LOAD  MEM[18024] accepted 1
+  968:  732:-       | 732:-       | 732:-       | 732:-       | 728:lw      r15=18016  BUS_LOAD  MEM[728] accepted 1
+  969:  732:addi    | 732:-       | 732:-       | 732:-       | 732:-       BUS_LOAD  MEM[728] accepted 1
+  970:  736:-       | 732:addi    | 732:-       | 732:-       | 732:-       BUS_LOAD  MEM[728] accepted 1
+  971:  736:-       | 736:-       | 732:addi    | 732:-       | 732:-       BUS_LOAD  MEM[728] accepted 1
+  972:  736:-       | 736:-       | 736:-       | 732:addi    | 732:-       BUS_LOAD  MEM[728] accepted 1
+  973:  736:-       | 736:-       | 736:-       | 736:-       | 732:addi    r10=18016  BUS_LOAD  MEM[728] accepted 1
+  974:  736:lw      | 736:-       | 736:-       | 736:-       | 736:-       BUS_LOAD  MEM[728] accepted 1
+  975:  740:-       | 736:lw      | 736:-       | 736:-       | 736:-       BUS_LOAD  MEM[736] accepted 1
+  976:  740:-       | 740:-       | 736:lw      | 736:-       | 736:-       BUS_LOAD  MEM[736] accepted 1
+  977:  740:-       | 740:-       | 740:-       | 736:lw      | 736:-       BUS_LOAD  MEM[65452] accepted 1
+  978:  740:-       | 740:-       | 740:-       | 740:-       | 736:lw      r1=1088  BUS_LOAD  MEM[736] accepted 1
+  979:  740:lw      | 740:-       | 740:-       | 740:-       | 740:-       BUS_LOAD  MEM[736] accepted 1
+  980:  744:-       | 740:lw      | 740:-       | 740:-       | 740:-       BUS_LOAD  MEM[736] accepted 1
+  981:  744:-       | 744:-       | 740:lw      | 740:-       | 740:-       BUS_LOAD  MEM[736] accepted 1
+  982:  744:-       | 744:-       | 744:-       | 740:lw      | 740:-       BUS_LOAD  MEM[65448] accepted 1
+  983:  744:-       | 744:-       | 744:-       | 744:-       | 740:lw      r8=65504  BUS_LOAD  MEM[736] accepted 1
+  984:  744:addi    | 744:-       | 744:-       | 744:-       | 744:-       BUS_LOAD  MEM[736] accepted 1
+  985:  748:-       | 744:addi    | 744:-       | 744:-       | 744:-       BUS_LOAD  MEM[744] accepted 1
+  986:  748:-       | 748:-       | 744:addi    | 744:-       | 744:-       BUS_LOAD  MEM[744] accepted 1
+  987:  748:-       | 748:-       | 748:-       | 744:addi    | 744:-       BUS_LOAD  MEM[744] accepted 1
+  988:  748:-       | 748:-       | 748:-       | 748:-       | 744:addi    r2=65456  BUS_LOAD  MEM[744] accepted 1
+  989:  748:jalr    | 748:-       | 748:-       | 748:-       | 748:-       BUS_LOAD  MEM[744] accepted 1
+  990:  752:-       | 748:jalr    | 748:-       | 748:-       | 748:-       BUS_LOAD  MEM[744] accepted 1
+  991:  752:-       | 752:-       | 748:jalr    | 748:-       | 748:-       BUS_LOAD  MEM[744] accepted 1
+  992:  752:-       | 752:-       | 752:-       | 748:jalr    | 748:-       BUS_LOAD  MEM[744] accepted 1
+  993: 1092:-       | 752:-       | 752:-       | 752:-       | 748:jalr    BUS_LOAD  MEM[1088] accepted 1
+  994: 1092:sw      |1092:-       | 752:-       | 752:-       | 752:-       BUS_LOAD  MEM[1088] accepted 1
+  995: 1096:-       |1092:sw      |1092:-       | 752:-       | 752:-       BUS_LOAD  MEM[1088] accepted 1
+  996: 1096:-       |1096:-       |1092:sw      |1092:-       | 752:-       BUS_LOAD  MEM[1088] accepted 1
+  997: 1096:-       |1096:-       |1096:-       |1092:sw      |1092:-       BUS_STORE MEM[65484] = 18016 accepted 1
+  998: 1096:-       |1096:-       |1096:-       |1096:-       |1092:sw      BUS_LOAD  MEM[1088] accepted 1
+  999: 1096:lw      |1096:-       |1096:-       |1096:-       |1096:-       BUS_LOAD  MEM[1088] accepted 1
+ 1000: 1100:-       |1096:lw      |1096:-       |1096:-       |1096:-       BUS_LOAD  MEM[1096] accepted 1
+ 1001: 1100:-       |1100:-       |1096:lw      |1096:-       |1096:-       BUS_LOAD  MEM[1096] accepted 1
+ 1002: 1100:-       |1100:-       |1100:-       |1096:lw      |1096:-       BUS_LOAD  MEM[65484] accepted 1
+ 1003: 1100:-       |1100:-       |1100:-       |1100:-       |1096:lw      r15=18016  BUS_LOAD  MEM[1096] accepted 1
+ 1004: 1100:bne     |1100:-       |1100:-       |1100:-       |1100:-       BUS_LOAD  MEM[1096] accepted 1
+ 1005: 1104:-       |1100:bne     |1100:-       |1100:-       |1100:-       BUS_LOAD  MEM[1096] accepted 1
+ 1006: 1104:-       |1104:-       |1100:bne     |1100:-       |1100:-       BUS_LOAD  MEM[1096] accepted 1
+ 1007: 1104:-       |1104:-       |1104:-       |1100:bne     |1100:-       BUS_LOAD  MEM[1096] accepted 1
+ 1008: 1112:-       |1104:-       |1104:-       |1104:-       |1100:bne     BUS_LOAD  MEM[1104] accepted 1
+ 1009: 1112:lw      |1112:-       |1104:-       |1104:-       |1104:-       BUS_LOAD  MEM[1104] accepted 1
+ 1010: 1116:-       |1112:lw      |1112:-       |1104:-       |1104:-       BUS_LOAD  MEM[1112] accepted 1
+ 1011: 1116:-       |1116:-       |1112:lw      |1112:-       |1104:-       BUS_LOAD  MEM[1112] accepted 1
+ 1012: 1116:-       |1116:-       |1116:-       |1112:lw      |1112:-       BUS_LOAD  MEM[65484] accepted 1
+ 1013: 1116:-       |1116:-       |1116:-       |1116:-       |1112:lw      r15=18016  BUS_LOAD  MEM[1112] accepted 1
+ 1014: 1116:sw      |1116:-       |1116:-       |1116:-       |1116:-       BUS_LOAD  MEM[1112] accepted 1
+ 1015: 1120:-       |1116:sw      |1116:-       |1116:-       |1116:-       BUS_LOAD  MEM[1112] accepted 1
+ 1016: 1120:-       |1120:-       |1116:sw      |1116:-       |1116:-       BUS_LOAD  MEM[1112] accepted 1
+ 1017: 1120:-       |1120:-       |1120:-       |1116:sw      |1116:-       BUS_STORE MEM[65480] = 18016 accepted 1
+ 1018: 1120:-       |1120:-       |1120:-       |1120:-       |1116:sw      BUS_LOAD  MEM[1112] accepted 1
+ 1019: 1120:lw      |1120:-       |1120:-       |1120:-       |1120:-       BUS_LOAD  MEM[1112] accepted 1
+ 1020: 1124:-       |1120:lw      |1120:-       |1120:-       |1120:-       BUS_LOAD  MEM[1120] accepted 1
+ 1021: 1124:-       |1124:-       |1120:lw      |1120:-       |1120:-       BUS_LOAD  MEM[1120] accepted 1
+ 1022: 1124:-       |1124:-       |1124:-       |1120:lw      |1120:-       BUS_LOAD  MEM[65484] accepted 1
+ 1023: 1124:-       |1124:-       |1124:-       |1124:-       |1120:lw      r15=18016  BUS_LOAD  MEM[1120] accepted 1
+ 1024: 1124:lw      |1124:-       |1124:-       |1124:-       |1124:-       BUS_LOAD  MEM[1120] accepted 1
+ 1025: 1128:-       |1124:lw      |1124:-       |1124:-       |1124:-       BUS_LOAD  MEM[1120] accepted 1
+ 1026: 1128:-       |1128:-       |1124:lw      |1124:-       |1124:-       BUS_LOAD  MEM[1120] accepted 1
+ 1027: 1128:-       |1128:-       |1128:-       |1124:lw      |1124:-       BUS_LOAD  MEM[18016] accepted 1
+ 1028: 1128:-       |1128:-       |1128:-       |1128:-       |1124:lw      r15=1632  BUS_LOAD  MEM[1120] accepted 1
+ 1029: 1128:sw      |1128:-       |1128:-       |1128:-       |1128:-       BUS_LOAD  MEM[1120] accepted 1
+ 1030: 1132:-       |1128:sw      |1128:-       |1128:-       |1128:-       BUS_LOAD  MEM[1128] accepted 1
+ 1031: 1132:-       |1132:-       |1128:sw      |1128:-       |1128:-       BUS_LOAD  MEM[1128] accepted 1
+ 1032: 1132:-       |1132:-       |1132:-       |1128:sw      |1128:-       BUS_STORE MEM[65484] = 1632 accepted 1
+ 1033: 1132:-       |1132:-       |1132:-       |1132:-       |1128:sw      BUS_LOAD  MEM[1128] accepted 1
+ 1034: 1132:jal     |1132:-       |1132:-       |1132:-       |1132:-       BUS_LOAD  MEM[1128] accepted 1
+ 1035: 1136:-       |1132:jal     |1132:-       |1132:-       |1132:-       BUS_LOAD  MEM[1128] accepted 1
+ 1036: 1136:-       |1136:-       |1132:jal     |1132:-       |1132:-       BUS_LOAD  MEM[1128] accepted 1
+ 1037: 1136:-       |1136:-       |1136:-       |1132:jal     |1132:-       BUS_LOAD  MEM[1128] accepted 1
+ 1038:  920:-       |1136:-       |1136:-       |1136:-       |1132:jal     BUS_LOAD  MEM[912] accepted 1
+ 1039:  920:lw      | 920:-       |1136:-       |1136:-       |1136:-       BUS_LOAD  MEM[912] accepted 1
+ 1040:  924:-       | 920:lw      | 920:-       |1136:-       |1136:-       BUS_LOAD  MEM[920] accepted 1
+ 1041:  924:-       | 924:-       | 920:lw      | 920:-       |1136:-       BUS_LOAD  MEM[920] accepted 1
+ 1042:  924:-       | 924:-       | 924:-       | 920:lw      | 920:-       BUS_LOAD  MEM[65484] accepted 1
+ 1043:  924:-       | 924:-       | 924:-       | 924:-       | 920:lw      r15=1632  BUS_LOAD  MEM[920] accepted 1
+ 1044:  924:lw      | 924:-       | 924:-       | 924:-       | 924:-       BUS_LOAD  MEM[920] accepted 1
+ 1045:  928:-       | 924:lw      | 924:-       | 924:-       | 924:-       BUS_LOAD  MEM[920] accepted 1
+ 1046:  928:-       | 928:-       | 924:lw      | 924:-       | 924:-       BUS_LOAD  MEM[920] accepted 1
+ 1047:  928:-       | 928:-       | 928:-       | 924:lw      | 924:-       BUS_LOAD  MEM[1636] accepted 1
+ 1048:  928:-       | 928:-       | 928:-       | 928:-       | 924:lw      r15=4  BUS_LOAD  MEM[920] accepted 1
+ 1049:  928:lw      | 928:-       | 928:-       | 928:-       | 928:-       BUS_LOAD  MEM[920] accepted 1
+ 1050:  932:-       | 928:lw      | 928:-       | 928:-       | 928:-       BUS_LOAD  MEM[928] accepted 1
+ 1051:  932:-       | 932:-       | 928:lw      | 928:-       | 928:-       BUS_LOAD  MEM[928] accepted 1
+ 1052:  932:-       | 932:-       | 932:-       | 928:lw      | 928:-       BUS_LOAD  MEM[65468] accepted 1
+ 1053:  932:-       | 932:-       | 932:-       | 932:-       | 928:lw      r14=4  BUS_LOAD  MEM[928] accepted 1
+ 1054:  932:bltu    | 932:-       | 932:-       | 932:-       | 932:-       BUS_LOAD  MEM[928] accepted 1
+ 1055:  936:-       | 932:bltu    | 932:-       | 932:-       | 932:-       BUS_LOAD  MEM[928] accepted 1
+ 1056:  936:-       | 936:-       | 932:bltu    | 932:-       | 932:-       BUS_LOAD  MEM[928] accepted 1
+ 1057:  936:-       | 936:-       | 936:-       | 932:bltu    | 932:-       BUS_LOAD  MEM[928] accepted 1
+ 1058:  936:-       | 936:-       | 936:-       | 936:-       | 932:bltu    BUS_LOAD  MEM[928] accepted 1
+ 1059:  936:lw      | 936:-       | 936:-       | 936:-       | 936:-       BUS_LOAD  MEM[928] accepted 1
+ 1060:  940:-       | 936:lw      | 936:-       | 936:-       | 936:-       BUS_LOAD  MEM[936] accepted 1
+ 1061:  940:-       | 940:-       | 936:lw      | 936:-       | 936:-       BUS_LOAD  MEM[936] accepted 1
+ 1062:  940:-       | 940:-       | 940:-       | 936:lw      | 936:-       BUS_LOAD  MEM[65484] accepted 1
+ 1063:  940:-       | 940:-       | 940:-       | 940:-       | 936:lw      r15=1632  BUS_LOAD  MEM[936] accepted 1
+ 1064:  940:lw      | 940:-       | 940:-       | 940:-       | 940:-       BUS_LOAD  MEM[936] accepted 1
+ 1065:  944:-       | 940:lw      | 940:-       | 940:-       | 940:-       BUS_LOAD  MEM[936] accepted 1
+ 1066:  944:-       | 944:-       | 940:lw      | 940:-       | 940:-       BUS_LOAD  MEM[936] accepted 1
+ 1067:  944:-       | 944:-       | 944:-       | 940:lw      | 940:-       BUS_LOAD  MEM[1636] accepted 1
+ 1068:  944:-       | 944:-       | 944:-       | 944:-       | 940:lw      r15=4  BUS_LOAD  MEM[936] accepted 1
+ 1069:  944:lw      | 944:-       | 944:-       | 944:-       | 944:-       BUS_LOAD  MEM[936] accepted 1
+ 1070:  948:-       | 944:lw      | 944:-       | 944:-       | 944:-       BUS_LOAD  MEM[944] accepted 1
+ 1071:  948:-       | 948:-       | 944:lw      | 944:-       | 944:-       BUS_LOAD  MEM[944] accepted 1
+ 1072:  948:-       | 948:-       | 948:-       | 944:lw      | 944:-       BUS_LOAD  MEM[65468] accepted 1
+ 1073:  948:-       | 948:-       | 948:-       | 948:-       | 944:lw      r14=4  BUS_LOAD  MEM[944] accepted 1
+ 1074:  948:bne     | 948:-       | 948:-       | 948:-       | 948:-       BUS_LOAD  MEM[944] accepted 1
+ 1075:  952:-       | 948:bne     | 948:-       | 948:-       | 948:-       BUS_LOAD  MEM[944] accepted 1
+ 1076:  952:-       | 952:-       | 948:bne     | 948:-       | 948:-       BUS_LOAD  MEM[944] accepted 1
+ 1077:  952:-       | 952:-       | 952:-       | 948:bne     | 948:-       BUS_LOAD  MEM[944] accepted 1
+ 1078:  952:-       | 952:-       | 952:-       | 952:-       | 948:bne     BUS_LOAD  MEM[944] accepted 1
+ 1079:  952:lw      | 952:-       | 952:-       | 952:-       | 952:-       BUS_LOAD  MEM[944] accepted 1
+ 1080:  956:-       | 952:lw      | 952:-       | 952:-       | 952:-       BUS_LOAD  MEM[952] accepted 1
+ 1081:  956:-       | 956:-       | 952:lw      | 952:-       | 952:-       BUS_LOAD  MEM[952] accepted 1
+ 1082:  956:-       | 956:-       | 956:-       | 952:lw      | 952:-       BUS_LOAD  MEM[65484] accepted 1
+ 1083:  956:-       | 956:-       | 956:-       | 956:-       | 952:lw      r15=1632  BUS_LOAD  MEM[952] accepted 1
+ 1084:  956:lw      | 956:-       | 956:-       | 956:-       | 956:-       BUS_LOAD  MEM[952] accepted 1
+ 1085:  960:-       | 956:lw      | 956:-       | 956:-       | 956:-       BUS_LOAD  MEM[952] accepted 1
+ 1086:  960:-       | 960:-       | 956:lw      | 956:-       | 956:-       BUS_LOAD  MEM[952] accepted 1
+ 1087:  960:-       | 960:-       | 960:-       | 956:lw      | 956:-       BUS_LOAD  MEM[1632] accepted 1
+ 1088:  960:-       | 960:-       | 960:-       | 960:-       | 956:lw      r14=18016  BUS_LOAD  MEM[952] accepted 1
+ 1089:  960:lw      | 960:-       | 960:-       | 960:-       | 960:-       BUS_LOAD  MEM[952] accepted 1
+ 1090:  964:-       | 960:lw      | 960:-       | 960:-       | 960:-       BUS_LOAD  MEM[960] accepted 1
+ 1091:  964:-       | 964:-       | 960:lw      | 960:-       | 960:-       BUS_LOAD  MEM[960] accepted 1
+ 1092:  964:-       | 964:-       | 964:-       | 960:lw      | 960:-       BUS_LOAD  MEM[65480] accepted 1
+ 1093:  964:-       | 964:-       | 964:-       | 964:-       | 960:lw      r15=18016  BUS_LOAD  MEM[960] accepted 1
+ 1094:  964:sw      | 964:-       | 964:-       | 964:-       | 964:-       BUS_LOAD  MEM[960] accepted 1
+ 1095:  968:-       | 964:sw      | 964:-       | 964:-       | 964:-       BUS_LOAD  MEM[960] accepted 1
+ 1096:  968:-       | 968:-       | 964:sw      | 964:-       | 964:-       BUS_LOAD  MEM[960] accepted 1
+ 1097:  968:-       | 968:-       | 968:-       | 964:sw      | 964:-       BUS_STORE MEM[18016] = 18016 accepted 1
+ 1098:  968:-       | 968:-       | 968:-       | 968:-       | 964:sw      BUS_LOAD  MEM[960] accepted 1
+ 1099:  968:jal     | 968:-       | 968:-       | 968:-       | 968:-       BUS_LOAD  MEM[960] accepted 1
+ 1100:  972:-       | 968:jal     | 968:-       | 968:-       | 968:-       BUS_LOAD  MEM[968] accepted 1
+ 1101:  972:-       | 972:-       | 968:jal     | 968:-       | 968:-       BUS_LOAD  MEM[968] accepted 1
+ 1102:  972:-       | 972:-       | 972:-       | 968:jal     | 968:-       BUS_LOAD  MEM[968] accepted 1
+ 1103: 1032:-       | 972:-       | 972:-       | 972:-       | 968:jal     BUS_LOAD  MEM[1024] accepted 1
+ 1104: 1032:lui     |1032:-       | 972:-       | 972:-       | 972:-       BUS_LOAD  MEM[1024] accepted 1
+ 1105: 1036:-       |1032:lui     |1032:-       | 972:-       | 972:-       BUS_LOAD  MEM[1032] accepted 1
+ 1106: 1036:-       |1036:-       |1032:lui     |1032:-       | 972:-       BUS_LOAD  MEM[1032] accepted 1
+ 1107: 1036:-       |1036:-       |1036:-       |1032:lui     |1032:-       BUS_LOAD  MEM[1032] accepted 1
+ 1108: 1036:-       |1036:-       |1036:-       |1036:-       |1032:lui     r15=16384  BUS_LOAD  MEM[1032] accepted 1
+ 1109: 1036:lw      |1036:-       |1036:-       |1036:-       |1036:-       BUS_LOAD  MEM[1032] accepted 1
+ 1110: 1040:-       |1036:lw      |1036:-       |1036:-       |1036:-       BUS_LOAD  MEM[1032] accepted 1
+ 1111: 1040:-       |1040:-       |1036:lw      |1036:-       |1036:-       BUS_LOAD  MEM[1032] accepted 1
+ 1112: 1040:-       |1040:-       |1040:-       |1036:lw      |1036:-       BUS_LOAD  MEM[65480] accepted 1
+ 1113: 1040:-       |1040:-       |1040:-       |1040:-       |1036:lw      r14=18016  BUS_LOAD  MEM[1032] accepted 1
+ 1114: 1040:sw      |1040:-       |1040:-       |1040:-       |1040:-       BUS_LOAD  MEM[1032] accepted 1
+ 1115: 1044:-       |1040:sw      |1040:-       |1040:-       |1040:-       BUS_LOAD  MEM[1040] accepted 1
+ 1116: 1044:-       |1044:-       |1040:sw      |1040:-       |1040:-       BUS_LOAD  MEM[1040] accepted 1
+ 1117: 1044:-       |1044:-       |1044:-       |1040:sw      |1040:-       BUS_STORE MEM[18024] = 18016 accepted 1
+ 1118: 1044:-       |1044:-       |1044:-       |1044:-       |1040:sw      BUS_LOAD  MEM[1040] accepted 1
+ 1119: 1044:lw      |1044:-       |1044:-       |1044:-       |1044:-       BUS_LOAD  MEM[1040] accepted 1
+ 1120: 1048:-       |1044:lw      |1044:-       |1044:-       |1044:-       BUS_LOAD  MEM[1040] accepted 1
+ 1121: 1048:-       |1048:-       |1044:lw      |1044:-       |1044:-       BUS_LOAD  MEM[1040] accepted 1
+ 1122: 1048:-       |1048:-       |1048:-       |1044:lw      |1044:-       BUS_LOAD  MEM[65484] accepted 1
+ 1123: 1048:-       |1048:-       |1048:-       |1048:-       |1044:lw      r15=1632  BUS_LOAD  MEM[1040] accepted 1
+ 1124: 1048:addi    |1048:-       |1048:-       |1048:-       |1048:-       BUS_LOAD  MEM[1040] accepted 1
+ 1125: 1052:-       |1048:addi    |1048:-       |1048:-       |1048:-       BUS_LOAD  MEM[1048] accepted 1
+ 1126: 1052:-       |1052:-       |1048:addi    |1048:-       |1048:-       BUS_LOAD  MEM[1048] accepted 1
+ 1127: 1052:-       |1052:-       |1052:-       |1048:addi    |1048:-       BUS_LOAD  MEM[1048] accepted 1
+ 1128: 1052:-       |1052:-       |1052:-       |1052:-       |1048:addi    r15=1640  BUS_LOAD  MEM[1048] accepted 1
+ 1129: 1052:sw      |1052:-       |1052:-       |1052:-       |1052:-       BUS_LOAD  MEM[1048] accepted 1
+ 1130: 1056:-       |1052:sw      |1052:-       |1052:-       |1052:-       BUS_LOAD  MEM[1048] accepted 1
+ 1131: 1056:-       |1056:-       |1052:sw      |1052:-       |1052:-       BUS_LOAD  MEM[1048] accepted 1
+ 1132: 1056:-       |1056:-       |1056:-       |1052:sw      |1052:-       BUS_STORE MEM[65484] = 1640 accepted 1
+ 1133: 1056:-       |1056:-       |1056:-       |1056:-       |1052:sw      BUS_LOAD  MEM[1048] accepted 1
+ 1134: 1056:lw      |1056:-       |1056:-       |1056:-       |1056:-       BUS_LOAD  MEM[1048] accepted 1
+ 1135: 1060:-       |1056:lw      |1056:-       |1056:-       |1056:-       BUS_LOAD  MEM[1056] accepted 1
+ 1136: 1060:-       |1060:-       |1056:lw      |1056:-       |1056:-       BUS_LOAD  MEM[1056] accepted 1
+ 1137: 1060:-       |1060:-       |1060:-       |1056:lw      |1056:-       BUS_LOAD  MEM[65484] accepted 1
+ 1138: 1060:-       |1060:-       |1060:-       |1060:-       |1056:lw      r15=1640  BUS_LOAD  MEM[1056] accepted 1
+ 1139: 1060:jal     |1060:-       |1060:-       |1060:-       |1060:-       BUS_LOAD  MEM[1056] accepted 1
+ 1140: 1064:-       |1060:jal     |1060:-       |1060:-       |1060:-       BUS_LOAD  MEM[1056] accepted 1
+ 1141: 1064:-       |1064:-       |1060:jal     |1060:-       |1060:-       BUS_LOAD  MEM[1056] accepted 1
+ 1142: 1064:-       |1064:-       |1064:-       |1060:jal     |1060:-       BUS_LOAD  MEM[1056] accepted 1
+ 1143: 1136:-       |1064:-       |1064:-       |1064:-       |1060:jal     BUS_LOAD  MEM[1128] accepted 1
+ 1144: 1136:addi    |1136:-       |1064:-       |1064:-       |1064:-       BUS_LOAD  MEM[1128] accepted 1
+ 1145: 1140:-       |1136:addi    |1136:-       |1064:-       |1064:-       BUS_LOAD  MEM[1136] accepted 1
+ 1146: 1140:-       |1140:-       |1136:addi    |1136:-       |1064:-       BUS_LOAD  MEM[1136] accepted 1
+ 1147: 1140:-       |1140:-       |1140:-       |1136:addi    |1136:-       BUS_LOAD  MEM[1136] accepted 1
+ 1148: 1140:-       |1140:-       |1140:-       |1140:-       |1136:addi    r10=1640  BUS_LOAD  MEM[1136] accepted 1
+ 1149: 1140:lw      |1140:-       |1140:-       |1140:-       |1140:-       BUS_LOAD  MEM[1136] accepted 1
+ 1150: 1144:-       |1140:lw      |1140:-       |1140:-       |1140:-       BUS_LOAD  MEM[1136] accepted 1
+ 1151: 1144:-       |1144:-       |1140:lw      |1140:-       |1140:-       BUS_LOAD  MEM[1136] accepted 1
+ 1152: 1144:-       |1144:-       |1144:-       |1140:lw      |1140:-       BUS_LOAD  MEM[65500] accepted 1
+ 1153: 1144:-       |1144:-       |1144:-       |1144:-       |1140:lw      r1=1260  BUS_LOAD  MEM[1136] accepted 1
+ 1154: 1144:lw      |1144:-       |1144:-       |1144:-       |1144:-       BUS_LOAD  MEM[1136] accepted 1
+ 1155: 1148:-       |1144:lw      |1144:-       |1144:-       |1144:-       BUS_LOAD  MEM[1144] accepted 1
+ 1156: 1148:-       |1148:-       |1144:lw      |1144:-       |1144:-       BUS_LOAD  MEM[1144] accepted 1
+ 1157: 1148:-       |1148:-       |1148:-       |1144:lw      |1144:-       BUS_LOAD  MEM[65496] accepted 1
+ 1158: 1148:-       |1148:-       |1148:-       |1148:-       |1144:lw      r8=65536  BUS_LOAD  MEM[1144] accepted 1
+ 1159: 1148:addi    |1148:-       |1148:-       |1148:-       |1148:-       BUS_LOAD  MEM[1144] accepted 1
+ 1160: 1152:-       |1148:addi    |1148:-       |1148:-       |1148:-       BUS_LOAD  MEM[1144] accepted 1
+ 1161: 1152:-       |1152:-       |1148:addi    |1148:-       |1148:-       BUS_LOAD  MEM[1144] accepted 1
+ 1162: 1152:-       |1152:-       |1152:-       |1148:addi    |1148:-       BUS_LOAD  MEM[1144] accepted 1
+ 1163: 1152:-       |1152:-       |1152:-       |1152:-       |1148:addi    r2=65504  BUS_LOAD  MEM[1144] accepted 1
+ 1164: 1152:jalr    |1152:-       |1152:-       |1152:-       |1152:-       BUS_LOAD  MEM[1144] accepted 1
+ 1165: 1156:-       |1152:jalr    |1152:-       |1152:-       |1152:-       BUS_LOAD  MEM[1152] accepted 1
+ 1166: 1156:-       |1156:-       |1152:jalr    |1152:-       |1152:-       BUS_LOAD  MEM[1152] accepted 1
+ 1167: 1156:-       |1156:-       |1156:-       |1152:jalr    |1152:-       BUS_LOAD  MEM[1152] accepted 1
+ 1168: 1264:-       |1156:-       |1156:-       |1156:-       |1152:jalr    BUS_LOAD  MEM[1256] accepted 1
+ 1169: 1264:sw      |1264:-       |1156:-       |1156:-       |1156:-       BUS_LOAD  MEM[1256] accepted 1
+ 1170: 1268:-       |1264:sw      |1264:-       |1156:-       |1156:-       BUS_LOAD  MEM[1264] accepted 1
+ 1171: 1268:-       |1268:-       |1264:sw      |1264:-       |1156:-       BUS_LOAD  MEM[1264] accepted 1
+ 1172: 1268:-       |1268:-       |1268:-       |1264:sw      |1264:-       BUS_STORE MEM[65516] = 1640 accepted 1
+ 1173: 1268:-       |1268:-       |1268:-       |1268:-       |1264:sw      BUS_LOAD  MEM[1264] accepted 1
+ 1174: 1268:addi    |1268:-       |1268:-       |1268:-       |1268:-       BUS_LOAD  MEM[1264] accepted 1
+ 1175: 1272:-       |1268:addi    |1268:-       |1268:-       |1268:-       BUS_LOAD  MEM[1264] accepted 1
+ 1176: 1272:-       |1272:-       |1268:addi    |1268:-       |1268:-       BUS_LOAD  MEM[1264] accepted 1
+ 1177: 1272:-       |1272:-       |1272:-       |1268:addi    |1268:-       BUS_LOAD  MEM[1264] accepted 1
+ 1178: 1272:-       |1272:-       |1272:-       |1272:-       |1268:addi    r15=0  BUS_LOAD  MEM[1264] accepted 1
+ 1179: 1272:addi    |1272:-       |1272:-       |1272:-       |1272:-       BUS_LOAD  MEM[1264] accepted 1
+ 1180: 1276:-       |1272:addi    |1272:-       |1272:-       |1272:-       BUS_LOAD  MEM[1272] accepted 1
+ 1181: 1276:-       |1276:-       |1272:addi    |1272:-       |1272:-       BUS_LOAD  MEM[1272] accepted 1
+ 1182: 1276:-       |1276:-       |1276:-       |1272:addi    |1272:-       BUS_LOAD  MEM[1272] accepted 1
+ 1183: 1276:-       |1276:-       |1276:-       |1276:-       |1272:addi    r10=0  BUS_LOAD  MEM[1272] accepted 1
+ 1184: 1276:lw      |1276:-       |1276:-       |1276:-       |1276:-       BUS_LOAD  MEM[1272] accepted 1
+ 1185: 1280:-       |1276:lw      |1276:-       |1276:-       |1276:-       BUS_LOAD  MEM[1272] accepted 1
+ 1186: 1280:-       |1280:-       |1276:lw      |1276:-       |1276:-       BUS_LOAD  MEM[1272] accepted 1
+ 1187: 1280:-       |1280:-       |1280:-       |1276:lw      |1276:-       BUS_LOAD  MEM[65532] accepted 1
+ 1188: 1280:-       |1280:-       |1280:-       |1280:-       |1276:lw      r1=144  BUS_LOAD  MEM[1272] accepted 1
+ 1189: 1280:lw      |1280:-       |1280:-       |1280:-       |1280:-       BUS_LOAD  MEM[1272] accepted 1
+ 1190: 1284:-       |1280:lw      |1280:-       |1280:-       |1280:-       BUS_LOAD  MEM[1280] accepted 1
+ 1191: 1284:-       |1284:-       |1280:lw      |1280:-       |1280:-       BUS_LOAD  MEM[1280] accepted 1
+ 1192: 1284:-       |1284:-       |1284:-       |1280:lw      |1280:-       BUS_LOAD  MEM[65528] accepted 1
+ 1193: 1284:-       |1284:-       |1284:-       |1284:-       |1280:lw      r8=65536  BUS_LOAD  MEM[1280] accepted 1
+ 1194: 1284:addi    |1284:-       |1284:-       |1284:-       |1284:-       BUS_LOAD  MEM[1280] accepted 1
+ 1195: 1288:-       |1284:addi    |1284:-       |1284:-       |1284:-       BUS_LOAD  MEM[1280] accepted 1
+ 1196: 1288:-       |1288:-       |1284:addi    |1284:-       |1284:-       BUS_LOAD  MEM[1280] accepted 1
+ 1197: 1288:-       |1288:-       |1288:-       |1284:addi    |1284:-       BUS_LOAD  MEM[1280] accepted 1
+ 1198: 1288:-       |1288:-       |1288:-       |1288:-       |1284:addi    r2=65536  BUS_LOAD  MEM[1280] accepted 1
+ 1199: 1288:jalr    |1288:-       |1288:-       |1288:-       |1288:-       BUS_LOAD  MEM[1280] accepted 1
+ 1200: 1292:-       |1288:jalr    |1288:-       |1288:-       |1288:-       BUS_LOAD  MEM[1288] accepted 1
+ 1201: 1292:-       |1292:-       |1288:jalr    |1288:-       |1288:-       BUS_LOAD  MEM[1288] accepted 1
+ 1202: 1292:-       |1292:-       |1292:-       |1288:jalr    |1288:-       BUS_LOAD  MEM[1288] accepted 1
+ 1203:  148:-       |1292:-       |1292:-       |1292:-       |1288:jalr    BUS_LOAD  MEM[144] accepted 1
+ 1204:  148:auipc   | 148:-       |1292:-       |1292:-       |1292:-       BUS_LOAD  MEM[144] accepted 1
+ 1205:  152:-       | 148:auipc   | 148:-       |1292:-       |1292:-       BUS_LOAD  MEM[144] accepted 1
+ 1206:  152:-       | 152:-       | 148:auipc   | 148:-       |1292:-       BUS_LOAD  MEM[144] accepted 1
+ 1207:  152:-       | 152:-       | 152:-       | 148:auipc   | 148:-       BUS_LOAD  MEM[144] accepted 1
+ 1208:  152:-       | 152:-       | 152:-       | 152:-       | 148:auipc   r2=65680  BUS_LOAD  MEM[144] accepted 1
+ 1209:  152:addi    | 152:-       | 152:-       | 152:-       | 152:-       BUS_LOAD  MEM[144] accepted 1
+ 1210:  156:-       | 152:addi    | 152:-       | 152:-       | 152:-       BUS_LOAD  MEM[152] accepted 1
+ 1211:  156:-       | 156:-       | 152:addi    | 152:-       | 152:-       BUS_LOAD  MEM[152] accepted 1
+ 1212:  156:-       | 156:-       | 156:-       | 152:addi    | 152:-       BUS_LOAD  MEM[152] accepted 1
+ 1213:  156:-       | 156:-       | 156:-       | 156:-       | 152:addi    r2=65536  BUS_LOAD  MEM[152] accepted 1
+ 1214:  156:sw      | 156:-       | 156:-       | 156:-       | 156:-       BUS_LOAD  MEM[152] accepted 1
+ 1215:  160:-       | 156:sw      | 156:-       | 156:-       | 156:-       BUS_LOAD  MEM[152] accepted 1
+ 1216:  160:-       | 160:-       | 156:sw      | 156:-       | 156:-       BUS_LOAD  MEM[152] accepted 1
+ 1217:  160:-       | 160:-       | 160:-       | 156:sw      | 156:-       BUS_STORE MEM[65528] = 0 accepted 1
+ 1218:  160:-       | 160:-       | 160:-       | 160:-       | 156:sw      BUS_LOAD  MEM[152] accepted 1
+ 1219:  160:nop     | 160:-       | 160:-       | 160:-       | 160:-       BUS_LOAD  MEM[152] accepted 1
+ 1220:  164:-       | 160:nop     | 160:-       | 160:-       | 160:-       BUS_LOAD  MEM[160] accepted 1
+ 1221:  164:-       | 164:-       | 160:nop     | 160:-       | 160:-       BUS_LOAD  MEM[160] accepted 1
+ 1222:  164:-       | 164:-       | 164:-       | 160:nop     | 160:-       BUS_LOAD  MEM[160] accepted 1
+ 1223:  164:-       | 164:-       | 164:-       | 164:-       | 160:nop     BUS_LOAD  MEM[160] accepted 1
+ 1224:  164:wfi     | 164:-       | 164:-       | 164:-       | 164:-       BUS_LOAD  MEM[160] accepted 1
+ 1225:  168:-       | 164:wfi     | 164:-       | 164:-       | 164:-       BUS_LOAD  MEM[160] accepted 1
+ 1226:  168:-       | 168:-       | 164:wfi     | 164:-       | 164:-       BUS_LOAD  MEM[160] accepted 1
+ 1227:  168:-       | 168:-       | 168:-       | 164:wfi     | 164:-       BUS_LOAD  MEM[160] accepted 1
+ 1228:  168:-       | 168:-       | 168:-       | 168:-       | 164:wfi     BUS_LOAD  MEM[160] accepted 1
