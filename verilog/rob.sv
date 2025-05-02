@@ -12,7 +12,7 @@ module rob(
 
     output ROB_T T, retire_T_out,
     output PPLN_CTRL ppln_ctrl,
-    output logic full, empty, retire,
+    output logic full, empty, retire, wfi,
     output logic [4:0] regfile_write_idx_out, 
     output logic [`XLEN-1:0] V1, V2, regfile_write_data,
     output logic [($bits(ROB_ENTRY)*`ROB_SZ)-1:0] rob_table_out,
@@ -29,6 +29,10 @@ module rob(
 
     assign retire_T_out = (retire) ? retire_T : 0;
     assign regfile_write_idx_out = (retire) ? regfile_write_idx : 0;
+
+    logic wfi_old;
+
+    
 
 
     logic head_wrap;
@@ -62,8 +66,13 @@ module rob(
             ppln_ctrl <= 0;
             head_wrap <= 0; // change here
             tail_wrap <= 0;
+            wfi <= 0;
+            wfi_old <= 0;
 
         end else begin
+            wfi <= rob_table[head].ppln_ctrl.halt && rob_table[head].ready && ~wfi_old; //rising edge of halt
+            wfi_old <= wfi;
+
             // load in cdb value into rob# and mark as Complete (C) --> deals with all types of instructions
             if (cdb.valid) begin
                 rob_table[cdb.T].V <= cdb.V;

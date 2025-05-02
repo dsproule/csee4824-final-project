@@ -1,21 +1,15 @@
 `include "verilog/sys_defs.svh"
 
 module func_unit_3(
-    input clock, reset, wr_valid, sq_free,
     input [63:0] Dmem2proc_data,
-    input ROB_T T, //pass through
-    input MEM_ACCESS mem_access, //for shifting
+    input MEM_ACCESS mem_access,
     input logic [`XLEN-1:0] proc2Dmem_data,
 
-    output [63:0]      proc2Dcache_data,
-    output logic dcache_ack_store
+    output [63:0]      proc2Dcache_data
 );
 
-    logic [`XLEN-1:0] rawDmem_addr;
-    logic [3:0]       line_offset;
     logic [5:0]       shift;
     logic [63:0]      Dmem_data;
-    mem_proc_states   mem_state;
 
     always_comb begin
         Dmem_data = Dmem2proc_data;
@@ -56,30 +50,5 @@ module func_unit_3(
     end
 
     assign proc2Dcache_data = Dmem_data;
-
-     // state machine to handle loads
-    always_ff @(posedge clock) begin
-        if (reset) begin
-            dcache_ack_store  <= 0;
-            mem_state <= MEM_WAIT_FOR_TAG;
-        end else begin
-            case (mem_state) 
-                // if valid pass to X_packet
-                MEM_WAIT_FOR_TAG:
-                    if (wr_valid) begin
-                        dcache_ack_store <= `TRUE;
-                        mem_state <= MEM_NONE;
-                    end
-                MEM_NONE: begin
-                    // if committed, return back to state waiting to give to X_packet
-                    dcache_ack_store <= `FALSE;
-                    if (sq_free)
-                        mem_state <= MEM_WAIT_FOR_TAG;
-                end
-                default: ;
-
-            endcase
-        end
-    end    
 
 endmodule   // func_unit_3

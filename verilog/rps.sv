@@ -61,17 +61,21 @@ module rps(
     input clock, reset, en,
     input        [5:0] req,
 
-    output logic [5:0] gnt,
+    output logic [5:0] gnt_out,
     output req_up
 );
 
     logic [3:0] count;
     logic [1:0] gnt_en;
     logic msb_req, lsb_req;
+    logic [5:0] gnt;
 
-    rps2 msb(.sel(count[0]), .req(req[5:4]), .en(gnt_en[1]), .gnt(gnt[5:4]), .req_up(msb_req));
-    rps4 lsb(.clock(clock), .reset(reset), .req(req[3:0]), .en(gnt_en[0]), .gnt(gnt[3:0]), .count(), .req_up(lsb_req));
+    rps2 msb(.sel(count[0]), .req(req[5:4]), .en(1'b1), .gnt(gnt[5:4]), .req_up(msb_req));
+    rps4 lsb(.clock(clock), .reset(reset), .req(req[3:0]), .en(1'b1), .gnt(gnt[3:0]), .count(), .req_up(lsb_req));
     rps2 top(.sel(count[2]), .req({msb_req, lsb_req}), .en(en), .gnt(gnt_en), .req_up(req_up));
+
+    assign gnt_out[5:4] = (msb_req & gnt_en[1]) ? gnt[5:4] : 2'b0;
+    assign gnt_out[3:0] = (lsb_req & gnt_en[0]) ? gnt[3:0] : 4'b0;
 
     always_ff @(posedge clock) begin
         if (reset)

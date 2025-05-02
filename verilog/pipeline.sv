@@ -8,6 +8,11 @@
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
+// cpi
+// assume taken: 3.95
+// branch_predictor: 3.99
+// assum not taken: 4.16
+
 `include "verilog/sys_defs.svh"
 
 // `define ASSUME_TAKEN
@@ -118,10 +123,9 @@ module pipeline (
     logic [1:0] cache2Dmem_command;
     logic Dcache_valid_out;
     logic [63:0] proc2Dcache_data, cache2Dmem_data, Dcache_data_out;
-    logic wr_proc, wr_valid;
 
     // lsq
-    logic mem_read_en, mem_write_en;
+    logic mem_read_en, mem_write_en, wfi;
     logic sq_empty, sq_full, lq_empty, lq_full;
 
     // debug outputs
@@ -151,9 +155,10 @@ module pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
+    wire dcache_action = (cache2Dmem_command != BUS_NONE);
     assign rd_mem = mem_read_en;
     assign wr_mem = mem_write_en;
-    assign Dmem_req = (wr_mem | rd_mem);
+    assign Dmem_req = (wr_mem | rd_mem | dcache_action);
 
     // for all memory vectors, ind0 -> wr and ind1 -> rd
 
@@ -304,13 +309,12 @@ module pipeline (
     logic rs_idx_full;
     logic [`RS_SZ-1:0] FU_ready_no_lsq;
 
-    assign rs_stall = ((D_S_reg.rs_idx == 2) | (D_S_reg.rs_idx == 3)) ? (busy[3:2] != 2'b00) : rs_idx_full;
-    assign FU_ready_no_lsq = {FU_ready[5:4], FU_ready[3], FU_ready[2], FU_ready[1:0]};
+    assign rs_stall = rs_idx_full || (sq_full && D_S_reg.rs_idx == 3) || (lq_full && D_S_reg.rs_idx == 2);
     rs_stage rs_stage_inst (
         // Inputs
         .clock(clock), .reset(reset | take_branch), .alloc_en(D_S_reg.valid & ~rs_stall), 
         .cdb(cdb), .D_S_reg(D_S_reg), 
-        .FU_ready(FU_ready_no_lsq),
+        .FU_ready(FU_ready),
         .T(rob_T_wire), .T1(T1_wire), .T2(T2_wire), 
         .V1(V1_rs), .V2(V2_rs), 
 
@@ -342,7 +346,7 @@ module pipeline (
         
         // Outputs
         .T(rob_T_wire), .retire_T_out(retire_T_wire), .tail_wrap(ROB_tail_wrap),
-        .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), 
+        .ppln_ctrl(pipeline_control), .full(rob_full), .empty(rob_empty), .wfi(wfi),
         .retire(retire), .regfile_write_idx_out(retire_r_wire), 
         .regfile_write_data(rob_write_data), .rob_table_out(rob_table_out),
         .V1(V1_rob), .V2(V2_rob),
@@ -404,17 +408,20 @@ module pipeline (
         .X_packet(X_packets[1])
     );
 
-    dcache dache_0(
+    wire [1:0] Dmem_command = (wr_mem) ? BUS_STORE :
+                              (rd_mem) ? BUS_LOAD : BUS_NONE;
+    dcache_nb dache_0(
         .clock(clock), .reset(reset),
 
         // From memory
-        .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), .Dmem2proc_tag(mem2proc_tag),
+        .Dmem2proc_response((Dmem_req) ? mem2proc_response : '0), 
+        .Dmem2proc_tag(mem2proc_tag),
         .Dmem2proc_data(mem2proc_data),
 
         // From FU stage
         .proc2Dcache_addr((wr_mem) ? proc2Dmem_addr[0] : proc2Dmem_addr[1]),
         .proc2Dcache_data(proc2Dcache_data),
-        .wr_proc(wr_proc),
+        .proc2Dcache_command(Dmem_command),
 
         // To memory
         .proc2Dmem_command(cache2Dmem_command),
@@ -423,20 +430,18 @@ module pipeline (
 
         // To fetch stage
         .Dcache_data_out(Dcache_data_out),
-        .Dcache_valid_out(Dcache_valid_out),
-        .wr_valid(wr_valid)
+        .Dcache_valid_out(Dcache_valid_out)
     );
 
     ROB_T store_T_wire, load_T_wire;
     MEM_ACCESS mem_access_load_wire, mem_access_store_wire;
     logic [`XLEN-1:0] proc2Dmem_data_wire;
     X_C_PACKET lsq_fwd_packet, func_unit_2_x_packet;
-    logic dcache_ack_store, dcache_ack_load, sq_free;
 
     lsq lsq_inst(
     // inputs
     .clock(clock), 
-    .reset(reset), .take_branch(take_branch),
+    .reset(reset), .take_branch(take_branch | wfi),
     .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
     .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
     .T(rob_T_wire),
@@ -447,8 +452,7 @@ module pipeline (
     .load_X(S_X_regs[2].valid),
     .retire_T(retire_T_wire), 
     .retire_en(retire),
-    .dcache_ack_store(dcache_ack_store), //prioritize loads for speed
-    .dcache_ack_load(dcache_ack_load),
+    .Dcache_valid_out(Dcache_valid_out), //prioritize loads for speed
 
     // outputs
     .load_fwd_packet(lsq_fwd_packet),
@@ -462,36 +466,30 @@ module pipeline (
     .mem_read_en(mem_read_en),
     .load_T(load_T_wire),
     .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
-    .sq_free(sq_free),
     .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
     
     );
-    assign wr_proc = wr_mem & Dcache_valid_out;
 
     func_unit_2 func_unit_02 (
         .clock(clock), .reset(reset | take_branch), 
-        .committed(gnt[2]), .data_valid(Dcache_valid_out & rd_mem),
+        .data_valid(Dcache_valid_out & rd_mem),
         .Dmem2proc_data(Dcache_data_out),
         .T(load_T_wire),
         .mem_access(mem_access_load_wire),
 
         // output logic mem_load_pend,
-        .X_packet(func_unit_2_x_packet),
-        .dcache_ack_load(dcache_ack_load)
+        .X_packet(func_unit_2_x_packet)
     );
 
     //forwarding from lsq if cdb is valid
     assign X_packets[2] = (lsq_fwd_packet.valid) ? lsq_fwd_packet : func_unit_2_x_packet;
 
-    func_unit_3 func_unit_03(
-        .clock(clock), .reset(reset | take_branch), .wr_valid(wr_valid & wr_mem), .sq_free(sq_free),
+    func_unit_3 func_unit_03( // literally just addr shifting now, timing handled by lsq
         .Dmem2proc_data(Dcache_data_out),
-        .T(store_T_wire),
         .mem_access(mem_access_store_wire),
         .proc2Dmem_data(proc2Dmem_data_wire), //handles masking before storing
 
-        .proc2Dcache_data(proc2Dcache_data),
-        .dcache_ack_store(dcache_ack_store) //throttle sq flow
+        .proc2Dcache_data(proc2Dcache_data)
     );
 
     func_unit_0 func_unit_04(
@@ -555,7 +553,7 @@ module pipeline (
         .req(FU_req), 
         .en(1'b1), 
         
-        .gnt(gnt), .req_up(cdb_valid)
+        .gnt_out(gnt), .req_up(cdb_valid)
     );
 
     //////////////////////////////////////////////////
