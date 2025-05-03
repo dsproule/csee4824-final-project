@@ -1,0 +1,62 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  May  3 17:35 2025
+Loading memory file: programs/mem_test.mem
+Using writeback output file: output/mem_test.wb
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3500 : System STILL at reset, can't show anything
+@@
+@@
+@@                  7000 : System STILL at reset, can't show anything
+@@
+@@
+@@                 10500 : System STILL at reset, can't show anything
+@@
+@@                 12260  Deasserting System reset......
+@@
+@@
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 0021202300001137 : 9324008927400247
+@@@ mem[    8] = 0021282300212423 : 9332805022589987
+@@@ mem[   16] = 0221202300212c23 : 153439197005425699
+@@@ mem[   24] = 0221282302212423 : 153447993132000291
+@@@ mem[   32] = 0421202302212c23 : 297554385114836003
+@@@ mem[   40] = 1050007304212423 : 1175439996734219299
+@@@
+@@@ mem[ 4096] = 0000000000001000 : 4096
+@@@ mem[ 4104] = 0000000000001000 : 4096
+@@@ mem[ 4112] = 0000000000001000 : 4096
+@@@ mem[ 4120] = 0000000000001000 : 4096
+@@@ mem[ 4128] = 0000000000001000 : 4096
+@@@ mem[ 4136] = 0000000000001000 : 4096
+@@@ mem[ 4144] = 0000000000001000 : 4096
+@@@ mem[ 4152] = 0000000000001000 : 4096
+@@@ mem[ 4160] = 0000000000001000 : 4096
+@@@ mem[ 4168] = 0000000000001000 : 4096
+@@@
+@@@
+@@                416520 : System halted
+@@
+@@@ System halted on WFI instruction
+@@@
+@@
+@@  116 cycles / 11 instrs = 10.545455 CPI
+@@
+@@  40250.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 420.
+$finish at simulation time               417520
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 41752000 ps
+CPU Time:      0.280 seconds;       Data structure size:   0.2Mb
+Sat May  3 17:35:19 2025

@@ -1,0 +1,55 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version U-2023.03-SP2-1_Full64; Runtime version U-2023.03-SP2-1_Full64;  Apr 22 18:17 2025
+Loading memory file: programs/try.mem
+Using writeback output file: output/try.wb
+Using pipeline output file: output/try.ppln
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                  3000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  6000 : System STILL at reset, can't show anything
+@@
+@@
+@@                  9000 : System STILL at reset, can't show anything
+@@
+@@                 11500  Deasserting System reset......
+@@
+@@
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 00c0009303000213 : 54043826938970643
+@@@ mem[    8] = 022081b303000113 : 153264993180057875
+@@@ mem[   16] = 0050029302408263 : 22520828558082659
+@@@ mem[   24] = 0070039300600313 : 31529127292961555
+@@@ mem[   32] = 0080029300410a63 : 36031627406674531
+@@@ mem[   40] = 00a0039300900313 : 45039926178218771
+@@@ mem[   48] = 0030029310500073 : 13513629539238003
+@@@ mem[   56] = 0050039300400313 : 22521928036123411
+@@@ mem[   64] = 0000000010500073 : 273678451
+@@@
+@@@
+@@                203000 : System halted
+@@
+@@@ System halted on WFI instruction
+@@@
+@@
+@@  65 cycles / 12 instrs = 5.416667 CPI
+@@
+@@  192.00 ns total time to execute
+@@
+
+$finish called from file "test/pipeline_test.sv", line 296.
+$finish at simulation time               303000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 303000 ps
+CPU Time:      0.200 seconds;       Data structure size:   0.1Mb
+Tue Apr 22 18:17:54 2025
