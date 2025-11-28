@@ -447,41 +447,40 @@ module pipeline (
     X_C_PACKET lsq_fwd_packet, func_unit_2_x_packet;
 
     lsq lsq_inst(
-    // inputs
-    .clock(clock), 
-    .reset(reset), .take_branch(take_branch | wfi),
-    .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
-    .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
-    .T(rob_T_wire),
-    .ROB_wrap(ROB_tail_wrap),
-    .S_X_store(S_X_regs[3]), 
-    .S_X_load(S_X_regs[2]),
-    .store_X(S_X_regs[3].valid),
-    .load_X(S_X_regs[2].valid),
-    .retire_T(retire_T_wire), 
-    .retire_en(retire),
-    .Dcache_valid_out(Dcache_valid_out), //prioritize loads for speed
+        // inputs
+        .clock(clock), 
+        .reset(reset), .take_branch(take_branch | wfi),
+        .sq_alloc(D_S_reg.rs_idx == 3 && D_S_reg.valid && !rs_stall), // only when dispatching a store
+        .lq_alloc(D_S_reg.rs_idx == 2 && D_S_reg.valid && !rs_stall), // only for load
+        .T(rob_T_wire),
+        .ROB_wrap(ROB_tail_wrap),
+        .S_X_store(S_X_regs[3]), 
+        .S_X_load(S_X_regs[2]),
+        .store_X(S_X_regs[3].valid),
+        .load_X(S_X_regs[2].valid),
+        .retire_T(retire_T_wire), 
+        .retire_en(retire),
+        .Dcache_valid_out(Dcache_valid_out), //prioritize loads for speed
 
-    // outputs
-    .load_fwd_packet(lsq_fwd_packet),
-    .mem_write_en(mem_write_en), //
-    .proc2Dmem_addr_store(proc2Dmem_addr[0]),
-    .proc2Dmem_data_store(proc2Dmem_data_wire),
-    .mem_access_store(mem_access_store_wire),
-    .store_T(store_T_wire),
-    .proc2Dmem_addr_load(proc2Dmem_addr[1]),
-    .mem_access_load(mem_access_load_wire),
-    .mem_read_en(mem_read_en),
-    .load_T(load_T_wire),
-    .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
-    .lq(lq_dbg),
-    .sq(sq_dbg),
-    .lq_tail(lq_tail_dbg),
-    .lq_head(lq_head_dbg),
-    .sq_tail(sq_tail_dbg),
-    .sq_head(sq_head_dbg),
-    .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
-    
+        // outputs
+        .load_fwd_packet(lsq_fwd_packet),
+        .mem_write_en(mem_write_en), //
+        .proc2Dmem_addr_store(proc2Dmem_addr[0]),
+        .proc2Dmem_data_store(proc2Dmem_data_wire),
+        .mem_access_store(mem_access_store_wire),
+        .store_T(store_T_wire),
+        .proc2Dmem_addr_load(proc2Dmem_addr[1]),
+        .mem_access_load(mem_access_load_wire),
+        .mem_read_en(mem_read_en),
+        .load_T(load_T_wire),
+        .store_X_packet(X_packets[3]), //advance ROB once the addresses needed are calculated
+        .lq(lq_dbg),
+        .sq(sq_dbg),
+        .lq_tail(lq_tail_dbg),
+        .lq_head(lq_head_dbg),
+        .sq_tail(sq_tail_dbg),
+        .sq_head(sq_head_dbg),
+        .sq_full(sq_full), .sq_empty(sq_empty), .lq_full(lq_full), .lq_empty(lq_empty)
     );
 
     func_unit_2 func_unit_02 (
