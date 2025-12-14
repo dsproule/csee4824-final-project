@@ -1,14 +1,14 @@
 /////////////////////////////////////////////////////////////////////////
 //                                                                     //
-//   Modulename :  sys_defs.svh                                        //
+//   Modulename :  sys_defs_ref.svh                                        //
 //                                                                     //
 //  Description :  This file has the macro-defines for macros used in  //
 //                 the pipeline design.                                //
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
-`ifndef __SYS_DEFS_SVH__
-`define __SYS_DEFS_SVH__
+`ifndef __SYS_DEFS_REF_SVH__
+`define __SYS_DEFS_REF_SVH__
 
 // all files should `include "sys_defs.svh" to at least define the timescale
 `timescale 1ns/100ps

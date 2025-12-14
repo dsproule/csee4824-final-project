@@ -1,8 +1,8 @@
 
 // The decoder, copied from p3/stage_id.sv without changes
 
-`include "verilog/sys_defs.svh"
-`include "verilog/ISA.svh"
+`include "verilog/golden_ref/sys_defs_ref.svh"
+`include "verilog/golden_ref/ISA.svh"
 
 module decoder (
     input INST  inst,

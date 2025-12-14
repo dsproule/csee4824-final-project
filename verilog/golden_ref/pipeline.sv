@@ -8,9 +8,9 @@
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
-`include "verilog/sys_defs.svh"
+`include "verilog/golden_ref/sys_defs_ref.svh"
 
-module pipeline (
+module inorder_pipeline (
     input        clock,             // System clock
     input        reset,             // System reset
     input [3:0]  mem2proc_response, // Tag from memory about current request

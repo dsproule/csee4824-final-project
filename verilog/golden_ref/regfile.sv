@@ -7,7 +7,7 @@
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
-`include "verilog/sys_defs.svh"
+include "verilog/golden_ref/sys_defs_ref.svh"
 
 module regfile (
     input             clock, // system clock

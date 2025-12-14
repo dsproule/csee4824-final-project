@@ -10,8 +10,8 @@
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
-`include "verilog/sys_defs.svh"
-`include "verilog/ISA.svh"
+`include "verilog/golden_ref/sys_defs_ref.svh"
+`include "verilog/golden_ref/ISA.svh"
 
 // ALU: computes the result of FUNC applied with operands A and B
 // This module is purely combinational

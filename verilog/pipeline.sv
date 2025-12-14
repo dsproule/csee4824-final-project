@@ -17,7 +17,7 @@
 
 // `define ASSUME_TAKEN
 
-module inorder_pipeline (
+module pipeline (
     input        clock,             // System clock
     input        reset,             // System reset
     input [3:0]  mem2proc_response, // Tag from memory about current request

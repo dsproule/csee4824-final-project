@@ -8,7 +8,7 @@
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
-`include "verilog/sys_defs.svh"
+`include "verilog/golden_ref/sys_defs_ref.svh"
 
 module stage_if (
     input             clock,          // system clock

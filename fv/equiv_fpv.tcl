@@ -1,11 +1,10 @@
-set ROOT_PATH ../csee4824-final-project
+set ROOT_PATH ..
 set RTL_PATH ${ROOT_PATH}/verilog
 
 set hdlin_enable_sv true
+
 analyze -sv \
-  ${RTL_PATH}/sys_defs.svh \
-  ${RTL_PATH}/ISA.svh \
-  ${RTL_PATH}/fifo.sv \
+  -incdir ${ROOT_PATH} \
   ${RTL_PATH}/pipeline.sv \
   ${RTL_PATH}/regfile.sv \
   ${RTL_PATH}/icache.sv \
@@ -33,22 +32,14 @@ analyze -sv \
   ${ROOT_PATH}/verilog/golden_ref/stage_mem.sv \
   ${ROOT_PATH}/verilog/golden_ref/stage_wb.sv \
   ${ROOT_PATH}/verilog/golden_ref/regfile.sv \
-  ${ROOT_PATH}/fv/equiv_check.sv \
+  ${ROOT_PATH}/fv/equiv_check.sv
 
-
-# Elaborate design and properties
 elaborate -top equiv_check
 
-# Set up Clocks and Resets
 clock clock
 reset reset
 
-# Get design information to check general complexity
 get_design_info
-
-# Prove properties
 prove -all
-
-# Report proof results
 report
 
