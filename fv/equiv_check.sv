@@ -122,6 +122,10 @@ module equiv_check;
         .mem2proc_tag(ref_mem2proc_tag)
     );
 
+    function automatic logic [63:0] imem_fn(input logic [`XLEN-1:3] addr);
+        imem_fn = $anyconst;
+    endfunction
+
     // --------------------------------------------------------------------
     // Assumptions: reg/control only
     // --------------------------------------------------------------------
