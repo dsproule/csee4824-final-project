@@ -36,7 +36,7 @@ analyze -sv \
 
 elaborate -top equiv_check
 
-clock clock
+clock clock -both_edges
 reset reset
 
 get_design_info
