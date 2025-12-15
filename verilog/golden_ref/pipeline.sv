@@ -185,7 +185,7 @@ module inorder_pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    stage_id stage_id_0 (
+    stage_id_ref stage_id_0 (
         // Inputs
         .clock (clock),
         .reset (reset),
@@ -243,7 +243,7 @@ module inorder_pipeline (
     //                                              //
     //////////////////////////////////////////////////
 
-    stage_ex stage_ex_0 (
+    stage_ex_ref stage_ex_0 (
         // Input
         .id_ex_reg (id_ex_reg),
 

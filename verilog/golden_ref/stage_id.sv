@@ -13,7 +13,7 @@
 
 // Decode an instruction: generate useful datapath control signals by matching the RISC-V ISA
 // This module is purely combinational
-module decoder (
+module decoder_ref (
     input INST  inst,
     input logic valid, // when low, ignore inst. Output will look like a NOP
 
@@ -198,7 +198,7 @@ module decoder (
 endmodule // decoder
 
 
-module stage_id (
+module stage_id_ref (
     input              clock,           // system clock
     input              reset,           // system reset
     input IF_ID_PACKET if_id_reg,
@@ -223,7 +223,7 @@ module stage_id (
     assign id_packet.dest_reg_idx = (has_dest_reg) ? if_id_reg.inst.r.rd : `ZERO_REG;
 
     // Instantiate the register file
-    regfile regfile_0 (
+    regfile_ref regfile_0 (
         .clock  (clock),
         .read_idx_1 (if_id_reg.inst.r.rs1),
         .read_idx_2 (if_id_reg.inst.r.rs2),
@@ -237,7 +237,7 @@ module stage_id (
     );
 
     // Instantiate the instruction decoder
-    decoder decoder_0 (
+    decoder_ref decoder_0 (
         // Inputs
         .inst  (if_id_reg.inst),
         .valid (if_id_reg.valid),

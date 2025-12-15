@@ -15,7 +15,7 @@
 
 // ALU: computes the result of FUNC applied with operands A and B
 // This module is purely combinational
-module alu (
+module alu_ref (
     input [`XLEN-1:0] opa,
     input [`XLEN-1:0] opb,
     ALU_FUNC          func,
@@ -63,7 +63,7 @@ endmodule // alu
 
 // Conditional branch module: compute whether to take conditional branches
 // This module is purely combinational
-module conditional_branch (
+module conditional_branch_ref (
     input [2:0]       func, // Specifies which condition to check
     input [`XLEN-1:0] rs1,  // Value to check against condition
     input [`XLEN-1:0] rs2,
@@ -89,7 +89,7 @@ module conditional_branch (
 endmodule // conditional_branch
 
 
-module stage_ex (
+module stage_ex_ref (
     input ID_EX_PACKET id_ex_reg,
 
     output EX_MEM_PACKET ex_packet
@@ -142,7 +142,7 @@ module stage_ex (
     end
 
     // Instantiate the ALU
-    alu alu_0 (
+    alu_ref alu_0 (
         // Inputs
         .opa(opa_mux_out),
         .opb(opb_mux_out),
@@ -153,7 +153,7 @@ module stage_ex (
     );
 
     // Instantiate the conditional branch module
-    conditional_branch conditional_branch_0 (
+    conditional_branch_ref conditional_branch_0 (
         // Inputs
         .func(id_ex_reg.inst.b.funct3), // instruction bits for which condition to check
         .rs1(id_ex_reg.rs1_value),

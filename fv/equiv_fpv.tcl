@@ -23,11 +23,11 @@ analyze -sv \
   ${RTL_PATH}/lsq.sv \
   ${RTL_PATH}/dcache_nb.sv \
   ${RTL_PATH}/two_bit_pred.sv \
+  ${ROOT_PATH}/test/mem.sv \
   ${RTL_PATH}/branch_pred.sv \
   ${ROOT_PATH}/verilog/golden_ref/pipeline.sv \
   ${ROOT_PATH}/verilog/golden_ref/stage_if.sv \
   ${ROOT_PATH}/verilog/golden_ref/stage_id.sv \
-  ${ROOT_PATH}/verilog/golden_ref/decoder.sv \
   ${ROOT_PATH}/verilog/golden_ref/stage_ex.sv \
   ${ROOT_PATH}/verilog/golden_ref/stage_mem.sv \
   ${ROOT_PATH}/verilog/golden_ref/stage_wb.sv \

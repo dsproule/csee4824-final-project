@@ -85,7 +85,7 @@ module equiv_check;
     // ----------------------------
     // Instantiate REF + its mem
     // ----------------------------
-    inorder_pipeline ref (
+    inorder_pipeline gold_ref (
         .clock(clock),
         .reset(reset),
 
@@ -177,10 +177,6 @@ module equiv_check;
     //
     // This avoids forcing DUT/REF to fetch in lockstep.
     // --------------------------------------------------------------------
-
-    // JasperGold supports anyconst-style symbolic constants.
-    // If your flow doesn't, replace with your tool's equivalent.
-    (* anyconst *) logic [63:0] IMEM_WORD;
 
     // We constrain "returned data" to be the same on both sides whenever both
     // return a word in the same cycle. This makes them run the same program
