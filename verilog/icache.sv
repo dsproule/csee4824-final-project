@@ -102,20 +102,51 @@ module icache (
                 end
         end
 
-        genvar u, i;
-        generate for (u = 0; u < `MSHR_SLOTS; u++) begin
-            for (i = 0; i < `MSHR_SLOTS; i++) begin
-                if (i != u) begin
-                    unique_addr: assert property(@(posedge clock)
-                        (mshr[i].valid && mshr[u].valid) |-> mshr[i].addr != mshr[u].addr
-                    );
-                end
+        // address only will ever occupy one mshr slot
+        int o;
+        logic addr_seen;
+        always_comb begin
+            addr_seen = 1'b0;
+            for (o = 0; o < `MSHR_SLOTS; o++) begin
+                if (o != `MSHR_SLOTS - 1) 
+                    addr_seen |= (mshr[o].valid && (mshr[o].addr == mshr[`MSHR_SLOTS-1].addr));
             end
+        end
+        unique_addr: assert property(@(posedge clock) mshr[`MSHR_SLOTS-1].valid |-> !addr_seen);
+
+        // if cache_valid out -> address is same as requested
+
+        // cache will respond to memory servicing
+        try_service: assert property(@(posedge clock) miss_outstanding |-> BUS_LOAD == proc2Imem_command);
+
+        // cache will continue trying to service cache_addr until done
+        not_stalled: assert property(@(posedge clock)
+            !Icache_valid_out |-> alloc_count() > 1 || will_alloc || current_in_cache
+        );
+
+        // if possible, cache will attempt prefetch
+
+        // cache will occupy all mshr slots
+        genvar i;
+        generate for (i = 0; i < `MSHR_SLOTS; i++) begin
+            slot_used: cover property(@(posedge clock) mshr[i].valid);
         end endgenerate
 
-        // tags can potentially hide allocations
+        // cache will not clobber mshr already in use
+        wont_clobber: assert property(@(posedge clock) alloc_count() == `MSHR_SLOTS |-> !will_alloc);
 
+        // cache never fills (interesting because we didn't know this)
+        never_full: assert property(@(posedge clock) alloc_count() < `MSHR_SLOTS);
         
+        ever_full: cover property(@(posedge clock) alloc_count() == `MSHR_SLOTS);
+
+        // count progesses 
+        count_progresses: assert property(@(posedge clock) disable iff (reset)
+            alloc_count() |-> ##1 (alloc_count() == $past(alloc_count()) + 1) || 
+                                  (alloc_count() == $past(alloc_count()) - 1) ||
+                                  (alloc_count() == $past(alloc_count())));
+        
+        // if a miss is outstanding -> cache will try again
         continue_attempts: assert property(@(posedge clock)
             miss_outstanding |-> proc2Imem_command == BUS_LOAD);
         
@@ -183,6 +214,11 @@ module icache (
     assign proc2Imem_command = (miss_outstanding) ? BUS_LOAD : BUS_NONE;
     assign proc2Imem_addr    = {mshr[mshr_req_idx].addr, 3'b0};
 
+    `ifdef FORMAL
+    logic will_alloc;
+    assign will_alloc = (~mshr[mshr_next_idx].valid & ~current_in_mshr & ~current_in_cache);
+    `endif
+
     // ---- Cache state registers ---- //
 
     always_ff @(posedge clock) begin
@@ -225,5 +261,16 @@ module icache (
             end
         end
     end
+
+    `ifdef FORMAL
+
+    function automatic int alloc_count();
+        alloc_count = 0;
+        for (int i = 0; i < `MSHR_SLOTS; i++) begin
+            alloc_count += mshr[i].valid;
+        end
+    endfunction
+
+    `endif
 
 endmodule // icache

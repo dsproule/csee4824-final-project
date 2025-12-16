@@ -34,9 +34,10 @@ module icache_check;
         .mem2proc_tag(mem2proc_tag)
     );
 
+    // values going to cache/mem must be known
     mem_data_addr_known: assume property(
         !$isunknown(mem2proc_data) && !$isunknown(proc2mem_addr)
-        && !$isunknown(proc2cache_addr) && !$isunknown(mem2proc_tag)
+        && !$isunknown(proc2cache_addr)
     );
 
     mem_aligned: assume property(
@@ -64,14 +65,14 @@ module icache_check;
     );
 
     // want one that data is consistent
-    logic found;
-    logic [63:0] recent_data;
+    // logic found;
+    // logic [63:0] recent_data;
 
-    always_comb begin
-        recent_data = mem_0.recent_data_for_addr(
-            proc2cache_addr[`XLEN-1:3], found
-        );
-    end
+    // always_comb begin
+    //     recent_data = mem_0.recent_data_for_addr(
+    //         proc2cache_addr[`XLEN-1:3], found
+    //     );
+    // end
 
     // assert property (@(posedge clock) disable iff (reset)
     //     (found && cache_valid_out)
