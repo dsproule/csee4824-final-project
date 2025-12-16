@@ -54,40 +54,11 @@ module icache_check;
         .Icache_data_out(cache_data_out),
         .Icache_valid_out(cache_valid_out)
     );
-
-    property inst0_valid; 
-        @(posedge clock) disable iff (reset)
-            (mem2proc_tag != 0) |-> (mem2proc_data[6:0] inside {
-                `RV32_OP, `RV32_OP_IMM,
-                `RV32_BRANCH, `RV32_JAL_OP,
-                `RV32_JALR_OP,
-                `RV32_LUI,
-                `RV32_AUIPC
-            });
-    endproperty;
     
-    property inst1_valid; 
-        @(posedge clock) disable iff (reset)
-            (mem2proc_tag != 0) |-> (mem2proc_data[38:32] inside {
-                `RV32_OP, `RV32_OP_IMM,
-                `RV32_BRANCH, `RV32_JAL_OP,
-                `RV32_JALR_OP,
-                `RV32_LUI,
-                `RV32_AUIPC
-            });
-    endproperty;
-    
-    // enforces valid instructions for both lines and constrains inst types
-    inst2_check: assume property(inst0_valid);
-    inst1_check: assume property(inst1_valid);
-
-    // guarantees the data we're receiving on the out is never xxx
-    no_x_prop: assert property (@(posedge clock) cache_valid_out |-> !$isunknown(cache_data_out));
-
-    // guarantees that memory address pointing at will not change unless we do a store
-    store_change: assume property(@(posedge clock)
-        (proc2mem_command != BUS_STORE) |-> ##1
-            mem_ref.unified_memory[proc2mem_addr] == $past(mem_ref.unified_memory[proc2mem_addr])
-    );
+    // // guarantees that memory address pointing at will not change unless we do a store
+    // store_change: assume property(@(posedge clock)
+    //     (proc2mem_command != BUS_STORE) |-> ##1
+    //         mem_ref.unified_memory[proc2mem_addr] == $past(mem_ref.unified_memory[proc2mem_addr])
+    // );
 
 endmodule

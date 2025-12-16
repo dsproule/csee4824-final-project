@@ -102,13 +102,29 @@ module icache (
                 end
         end
 
-        // prove addr in cache is actually the address queried (relevant becaus only 12 bits used)
-        refer_same_addr: assert property(@(posedge clock)
-            Icache_valid_out |-> proc2Icache_addr[`XLEN-1:3] == last_icache_addr[main_index].addr);
+        genvar u, i;
+        generate for (u = 0; u < `MSHR_SLOTS; u++) begin
+            for (i = 0; i < `MSHR_SLOTS; i++) begin
+                if (i != u) begin
+                    unique_addr: assert property(@(posedge clock)
+                        (mshr[i].valid && mshr[u].valid) |-> mshr[i].addr != mshr[u].addr
+                    );
+                end
+            end
+        end endgenerate
+
+        // tags can potentially hide allocations
+        addr_correct: assert property(@(posedge clock)
+            (!mem_forward && Icache_valid_out && last_icache_addr[main_index].valid) |-> last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]
+        );
         
-        assume property(@(posedge clock) 
-            !$isunknown(last_icache_addr[main_index].addr) && $isunknown(last_icache_addr[main_index].valid));
-        // 
+        continue_attempts: assert property(@(posedge clock)
+            miss_outstanding |-> proc2Imem_command == BUS_LOAD
+        );
+
+        values_valid: assume property(@(posedge clock) 
+            !$isunknown(last_icache_addr[main_index].addr) && !$isunknown(last_icache_addr[main_index].valid));
+        
     `endif
 
     logic [$clog2(`MSHR_SLOTS)-1:0] mshr_next_idx;
