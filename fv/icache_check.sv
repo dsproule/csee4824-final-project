@@ -41,7 +41,7 @@ module icache_check;
     );
 
     mem_aligned: assume property(
-        (proc2mem_addr[2:0]==3'b0) & (proc2mem_addr<`MEM_SIZE_IN_BYTES)
+        (proc2mem_addr[2:0]==3'b0) & (proc2mem_addr < `MEM_SIZE_IN_BYTES)
     );
 
     icache icache_0 (
@@ -64,23 +64,4 @@ module icache_check;
         .Icache_valid_out(cache_valid_out)
     );
 
-    // want one that data is consistent
-    // logic found;
-    // logic [63:0] recent_data;
-
-    // always_comb begin
-    //     recent_data = mem_0.recent_data_for_addr(
-    //         proc2cache_addr[`XLEN-1:3], found
-    //     );
-    // end
-
-    // assert property (@(posedge clock) disable iff (reset)
-    //     (found && cache_valid_out)
-    //     |-> cache_data_out == recent_data
-    // );
-
-    // data_consistent: assert property(@(posedge clock)
-    //     (in_recent && cache_valid_out && mem_0.data_recent[j].valid) |-> (cache_data_out == mem_0.data_recent[in_recent_i].data)
-    // );
-    
 endmodule

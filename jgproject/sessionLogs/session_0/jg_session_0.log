@@ -5,10 +5,10 @@
 # version   : 2024.06p002 64 bits
 # build date: 2024.09.02 16:28:38 UTC
 # ----------------------------------------
-# started   : 2025-12-16 14:54:55 EST
+# started   : 2025-12-16 18:26:29 EST
 # hostname  : cadpc05.(none)
-# pid       : 2455585
-# arguments : '-label' 'session_0' '-console' '//127.0.0.1:40417' '-nowindow' '-style' 'windows' '-exitonerror' '-data' 'AAAAqnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSpiBmIdBlyGJIZGhhCGZIQPI5wDy0xgKGMqAbDUgq4xBnyETKJcIlk9liIfSyQzZDHpgXTlgswBfnRHb' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.postCmds.tcl'
+# pid       : 2531598
+# arguments : '-label' 'session_0' '-console' '//127.0.0.1:34003' '-nowindow' '-style' 'windows' '-exitonerror' '-data' 'AAAAqnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSpiBmIdBlyGJIZGhhCGZIQPI5wDy0xgKGMqAbDUgq4xBnyETKJcIlk9liIfSyQzZDHpgXTlgswBfnRHb' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.postCmds.tcl'
 
 Any disclosure about the Cadence Design Systems software or its use
 model to any third party violates the written Non-Disclosure Agreement
@@ -69,8 +69,8 @@ INFO: reading configuration file "/user/stud/fall23/das2313/.config/cadence/jasp
 [-- (VERI-1482)] Analyzing Verilog file './verilog/sys_defs.svh'
 [-- (VERI-1482)] Analyzing Verilog file './verilog/icache.sv'
 [INFO (VERI-1328)] ./verilog/icache.sv(11): analyzing included file 'verilog/sys_defs.svh'
-[WARN (VERI-1875)] ./verilog/icache.sv(124): identifier 'will_alloc' is used before its declaration
-[WARN (VERI-1875)] ./verilog/icache.sv(136): identifier 'will_alloc' is used before its declaration
+[WARN (VERI-1875)] ./verilog/icache.sv(131): identifier 'mshr_resp_idx' is used before its declaration
+[WARN (VERI-1875)] ./verilog/icache.sv(143): identifier 'will_alloc' is used before its declaration
 [-- (VERI-1482)] Analyzing Verilog file './fv/fv_mem.sv'
 [INFO (VERI-1328)] ./fv/fv_mem.sv(12): analyzing included file 'verilog/sys_defs.svh'
 [-- (VERI-1482)] Analyzing Verilog file './fv/icache_check.sv'
@@ -81,7 +81,7 @@ INFO: reading configuration file "/user/stud/fall23/das2313/.config/cadence/jasp
 % 
 % elaborate -top icache_check
 INFO (ISW003): Top module name is "icache_check".
-[INFO (HIER-8002)] ./fv/icache_check.sv(86): Disabling old hierarchical reference handler
+[INFO (HIER-8002)] ./fv/icache_check.sv(67): Disabling old hierarchical reference handler
 [WARN (VERI-1927)] ./fv/icache_check.sv(35): port 'proc2mem_data' remains unconnected for this instance
 [INFO (VERI-1018)] ./fv/fv_mem.sv(14): compiling module 'mem'
 [WARN (VERI-1209)] ./fv/fv_mem.sv(93): expression size 64 truncated to fit in target size 16
@@ -95,10 +95,6 @@ INFO (ISW003): Top module name is "icache_check".
 [INFO (VERI-8005)] ./fv/fv_mem.sv(38): Unintentional sequential element inferred for loaded_data read before write using blocking assignment
 [WARN (VERI-1796)] ./fv/fv_mem.sv(139): system function call isunknown with non-constant argument is not supported for synthesis
 [INFO (VERI-1018)] ./verilog/icache.sv(34): compiling module 'icache'
-[WARN (VERI-1899)] ./verilog/icache.sv(183): 'mshr_req_idx' inside always_comb block does not represent combinational logic
-[WARN (VERI-1899)] ./verilog/icache.sv(201): 'mshr_resp_idx' inside always_comb block does not represent combinational logic
-[WARN (VDB-1000)] ./verilog/icache.sv(103): net 'last_icache_addr[31].addr[31]' is constantly driven from multiple places
-[WARN (VDB-1001)] ./verilog/icache.sv(263): found another driver here
 [INFO (VERI-1018)] ./fv/icache_check.sv(5): compiling module 'icache_check'
 [WARN (VERI-8028)] ./fv/icache_check.sv(25): missing/open ports on instance mem_0 of module mem
 [WARN (VERI-1796)] ./fv/icache_check.sv(39): system function call isunknown with non-constant argument is not supported for synthesis
@@ -117,7 +113,6 @@ INFO (INL208): Elaboration synthesis summary:
   Number of analyzed Verilog modules      4 (4 synthesized)
   Number of analyzed VHDL entities        0 (0 synthesized)
 INFO (INL003): Clearing all state information (assumes, stopats, and so forth).
-INFO (IMDS005): Number of multiple-driven bits in design: 960. Use "get_design_info -list multiple_driven" for more information.
 icache_check
 [<embedded>] % clock clock -both_edges
 [<embedded>] % reset reset
@@ -127,29 +122,29 @@ INFO (IRS006): Current reset condition is "reset".
 [<embedded>] % get_design_info
 Statistics [for instance "icache_check"]
 ---------------------------
-# Flops:         193 (7297) (101 property flop bits)
-# Latches:       2 (2)
-# Gates:         1321 (138026)
-# Nets:          1617
+# Flops:         257 (6339) (103 property flop bits)
+# Latches:       0 (0)
+# Gates:         1259 (134805)
+# Nets:          1556
 # Ports:         0
-# RTL Lines:     468
+# RTL Lines:     465
 # RTL Instances: 3
 # Embedded Assumptions: 5
-# Embedded Assertions:  7
-# Embedded Covers:      11
-7299
+# Embedded Assertions:  8
+# Embedded Covers:      12
+6339
 [<embedded>] % prove -all
 Ncustom1: Custom engine code is hT3Ng7hPPfiYQOTDZ3qhYOwGAM51eA+J/FjkM5shLioAsqhgLR4Ft+O1BuKG6ilQ83B9tLXSl+CwjiTMAQA
 Bcustom2: Custom engine code is hT3Nm7hPr1Vp3Di1Ra2USNIGL4JypRnLKLAdF6JAyuavO2JfGCiY9OZJhcAcOUnLx5xwNdhILGrAWX9s+z2WDkKwNR7tAfClBEjRFVQeq6DU54boFgEA
 AMcustom3: Custom engine code is hT3Ng7hP/feYQOTDZ3qhYOwGAM51eA+J/FjkM5shLioAsqhgLR4Ft+O1BuKG6ilQ83B9tLXSmmqwm7g9AQA
 Mpcustom4: Custom engine code is hT3NZbhP9fmY2AbBQnsjfOxn6c+6e6yL+/e8fZFmaQrnlgEA
-INFO (IPF036): Starting proof on task: "<embedded>", 18 properties to prove with 0 already proven/unreachable
+INFO (IPF036): Starting proof on task: "<embedded>", 20 properties to prove with 0 already proven/unreachable
 INFO (IRS029): Starting reset analysis: phase 1 of 4.
 INFO (IRS030): Running reset analysis: phase 2 of 4.
 INFO (IRS031): Running reset analysis: phase 3 of 4.
 INFO (IRS020): Starting the reset analysis simulation with a limit of 100 iterations (phase 4 of 4).
 INFO (IRS024): Reset iterations 0 to 7 analyzed.
-INFO (IRS018): Reset analysis simulation executed for 6 iterations. Assigned values for 4173 of 5276 design flops, 0 of 2 design latches, 1081 of 2042 internal elements.
+INFO (IRS018): Reset analysis simulation executed for 6 iterations. Assigned values for 5133 of 6236 design flops, 0 of 0 design latches, 125 of 126 internal elements.
 INFO (IRS039): Reset analysis complete.
 INFO (IPF031): Settings used for proof thread 0:
     orchestration                 = on
@@ -166,8 +161,8 @@ ADcustom7: Custom engine code is hT3Nv7hPv1752HrFRa2kROx2f/ECJeZB2AZsLdlO8VwmIuq
 Tricustom8: Custom engine code is hT3Nu7hPt1752DvFRa0kNDiyIV97VyejwM9C/jCLJjdPvusZONHY42VYUy0Q1ZotnhcVtNc56tJ5wbxv6V2+XpdsaSlHck5vfnbYjdwj1OECy9U+7oSQ0SZE3g5ayD+Phuh4odCJTjeKa2k4elM9ldQfkAEA
 Gcustom9: Custom engine code is hT3NibhPDfeYQADBZnYcglOvK9Pfd7EOeniIqP8jNsyIqInncipMGcUXqAadachREE9F2PwhBUZUNw5kHnd4JdXkamORRgEA
 C2custom10: Custom engine code is hT3NirhPjfWYQADBZnYcglOvK9Pfd7EOeniIqP8jNsyIqInncgkrYMMXCYbdK0dUjZIF9d4cJ0rHoBDjwVLBKuG86XYVV00BAA
-0.0.PRE: A proof was found: No trace exists. [0.00 s]
 AGcustom11: Custom engine code is hT3NirhP/fmYQADBZnYcglOvK9Pfd7EOeniIqP8jNsyIqInnckcwYMMXCYbdK0dUjZIF9d4cJ0rHoBDjwVLBKuHEZnZByh0BAA
+0.0.PRE: A proof was found: No trace exists. [0.00 s]
 Bcustom12: Custom engine code is hT3NjrhPDfiYQADBZnYcglOvK9PfWxFtenjIyBqfrgr7if/jL/yPOuK1BAflEcW0DxNH2eDIoezN2gxlQFg81RZtiWXh7aiTAidvAQA
 INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.try_service" was proven in 0.00 s.
 Ncustom13: Custom engine code is hT3NR7hPByFp3TrFSTLhUmMH4KWtJglTyV/c51BHEeZWamnJv767nE6PCak26bd3gf3XGN3rIRheufhDieCJQVISo+gNYUKhiUedBKGtsP/a18svAnlMJZudHxDFwK5ufsyoxsIyiAeSY2oi3tEuoDHr5gw42DFKAG3PqO3CEsl8Azzdt3pl5nGA1Ifv2H02eYsFzWb/nfp8PMb3F0krE/EgBcm8TD9Div8BAA
@@ -177,24 +172,24 @@ INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.continue_attempts" w
 0: Found proofs for 2 properties in preprocessing
 0: Using multistage preprocessing
 0: Starting reduce
-0: Finished reduce in 0.054s
+0: Finished reduce in 0.058s
 0.0.PRE: Performing Proof Simplification...
-0.0.N: clocks: 5, declared: 3, looping: 0, posedge: 5, negedge: 0, noedge: 0, bothedge: 0
+0.0.N: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.N: Proof Simplification Iteration 1	[0.00 s]
 0.0.N: Proof Simplification Iteration 2	[0.01 s]
 0.0.N: Proof Simplification Iteration 3	[0.01 s]
-0.0.N: Proof Simplification Iteration 4	[0.01 s]
+0.0.N: Proof Simplification Iteration 4	[0.02 s]
 0.0.N: Proof Simplification Iteration 5	[0.02 s]
 0.0.PRE: Proof Simplification completed in 0.04 s
-0.0.N: Identified and disabled 4 duplicated targets.
+0.0.N: Identified and disabled 5 duplicated targets.
 0: About to start ProofGrid in its own thread with a limit of 10000 pending notifications and a limit of 10 traces.
 0: =============================== ProofGrid start ===============================
-0: ProofGrid usable level: 12
+0: ProofGrid usable level: 13
 0: Initial ProofGrid level: 1
 0: ProofGrid is starting event handling
-0.0.Hp: Proofgrid shell started at 2455675@cadpc05(local) jg_2455585_cadpc05_1
+0.0.Hp: Proofgrid shell started at 2531672@cadpc05(local) jg_2531598_cadpc05_1
+0.0.N: Proofgrid shell started at 2531671@cadpc05(local) jg_2531598_cadpc05_1
 0.0.Hp: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.N: Proofgrid shell started at 2455674@cadpc05(local) jg_2455585_cadpc05_1
 0.0.N: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.N: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
 0.0.N: Starting proof for property "icache_check.mem_0.data_out_lock:precondition1"	[0.00 s].
@@ -202,110 +197,100 @@ INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.continue_attempts" w
 0.0.N: Trace Attempt  1	[0.00 s]
 0.0.N: Trace Attempt  2	[0.00 s]
 0.0.N: Trace Attempt  3	[0.00 s]
-0.0.Hp: A proof was found: No trace exists. [0.02 s]
-INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.wont_clobber" was proven in 0.01 s.
-0.0.Hp: Trace Attempt  1	[0.02 s]
 0.0.N: Trace Attempt  3	[0.01 s]
 0.0.N: Trace Attempt  4	[0.02 s]
 0.0.N: Trace Attempt  5	[0.02 s]
-0.0.L: Proofgrid shell started at 2455710@cadpc05(local) jg_2455585_cadpc05_1
-0.0.Mpcustom4: Proofgrid shell started at 2455708@cadpc05(local) jg_2455585_cadpc05_1
-0.0.L: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.Mpcustom4: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.Bm: Proofgrid shell started at 2455707@cadpc05(local) jg_2455585_cadpc05_1
-0.0.L: Using trace diversification with seed 1 (0.05)
-0.0.L: Using LRU state removal heuristic
-0.0.Oh: Proofgrid shell started at 2455709@cadpc05(local) jg_2455585_cadpc05_1
-0.0.L: Using states from traces to { (reset) }
-0.0.Ht: Proofgrid shell started at 2455706@cadpc05(local) jg_2455585_cadpc05_1
-0.0.Bm: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.Oh: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.B: Proofgrid shell started at 2455711@cadpc05(local) jg_2455585_cadpc05_1
-0.0.Ht: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.Mpcustom4: Trace Attempt  1	[0.01 s]
-0.0.B: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.Bm: Trace Attempt  1	[0.01 s]
-0.0.Bm: Trace Attempt  2	[0.01 s]
-0.0.Bm: A trace with 2 cycles was found. [0.01 s]
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.not_stalled:precondition1" was covered in 2 cycles in 0.11 s.
-0.0.B: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
-0.0.B: Starting proof for property "icache_check.mem_0.data_out_lock:precondition1"	[0.00 s].
-0.0.B: Starting proof for property "icache_check.mem_0.data_in_flight:precondition1"	[0.00 s].
-0.0.Bm: Trace Attempt  3	[0.01 s]
-0.0.AM: Proofgrid shell started at 2455712@cadpc05(local) jg_2455585_cadpc05_1
-0.0.Bm: Trace Attempt  4	[0.01 s]
-0.0.Bm: A trace with 4 cycles was found. [0.01 s]
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.unique_addr:precondition1" was covered in 4 cycles in 0.13 s.
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.try_service:precondition1" was covered in 4 cycles in 0.13 s.
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.ever_full" was covered in 4 cycles in 0.13 s.
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.count_progresses:precondition1" was covered in 4 cycles in 0.13 s.
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.genblk1[1].slot_used" was covered in 4 cycles in 0.13 s.
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.continue_attempts:precondition1" was covered in 4 cycles in 0.13 s.
-0.0.Mpcustom4: Trace Attempt  2	[0.02 s]
-0.0.Bm: A trace with 4 cycles was found. [0.01 s]
-INFO (IPF055): 0.0.Bm: A counterexample (cex) with 4 cycles was found for the property "icache_check.icache_0.not_stalled" in 0.14 s.
-0.0.B: Trace Attempt  1	[0.00 s]
-0.0.Bm: Trace Attempt  5	[0.01 s]
-0.0.L: Trace Attempt  3	[0.02 s]
-0.0.B: Trace Attempt  2	[0.00 s]
-0.0.B: Trace Attempt  3	[0.00 s]
-0.0.AM: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.B: Trace Attempt  4	[0.00 s]
-0.0.B: Trace Attempt  5	[0.01 s]
-0.0.Bm: Trace Attempt  6	[0.01 s]
-0.0.Bm: A trace with 6 cycles was found. [0.01 s]
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.genblk1[0].slot_used" was covered in 6 cycles in 0.16 s.
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.wont_clobber:precondition1" was covered in 6 cycles in 0.16 s.
-INFO (IPF055): 0.0.Bm: A counterexample (cex) with 6 cycles was found for the property "icache_check.icache_0.never_full" in 0.16 s.
+0.0.Hp: A proof was found: No trace exists. [0.03 s]
+INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.wont_clobber" was proven in 0.02 s.
 0.0.N: Trace Attempt  7	[0.04 s]
-0.0.N: A trace with 7 cycles was found. [0.09 s]
-INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_out_lock:precondition1" was covered in 7 cycles in 0.25 s.
-INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_in_flight:precondition1" was covered in 7 cycles in 0.25 s.
-0.0.N: Stopped processing property "icache_check.mem_0.data_out_lock:precondition1"	[0.27 s].
-0.0.N: Stopped processing property "icache_check.mem_0.data_in_flight:precondition1"	[0.27 s].
-0.0.Bm: Trace Attempt  7	[0.02 s]
+0.0.N: A trace with 7 cycles was found. [0.07 s]
+INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_out_lock:precondition1" was covered in 7 cycles in 0.29 s.
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.unique_addr:precondition1" was covered in 4 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.try_service:precondition1" was covered in 4 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.does_free:precondition1" was covered in 6 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.genblk1[0].slot_used" was covered in 6 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.wont_clobber:precondition1" was covered in 6 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.count_progresses:precondition1" was covered in 4 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_in_flight:precondition1" was covered in 7 cycles in 0.29 s.
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.genblk1[1].slot_used" was covered in 4 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.continue_attempts:precondition1" was covered in 4 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF055): 0.0.N: A counterexample (cex) with 6 cycles was found for the property "icache_check.icache_0.never_full" in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.ever_full" was covered in 6 cycles in 0.29 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+0.0.N: Stopped processing property "icache_check.mem_0.data_out_lock:precondition1"	[0.32 s].
+0.0.N: Stopped processing property "icache_check.mem_0.data_in_flight:precondition1"	[0.32 s].
 0.0.N: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.AM: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
-0.0.AM: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.B: Trace Attempt  6	[0.01 s]
-0.0.B: Stopped processing property "icache_check.mem_0.data_out_lock:precondition1"	[0.07 s].
-0.0.B: Stopped processing property "icache_check.mem_0.data_in_flight:precondition1"	[0.07 s].
-0.0.B: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.AM: Trace Attempt  1	[0.00 s]
-0.0.AM: Trace Attempt  2	[0.00 s]
 0.0.N: Trace Attempt  1	[0.00 s]
+0.0.N: Trace Attempt  2	[0.00 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  3	[0.01 s]
+0.0.N: Trace Attempt  4	[0.01 s]
+0.0.N: Trace Attempt  4	[0.02 s]
+0.0.N: Trace Attempt  5	[0.02 s]
+0.0.Ht: Proofgrid shell started at 2531703@cadpc05(local) jg_2531598_cadpc05_1
+0.0.Ht: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.Bm: Proofgrid shell started at 2531704@cadpc05(local) jg_2531598_cadpc05_1
+0.0.Oh: Proofgrid shell started at 2531706@cadpc05(local) jg_2531598_cadpc05_1
+0.0.Hp: Trace Attempt  1	[0.12 s]
+0.0.Hp: Trace Attempt  2	[0.12 s]
+0.0.Mpcustom4: Proofgrid shell started at 2531705@cadpc05(local) jg_2531598_cadpc05_1
+0.0.L: Proofgrid shell started at 2531707@cadpc05(local) jg_2531598_cadpc05_1
+0.0.Oh: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.Bm: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.Mpcustom4: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.B: Proofgrid shell started at 2531708@cadpc05(local) jg_2531598_cadpc05_1
+0.0.L: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.Ht: Trace Attempt  1	[0.02 s]
 0.0.Ht: Trace Attempt  2	[0.02 s]
-0.0.N: Trace Attempt  2	[0.00 s]
+0.0.Bm: Trace Attempt  1	[0.01 s]
+0.0.Bm: Trace Attempt  2	[0.01 s]
 0.0.Ht: Trace Attempt  3	[0.02 s]
-0.0.AM: Trace Attempt  3	[0.00 s]
-0.0.AM: Trace Attempt  4	[0.00 s]
+0.0.Bm: Trace Attempt  3	[0.01 s]
+0.0.B: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.Bm: Trace Attempt  4	[0.01 s]
+0.0.L: Using trace diversification with seed 1 (0.05)
+0.0.L: Using LRU state removal heuristic
+0.0.Bm: Trace Attempt  5	[0.01 s]
+0.0.Ht: Trace Attempt  4	[0.02 s]
+0.0.L: Using states from traces to { (reset) }
+0.0.Ht: Trace Attempt  5	[0.02 s]
+0.0.AM: Proofgrid shell started at 2531709@cadpc05(local) jg_2531598_cadpc05_1
+0.0.Mpcustom4: Trace Attempt  1	[0.01 s]
+0.0.B: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
+0.0.B: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.AM: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.B: Trace Attempt  1	[0.00 s]
 0.0.B: Trace Attempt  2	[0.00 s]
-0.0.Ht: Trace Attempt  4	[0.02 s]
 0.0.B: Trace Attempt  3	[0.01 s]
+0.0.Mpcustom4: Trace Attempt  2	[0.02 s]
 0.0.B: Trace Attempt  4	[0.01 s]
-0.0.Ht: Trace Attempt  5	[0.02 s]
+0.0.AM: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
+0.0.AM: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.Bm: Trace Attempt  8	[0.02 s]
+0.0.Bm: A trace with 8 cycles was found. [0.02 s]
+INFO (IPF055): 0.0.Bm: A counterexample (cex) with 8 cycles was found for the property "icache_check.icache_0.valid_addr" in 0.00 s.
+INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.valid_addr:precondition1" was covered in 8 cycles in 0.00 s.
 0.0.B: Trace Attempt  5	[0.01 s]
-0.0.N: Trace Attempt  2	[0.01 s]
-0.0.L: Trace Attempt  4	[0.04 s]
-0.0.N: Trace Attempt  3	[0.02 s]
-0.0.N: Trace Attempt  4	[0.02 s]
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.Bm: Trace Attempt  9	[0.03 s]
+0.0.AM: Trace Attempt  3	[0.00 s]
+0.0.AM: Trace Attempt  4	[0.00 s]
+0.0.L: Trace Attempt  3	[0.03 s]
 0.0.AM: Trace Attempt  5	[0.02 s]
-0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
-0.0.L: Trace Attempt  3	[0.06 s]
-0.0.AM: Trace Attempt  1	[0.04 s]
-0.0.N: Trace Attempt  4	[0.04 s]
-0.0.AM: Trace Attempt  2	[0.04 s]
-0.0.AM: Trace Attempt  3	[0.04 s]
+INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.unique_addr:precondition1" in 0.10 s.
+INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.genblk1[1].slot_used" in 0.12 s.
 0.0.L: Trace Attempt  4	[0.07 s]
-0.0.N: Trace Attempt  5	[0.05 s]
-0.0.L: Using states from traces to { icache_check.icache_0.genblk1[0].slot_used (5) }
-0.0.L: Trace Attempt  3	[0.09 s]
-0.0.L: Overconstrained local search, searching for dead end trace with 6 - 8 cycles
-0.0.N: Trace Attempt  1	[0.08 s]
-0.0.N: Trace Attempt  2	[0.09 s]
-0.0.N: Trace Attempt  3	[0.09 s]
+0.0.N: Trace Attempt  1	[0.12 s]
+0.0.N: Trace Attempt  2	[0.12 s]
+0.0.N: Trace Attempt  3	[0.12 s]
+0.0.N: Trace Attempt  4	[0.13 s]
+0.0.Oh: bwd trail(1): 1 0.0887206s
+0.0.Oh: All properties either determined or skipped. [0.10 s]
+0.0.Oh: Exited with Success (@ 0.23 s)
+0.0.Oh: Completed, Restart ignored.
+0: ProofGrid usable level: 3
+0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
+0.0.AM: Trace Attempt  1	[0.09 s]
 0.0.N: Requesting engine job to terminate
 0.0.B: Requesting engine job to terminate
 0.0.AM: Requesting engine job to terminate
@@ -313,43 +298,41 @@ INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_in_flight:prec
 0.0.Ht: Requesting engine job to terminate
 0.0.Bm: Requesting engine job to terminate
 0.0.Mpcustom4: Requesting engine job to terminate
-0.0.Oh: Requesting engine job to terminate
 0.0.L: Requesting engine job to terminate
-INFO (IPF144): 0: Initiating shutdown of proof [0.20 s]
-0.0.Hp: A proof was found: No trace exists. [0.20 s]
-INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.unique_addr" was proven in 0.28 s.
-0.0.Hp: A proof was found: No trace exists. [0.20 s]
-INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.count_progresses" was proven in 0.28 s.
-0.0.Hp: All properties determined. [0.20 s]
-0.0.N: Stopped processing property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.AM: Stopped processing property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.AM: All properties determined. [0.10 s]
-0.0.N: All properties determined. [0.10 s]
-0.0.AM: Exited with Success (@ 0.21 s)
+INFO (IPF144): 0: Initiating shutdown of proof [0.24 s]
+0.0.Hp: A proof was found: No trace exists. [0.23 s]
+INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.unique_addr" was proven in 0.44 s.
+0.0.Hp: A proof was found: No trace exists. [0.23 s]
+INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.does_free" was proven in 0.44 s.
+0.0.Hp: A proof was found: No trace exists. [0.23 s]
+INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.count_progresses" was proven in 0.44 s.
+0.0.Hp: All properties determined. [0.23 s]
+0.0.N: Stopped processing property "icache_check.icache_0.unique_addr"	[0.13 s].
+0.0.N: All properties determined. [0.15 s]
+0.0.AM: Trace Attempt  2	[0.09 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.unique_addr"	[0.12 s].
+0.0.N: Exited with Success (@ 0.24 s)
 0: ProofGrid usable level: 0
-0.0.B: Trace Attempt 16	[0.09 s]
-0.0.B: Stopped processing property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.N: Exited with Success (@ 0.21 s)
-0.0.B: All properties determined. [0.10 s]
-0.0.L: Trace Attempt  6	[0.09 s]
-0.0.L: All properties determined. [0.13 s]
-0.0.B: Exited with Success (@ 0.21 s)
 0.0.Ht: Interrupted (multi)
-0.0.Ht: Trace Attempt 20	[0.11 s]
+0.0.Ht: Trace Attempt 20	[0.12 s]
 0.0.Ht: All properties determined. [0.12 s]
-0.0.L: Exited with Success (@ 0.22 s)
-0.0.Bm: Trace Attempt 21	[0.11 s]
-0.0.Bm: All properties determined. [0.13 s]
-0.0.Ht: Exited with Success (@ 0.22 s)
-0.0.Bm: Exited with Success (@ 0.23 s)
-0.0.Oh: bwd trail(1): 1 0.140719s
-0.0.Hp: Exited with Success (@ 0.24 s)
-0.0.Oh: All properties determined. [0.15 s]
-0.0.Oh: Exited with Success (@ 0.25 s)
-0.0.Mpcustom4: All properties determined. [0.16 s]
-0.0.Mpcustom4: Exited with Success (@ 0.25 s)
+0.0.AM: All properties determined. [0.09 s]
+0.0.L: All properties determined. [0.11 s]
+0.0.AM: Exited with Success (@ 0.24 s)
+0.0.B: Trace Attempt 16	[0.09 s]
+0.0.B: Stopped processing property "icache_check.icache_0.unique_addr"	[0.12 s].
+0.0.L: Exited with Success (@ 0.25 s)
+0.0.B: All properties determined. [0.10 s]
+0.0.Bm: Trace Attempt 20	[0.11 s]
+0.0.Bm: All properties determined. [0.12 s]
+0.0.B: Exited with Success (@ 0.25 s)
+0.0.Bm: Exited with Success (@ 0.25 s)
+0.0.Hp: Exited with Success (@ 0.26 s)
+0.0.Ht: Exited with Success (@ 0.26 s)
+0.0.Mpcustom4: All properties determined. [0.17 s]
+0.0.Mpcustom4: Exited with Success (@ 0.30 s)
 0: --------------------------------------------------------------
-ProofGrid Summary (utilization 61.73 %)
+ProofGrid Summary (utilization 54.72 %)
 --------------------------------------------------------------
      engines started                               :     9
      engine jobs started                           :     9
@@ -358,25 +341,25 @@ ProofGrid Summary (utilization 61.73 %)
     ------------------------------------------------------
     Engine  Pending     Running        Dead    Utilization
     ------------------------------------------------------
-      N        0.08        0.19        0.00       70.93 %
-     Hp        0.06        0.20        0.00       76.36 %
-     Ht        0.09        0.11        0.00       54.49 %
-     Bm        0.08        0.11        0.00       57.24 %
-    Mpcustom4        0.08        0.12        0.00       60.38 %
-     Oh        0.08        0.11        0.00       57.40 %
-      L        0.07        0.12        0.00       61.74 %
-      B        0.08        0.11        0.00       55.92 %
-     AM        0.09        0.10        0.00       52.71 %
-    all        0.08        0.13        0.00       61.73 %
+      N        0.09        0.23        0.00       70.89 %
+     Hp        0.07        0.23        0.00       75.23 %
+     Ht        0.11        0.12        0.00       51.49 %
+     Bm        0.12        0.11        0.00       48.61 %
+    Mpcustom4        0.12        0.11        0.00       48.43 %
+     Oh        0.11        0.10        0.00       45.99 %
+      L        0.12        0.11        0.00       47.64 %
+      B        0.12        0.10        0.00       46.41 %
+     AM        0.12        0.09        0.00       42.87 %
+    all        0.11        0.13        0.00       54.72 %
 
     Total time in state (seconds)
     -----------------------------------------
             Pending     Running        Dead  
     -----------------------------------------
-               0.72        1.16        0.00
+               0.99        1.20        0.00
 
-    Data read    : 115.08 kiB
-    Data written : 6.13 kiB
+    Data read    : 82.78 kiB
+    Data written : 6.32 kiB
 
 0: All pending notifications were processed.
 INFO (IPF059): 0: Completed proof on task: "<embedded>"
@@ -384,21 +367,21 @@ INFO (IPF059): 0: Completed proof on task: "<embedded>"
 ==============================================================
 SUMMARY
 ==============================================================
-           Properties Considered              : 18
-                 assertions                   : 7
-                  - proven                    : 5 (71.4286%)
+           Properties Considered              : 20
+                 assertions                   : 8
+                  - proven                    : 6 (75%)
                   - bounded_proven (user)     : 0 (0%)
                   - bounded_proven (auto)     : 0 (0%)
                   - marked_proven             : 0 (0%)
-                  - cex                       : 2 (28.5714%)
+                  - cex                       : 2 (25%)
                   - ar_cex                    : 0 (0%)
                   - undetermined              : 0 (0%)
                   - unknown                   : 0 (0%)
                   - error                     : 0 (0%)
-                 covers                       : 11
+                 covers                       : 12
                   - unreachable               : 0 (0%)
                   - bounded_unreachable (user): 0 (0%)
-                  - covered                   : 11 (100%)
+                  - covered                   : 12 (100%)
                   - ar_covered                : 0 (0%)
                   - undetermined              : 0 (0%)
                   - unknown                   : 0 (0%)
@@ -412,7 +395,7 @@ determined
     2024.06p002 64 bits for Linux64 3.10.0-1160.21.1.el7.x86_64
     Host Name: cadpc05.ee.columbia.edu
     User Name: das2313
-    Printed on: Tuesday, Dec16, 2025 02:54:57 PM EST
+    Printed on: Tuesday, Dec16, 2025 06:26:32 PM EST
     Working Directory: /homes/user/stud/fall23/das2313/csee4824/csee4824-final-project
 
 
@@ -425,24 +408,26 @@ RESULTS
 ------------------------------------------------------------------------------------------------------------------
 
 ---[ <embedded> ]-------------------------------------------------------------------------------------------------
-[1]   icache_check.mem_0.data_out_lock:precondition1                  covered         N             7    0.253 s      
-[2]   icache_check.mem_0.data_in_flight:precondition1                 covered         N             7    0.253 s      
-[3]   icache_check.icache_0.unique_addr                               proven          Hp     Infinite    0.278 s      
-[4]   icache_check.icache_0.unique_addr:precondition1                 covered         Bm            4    0.125 s      
+[1]   icache_check.mem_0.data_out_lock:precondition1                  covered         N             7    0.288 s      
+[2]   icache_check.mem_0.data_in_flight:precondition1                 covered         N             7    0.288 s      
+[3]   icache_check.icache_0.unique_addr                               proven          Hp     Infinite    0.444 s      
+[4]   icache_check.icache_0.unique_addr:precondition1                 covered         N             4    0.288 s      
 [5]   icache_check.icache_0.try_service                               proven          PRE    Infinite    0.000 s      
-[6]   icache_check.icache_0.try_service:precondition1                 covered         Bm            4    0.125 s      
-[7]   icache_check.icache_0.not_stalled                               cex             Bm            4    0.142 s      
-[8]   icache_check.icache_0.not_stalled:precondition1                 covered         Bm            2    0.106 s      
-[9]   icache_check.icache_0.genblk1[0].slot_used                      covered         Bm            6    0.159 s      
-[10]  icache_check.icache_0.genblk1[1].slot_used                      covered         Bm            4    0.125 s      
-[11]  icache_check.icache_0.wont_clobber                              proven          Hp     Infinite    0.013 s      
-[12]  icache_check.icache_0.wont_clobber:precondition1                covered         Bm            6    0.159 s      
-[13]  icache_check.icache_0.never_full                                cex             Bm            6    0.159 s      
-[14]  icache_check.icache_0.ever_full                                 covered         Bm            4    0.125 s      
-[15]  icache_check.icache_0.count_progresses                          proven          Hp     Infinite    0.278 s      
-[16]  icache_check.icache_0.count_progresses:precondition1            covered         Bm            4    0.125 s      
-[17]  icache_check.icache_0.continue_attempts                         proven          PRE    Infinite    0.000 s      
-[18]  icache_check.icache_0.continue_attempts:precondition1           covered         Bm            4    0.125 s      
+[6]   icache_check.icache_0.try_service:precondition1                 covered         N         2 - 4    0.288 s      
+[7]   icache_check.icache_0.valid_addr                                cex             Bm            8    0.002 s      
+[8]   icache_check.icache_0.valid_addr:precondition1                  covered         Bm            8    0.002 s      
+[9]   icache_check.icache_0.does_free                                 proven          Hp     Infinite    0.444 s      
+[10]  icache_check.icache_0.does_free:precondition1                   covered         N         2 - 6    0.288 s      
+[11]  icache_check.icache_0.genblk1[0].slot_used                      covered         N         4 - 6    0.288 s      
+[12]  icache_check.icache_0.genblk1[1].slot_used                      covered         N             4    0.288 s      
+[13]  icache_check.icache_0.wont_clobber                              proven          Hp     Infinite    0.016 s      
+[14]  icache_check.icache_0.wont_clobber:precondition1                covered         N         2 - 6    0.288 s      
+[15]  icache_check.icache_0.never_full                                cex             N         2 - 6    0.288 s      
+[16]  icache_check.icache_0.ever_full                                 covered         N         2 - 6    0.288 s      
+[17]  icache_check.icache_0.count_progresses                          proven          Hp     Infinite    0.444 s      
+[18]  icache_check.icache_0.count_progresses:precondition1            covered         N         2 - 4    0.288 s      
+[19]  icache_check.icache_0.continue_attempts                         proven          PRE    Infinite    0.000 s      
+[20]  icache_check.icache_0.continue_attempts:precondition1           covered         N         2 - 4    0.288 s      
 
 ==============================================================
 ASSUMPTIONS
@@ -463,6 +448,6 @@ INFO (IPL005): Received request to exit from the console.
 INFO (IPL014): Waiting for the Tcl-thread to exit.
 INFO: Waiting for proof threads to stop...
 INFO: Proof threads stopped.
-INFO (IPL018): The peak resident set memory use for this session was 0.470 GB.
+INFO (IPL018): The peak resident set memory use for this session was 0.446 GB.
 INFO (IPL015): The Tcl-thread exited with status 0.
 INFO (IPL016): Exiting the analysis session with status 0.

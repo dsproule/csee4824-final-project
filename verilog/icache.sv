@@ -14,7 +14,7 @@
 `define CACHE_LINES 32
 `define CACHE_LINE_BITS $clog2(`CACHE_LINES)
 // how many outstanding misses to handle at a time
-`define MSHR_SLOTS 5
+`define MSHR_SLOTS 2
 
 typedef struct packed {
     logic [63:0]                  data;
@@ -93,14 +93,15 @@ module icache (
     end
 
     `ifdef FORMAL
+
         LAST_ICACHE last_icache_addr [`CACHE_LINES-1:0];
 
-        always_ff @(posedge clock) begin
-            if (reset)
-                for (int formal_i = 0; formal_i < `CACHE_LINES; formal_i++) begin
-                    last_icache_addr[formal_i] <= '0;
-                end
-        end
+        // always_ff @(posedge clock) begin
+        //     if (reset)
+        //         for (int formal_i = 0; formal_i < `CACHE_LINES; formal_i++) begin
+        //             last_icache_addr[formal_i] <= '0;
+        //         end
+        // end
 
         // address only will ever occupy one mshr slot
         int o;
@@ -119,9 +120,15 @@ module icache (
         // cache will respond to memory servicing
         try_service: assert property(@(posedge clock) miss_outstanding |-> BUS_LOAD == proc2Imem_command);
 
+        addr_hidden: assert property(@(posedge clock)
+            (!mem_forward && Icache_valid_out) |-> 
+                    last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]
+        );
+        
         // cache will continue trying to service cache_addr until done
-        not_stalled: assert property(@(posedge clock)
-            !Icache_valid_out |-> alloc_count() > 1 || will_alloc || current_in_cache
+
+        does_free: assert property(@(posedge clock)
+            got_mem_data |-> ##1 mshr[$past(mshr_resp_idx)].valid == `FALSE
         );
 
         // if possible, cache will attempt prefetch
@@ -138,6 +145,7 @@ module icache (
         // cache never fills (interesting because we didn't know this)
         never_full: assert property(@(posedge clock) alloc_count() < `MSHR_SLOTS);
         
+        // discovered max to be 2 but added this here so we don't trigger always (real assertion)
         ever_full: cover property(@(posedge clock) alloc_count() == `MSHR_SLOTS);
 
         // count progesses 
@@ -172,6 +180,7 @@ module icache (
     logic miss_outstanding;
     // checks mshr for any addr without mem tags (means they need to request an addr)
     always_comb begin
+        mshr_req_idx     = 0;
         miss_outstanding = 0;
 
         for (logic [$clog2(`MSHR_SLOTS):0] mshr_miss_idx = 0; mshr_miss_idx < `MSHR_SLOTS; mshr_miss_idx++) begin
@@ -188,7 +197,8 @@ module icache (
     logic got_mem_data;
     // if any of the mem_tags match the memory response, set the flag and save the idx
     always_comb begin
-        got_mem_data = 0;
+        got_mem_data  = 0;
+        mshr_resp_idx = 0;        
 
         for (logic [$clog2(`MSHR_SLOTS):0] mshr_miss_idx = 0; mshr_miss_idx < `MSHR_SLOTS; mshr_miss_idx++) begin
             if ((mshr[mshr_miss_idx].mem_tag == Imem2proc_tag) & mshr[mshr_miss_idx].valid & (Imem2proc_tag != 0)) begin
@@ -227,6 +237,12 @@ module icache (
             icache_data    <= 0; // Set all cache data to 0 (including valid bits)
             fetch_main_addr <= 0;
             last_fetch_hit <= 0;
+
+            `ifdef FORMAL
+            for (int formal_i = 0; formal_i < `CACHE_LINES; formal_i++) begin
+                last_icache_addr[formal_i] <= '0;
+            end
+            `endif
         end else begin
             last_fetch_hit <= Icache_valid_out;
             // if slot is empty and the req address is not present, allocate it
