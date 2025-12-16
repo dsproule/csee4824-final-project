@@ -114,16 +114,12 @@ module icache (
         end endgenerate
 
         // tags can potentially hide allocations
-        addr_correct: assert property(@(posedge clock)
+        addr_correct: assert property(@(posedge clock) disable iff (reset) 
             (!mem_forward && Icache_valid_out && last_icache_addr[main_index].valid) |-> last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]
         );
         
         continue_attempts: assert property(@(posedge clock)
-            miss_outstanding |-> proc2Imem_command == BUS_LOAD
-        );
-
-        values_valid: assume property(@(posedge clock) 
-            !$isunknown(last_icache_addr[main_index].addr) && !$isunknown(last_icache_addr[main_index].valid));
+            miss_outstanding |-> proc2Imem_command == BUS_LOAD);
         
     `endif
 

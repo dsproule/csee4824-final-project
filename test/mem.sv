@@ -42,16 +42,15 @@ module mem (
     wire valid_address = (proc2mem_addr[2:0]==3'b0) &
                          (proc2mem_addr<`MEM_SIZE_IN_BYTES);
 
-    `ifdef FORMAL
-        // guarantees value provided matches what was loaded from mem
-        data_out_lock: assume property(@(negedge clk)
-            (mem2proc_tag != 0) |-> mem2proc_data == loaded_data[mem2proc_tag]);
+    // `ifdef FORMAL
+    //     // guarantees value provided matches what was loaded from mem
+    //     data_out_lock: assume property(@(negedge clk)
+    //         (mem2proc_tag != 0) |-> mem2proc_data == loaded_data[mem2proc_tag]);
 
-        // guarantees that if providing a value, we were waiting on a valid request
-        data_in_flight: assume property (@(negedge clk)
-            (mem2proc_tag != 0) |-> $past(waiting_for_bus[mem2proc_tag]));
-
-    `endif
+    //     // guarantees that if providing a value, we were waiting on a valid request
+    //     data_in_flight: assume property (@(negedge clk)
+    //         (mem2proc_tag != 0) |-> $past(waiting_for_bus[mem2proc_tag]));
+    // `endif
 
     always @(negedge clk) begin
         next_mem2proc_tag      = 4'b0;

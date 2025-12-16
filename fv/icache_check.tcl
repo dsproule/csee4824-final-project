@@ -1,5 +1,6 @@
 set ROOT_PATH .
 set RTL_PATH ${ROOT_PATH}/verilog
+set FV_PATH ${ROOT_PATH}/fv
 
 set CLOCK_PERIOD 1300
 
@@ -10,7 +11,7 @@ analyze -sv \
     ${RTL_PATH}/sys_defs.svh \
     ${RTL_PATH}/icache.sv \
     ${ROOT_PATH}/test/mem.sv \
-    ${ROOT_PATH}/fv/icache_check.sv
+    ${FV_PATH}/icache_check.sv
 
 elaborate -top icache_check
 clock clock -both_edges
