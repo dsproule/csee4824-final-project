@@ -5,6 +5,7 @@ set CLOCK_PERIOD 1300
 
 analyze -sv \
     +define+CLOCK_PERIOD=${CLOCK_PERIOD} \
+    +define+FORMAL \
     -incdir ${ROOT_PATH} \
     ${RTL_PATH}/sys_defs.svh \
     ${RTL_PATH}/icache.sv \

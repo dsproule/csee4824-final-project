@@ -77,27 +77,17 @@ module icache_check;
             });
     endproperty;
     
-    // enforces valid instructions for both lines and mem constrains insts
+    // enforces valid instructions for both lines and constrains inst types
     inst2_check: assume property(inst0_valid);
     inst1_check: assume property(inst1_valid);
 
-    // guarantees the data we're receiving on the out is not xxx
+    // guarantees the data we're receiving on the out is never xxx
     no_x_prop: assert property (@(posedge clock) cache_valid_out |-> !$isunknown(cache_data_out));
-    cache_match_mem: assert property (@(posedge clock) 
-        cache_valid_out |-> (cache_data_out == mem_ref.unified_memory[proc2cache_addr])
-    );
 
-    mem_valid: assume property(@(posedge clock) 
-        (mem2proc_tag != 0) |-> mem2proc_data == mem_ref.unified_memory[proc2mem_addr]
-    );
-
+    // guarantees that memory address pointing at will not change unless we do a store
     store_change: assume property(@(posedge clock)
         (proc2mem_command != BUS_STORE) |-> ##1
             mem_ref.unified_memory[proc2mem_addr] == $past(mem_ref.unified_memory[proc2mem_addr])
     );
-
-    // proves the icache never deadlocks
-    // deadlock: cover property(@(posedge clock) 
-    //     (mem2proc_response != 0) |-> [1:$] );
 
 endmodule

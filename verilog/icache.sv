@@ -30,6 +30,7 @@ typedef struct packed {
     logic valid;
 } MSHR_ENTRY_I;
 
+
 module icache (
     input clock,
     input reset,
@@ -50,6 +51,12 @@ module icache (
     output logic [63:0] Icache_data_out, // Data is mem[proc2Icache_addr]
     output logic        Icache_valid_out // When valid is high
 );
+    `ifdef FORMAL
+        typedef struct packed {
+            logic [`XLEN-1:3] addr;
+            logic valid;
+        } LAST_ICACHE;
+    `endif
 
     // ---- Cache data ---- //
 
@@ -84,6 +91,25 @@ module icache (
                                 (icache_data[main_index].tags == main_tag);
         end
     end
+
+    `ifdef FORMAL
+        LAST_ICACHE last_icache_addr [`CACHE_LINES-1:0];
+
+        always_ff @(posedge clock) begin
+            if (reset)
+                for (int formal_i = 0; formal_i < `CACHE_LINES; formal_i++) begin
+                    last_icache_addr[formal_i] <= '0;
+                end
+        end
+
+        // prove addr in cache is actually the address queried (relevant becaus only 12 bits used)
+        refer_same_addr: assert property(@(posedge clock)
+            Icache_valid_out |-> proc2Icache_addr[`XLEN-1:3] == last_icache_addr[main_index].addr);
+        
+        assume property(@(posedge clock) 
+            !$isunknown(last_icache_addr[main_index].addr) && $isunknown(last_icache_addr[main_index].valid));
+        // 
+    `endif
 
     logic [$clog2(`MSHR_SLOTS)-1:0] mshr_next_idx;
     logic current_in_mshr;
@@ -176,6 +202,11 @@ module icache (
                 icache_data[resp_index].data  <= Imem2proc_data;
                 icache_data[resp_index].tags  <= resp_tag;
                 icache_data[resp_index].valid <= 1;
+
+                `ifdef FORMAL
+                    last_icache_addr[resp_index].addr  <= mshr[mshr_resp_idx].addr[`XLEN-1:3];
+                    last_icache_addr[resp_index].valid <= 1'b1;
+                `endif
 
                 if (mshr[mshr_resp_idx].addr == proc2Icache_addr[`XLEN-1:3])
                     fetch_main_addr <= 0;

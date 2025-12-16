@@ -42,6 +42,17 @@ module mem (
     wire valid_address = (proc2mem_addr[2:0]==3'b0) &
                          (proc2mem_addr<`MEM_SIZE_IN_BYTES);
 
+    `ifdef FORMAL
+        // guarantees value provided matches what was loaded from mem
+        data_out_lock: assume property(@(negedge clk)
+            (mem2proc_tag != 0) |-> mem2proc_data == loaded_data[mem2proc_tag]);
+
+        // guarantees that if providing a value, we were waiting on a valid request
+        data_in_flight: assume property (@(negedge clk)
+            (mem2proc_tag != 0) |-> $past(waiting_for_bus[mem2proc_tag]));
+
+    `endif
+
     always @(negedge clk) begin
         next_mem2proc_tag      = 4'b0;
         next_mem2proc_response = 4'b0;
@@ -54,7 +65,8 @@ module mem (
             if(cycles_left[i]>16'd0) begin
                 cycles_left[i] = cycles_left[i]-16'd1;
 
-            end else if(acquire_tag && !waiting_for_bus[i]) begin
+            // receives the value
+            end else if (acquire_tag && !waiting_for_bus[i]) begin
                 next_mem2proc_response = i;
                 acquire_tag            = 1'b0;
                 cycles_left[i]         = `MEM_LATENCY_IN_CYCLES;
@@ -68,8 +80,10 @@ module mem (
                 end else begin
                     unified_memory[proc2mem_addr[`XLEN-1:3]]=proc2mem_data;
                 end
+
             end
 
+            // places value for proper response
             if((cycles_left[i]==16'd0) && waiting_for_bus[i] && !bus_filled) begin
                     bus_filled         = 1'b1;
                     next_mem2proc_tag  = i;
