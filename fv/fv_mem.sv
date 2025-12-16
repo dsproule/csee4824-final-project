@@ -13,10 +13,13 @@
 
 module mem (
     input             clk,           // Memory clock
+    input             reset,           // Memory clock
     input [`XLEN-1:0] proc2mem_addr, // address for current command
                                      // support for memory model with byte level addressing
     input [63:0]      proc2mem_data, // address for current command
     input [1:0]       proc2mem_command, // `BUS_NONE `BUS_LOAD or `BUS_STORE
+
+    input logic [63:0] fv_load_data,
 
     output logic [3:0]  mem2proc_response, // 0 = can't accept, other=tag of transaction
     output logic [63:0] mem2proc_data,     // data resulting from a load
@@ -42,20 +45,12 @@ module mem (
     // Implement the Memory function
     wire valid_address = (proc2mem_addr[2:0]==3'b0) &
                          (proc2mem_addr<`MEM_SIZE_IN_BYTES);
-
-    // guarantees value provided matches what was loaded from mem
-    // data_out_lock: assume property(@(negedge clk)
-    //     (mem2proc_tag != 0) |-> mem2proc_data == loaded_data[mem2proc_tag]);
-
-    // // guarantees that if providing a value, we were waiting on a valid request
-    // data_in_flight: assume property (@(negedge clk)
-    //     (mem2proc_tag != 0) |-> $past(waiting_for_bus[mem2proc_tag]));
     
-    // Maintain record of recent `NUME_MEM_TAGS requests (guaranteed state)
+    // Maintain record of recent `NUM_MEM_TAGS requests (guaranteed state)
     MEM_REQ     data_recent    [`NUM_MEM_TAGS:0];
     
     logic   in_recent;
-    logic [4:0] in_recent_slot;
+    logic [3:0] in_recent_i;
 
     always @(negedge clk) begin
         if (reset) begin
@@ -80,7 +75,7 @@ module mem (
 
             // memory management
             in_recent = 1'b0;
-            for (int i = 0; i <= `NUME_MEM_TAGS; i++) begin
+            for (int i = 0; i <= `NUM_MEM_TAGS; i++) begin
                 if (data_recent[i].valid && data_recent[i].addr == proc2mem_addr[`XLEN-1:3]) begin
                     in_recent   = 1'b1;
                     in_recent_i = i;
@@ -99,13 +94,13 @@ module mem (
 
                     if (proc2mem_command == BUS_LOAD) begin
                         waiting_for_bus[i] = 1'b1;
-                        loaded_data[i] = $anyseq;
+                        loaded_data[i] = (!in_recent) ? fv_load_data : data_recent[in_recent_i].data;
                     end 
 
                     if (in_recent) begin
                         // update value
                         if (proc2mem_command == BUS_STORE)
-                            data_recent[in_recent_i] = proc2mem_data;
+                            data_recent[in_recent_i].data = proc2mem_data;
                     end else begin
                         // shift entire array
                         for (int j = 0; j < `NUM_MEM_TAGS - 1; j++)
@@ -132,5 +127,30 @@ module mem (
             mem2proc_tag      <= next_mem2proc_tag;
         end
     end
+
+    // guarantees value provided matches what was loaded from mem
+    data_out_lock: assume property(@(negedge clk)
+        (mem2proc_tag != 0) |-> mem2proc_data == data_recent[in_recent_i].data);
+
+    // guarantees that if providing a value, we were waiting on a valid request
+    data_in_flight: assume property (@(negedge clk)
+        (mem2proc_tag != 0) |-> $past(waiting_for_bus[mem2proc_tag]));
+
+    assume property(@(negedge clk) !$isunknown(fv_load_data));
+
+    function automatic logic [63:0] recent_data_for_addr(
+        input logic [`XLEN-1:3] addr,
+        
+        output logic found
+    );
+        found = 1'b0;
+        recent_data_for_addr = '0;
+        for (int j = 0; j <= `NUM_MEM_TAGS; j++) begin
+            if (data_recent[j].valid && data_recent[j].addr == addr) begin
+                found = 1'b1;
+                recent_data_for_addr = data_recent[j].data;
+            end
+        end
+    endfunction
 
 endmodule // module mem

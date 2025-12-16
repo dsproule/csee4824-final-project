@@ -5,10 +5,10 @@
 # version   : 2024.06p002 64 bits
 # build date: 2024.09.02 16:28:38 UTC
 # ----------------------------------------
-# started   : 2025-12-16 11:48:57 EST
-# hostname  : cadpc05.(none)
-# pid       : 2370810
-# arguments : '-label' 'session_0' '-console' '//127.0.0.1:36929' '-nowindow' '-style' 'windows' '-exitonerror' '-data' 'AAAAqnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSpiBmIdBlyGJIZGhhCGZIQPI5wDy0xgKGMqAbDUgq4xBnyETKJcIlk9liIfSyQzZDHpgXTlgswBfnRHb' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.postCmds.tcl'
+# started   : 2025-12-16 12:47:54 EST
+# hostname  : cadpc39.(none)
+# pid       : 2613410
+# arguments : '-label' 'session_0' '-console' '//127.0.0.1:36535' '-style' 'windows' '-data' 'AAAAmnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSkAaOBh0GdIYChjKgGw1IKuMQZ8hkyGZIRGIMxhSGeKhdDJDNoMeQwmQzgHrBQBjEA+f' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl'
 set ROOT_PATH .
 set RTL_PATH ${ROOT_PATH}/verilog
 set FV_PATH ${ROOT_PATH}/fv
@@ -21,7 +21,7 @@ analyze -sv \
     -incdir ${ROOT_PATH} \
     ${RTL_PATH}/sys_defs.svh \
     ${RTL_PATH}/icache.sv \
-    ${ROOT_PATH}/test/mem.sv \
+    ${FV_PATH}/fv_mem.sv \
     ${FV_PATH}/icache_check.sv
 
 elaborate -top icache_check
@@ -30,7 +30,3 @@ reset reset
 
 get_design_info
 prove -all
-report
-
-
-exit -force

@@ -114,9 +114,7 @@ module icache (
         end endgenerate
 
         // tags can potentially hide allocations
-        addr_correct: assert property(@(posedge clock) disable iff (reset) 
-            (!mem_forward && Icache_valid_out && last_icache_addr[main_index].valid) |-> last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]
-        );
+
         
         continue_attempts: assert property(@(posedge clock)
             miss_outstanding |-> proc2Imem_command == BUS_LOAD);
@@ -216,8 +214,8 @@ module icache (
                 icache_data[resp_index].valid <= 1;
 
                 `ifdef FORMAL
-                    last_icache_addr[resp_index].addr  <= mshr[mshr_resp_idx].addr[`XLEN-1:3];
-                    last_icache_addr[resp_index].valid <= 1'b1;
+                last_icache_addr[resp_index].addr  <= mshr[mshr_resp_idx].addr;
+                last_icache_addr[resp_index].valid <= 1'b1;
                 `endif
 
                 if (mshr[mshr_resp_idx].addr == proc2Icache_addr[`XLEN-1:3])

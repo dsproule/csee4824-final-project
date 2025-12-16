@@ -20,16 +20,27 @@ module icache_check;
     logic [63:0] cache_data_out;
     logic        cache_valid_out;
 
+    logic [63:0] fv_load_data;
     /* Memory handling section */
     mem mem_0 (
-        .clk(clock),
+        .clk(clock), .reset(reset),
         .proc2mem_addr(proc2mem_addr),
         // .proc2mem_data(proc2mem_data),
         .proc2mem_command(proc2mem_command),
+        .fv_load_data(fv_load_data),
 
         .mem2proc_response(mem2proc_response),
         .mem2proc_data(mem2proc_data),
         .mem2proc_tag(mem2proc_tag)
+    );
+
+    mem_data_addr_known: assume property(
+        !$isunknown(mem2proc_data) && !$isunknown(proc2mem_addr)
+        && !$isunknown(proc2cache_addr) && !$isunknown(mem2proc_tag)
+    );
+
+    mem_aligned: assume property(
+        (proc2mem_addr[2:0]==3'b0) & (proc2mem_addr<`MEM_SIZE_IN_BYTES)
     );
 
     icache icache_0 (
@@ -52,9 +63,23 @@ module icache_check;
         .Icache_valid_out(cache_valid_out)
     );
 
-    assume property(@(posedge clock)
-        !$isunknown(mem2proc_data) && !$isunknown(proc2cache_addr) &&
-        !$isunknown(proc2cache_addr) && !$isunknown(proc2mem_addr)
-    );
+    // want one that data is consistent
+    logic found;
+    logic [63:0] recent_data;
+
+    always_comb begin
+        recent_data = mem_0.recent_data_for_addr(
+            proc2cache_addr[`XLEN-1:3], found
+        );
+    end
+
+    // assert property (@(posedge clock) disable iff (reset)
+    //     (found && cache_valid_out)
+    //     |-> cache_data_out == recent_data
+    // );
+
+    // data_consistent: assert property(@(posedge clock)
+    //     (in_recent && cache_valid_out && mem_0.data_recent[j].valid) |-> (cache_data_out == mem_0.data_recent[in_recent_i].data)
+    // );
     
 endmodule
