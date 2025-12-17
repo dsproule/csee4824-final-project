@@ -24,13 +24,14 @@ module icache_check;
     mem mem_0 (
         .clk(clock), .reset(reset),
         .proc2mem_addr(proc2mem_addr),
-        // .proc2mem_data(proc2mem_data),
         .proc2mem_command(proc2mem_command),
 
         .mem2proc_response(mem2proc_response),
         .mem2proc_data(mem2proc_data),
         .mem2proc_tag(mem2proc_tag)
     );
+
+    assume property(proc2mem_command != BUS_STORE);
 
     // values going to cache/mem must be known
     mem_data_addr_known: assume property(
@@ -61,5 +62,5 @@ module icache_check;
         .Icache_data_out(cache_data_out),
         .Icache_valid_out(cache_valid_out)
     );
-
+    
 endmodule

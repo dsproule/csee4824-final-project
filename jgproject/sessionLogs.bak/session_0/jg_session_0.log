@@ -5,10 +5,10 @@
 # version   : 2024.06p002 64 bits
 # build date: 2024.09.02 16:28:38 UTC
 # ----------------------------------------
-# started   : 2025-12-16 20:26:39 EST
+# started   : 2025-12-17 12:09:05 EST
 # hostname  : cadpc05.(none)
-# pid       : 2567036
-# arguments : '-label' 'session_0' '-console' '//127.0.0.1:44573' '-nowindow' '-style' 'windows' '-exitonerror' '-data' 'AAAAqnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSpiBmIdBlyGJIZGhhCGZIQPI5wDy0xgKGMqAbDUgq4xBnyETKJcIlk9liIfSyQzZDHpgXTlgswBfnRHb' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.postCmds.tcl'
+# pid       : 2804799
+# arguments : '-label' 'session_0' '-console' '//127.0.0.1:43485' '-nowindow' '-style' 'windows' '-exitonerror' '-data' 'AAAAqnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSpiBmIdBlyGJIZGhhCGZIQPI5wDy0xgKGMqAbDUgq4xBnyETKJcIlk9liIfSyQzZDHpgXTlgswBfnRHb' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.postCmds.tcl'
 
 Any disclosure about the Cadence Design Systems software or its use
 model to any third party violates the written Non-Disclosure Agreement
@@ -69,16 +69,13 @@ INFO: reading configuration file "/user/stud/fall23/das2313/.config/cadence/jasp
 [-- (VERI-1482)] Analyzing Verilog file './verilog/sys_defs.svh'
 [-- (VERI-1482)] Analyzing Verilog file './verilog/icache.sv'
 [INFO (VERI-1328)] ./verilog/icache.sv(11): analyzing included file 'verilog/sys_defs.svh'
-[WARN (VERI-1875)] ./verilog/icache.sv(120): identifier 'mshr_resp_idx' is used before its declaration
+[ERROR (VERI-9011)] ./verilog/icache.sv(163): block id 'cache_insert_consistent' is already declared
+[INFO (VERI-1967)] ./verilog/icache.sv(159): previous declaration of 'cache_insert_consistent' is from here
 [WARN (VERI-1763)] ./verilog/icache.sv(127): SVA directive is not sensitive to any clock. The directive will be sampled on the posedge of the fastest clock.
-[WARN (VERI-1875)] ./verilog/icache.sv(136): identifier 'will_alloc' is used before its declaration
-[-- (VERI-1482)] Analyzing Verilog file './fv/fv_mem.sv'
-[INFO (VERI-1328)] ./fv/fv_mem.sv(12): analyzing included file 'verilog/sys_defs.svh'
-[ERROR (VERI-1128)] ./fv/fv_mem.sv(28): 'clock' is not declared
-[ERROR (VERI-1072)] ./fv/fv_mem.sv(157): module 'mem' is ignored due to previous errors
+[ERROR (VERI-1072)] ./verilog/icache.sv(299): module 'icache' is ignored due to previous errors
 Summary of errors detected:
-	[ERROR (VERI-1128)] ./fv/fv_mem.sv(28): 'clock' is not declared
-	[ERROR (VERI-1072)] ./fv/fv_mem.sv(157): module 'mem' is ignored due to previous errors
+	[ERROR (VERI-9011)] ./verilog/icache.sv(163): block id 'cache_insert_consistent' is already declared
+	[ERROR (VERI-1072)] ./verilog/icache.sv(299): module 'icache' is ignored due to previous errors
 ERROR (ENL034): 2 errors detected in the design file(s).
 
 ERROR: problem encountered at line 7 in file fv/icache_check.tcl

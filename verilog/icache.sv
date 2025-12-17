@@ -94,63 +94,80 @@ module icache (
 
     `ifdef FORMAL
 
-        LAST_ICACHE last_icache_addr [`CACHE_LINES-1:0];
+    LAST_ICACHE last_icache_addr [`CACHE_LINES-1:0];
 
-        // address only will ever occupy one mshr slot
-        int o;
-        logic addr_seen;
-        always_comb begin
-            addr_seen = 1'b0;
-            for (o = 0; o < `MSHR_SLOTS; o++) begin
-                if (o != `MSHR_SLOTS - 1) 
-                    addr_seen |= (mshr[o].valid && (mshr[o].addr == mshr[`MSHR_SLOTS-1].addr));
-            end
+    // address only will ever occupy one mshr slot
+    int o;
+    logic addr_seen;
+    always_comb begin
+        addr_seen = 1'b0;
+        for (o = 0; o < `MSHR_SLOTS; o++) begin
+            if (o != `MSHR_SLOTS - 1) 
+                addr_seen |= (mshr[o].valid && (mshr[o].addr == mshr[`MSHR_SLOTS-1].addr));
         end
-        unique_addr: assert property(@(posedge clock) mshr[`MSHR_SLOTS-1].valid |-> !addr_seen);
+    end
+    unique_addr: assert property(@(posedge clock) mshr[`MSHR_SLOTS-1].valid |-> !addr_seen);
 
-        // cache will respond to memory servicing
-        try_service: assert property(@(posedge clock) miss_outstanding |-> BUS_LOAD == proc2Imem_command);
+    // cache will respond to memory servicing
+    try_service: assert property(@(posedge clock) miss_outstanding |-> BUS_LOAD == proc2Imem_command);
 
-        // if cache_valid out -> address is same as requested (interesting edge case)
-        addr_hidden: assert property(@(posedge clock)
-            (!mem_forward && Icache_valid_out) |-> 
-                    last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]);
-        
-        does_free: assert property(@(posedge clock)
-            got_mem_data |-> ##1 mshr[$past(mshr_resp_idx)].valid == `FALSE);
+    // if cache_valid out -> address is same as requested (interesting edge case)
+    addr_hidden: assert property(@(posedge clock)
+        (!mem_forward && Icache_valid_out) |-> 
+                last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]);
+    
+    does_free: assert property(@(posedge clock)
+        got_mem_data |-> ##1 mshr[$past(mshr_resp_idx)].valid == `FALSE);
 
-        // if possible, cache will attempt prefetch
-        finish_in_3: assert property(@(posedge clock) disable iff (reset)
-            mshr[`MSHR_SLOTS-1].valid |-> ##[1:3] $fell(mshr[`MSHR_SLOTS-1].valid));
-        // if this is false obvously above is
-        latency_lt_3: assert property(
-            `MEM_LATENCY_IN_CYCLES <= 3);
+    // if possible, cache will attempt prefetch
+    finish_in_3: assert property(@(posedge clock) disable iff (reset)
+        mshr[`MSHR_SLOTS-1].valid |-> ##[1:3] $fell(mshr[`MSHR_SLOTS-1].valid));
+    // if this is false obvously above is
+    latency_lt_3: assert property(
+        `MEM_LATENCY_IN_CYCLES <= 3);
 
-        // cache will occupy all mshr slots
-        genvar i;
-        generate for (i = 0; i < `MSHR_SLOTS; i++) begin
-            slot_used: cover property(@(posedge clock) mshr[i].valid);
-        end endgenerate
+    // cache will occupy all mshr slots
+    genvar i;
+    generate for (i = 0; i < `MSHR_SLOTS; i++) begin
+        slot_used: cover property(@(posedge clock) mshr[i].valid);
+    end endgenerate
 
-        // cache will not clobber mshr already in use
-        wont_clobber: assert property(@(posedge clock) alloc_count() == `MSHR_SLOTS |-> !will_alloc);
+    // cache will not clobber mshr already in use
+    wont_clobber: assert property(@(posedge clock) alloc_count() == `MSHR_SLOTS |-> !will_alloc);
 
-        // cache never fills (interesting because we didn't know this)
-        never_full: assert property(@(posedge clock) alloc_count() < `MSHR_SLOTS);
-        
-        // discovered max to be 2 but added this here so we don't trigger always (real assertion)
-        ever_full: cover property(@(posedge clock) alloc_count() == `MSHR_SLOTS);
+    // cache never fills (interesting because we didn't know this)
+    never_full: assert property(@(posedge clock) alloc_count() < `MSHR_SLOTS);
+    
+    // discovered max to be 2 but added this here so we don't trigger always (real assertion)
+    ever_full: cover property(@(posedge clock) alloc_count() == `MSHR_SLOTS);
 
-        // count progesses 
-        count_progresses: assert property(@(posedge clock) disable iff (reset)
-            alloc_count() |-> ##1 (alloc_count() == $past(alloc_count()) + 1) || 
-                                  (alloc_count() == $past(alloc_count()) - 1) ||
-                                  (alloc_count() == $past(alloc_count())));
-        
-        // if a miss is outstanding -> cache will try again
-        continue_attempts: assert property(@(posedge clock)
-            miss_outstanding |-> proc2Imem_command == BUS_LOAD);
-        
+    // count progesses 
+    count_progresses: assert property(@(posedge clock) disable iff (reset)
+        alloc_count() |-> ##1 (alloc_count() == $past(alloc_count()) + 1) || 
+                                (alloc_count() == $past(alloc_count()) - 1) ||
+                                (alloc_count() == $past(alloc_count())));
+    
+    // if a miss is outstanding -> cache will try again
+    continue_attempts: assert property(@(posedge clock)
+        miss_outstanding |-> proc2Imem_command == BUS_LOAD);
+
+    // together verify data integrity
+    // proves data out is always same as what is stored
+    cache_out_consistent: assert property(@(posedge clock)
+        !mem_forward && Icache_valid_out |-> Icache_data_out == icache_data[main_index].data
+    );
+
+    // proves data put into cache is same as received from memory
+    cache_insert_consistent: assert property(@(posedge clock)
+        Imem2proc_tag != 0 |-> ##1 icache_data[$past(resp_index)].data == $past(Imem2proc_data)
+    );
+    
+    // proves icache data will not change unless acted upon
+    stable_icache_data: assert property(@(posedge clock) disable iff (reset)
+        Imem2proc_tag == 0 |-> ##1 icache_data == $past(icache_data)
+    );
+
+
     `endif
 
     logic [$clog2(`MSHR_SLOTS)-1:0] mshr_next_idx;

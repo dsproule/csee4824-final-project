@@ -5,10 +5,10 @@
 # version   : 2024.06p002 64 bits
 # build date: 2024.09.02 16:28:38 UTC
 # ----------------------------------------
-# started   : 2025-12-16 20:27:13 EST
+# started   : 2025-12-17 12:09:36 EST
 # hostname  : cadpc05.(none)
-# pid       : 2567301
-# arguments : '-label' 'session_0' '-console' '//127.0.0.1:46323' '-nowindow' '-style' 'windows' '-exitonerror' '-data' 'AAAAqnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSpiBmIdBlyGJIZGhhCGZIQPI5wDy0xgKGMqAbDUgq4xBnyETKJcIlk9liIfSyQzZDHpgXTlgswBfnRHb' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.postCmds.tcl'
+# pid       : 2805038
+# arguments : '-label' 'session_0' '-console' '//127.0.0.1:43495' '-nowindow' '-style' 'windows' '-exitonerror' '-data' 'AAAAqnicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYYZphSpiBmIdBlyGJIZGhhCGZIQPI5wDy0xgKGMqAbDUgq4xBnyETKJcIlk9liIfSyQzZDHpgXTlgswBfnRHb' '-proj' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/sessionLogs/session_0' '-init' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.initCmds.tcl' 'fv/icache_check.tcl' '-hidden' '/homes/user/stud/fall23/das2313/csee4824/csee4824-final-project/jgproject/.tmp/.postCmds.tcl'
 
 Any disclosure about the Cadence Design Systems software or its use
 model to any third party violates the written Non-Disclosure Agreement
@@ -72,18 +72,20 @@ INFO: reading configuration file "/user/stud/fall23/das2313/.config/cadence/jasp
 [WARN (VERI-1875)] ./verilog/icache.sv(120): identifier 'mshr_resp_idx' is used before its declaration
 [WARN (VERI-1763)] ./verilog/icache.sv(127): SVA directive is not sensitive to any clock. The directive will be sampled on the posedge of the fastest clock.
 [WARN (VERI-1875)] ./verilog/icache.sv(136): identifier 'will_alloc' is used before its declaration
+[WARN (VERI-1875)] ./verilog/icache.sv(160): identifier 'resp_index' is used before its declaration
 [-- (VERI-1482)] Analyzing Verilog file './fv/fv_mem.sv'
 [INFO (VERI-1328)] ./fv/fv_mem.sv(12): analyzing included file 'verilog/sys_defs.svh'
 [-- (VERI-1482)] Analyzing Verilog file './fv/icache_check.sv'
 [INFO (VERI-1328)] ./fv/icache_check.sv(2): analyzing included file 'verilog/sys_defs.svh'
 [INFO (VERI-1328)] ./fv/icache_check.sv(3): analyzing included file 'verilog/ISA.svh'
-[WARN (VERI-1763)] ./fv/icache_check.sv(39): SVA directive is not sensitive to any clock. The directive will be sampled on the posedge of the fastest clock.
-[WARN (VERI-1763)] ./fv/icache_check.sv(43): SVA directive is not sensitive to any clock. The directive will be sampled on the posedge of the fastest clock.
+[WARN (VERI-1763)] ./fv/icache_check.sv(34): SVA directive is not sensitive to any clock. The directive will be sampled on the posedge of the fastest clock.
+[WARN (VERI-1763)] ./fv/icache_check.sv(40): SVA directive is not sensitive to any clock. The directive will be sampled on the posedge of the fastest clock.
+[WARN (VERI-1763)] ./fv/icache_check.sv(44): SVA directive is not sensitive to any clock. The directive will be sampled on the posedge of the fastest clock.
 % 
 % elaborate -top icache_check
 INFO (ISW003): Top module name is "icache_check".
-[INFO (HIER-8002)] ./fv/icache_check.sv(65): Disabling old hierarchical reference handler
-[WARN (VERI-1927)] ./fv/icache_check.sv(33): port 'proc2mem_data' remains unconnected for this instance
+[INFO (HIER-8002)] ./fv/icache_check.sv(66): Disabling old hierarchical reference handler
+[WARN (VERI-1927)] ./fv/icache_check.sv(32): port 'proc2mem_data' remains unconnected for this instance
 [INFO (VERI-1018)] ./fv/fv_mem.sv(14): compiling module 'mem'
 [WARN (VERI-1796)] ./fv/fv_mem.sv(28): system function call isunknown with non-constant argument is not supported for synthesis
 [WARN (VERI-1209)] ./fv/fv_mem.sv(94): expression size 64 truncated to fit in target size 16
@@ -100,13 +102,13 @@ INFO (ISW003): Top module name is "icache_check".
 [INFO (VERI-1018)] ./verilog/icache.sv(34): compiling module 'icache'
 [INFO (VERI-1018)] ./fv/icache_check.sv(5): compiling module 'icache_check'
 [WARN (VERI-8028)] ./fv/icache_check.sv(24): missing/open ports on instance mem_0 of module mem
-[WARN (VERI-1796)] ./fv/icache_check.sv(37): system function call isunknown with non-constant argument is not supported for synthesis
-[WARN (VERI-1796)] ./fv/icache_check.sv(37): system function call isunknown with non-constant argument is not supported for synthesis
 [WARN (VERI-1796)] ./fv/icache_check.sv(38): system function call isunknown with non-constant argument is not supported for synthesis
+[WARN (VERI-1796)] ./fv/icache_check.sv(38): system function call isunknown with non-constant argument is not supported for synthesis
+[WARN (VERI-1796)] ./fv/icache_check.sv(39): system function call isunknown with non-constant argument is not supported for synthesis
 [WARN (VDB-1002)] ./fv/icache_check.sv(7): net 'clock' does not have a driver
 [WARN (VDB-1002)] ./fv/icache_check.sv(8): net 'reset' does not have a driver
 [WARN (VDB-1002)] ./fv/icache_check.sv(14): net 'proc2cache_addr[31]' does not have a driver
-[WARN (VDB-1013)] ./fv/icache_check.sv(33): input port 'proc2mem_data[63]' is not connected on this instance
+[WARN (VDB-1013)] ./fv/icache_check.sv(32): input port 'proc2mem_data[63]' is not connected on this instance
 INFO (INL208): Elaboration synthesis summary:
   Number of synthesized netlists          4 (1 packages)
   Single run mode                         On
@@ -124,29 +126,29 @@ INFO (IRS006): Current reset condition is "reset".
 [<embedded>] % get_design_info
 Statistics [for instance "icache_check"]
 ---------------------------
-# Flops:         266 (6450) (112 property flop bits)
+# Flops:         266 (8860) (2522 property flop bits)
 # Latches:       0 (0)
-# Gates:         1419 (140809)
-# Nets:          1725
+# Gates:         1484 (145066)
+# Nets:          1790
 # Ports:         0
-# RTL Lines:     457
+# RTL Lines:     472
 # RTL Instances: 3
-# Embedded Assumptions: 6
-# Embedded Assertions:  10
-# Embedded Covers:      16
-6450
+# Embedded Assumptions: 7
+# Embedded Assertions:  13
+# Embedded Covers:      19
+8860
 [<embedded>] % prove -all
 Ncustom1: Custom engine code is hT3Ng7hPPfiYQOTDZ3qhYOwGAM51eA+J/FjkM5shLioAsqhgLR4Ft+O1BuKG6ilQ83B9tLXSl+CwjiTMAQA
 Bcustom2: Custom engine code is hT3Nm7hPr1Vp3Di1Ra2USNIGL4JypRnLKLAdF6JAyuavO2JfGCiY9OZJhcAcOUnLx5xwNdhILGrAWX9s+z2WDkKwNR7tAfClBEjRFVQeq6DU54boFgEA
 AMcustom3: Custom engine code is hT3Ng7hP/feYQOTDZ3qhYOwGAM51eA+J/FjkM5shLioAsqhgLR4Ft+O1BuKG6ilQ83B9tLXSmmqwm7g9AQA
 Mpcustom4: Custom engine code is hT3NZbhP9fmY2AbBQnsjfOxn6c+6e6yL+/e8fZFmaQrnlgEA
-INFO (IPF036): Starting proof on task: "<embedded>", 26 properties to prove with 0 already proven/unreachable
+INFO (IPF036): Starting proof on task: "<embedded>", 32 properties to prove with 0 already proven/unreachable
 INFO (IRS029): Starting reset analysis: phase 1 of 4.
 INFO (IRS030): Running reset analysis: phase 2 of 4.
 INFO (IRS031): Running reset analysis: phase 3 of 4.
 INFO (IRS020): Starting the reset analysis simulation with a limit of 100 iterations (phase 4 of 4).
 INFO (IRS024): Reset iterations 0 to 7 analyzed.
-INFO (IRS018): Reset analysis simulation executed for 6 iterations. Assigned values for 5235 of 6338 design flops, 0 of 0 design latches, 140 of 141 internal elements.
+INFO (IRS018): Reset analysis simulation executed for 6 iterations. Assigned values for 5235 of 6338 design flops, 0 of 0 design latches, 2492 of 2557 internal elements.
 INFO (IRS039): Reset analysis complete.
 INFO (IPF031): Settings used for proof thread 0:
     orchestration                 = on
@@ -161,13 +163,13 @@ AMcustom5: Custom engine code is hT3N1rhP11/52HrFRS21ROp2LOjVTgPvT8L8BGXHgLhaIuq
 Ncustom6: Custom engine code is hT3OXrhPByJp3TrFSTLhUmMH4KVtJgmTCnNDF46yMXOKY48m4LS5nE7yBzFjA7kDuwO/GhGUpEPiky3p3wmPn3dJZHxFMsafSoObRzSC+tn7sEY0WbTdZ/FV4hL3MYH/b1CIUvXSWR4wqEoVLsmMOD4xIPT4lI1LO6ZCO7PnnWQuLwetnvKlrXx6wCW/A+x+enqslg1YPobi4wEF/EvbzOvcTYdJvl2s4H2yZg2b2ofAVN5WvhWk1HoBAA
 ADcustom7: Custom engine code is hT3Nv7hPv1752HrFRa2kROx2f/ECJeZB2AZsLdlO8VwmIuqtT4nIDFXclhg+O+o+DMmQCekbheGk0kK28laA9gaOFDXsQp29J3X615HY1IPHJWd6FUFvCHjO+p1k652b5JJvZlShNpGlGSXAiQe/mEAj6tEBAA
 Tricustom8: Custom engine code is hT3Nu7hPt1752DvFRa0kNDiyIV97VyejwM9C/jCLJjdPvusZONHY42VYUy0Q1ZotnhcVtNc56tJ5wbxv6V2+XpdsaSlHck5vfnbYjdwj1OECy9U+7oSQ0SZE3g5ayD+Phuh4odCJTjeKa2k4elM9ldQfkAEA
+0.0.PRE: A proof was found: No trace exists. [0.00 s]
 Gcustom9: Custom engine code is hT3NibhPDfeYQADBZnYcglOvK9Pfd7EOeniIqP8jNsyIqInncipMGcUXqAadachREE9F2PwhBUZUNw5kHnd4JdXkamORRgEA
+INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.try_service" was proven in 0.00 s.
 C2custom10: Custom engine code is hT3NirhPjfWYQADBZnYcglOvK9Pfd7EOeniIqP8jNsyIqInncgkrYMMXCYbdK0dUjZIF9d4cJ0rHoBDjwVLBKuG86XYVV00BAA
 AGcustom11: Custom engine code is hT3NirhP/fmYQADBZnYcglOvK9Pfd7EOeniIqP8jNsyIqInnckcwYMMXCYbdK0dUjZIF9d4cJ0rHoBDjwVLBKuHEZnZByh0BAA
 Bcustom12: Custom engine code is hT3NjrhPDfiYQADBZnYcglOvK9PfWxFtenjIyBqfrgr7if/jL/yPOuK1BAflEcW0DxNH2eDIoezN2gxlQFg81RZtiWXh7aiTAidvAQA
-0.0.PRE: A proof was found: No trace exists. [0.00 s]
 Ncustom13: Custom engine code is hT3NR7hPByFp3TrFSTLhUmMH4KWtJglTyV/c51BHEeZWamnJv767nE6PCak26bd3gf3XGN3rIRheufhDieCJQVISo+gNYUKhiUedBKGtsP/a18svAnlMJZudHxDFwK5ufsyoxsIyiAeSY2oi3tEuoDHr5gw42DFKAG3PqO3CEsl8Azzdt3pl5nGA1Ifv2H02eYsFzWb/nfp8PMb3F0krE/EgBcm8TD9Div8BAA
-INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.try_service" was proven in 0.00 s.
 Tricustom14: Custom engine code is hT3Nu7hP3fiYQADBZnYcglNHp9bfd7EOeniIqP/ji8sGLQu8yhsFO+wxJ+O+R0bU8g/IewXFomyos+viQnWc2xYNYmMqpo3i40O7DaZR7qfp4YqNx26KRvQ/qx0BAA
 0.0.PRE: A proof was found: No trace exists. [0.00 s]
 INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.latency_lt_3" was proven in 0.00 s.
@@ -176,23 +178,25 @@ INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.continue_attempts" w
 0: Found proofs for 3 properties in preprocessing
 0: Using multistage preprocessing
 0: Starting reduce
-0: Finished reduce in 0.057s
+0: Finished reduce in 0.067s
 0.0.PRE: Performing Proof Simplification...
 0.0.N: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.N: Proof Simplification Iteration 1	[0.00 s]
-0.0.N: Proof Simplification Iteration 2	[0.01 s]
-0.0.N: Proof Simplification Iteration 3	[0.01 s]
-0.0.N: Proof Simplification Iteration 4	[0.02 s]
-0.0.N: Proof Simplification Iteration 5	[0.02 s]
-0.0.PRE: Proof Simplification completed in 0.05 s
-0.0.N: Identified and disabled 5 duplicated targets.
+0.0.N: Proof Simplification Iteration 2	[0.02 s]
+0.0.N: Proof Simplification Iteration 3	[0.03 s]
+0.0.PRE: A proof was found: No trace exists. [0.00 s]
+INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.cache_out_consistent" was proven in 0.00 s.
+0.0.N: Proof Simplification Iteration 4	[0.04 s]
+0.0.N: Proof Simplification Iteration 5	[0.05 s]
+0.0.PRE: Proof Simplification completed in 0.08 s
+0.0.N: Identified and disabled 6 duplicated targets.
 0: About to start ProofGrid in its own thread with a limit of 10000 pending notifications and a limit of 10 traces.
 0: =============================== ProofGrid start ===============================
-0: ProofGrid usable level: 18
+0: ProofGrid usable level: 22
 0: Initial ProofGrid level: 1
 0: ProofGrid is starting event handling
-0.0.Hp: Proofgrid shell started at 2567383@cadpc05(local) jg_2567301_cadpc05_1
-0.0.N: Proofgrid shell started at 2567382@cadpc05(local) jg_2567301_cadpc05_1
+0.0.Hp: Proofgrid shell started at 2805126@cadpc05(local) jg_2805038_cadpc05_1
+0.0.N: Proofgrid shell started at 2805125@cadpc05(local) jg_2805038_cadpc05_1
 0.0.Hp: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.N: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.N: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
@@ -202,235 +206,305 @@ INFO (IPF057): 0.0.PRE: The property "icache_check.icache_0.continue_attempts" w
 0.0.N: Trace Attempt  2	[0.00 s]
 0.0.N: Trace Attempt  3	[0.00 s]
 0.0.N: Trace Attempt  3	[0.01 s]
-0.0.Hp: A proof was found: No trace exists. [0.03 s]
-INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.wont_clobber" was proven in 0.02 s.
 0.0.N: Trace Attempt  4	[0.02 s]
 0.0.N: Trace Attempt  5	[0.02 s]
-0.0.Ht: Proofgrid shell started at 2567414@cadpc05(local) jg_2567301_cadpc05_1
-0.0.Bm: Proofgrid shell started at 2567415@cadpc05(local) jg_2567301_cadpc05_1
+0.0.Hp: A proof was found: No trace exists. [0.07 s]
+INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.wont_clobber" was proven in 0.05 s.
+0.0.Hp: Trace Attempt  1	[0.07 s]
+0.0.Ht: Proofgrid shell started at 2805157@cadpc05(local) jg_2805038_cadpc05_1
 0.0.Ht: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.Bm: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.AM: Proofgrid shell started at 2567420@cadpc05(local) jg_2567301_cadpc05_1
-0.0.Mpcustom4: Proofgrid shell started at 2567416@cadpc05(local) jg_2567301_cadpc05_1
-0.0.Bm: Trace Attempt  1	[0.01 s]
-0.0.N: Trace Attempt  7	[0.05 s]
-0.0.N: A trace with 7 cycles was found. [0.08 s]
-INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_out_lock:precondition1" was covered in 7 cycles in 0.19 s.
-INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.unique_addr:precondition1" was covered in 4 cycles in 0.19 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
-INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.try_service:precondition1" was covered in 4 cycles in 0.19 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
-INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.does_free:precondition1" was covered in 6 cycles in 0.19 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
-INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.count_progresses:precondition1" was covered in 4 cycles in 0.19 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
-INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_in_flight:precondition1" was covered in 7 cycles in 0.19 s.
-INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.finish_in_3:precondition1" was covered in 4 cycles in 0.19 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
-INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.genblk1[4].slot_used" was covered in 4 cycles in 0.19 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
-INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.continue_attempts:precondition1" was covered in 4 cycles in 0.19 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
-0.0.Bm: Trace Attempt  2	[0.01 s]
-0.0.N: Stopped processing property "icache_check.mem_0.data_out_lock:precondition1"	[0.21 s].
-0.0.N: Stopped processing property "icache_check.mem_0.data_in_flight:precondition1"	[0.21 s].
-0.0.N: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.Bm: Trace Attempt  3	[0.01 s]
-0.0.AM: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.L: Proofgrid shell started at 2567418@cadpc05(local) jg_2567301_cadpc05_1
-0.0.Bm: Trace Attempt  4	[0.01 s]
-0.0.N: Trace Attempt  1	[0.00 s]
-0.0.Mpcustom4: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.N: Trace Attempt  2	[0.00 s]
-0.0.Oh: Proofgrid shell started at 2567417@cadpc05(local) jg_2567301_cadpc05_1
-0.0.Bm: Trace Attempt  5	[0.01 s]
-0.0.AM: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
-0.0.AM: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.L: Proofgrid shell started at 2805161@cadpc05(local) jg_2805038_cadpc05_1
+0.0.Bm: Proofgrid shell started at 2805158@cadpc05(local) jg_2805038_cadpc05_1
+0.0.B: Proofgrid shell started at 2805162@cadpc05(local) jg_2805038_cadpc05_1
+0.0.AM: Proofgrid shell started at 2805163@cadpc05(local) jg_2805038_cadpc05_1
+0.0.Mpcustom4: Proofgrid shell started at 2805159@cadpc05(local) jg_2805038_cadpc05_1
 0.0.L: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.AM: Trace Attempt  1	[0.00 s]
-0.0.N: Trace Attempt  2	[0.01 s]
-0.0.AM: Trace Attempt  2	[0.00 s]
-0.0.Oh: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.Bm: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.Oh: Proofgrid shell started at 2805160@cadpc05(local) jg_2805038_cadpc05_1
+0.0.B: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.AM: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.Mpcustom4: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
 0.0.L: Using trace diversification with seed 1 (0.05)
 0.0.L: Using LRU state removal heuristic
-0.0.Bm: Trace Attempt  6	[0.02 s]
-0.0.Bm: A trace with 6 cycles was found. [0.02 s]
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.genblk1[3].slot_used" was covered in 6 cycles in 0.14 s.
-0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.Oh: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.L: Using states from traces to { (reset) }
+0.0.AM: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
+0.0.AM: Starting proof for property "icache_check.mem_0.data_out_lock:precondition1"	[0.00 s].
+0.0.AM: Starting proof for property "icache_check.mem_0.data_in_flight:precondition1"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.Bm: Trace Attempt  1	[0.02 s]
+0.0.B: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
+0.0.B: Starting proof for property "icache_check.mem_0.data_out_lock:precondition1"	[0.00 s].
+0.0.B: Starting proof for property "icache_check.mem_0.data_in_flight:precondition1"	[0.00 s].
+0.0.Bm: Trace Attempt  2	[0.02 s]
+0.0.Bm: A trace with 2 cycles was found. [0.02 s]
+INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.stable_icache_data:precondition1" was covered in 2 cycles in 0.12 s.
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Trace Attempt  2	[0.00 s]
+0.0.B: Trace Attempt  3	[0.00 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.AM: Trace Attempt  2	[0.01 s]
+0.0.Bm: Trace Attempt  3	[0.03 s]
+0.0.N: Trace Attempt  7	[0.05 s]
+0.0.N: A trace with 7 cycles was found. [0.10 s]
+INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_out_lock:precondition1" was covered in 7 cycles in 0.24 s.
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.unique_addr:precondition1" was covered in 4 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.try_service:precondition1" was covered in 4 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.does_free:precondition1" was covered in 6 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.genblk1[3].slot_used" was covered in 6 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.count_progresses:precondition1" was covered in 4 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.cache_insert_consistent:precondition1" was covered in 6 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.mem_0.data_in_flight:precondition1" was covered in 7 cycles in 0.24 s.
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.finish_in_3:precondition1" was covered in 4 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.genblk1[4].slot_used" was covered in 4 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+INFO (IPF047): 0.0.N: The cover property "icache_check.icache_0.continue_attempts:precondition1" was covered in 4 cycles in 0.24 s by the incidental trace "icache_check.mem_0.data_out_lock:precondition1".
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.N: Stopped processing property "icache_check.mem_0.data_out_lock:precondition1"	[0.26 s].
+0.0.N: Stopped processing property "icache_check.mem_0.data_in_flight:precondition1"	[0.26 s].
+0.0.N: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.Bm: Trace Attempt  4	[0.03 s]
+0.0.B: Trace Attempt  6	[0.01 s]
+0.0.B: Stopped processing property "icache_check.mem_0.data_out_lock:precondition1"	[0.16 s].
+0.0.B: Stopped processing property "icache_check.mem_0.data_in_flight:precondition1"	[0.16 s].
+0.0.B: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.N: Trace Attempt  1	[0.00 s]
+0.0.N: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.02 s]
+0.0.Bm: Trace Attempt  5	[0.04 s]
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Trace Attempt  2	[0.00 s]
+0.0.B: Trace Attempt  3	[0.00 s]
+0.0.Ht: Trace Attempt  1	[0.05 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.AM: Stopped processing property "icache_check.mem_0.data_out_lock:precondition1"	[0.17 s].
+0.0.AM: Stopped processing property "icache_check.mem_0.data_in_flight:precondition1"	[0.17 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.Ht: Trace Attempt  2	[0.05 s]
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
 0.0.N: Trace Attempt  3	[0.01 s]
 0.0.N: Trace Attempt  4	[0.01 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.Mpcustom4: Trace Attempt  1	[0.04 s]
 0.0.AM: Trace Attempt  4	[0.01 s]
-0.0.Ht: Trace Attempt  1	[0.03 s]
-0.0.L: Using states from traces to { (reset) }
-0.0.Ht: Trace Attempt  2	[0.03 s]
-0.0.B: Proofgrid shell started at 2567419@cadpc05(local) jg_2567301_cadpc05_1
-0.0.Bm: Trace Attempt  7	[0.03 s]
-0.0.Ht: Trace Attempt  3	[0.03 s]
-0.0.Mpcustom4: Trace Attempt  1	[0.02 s]
-0.0.Ht: Trace Attempt  4	[0.03 s]
-0.0.Ht: Trace Attempt  5	[0.04 s]
-0.0.Mpcustom4: Trace Attempt  2	[0.02 s]
-0.0.B: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
-0.0.Bm: Trace Attempt  8	[0.03 s]
-0.0.Bm: A trace with 8 cycles was found. [0.03 s]
-INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.genblk1[2].slot_used" was covered in 8 cycles in 0.16 s.
-0.0.N: Trace Attempt  4	[0.02 s]
-0.0.Bm: A trace with 8 cycles was found. [0.04 s]
+0.0.L: Trace Attempt  3	[0.05 s]
+0.0.Ht: Trace Attempt  3	[0.06 s]
+0.0.Mpcustom4: Trace Attempt  2	[0.05 s]
+0.0.Ht: Trace Attempt  4	[0.07 s]
+0.0.N: Trace Attempt  4	[0.03 s]
+0.0.Ht: Trace Attempt  5	[0.07 s]
+0.0.N: Trace Attempt  5	[0.04 s]
+0.0.L: Trace Attempt  4	[0.08 s]
+0.0.Bm: Trace Attempt  8	[0.08 s]
+0.0.Bm: A trace with 8 cycles was found. [0.09 s]
 INFO (IPF055): 0.0.Bm: A counterexample (cex) with 8 cycles was found for the property "icache_check.icache_0.addr_hidden" in 0.18 s.
 INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.addr_hidden:precondition1" was covered in 8 cycles in 0.18 s.
-0.0.L: Trace Attempt  3	[0.02 s]
-0.0.Bm: Trace Attempt  9	[0.04 s]
-0.0.B: Next scan (0) will use per property time limit: 1s * 10 ^ 0 = 1s
-0.0.B: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
-0.0.N: Trace Attempt  5	[0.03 s]
+INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.genblk1[2].slot_used" was covered in 8 cycles in 0.18 s.
+INFO (IPF047): 0.0.Bm: The cover property "icache_check.icache_0.cache_out_consistent:precondition1" was covered in 8 cycles in 0.18 s.
+0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
+0.0.AM: Trace Attempt  5	[0.08 s]
+0.0.L: Trace Attempt  3	[0.12 s]
+0.0.L: Trace Attempt  4	[0.14 s]
+0.0.L: Using states from traces to { icache_check.icache_0.does_free:precondition1 (5) }
+0.0.L: Trace Attempt  3	[0.18 s]
+0.0.L: Overconstrained local search, searching for dead end trace with 6 - 8 cycles
+0.0.Bm: Trace Attempt  9	[0.21 s]
+0.0.L: Trace Attempt  7	[0.23 s]
+0.0.L: A trace with 7 cycles was found. [0.23 s]
+INFO (IPF155): 0.0.L: A dead end state was reached after 7 cycles in task "<embedded>" in 0.23 s.
+    Use check_assumptions -show -dead_end to show this property in the property table.
+0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
+0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
+0.0.L: Trace Attempt  3	[0.26 s]
+0.0.L: Trace Attempt  4	[0.28 s]
+0.0.L: Trace Attempt  5	[0.29 s]
+0.0.L: Using states from traces to { icache_check.mem_0.data_out_lock:precondition1 (6) }
+0.0.L: Trace Attempt  3	[0.34 s]
+0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden:precondition1 (7) }
+0.0.L: Trace Attempt  3	[0.40 s]
+0.0.L: Trace Attempt  4	[0.41 s]
+0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden <9> }
+0.0.L: Trace Attempt  3	[0.46 s]
+0.0.L: Trace Attempt  4	[0.48 s]
+0.0.L: Trace Attempt  5	[0.51 s]
+0.0.L: Using states from traces to { icache_check.icache_0.genblk1[2].slot_used (15) }
+0.0.L: Trace Attempt  3	[0.71 s]
+0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
+0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden <9> }
+0.0.L: Trace Attempt  3	[0.74 s]
+0.0.L: Trace Attempt  4	[0.76 s]
+0.0.L: Trace Attempt  5	[0.79 s]
+0: ProofGrid usable level: 10
+0.0.Mpcustom4: Trace Attempt  3	[1.00 s]
+0.0.N: Trace Attempt  1	[0.99 s]
+0.0.N: Trace Attempt  2	[1.00 s]
+0.0.N: Per property time limit expired (1.00 s) [1.00 s]
+0.0.N: Stopped processing property "icache_check.icache_0.unique_addr"	[0.85 s].
+0.0.N: Starting proof for property "icache_check.icache_0.does_free"	[0.00 s].
+0.0.N: Trace Attempt  1	[0.01 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  2	[0.02 s]
+0.0.N: Trace Attempt  3	[0.03 s]
+0.0.N: Trace Attempt  4	[0.03 s]
+0.0.N: Trace Attempt  4	[0.07 s]
+0.0.B: Trace Attempt 50	[0.99 s]
+0.0.B: Stopped processing property "icache_check.icache_0.unique_addr"	[0.94 s].
+0.0.B: Starting proof for property "icache_check.icache_0.does_free"	[0.00 s].
+0.0.N: Trace Attempt  5	[0.09 s]
+0.0.B: Trace Attempt  1	[0.01 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.Mpcustom4: Trace Attempt  4	[1.19 s]
+0.0.Oh: bwd trail(1): 1 1.21475s
+0.0.Oh: All properties either determined or skipped. [1.25 s]
+0.0.Mpcustom4: Trace Attempt  5	[1.26 s]
+0.0.AM: Trace Attempt 14	[0.61 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.unique_addr"	[1.09 s].
+0.0.Oh: Exited with Success (@ 1.37 s)
+0.0.AM: Starting proof for property "icache_check.icache_0.does_free"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
+0.0.AM: Trace Attempt  5	[0.06 s]
+0.0.AM: Trace Attempt  1	[0.08 s]
+0.0.AM: Trace Attempt  2	[0.08 s]
+0.0.AM: Trace Attempt  3	[0.08 s]
+0.0.AM: Trace Attempt  5	[0.09 s]
+0.0.AM: Validation of fixpoint was successful. Time = 0.00
+0.0.AM: Trace Attempt  9	[0.10 s]
+0.0.AM: A proof was found: No trace exists. [0.10 s]
+INFO (IPF057): 0.0.AM: The property "icache_check.icache_0.does_free" was proven in 0.10 s.
+0.0.AM: Stopped processing property "icache_check.icache_0.does_free"	[0.10 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
+0.0.AM: Trace Attempt  5	[0.01 s]
+0.0.N: Trace Attempt  9	[0.37 s]
+0.0.N: Stopped processing property "icache_check.icache_0.does_free"	[0.37 s].
+0.0.N: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
+0.0.B: Trace Attempt 23	[0.26 s]
+0.0.B: Stopped processing property "icache_check.icache_0.does_free"	[0.28 s].
+0.0.B: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
+0.0.N: Trace Attempt  1	[0.00 s]
+0.0.N: Trace Attempt  2	[0.01 s]
 0.0.B: Trace Attempt  1	[0.00 s]
 0.0.B: Trace Attempt  2	[0.00 s]
 0.0.B: Trace Attempt  3	[0.01 s]
 0.0.B: Trace Attempt  4	[0.01 s]
 0.0.B: Trace Attempt  5	[0.01 s]
-INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.unique_addr:precondition1" in 0.07 s.
-INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.try_service:precondition1" in 0.07 s.
-INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.count_progresses:precondition1" in 0.07 s.
-INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.finish_in_3:precondition1" in 0.07 s.
-INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.genblk1[4].slot_used" in 0.07 s.
-INFO (IPF054): 0.0.L: A min_length bound of 4 was found for the property "icache_check.icache_0.continue_attempts:precondition1" in 0.07 s.
-0.0.L: Trace Attempt  4	[0.05 s]
-0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
-0.0.AM: Trace Attempt  5	[0.07 s]
-0.0.L: Trace Attempt  3	[0.08 s]
-0.0.L: Trace Attempt  4	[0.09 s]
-0.0.L: Using states from traces to { icache_check.icache_0.does_free:precondition1 (5) }
-0.0.L: Trace Attempt  3	[0.12 s]
-0.0.L: Overconstrained local search, searching for dead end trace with 6 - 8 cycles
-0.0.L: Trace Attempt  7	[0.17 s]
-0.0.L: A trace with 7 cycles was found. [0.17 s]
-INFO (IPF155): 0.0.L: A dead end state was reached after 7 cycles in task "<embedded>" in 0.08 s.
-    Use check_assumptions -show -dead_end to show this property in the property table.
-0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
-0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
-0.0.L: Trace Attempt  3	[0.19 s]
-0.0.L: Trace Attempt  4	[0.21 s]
-0.0.L: Trace Attempt  5	[0.22 s]
-0.0.L: Using states from traces to { icache_check.mem_0.data_out_lock:precondition1 (6) }
-0.0.L: Trace Attempt  3	[0.25 s]
-0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden:precondition1 (7) }
-0.0.L: Trace Attempt  3	[0.28 s]
-0.0.L: Trace Attempt  4	[0.29 s]
-0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden <9> }
-0.0.L: Trace Attempt  3	[0.32 s]
-0.0.L: Trace Attempt  4	[0.33 s]
-0.0.L: Trace Attempt  5	[0.35 s]
-0.0.Mpcustom4: Trace Attempt  3	[0.41 s]
-0.0.L: Using states from traces to { icache_check.icache_0.genblk1[2].slot_used (15) }
-0.0.L: Trace Attempt  3	[0.44 s]
-0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
-0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden <9> }
-0.0.L: Trace Attempt  3	[0.46 s]
-0.0.Mpcustom4: Trace Attempt  4	[0.47 s]
-0.0.L: Trace Attempt  4	[0.47 s]
-0.0.Mpcustom4: Trace Attempt  5	[0.49 s]
-0.0.L: Trace Attempt  5	[0.49 s]
-0.0.Oh: bwd trail(1): 1 0.489776s
-0.0.Oh: All properties either determined or skipped. [0.50 s]
-0: ProofGrid usable level: 8
-0.0.Oh: Exited with Success (@ 0.61 s)
-0: ProofGrid usable level: 8
-0.0.Mpcustom4: Trace Attempt  3	[0.57 s]
-0.0.Mpcustom4: Trace Attempt  4	[0.59 s]
-0.0.Mpcustom4: Trace Attempt  5	[0.61 s]
-0.0.AM: Trace Attempt  1	[0.67 s]
-0.0.AM: Trace Attempt  2	[0.68 s]
-0.0.AM: Trace Attempt  3	[0.68 s]
-0.0.AM: Trace Attempt  4	[0.69 s]
-0.0.Hp: A proof was found: No trace exists. [0.87 s]
-INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.unique_addr" was proven in 0.86 s.
-0.0.Hp: A proof was found: No trace exists. [0.87 s]
-INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.does_free" was proven in 0.86 s.
-0.0.Hp: A proof was found: No trace exists. [0.87 s]
-INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.count_progresses" was proven in 0.86 s.
-0.0.AM: Stopped processing property "icache_check.icache_0.unique_addr"	[0.65 s].
-0.0.AM: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
-0.0.AM: Trace Attempt  1	[0.00 s]
-0.0.AM: Trace Attempt  2	[0.00 s]
-0.0.AM: Trace Attempt  3	[0.00 s]
-0.0.AM: Trace Attempt  4	[0.01 s]
-0.0.AM: Trace Attempt  5	[0.01 s]
-0.0.B: Trace Attempt 36	[0.74 s]
-0.0.B: Stopped processing property "icache_check.icache_0.unique_addr"	[0.61 s].
-0.0.B: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
-0.0.B: Trace Attempt  1	[0.00 s]
-0.0.B: Trace Attempt  2	[0.00 s]
-0.0.B: Trace Attempt  3	[0.00 s]
-0.0.B: Trace Attempt  4	[0.01 s]
-0.0.B: Trace Attempt  5	[0.01 s]
-0.0.N: Trace Attempt 12	[0.66 s]
-0.0.N: Stopped processing property "icache_check.icache_0.unique_addr"	[0.68 s].
-0.0.N: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
-0.0.N: Trace Attempt  1	[0.00 s]
-0.0.N: Trace Attempt  2	[0.00 s]
-0.0.N: Trace Attempt  2	[0.01 s]
-0.0.N: Trace Attempt  3	[0.01 s]
-0.0.N: Trace Attempt  4	[0.01 s]
-0: ProofGrid usable level: 5
-0.0.N: Trace Attempt  4	[0.03 s]
-0.0.N: Trace Attempt  5	[0.04 s]
-0.0.Mpcustom4: Trace Attempt  3	[0.94 s]
-0.0.Mpcustom4: Trace Attempt  4	[0.94 s]
-0.0.Mpcustom4: Trace Attempt  5	[0.98 s]
-0.0.Mpcustom4: Trace Attempt  4	[1.13 s]
-0.0.Mpcustom4: Trace Attempt  5	[1.19 s]
-0.0.AM: Trace Attempt  1	[0.44 s]
-0.0.AM: Trace Attempt  2	[0.45 s]
-0.0.AM: Trace Attempt  3	[0.45 s]
-0.0.N: Trace Attempt  1	[0.51 s]
-0.0.N: Trace Attempt  2	[0.51 s]
-0.0.N: Trace Attempt  3	[0.51 s]
-0.0.AM: Validation of fixpoint was successful. Time = 0.00
-0.0.AM: Trace Attempt 17	[0.83 s]
-0.0.AM: A proof was found: No trace exists. [0.85 s]
-INFO (IPF057): 0.0.AM: The property "icache_check.icache_0.finish_in_3" was proven in 0.85 s.
-0.0.AM: Stopped processing property "icache_check.icache_0.finish_in_3"	[0.85 s].
-0.0.AM: Starting proof for property "icache_check.icache_0.genblk1[0].slot_used"	[0.00 s].
-0.0.N: Trace Attempt 10	[0.56 s]
-0.0.N: Stopped processing property "icache_check.icache_0.finish_in_3"	[0.82 s].
-0.0.N: Starting proof for property "icache_check.icache_0.genblk1[0].slot_used"	[0.00 s].
-0.0.AM: Trace Attempt  1	[0.00 s]
-0.0.AM: Trace Attempt  2	[0.00 s]
-0.0.N: Trace Attempt  1	[0.00 s]
-0.0.N: Trace Attempt  2	[0.00 s]
-0.0.AM: Trace Attempt  3	[0.01 s]
-0.0.AM: Trace Attempt  4	[0.01 s]
-0.0.N: Trace Attempt  2	[0.01 s]
-0.0.N: Trace Attempt  3	[0.01 s]
-0.0.N: Trace Attempt  4	[0.01 s]
-0.0.AM: Trace Attempt  5	[0.02 s]
-0.0.N: Trace Attempt  4	[0.03 s]
-0.0.N: Trace Attempt  5	[0.04 s]
-0.0.B: Trace Attempt 55	[0.83 s]
-0.0.B: Stopped processing property "icache_check.icache_0.finish_in_3"	[0.90 s].
-0.0.B: Starting proof for property "icache_check.icache_0.genblk1[0].slot_used"	[0.00 s].
-0.0.B: Trace Attempt  1	[0.00 s]
-0.0.B: Trace Attempt  2	[0.00 s]
-0.0.B: Trace Attempt  3	[0.00 s]
-0.0.B: Trace Attempt  4	[0.01 s]
-0.0.B: Trace Attempt  5	[0.01 s]
-0: ProofGrid usable level: 4
-0.0.N: Trace Attempt  1	[0.43 s]
-0.0.N: Trace Attempt  2	[0.43 s]
-0.0.N: Trace Attempt  3	[0.43 s]
-0.0.N: Validation of fixpoint was successful. Time = 0.00
-0.0.N: Trace Attempt 16	[0.58 s]
-0.0.N: A proof was found: No trace exists. [0.66 s]
-INFO (IPF051): 0.0.N: The cover property "icache_check.icache_0.genblk1[0].slot_used" was proven unreachable in 0.66 s.
-0.0.N: Stopped processing property "icache_check.icache_0.genblk1[0].slot_used"	[0.66 s].
-0.0.N: Starting proof for property "icache_check.icache_0.genblk1[1].slot_used"	[0.00 s].
-0.0.N: Trace Attempt  1	[0.00 s]
-0.0.N: Trace Attempt  2	[0.00 s]
 0.0.N: Trace Attempt  2	[0.01 s]
 0.0.N: Trace Attempt  3	[0.02 s]
 0.0.N: Trace Attempt  4	[0.02 s]
-0.0.N: Trace Attempt  5	[0.02 s]
-0.0.N: Trace Attempt  7	[0.02 s]
-0.0.N: A proof was found: No trace exists. [0.02 s]
-INFO (IPF051): 0.0.N: The cover property "icache_check.icache_0.genblk1[1].slot_used" was proven unreachable in 0.02 s.
-0.0.N: Stopped processing property "icache_check.icache_0.genblk1[1].slot_used"	[0.02 s].
+0.0.N: Trace Attempt  4	[0.04 s]
+0.0.N: Trace Attempt  5	[0.05 s]
+0.0.Mpcustom4: Trace Attempt  3	[1.48 s]
+0.0.Mpcustom4: Trace Attempt  4	[1.58 s]
+0.0.Mpcustom4: Trace Attempt  5	[1.66 s]
+0: ProofGrid usable level: 9
+0.0.N: Trace Attempt  1	[0.59 s]
+0.0.N: Trace Attempt  2	[0.59 s]
+0.0.N: Trace Attempt  3	[0.59 s]
+0.0.Mpcustom4: Trace Attempt  3	[2.00 s]
+0.0.AM: Trace Attempt  1	[0.64 s]
+0.0.AM: Trace Attempt  2	[0.65 s]
+0.0.AM: Trace Attempt  3	[0.65 s]
+0.0.Mpcustom4: Trace Attempt  4	[2.04 s]
+0.0.Mpcustom4: Trace Attempt  5	[2.36 s]
+0.0.N: Trace Attempt 10	[0.75 s]
+0.0.N: Per property time limit expired (1.00 s) [1.00 s]
+0.0.N: Stopped processing property "icache_check.icache_0.finish_in_3"	[1.00 s].
+0.0.N: Starting proof for property "icache_check.icache_0.genblk1[0].slot_used"	[0.00 s].
+0.0.N: Trace Attempt  1	[0.00 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  3	[0.02 s]
+0.0.N: Trace Attempt  4	[0.02 s]
+0.0.N: Trace Attempt  4	[0.04 s]
+0.0.N: Trace Attempt  5	[0.05 s]
+0.0.AM: Trace Attempt 16	[0.90 s]
+0.0.AM: Per property time limit expired (1.00 s) [1.08 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.finish_in_3"	[1.08 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.genblk1[0].slot_used"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
+0.0.AM: Trace Attempt  5	[0.03 s]
+0.0.B: Trace Attempt 57	[1.01 s]
+0.0.B: Stopped processing property "icache_check.icache_0.finish_in_3"	[1.10 s].
+0.0.B: Starting proof for property "icache_check.icache_0.genblk1[0].slot_used"	[0.00 s].
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.N: Trace Attempt  1	[0.69 s]
+0.0.N: Trace Attempt  2	[0.70 s]
+0.0.N: Trace Attempt  3	[0.70 s]
+0.0.N: Trace Attempt  5	[0.70 s]
+0.0.AM: Trace Attempt  1	[0.78 s]
+0.0.AM: Trace Attempt  2	[0.79 s]
+0.0.AM: Trace Attempt  3	[0.79 s]
+0.0.AM: Trace Attempt  5	[0.80 s]
+0.0.N: Trace Attempt 12	[0.80 s]
+0.0.N: Per property time limit expired (1.00 s) [1.00 s]
+0.0.N: Stopped processing property "icache_check.icache_0.genblk1[0].slot_used"	[1.00 s].
+0.0.N: Starting proof for property "icache_check.icache_0.genblk1[1].slot_used"	[0.00 s].
+0.0.AM: Trace Attempt  9	[0.86 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.genblk1[0].slot_used"	[0.95 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.genblk1[1].slot_used"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.N: Trace Attempt  1	[0.01 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  2	[0.02 s]
+0.0.AM: Trace Attempt  5	[0.02 s]
+0.0.N: Trace Attempt  3	[0.03 s]
+0.0.N: Trace Attempt  4	[0.03 s]
+0.0.N: Trace Attempt  4	[0.06 s]
+0.0.B: Trace Attempt 46	[0.89 s]
+0.0.B: Stopped processing property "icache_check.icache_0.genblk1[0].slot_used"	[0.97 s].
+0.0.B: Starting proof for property "icache_check.icache_0.genblk1[1].slot_used"	[0.00 s].
+0.0.N: Trace Attempt  5	[0.07 s]
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.N: Trace Attempt  1	[0.51 s]
+0.0.Mpcustom4: Trace Attempt  4	[3.91 s]
+0.0.N: Trace Attempt  2	[0.51 s]
+0.0.N: Trace Attempt  3	[0.51 s]
+0.0.N: Trace Attempt  5	[0.52 s]
+0.0.AM: Trace Attempt  1	[0.65 s]
+0.0.AM: Trace Attempt  2	[0.66 s]
+0.0.AM: Trace Attempt  3	[0.66 s]
+0.0.N: Validation of fixpoint was successful. Time = 0.00
+0.0.N: Trace Attempt 14	[0.75 s]
+0.0.N: A proof was found: No trace exists. [0.79 s]
+INFO (IPF051): 0.0.N: The cover property "icache_check.icache_0.genblk1[1].slot_used" was proven unreachable in 0.79 s.
+0.0.N: Stopped processing property "icache_check.icache_0.genblk1[1].slot_used"	[0.79 s].
 0.0.N: Starting proof for property "icache_check.icache_0.wont_clobber:precondition1"	[0.00 s].
 0.0.N: Starting proof for property "icache_check.icache_0.ever_full"	[0.00 s].
+0.0.AM: Trace Attempt  6	[0.67 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.genblk1[1].slot_used"	[0.79 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.wont_clobber:precondition1"	[0.00 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.ever_full"	[0.00 s].
 0.0.N: Trace Attempt  1	[0.00 s]
-0.0.N: Trace Attempt  2	[0.00 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
 0.0.N: Trace Attempt  2	[0.01 s]
 0.0.N: Trace Attempt  3	[0.02 s]
 0.0.N: Trace Attempt  4	[0.02 s]
@@ -444,26 +518,1366 @@ INFO (IPF051): 0.0.N: The cover property "icache_check.icache_0.wont_clobber:pre
 INFO (IPF051): 0.0.N: The cover property "icache_check.icache_0.ever_full" was proven unreachable in 0.02 s.
 0.0.N: Stopped processing property "icache_check.icache_0.wont_clobber:precondition1"	[0.02 s].
 0.0.N: Stopped processing property "icache_check.icache_0.ever_full"	[0.02 s].
-0.0.N: Last scan. Per property time limit: 0s
 0.0.N: Starting proof for property "icache_check.icache_0.never_full"	[0.00 s].
 0.0.N: Trace Attempt  1	[0.00 s]
-0.0.N: Trace Attempt  2	[0.00 s]
-0.0.B: Trace Attempt 41	[0.59 s]
-0.0.B: Stopped processing property "icache_check.icache_0.genblk1[0].slot_used"	[0.63 s].
-0.0.B: Last scan. Per property time limit: 0s
-0.0.B: Starting proof for property "icache_check.icache_0.never_full"	[0.00 s].
 0.0.N: Trace Attempt  2	[0.01 s]
-0.0.B: Trace Attempt  1	[0.00 s]
-0.0.B: Trace Attempt  2	[0.00 s]
-0.0.B: Trace Attempt  3	[0.00 s]
-0.0.B: Trace Attempt  4	[0.01 s]
-0.0.B: Trace Attempt  5	[0.01 s]
-0.0.N: Trace Attempt  3	[0.01 s]
-0.0.N: Trace Attempt  4	[0.01 s]
-0.0.N: Trace Attempt  5	[0.01 s]
+0.0.AM: Trace Attempt  5	[0.03 s]
+0.0.Mpcustom4: Trace Attempt  5	[4.22 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  3	[0.02 s]
+0.0.N: Trace Attempt  4	[0.02 s]
+0.0.N: Trace Attempt  5	[0.02 s]
 0.0.N: Trace Attempt  1	[0.02 s]
 0.0.N: Trace Attempt  2	[0.02 s]
+0.0.B: Trace Attempt 43	[0.71 s]
+0.0.B: Stopped processing property "icache_check.icache_0.genblk1[1].slot_used"	[0.76 s].
 0.0.N: Validation of fixpoint was successful. Time = 0.00
+0.0.B: Starting proof for property "icache_check.icache_0.never_full"	[0.00 s].
+0.0.N: A proof was found: No trace exists. [0.02 s]
+INFO (IPF057): 0.0.N: The property "icache_check.icache_0.never_full" was proven in 0.02 s.
+0.0.N: Stopped processing property "icache_check.icache_0.never_full"	[0.02 s].
+0.0.N: Starting proof for property "icache_check.icache_0.count_progresses"	[0.00 s].
+0.0.AM: Trace Attempt  6	[0.03 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.wont_clobber:precondition1"	[0.05 s].
+0.0.AM: Stopped processing property "icache_check.icache_0.ever_full"	[0.05 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.count_progresses"	[0.00 s].
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Stopped processing property "icache_check.icache_0.never_full"	[0.00 s].
+0.0.B: Starting proof for property "icache_check.icache_0.count_progresses"	[0.00 s].
+0.0.N: Trace Attempt  1	[0.00 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  3	[0.02 s]
+0.0.N: Trace Attempt  4	[0.02 s]
+0.0.AM: Trace Attempt  5	[0.02 s]
+0.0.N: Trace Attempt  4	[0.04 s]
+0.0.N: Trace Attempt  5	[0.05 s]
+0.0.Bm: Trace Attempt 15	[4.32 s]
+0.0.N: Trace Attempt  1	[0.15 s]
+0.0.N: Trace Attempt  2	[0.16 s]
+0.0.N: Trace Attempt  3	[0.16 s]
+0.0.N: Trace Attempt  4	[0.16 s]
+0.0.N: Validation of fixpoint was successful. Time = 0.00
+0.0.N: A proof was found: No trace exists. [0.17 s]
+INFO (IPF057): 0.0.N: The property "icache_check.icache_0.count_progresses" was proven in 0.17 s.
+0.0.N: Stopped processing property "icache_check.icache_0.count_progresses"	[0.17 s].
+0.0.N: Starting proof for property "icache_check.icache_0.cache_insert_consistent"	[0.00 s].
+0.0.N: Trace Attempt  1	[0.01 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt 22	[0.16 s]
+0.0.B: Stopped processing property "icache_check.icache_0.count_progresses"	[0.18 s].
+0.0.B: Starting proof for property "icache_check.icache_0.cache_insert_consistent"	[0.00 s].
+0.0.B: Trace Attempt  1	[0.01 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.N: Trace Attempt  2	[0.02 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.AM: Trace Attempt  6	[0.02 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.count_progresses"	[0.20 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.cache_insert_consistent"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.01 s]
+0.0.N: Trace Attempt  3	[0.04 s]
+0.0.N: Trace Attempt  4	[0.04 s]
+0.0.AM: Trace Attempt  2	[0.01 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.02 s]
+0.0.N: Trace Attempt  4	[0.08 s]
+0.0.N: Trace Attempt  5	[0.10 s]
+0: ProofGrid usable level: 5
+0.0.AM: Trace Attempt  5	[0.76 s]
+0.0.AM: Trace Attempt  1	[0.81 s]
+0.0.AM: Trace Attempt  2	[0.83 s]
+0.0.AM: Trace Attempt  3	[0.83 s]
+0.0.AM: Trace Attempt  5	[0.85 s]
+0.0.B: Trace Attempt 14	[0.45 s]
+0.0.B: Per property time limit expired (1.00 s) [1.01 s]
+0.0.B: Stopped processing property "icache_check.icache_0.cache_insert_consistent"	[1.01 s].
+0.0.B: Starting proof for property "icache_check.icache_0.stable_icache_data"	[0.00 s].
+0.0.N: Trace Attempt  8	[0.19 s]
+0.0.N: Per property time limit expired (1.00 s) [1.03 s]
+0.0.N: Stopped processing property "icache_check.icache_0.cache_insert_consistent"	[1.03 s].
+0.0.N: Starting proof for property "icache_check.icache_0.stable_icache_data"	[0.00 s].
+0.0.B: Trace Attempt  1	[0.01 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.N: Trace Attempt  1	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.N: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  5	[0.02 s]
+0.0.AM: Trace Attempt  8	[0.98 s]
+0.0.AM: Per property time limit expired (1.00 s) [1.02 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.cache_insert_consistent"	[1.02 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.stable_icache_data"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.01 s]
+0.0.AM: Trace Attempt  2	[0.01 s]
+0.0.N: Trace Attempt  2	[0.03 s]
+0.0.AM: Trace Attempt  3	[0.02 s]
+0.0.AM: Trace Attempt  4	[0.02 s]
+0.0.N: Trace Attempt  3	[0.04 s]
+0.0.N: Trace Attempt  4	[0.04 s]
+0.0.N: Trace Attempt  4	[0.09 s]
+0.0.N: Trace Attempt  5	[0.16 s]
+0.0.Ht: Trace Attempt 17	[6.22 s]
+0.0.N: Trace Attempt  8	[0.36 s]
+0.0.N: Per property time limit expired (1.00 s) [1.00 s]
+0.0.N: Stopped processing property "icache_check.icache_0.stable_icache_data"	[1.00 s].
+0.0.N: Next scan (1) will use per property time limit: 1s * 10 ^ 1 = 10s
+0.0.N: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.B: Trace Attempt 14	[0.55 s]
+0.0.B: Per property time limit expired (1.00 s) [1.01 s]
+0.0.B: Stopped processing property "icache_check.icache_0.stable_icache_data"	[1.02 s].
+0.0.B: Next scan (1) will use per property time limit: 1s * 10 ^ 1 = 10s
+0.0.B: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.stable_icache_data"	[1.01 s].
+0.0.AM: Next scan (1) will use per property time limit: 1s * 10 ^ 1 = 10s
+0.0.AM: Starting proof for property "icache_check.icache_0.unique_addr"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
+0.0.N: Trace Attempt 12	[0.08 s]
+0.0.AM: Trace Attempt  5	[0.08 s]
+0.0.N: Trace Attempt  1	[0.37 s]
+0.0.N: Trace Attempt  2	[0.37 s]
+0.0.N: Trace Attempt  3	[0.38 s]
+0.0.N: Trace Attempt  4	[0.38 s]
+0.0.N: Trace Attempt  5	[0.40 s]
+0.0.Hp: A proof was found: No trace exists. [8.05 s]
+INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.unique_addr" was proven in 8.04 s.
+0.0.Hp: A proof was found: No trace exists. [8.05 s]
+INFO (IPF051): 0.0.Hp: The cover property "icache_check.icache_0.genblk1[0].slot_used" was proven unreachable in 8.04 s.
+0.0.Hp: A proof was found: No trace exists. [8.05 s]
+INFO (IPF057): 0.0.Hp: The property "icache_check.icache_0.stable_icache_data" was proven in 8.04 s.
+0: ProofGrid usable level: 2
+0.0.N: Stopped processing property "icache_check.icache_0.unique_addr"	[1.51 s].
+0.0.N: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
+0.0.AM: Trace Attempt 14	[0.71 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.unique_addr"	[1.58 s].
+0.0.AM: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
+0.0.AM: Trace Attempt  1	[0.00 s]
+0.0.AM: Trace Attempt  2	[0.00 s]
+0.0.AM: Trace Attempt  3	[0.01 s]
+0.0.AM: Trace Attempt  4	[0.01 s]
+0.0.AM: Trace Attempt  5	[0.01 s]
+0.0.B: Trace Attempt 59	[1.48 s]
+0.0.B: Stopped processing property "icache_check.icache_0.unique_addr"	[1.62 s].
+0.0.B: Starting proof for property "icache_check.icache_0.finish_in_3"	[0.00 s].
+0.0.B: Trace Attempt  1	[0.00 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.Mpcustom4: Trace Attempt  4	[8.25 s]
+0.0.N: Trace Attempt  1	[0.35 s]
+0.0.N: Trace Attempt  2	[0.36 s]
+0.0.N: Trace Attempt  3	[0.36 s]
+0.0.N: Trace Attempt  4	[0.36 s]
+0.0.Mpcustom4: Trace Attempt  5	[8.36 s]
+0.0.N: Validation of fixpoint was successful. Time = 0.00
+0.0.N: Trace Attempt 10	[0.40 s]
+0.0.N: A proof was found: No trace exists. [0.41 s]
+INFO (IPF057): 0.0.N: The property "icache_check.icache_0.finish_in_3" was proven in 0.41 s.
+0.0.N: Stopped processing property "icache_check.icache_0.finish_in_3"	[0.41 s].
+0.0.N: Last scan. Per property time limit: 0s
+0.0.N: Starting proof for property "icache_check.icache_0.cache_insert_consistent"	[0.00 s].
+0.0.B: Trace Attempt 30	[0.29 s]
+0.0.B: Stopped processing property "icache_check.icache_0.finish_in_3"	[0.33 s].
+0.0.B: Last scan. Per property time limit: 0s
+0.0.B: Starting proof for property "icache_check.icache_0.cache_insert_consistent"	[0.00 s].
+0.0.B: Trace Attempt  1	[0.01 s]
+0.0.B: Trace Attempt  2	[0.01 s]
+0.0.AM: Trace Attempt 10	[0.06 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.finish_in_3"	[0.38 s].
+0.0.AM: Last scan. Per property time limit: 0s
+0.0.AM: Starting proof for property "icache_check.icache_0.cache_insert_consistent"	[0.00 s].
+0.0.B: Trace Attempt  3	[0.01 s]
+0.0.B: Trace Attempt  4	[0.01 s]
+0.0.B: Trace Attempt  5	[0.01 s]
+0.0.AM: Trace Attempt  1	[0.01 s]
+0.0.AM: Trace Attempt  2	[0.01 s]
+0.0.AM: Trace Attempt  3	[0.02 s]
+0.0.AM: Trace Attempt  4	[0.02 s]
+0.0.N: Trace Attempt  8	[0.09 s]
+0.0.Bm: Trace Attempt 19	[8.52 s]
+0.0.Mpcustom4: Trace Attempt  5	[9.07 s]
+0: ProofGrid usable level: 1
+0.0.AM: Trace Attempt  5	[0.76 s]
+0.0.AM: Trace Attempt  1	[0.81 s]
+0.0.AM: Trace Attempt  2	[0.83 s]
+0.0.AM: Trace Attempt  3	[0.83 s]
+0.0.AM: Trace Attempt  5	[0.86 s]
+0.0.Mpcustom4: Trace Attempt  5	[9.63 s]
+0.0.Mpcustom4: Trace Attempt  5	[10.21 s]
+0.0.Ht: Trace Attempt 19	[10.77 s]
+0.0.Mpcustom4: Trace Attempt  5	[11.01 s]
+0.0.Mpcustom4: Trace Attempt  5	[12.33 s]
+0.0.B: Trace Attempt 25	[4.09 s]
+0.0.Bm: Trace Attempt 35	[13.04 s]
+0.0.N: Trace Attempt 11	[5.20 s]
+0.0.Mpcustom4: Trace Attempt  5	[13.62 s]
+0.0.L: Trace Attempt 13	[14.20 s]
+0.0.Mpcustom4: Trace Attempt  5	[14.97 s]
+0.0.Ht: Trace Attempt 39	[16.00 s]
+0.0.B: Trace Attempt 33	[8.40 s]
+0.0.Bm: Trace Attempt 45	[18.21 s]
+0.0.Ht: Trace Attempt 45	[20.84 s]
+0.0.Hp: Trace Attempt  2	[20.98 s]
+0.0.Hp: Trace Attempt  3	[20.99 s]
+0.0.Hp: Trace Attempt  4	[20.99 s]
+0.0.Hp: Trace Attempt  5	[21.00 s]
+0.0.B: Trace Attempt 41	[12.74 s]
+0.0.Mpcustom4: Trace Attempt  8	[21.57 s]
+0.0.L: Trace Attempt 15	[22.62 s]
+0.0.Bm: Trace Attempt 53	[23.33 s]
+0.0.B: Trace Attempt 47	[16.79 s]
+0.0.Ht: Trace Attempt 55	[25.72 s]
+0.0.N: Trace Attempt 13	[18.30 s]
+0.0.N: Trace Attempt  1	[18.95 s]
+0.0.N: Trace Attempt  2	[19.08 s]
+0.0.N: Trace Attempt  3	[19.09 s]
+0.0.N: Trace Attempt  4	[19.13 s]
+0.0.N: Trace Attempt  5	[19.20 s]
+0.0.Mpcustom4: Trace Attempt  8	[28.23 s]
+0.0.Bm: Trace Attempt 61	[28.49 s]
+0.0.Ht: Trace Attempt 61	[30.88 s]
+0.0.Hp: Trace Attempt 51	[31.31 s]
+0.0.B: Trace Attempt 57	[23.12 s]
+0.0.L: Trace Attempt 17	[33.89 s]
+0.0.Bm: Trace Attempt 67	[34.08 s]
+0.0.Ht: Trace Attempt 69	[35.08 s]
+0.0.Mpcustom4: Trace Attempt  8	[36.69 s]
+0.0.B: Trace Attempt 61	[28.81 s]
+0.0.Bm: Trace Attempt 73	[39.46 s]
+0.0.B: Trace Attempt 67	[32.83 s]
+0.0.Ht: Trace Attempt 75	[41.57 s]
+0.0.Bm: Trace Attempt 79	[44.15 s]
+0.0.B: Trace Attempt 71	[36.92 s]
+0.0.Hp: Trace Attempt 69	[45.44 s]
+0.0.L: Trace Attempt 19	[45.39 s]
+0.0.Mpcustom4: Trace Attempt  8	[45.40 s]
+0.0.Ht: Trace Attempt 83	[46.85 s]
+0.0.Bm: Trace Attempt 85	[50.50 s]
+0.0.B: Trace Attempt 75	[42.61 s]
+0.0.Ht: Trace Attempt 89	[54.11 s]
+0.0.B: Trace Attempt 79	[46.64 s]
+0.0.Mpcustom4: Trace Attempt  8	[55.55 s]
+0.0.Bm: Trace Attempt 97	[56.63 s]
+0.0.Ht: Trace Attempt 101	[59.13 s]
+0.0.B: Trace Attempt 83	[51.28 s]
+0.0.L: Trace Attempt 21	[60.29 s]
+0.0.Bm: Trace Attempt 103	[63.26 s]
+0.0.Ht: Trace Attempt 103	[63.97 s]
+0.0.B: Trace Attempt 85	[55.88 s]
+0.0.Hp: Trace Attempt 85	[66.93 s]
+0.0.Bm: Trace Attempt 109	[67.30 s]
+0.0.Mpcustom4: Trace Attempt  8	[67.38 s]
+0.0.Hp: Trace Attempt 110	[70.94 s]
+0.0.B: Trace Attempt 89	[62.69 s]
+0.0.Bm: Trace Attempt 111	[71.36 s]
+0.0.Ht: Trace Attempt 109	[71.90 s]
+0.0.L: Trace Attempt 23	[74.01 s]
+0.0.Hp: Trace Attempt 111	[75.17 s]
+0.0.B: Trace Attempt 91	[67.47 s]
+0.0.Ht: Trace Attempt 117	[76.98 s]
+0.0.Bm: Trace Attempt 117	[77.37 s]
+0.0.Mpcustom4: Trace Attempt  8	[80.00 s]
+0.0.B: Trace Attempt 93	[72.94 s]
+0.0.Bm: Trace Attempt 119	[82.31 s]
+0.0.Ht: Trace Attempt 121	[82.59 s]
+0.0.B: Trace Attempt 95	[77.02 s]
+0.0.Bm: Trace Attempt 125	[87.65 s]
+0.0.Ht: Trace Attempt 125	[90.46 s]
+0.0.L: Trace Attempt 25	[92.31 s]
+0.0.Bm: Trace Attempt 129	[92.67 s]
+0.0.Mpcustom4: Trace Attempt  8	[93.24 s]
+0.0.B: Trace Attempt 99	[85.53 s]
+0.0.Ht: Trace Attempt 133	[95.07 s]
+0.0.Bm: Trace Attempt 131	[97.18 s]
+0.0.Hp: Trace Attempt 117	[99.42 s]
+0.0.Ht: Trace Attempt 137	[99.94 s]
+0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden:precondition1 (7) }
+0.0.L: Trace Attempt  3	[100.87 s]
+0.0.L: Trace Attempt  4	[100.89 s]
+0.0.L: Trace Attempt  5	[100.91 s]
+0.0.B: Trace Attempt 103	[94.23 s]
+0.0.Bm: Trace Attempt 137	[102.75 s]
+0.0.Ht: Trace Attempt 143	[105.03 s]
+0.0.Hp: Trace Attempt 137	[105.19 s]
+0.0.L: Trace Attempt 17	[105.77 s]
+0.0.Mpcustom4: Trace Attempt  8	[106.22 s]
+0.0.B: Trace Attempt 105	[98.87 s]
+0.0.L: Trace Attempt 23	[109.87 s]
+0.0.Hp: Trace Attempt 145	[110.73 s]
+0.0.Ht: Trace Attempt 145	[111.41 s]
+0.0.Bm: Trace Attempt 145	[112.31 s]
+0.0.B: Trace Attempt 107	[104.00 s]
+0.0.L: Trace Attempt 31	[114.08 s]
+0.0.Ht: Trace Attempt 151	[115.86 s]
+0.0.Bm: Trace Attempt 147	[117.97 s]
+0.0.B: Trace Attempt 109	[110.18 s]
+0.0.L: Trace Attempt 39	[119.25 s]
+0.0.Ht: Trace Attempt 155	[121.14 s]
+0.0.Mpcustom4: Trace Attempt  8	[121.63 s]
+0.0.Bm: Trace Attempt 157	[122.32 s]
+0.0.B: Trace Attempt 111	[115.87 s]
+0.0.L: Trace Attempt 47	[124.63 s]
+0.0.Hp: Trace Attempt 147	[125.52 s]
+0.0.Ht: Trace Attempt 161	[126.21 s]
+0.0.Bm: Trace Attempt 161	[127.79 s]
+0.0.B: Trace Attempt 113	[120.25 s]
+0.0.L: Trace Attempt 53	[128.73 s]
+0.0.Ht: Trace Attempt 163	[133.41 s]
+0.0.B: Trace Attempt 115	[125.20 s]
+0.0.Bm: Trace Attempt 163	[133.89 s]
+0.0.L: Trace Attempt 61	[135.19 s]
+0.0.Ht: Trace Attempt 167	[137.72 s]
+0.0.Bm: Trace Attempt 166	[137.93 s]
+0.0.Mpcustom4: Trace Attempt  8	[138.53 s]
+0.0.B: Trace Attempt 117	[131.01 s]
+0.0.L: Trace Attempt 69	[140.98 s]
+0.0.L: Trace Attempt 75	[145.90 s]
+0.0.Ht: Trace Attempt 173	[146.07 s]
+0.0.B: Trace Attempt 119	[138.50 s]
+0.0.Bm: Trace Attempt 171	[148.43 s]
+0.0.Ht: Trace Attempt 179	[151.40 s]
+0.0.B: Trace Attempt 121	[143.60 s]
+0.0.L: Trace Attempt 79	[152.02 s]
+0.0.Mpcustom4: Trace Attempt  8	[155.53 s]
+0.0.Bm: Trace Attempt 179	[155.96 s]
+0.0.Hp: Trace Attempt 161	[156.27 s]
+0.0.L: Trace Attempt 85	[156.48 s]
+0.0.B: Trace Attempt 123	[150.04 s]
+0.0.Ht: Trace Attempt 183	[160.53 s]
+0.0.B: Trace Attempt 125	[154.39 s]
+0.0.L: Trace Attempt 91	[163.07 s]
+0.0.Bm: Trace Attempt 183	[164.76 s]
+0.0.Ht: Trace Attempt 189	[165.04 s]
+0.0.Hp: Trace Attempt 183	[165.14 s]
+0.0.B: Trace Attempt 127	[159.58 s]
+0.0.L: Trace Attempt 99	[170.37 s]
+0.0.Ht: Trace Attempt 193	[171.59 s]
+0.0.B: Trace Attempt 129	[164.07 s]
+0.0.Mpcustom4: Trace Attempt  8	[172.62 s]
+0.0.Hp: Trace Attempt 191	[174.79 s]
+0.0.N: Trace Attempt 10	[166.62 s]
+0.0.Bm: Trace Attempt 193	[175.56 s]
+0.0.L: Trace Attempt 103	[176.19 s]
+0.0.Ht: Trace Attempt 199	[176.22 s]
+0.0.B: Trace Attempt 131	[168.14 s]
+0.0.J: Proofgrid shell started at 2807762@cadpc05(local) jg_2805038_cadpc05_1
+0.0.L: Requesting engine job to terminate
+0.0.J: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.U2: Proofgrid shell started at 2807779@cadpc05(local) jg_2805038_cadpc05_1
+0.0.U: Proofgrid shell started at 2807778@cadpc05(local) jg_2805038_cadpc05_1
+0.0.U2: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.U: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.J: Trace Attempt  1	[0.13 s]
+0.0.J: Trace Attempt  1	[0.13 s]
+0.0.J: Trace Attempt  2	[0.13 s]
+0.0.J: Trace Attempt  1	[0.13 s]
+0.0.J: Trace Attempt  3	[0.13 s]
+0.0.J: Trace Attempt  1	[0.13 s]
+0.0.J: Trace Attempt  4	[0.13 s]
+0.0.J: Trace Attempt  1	[0.13 s]
+0.0.J: Trace Attempt  1	[0.14 s]
+0.0.U2: Seed 1
+0.0.U: Reached length limit (100) [0.04 s]
+0.0.U: Exited with Success (@ 181.16 s)
+0.0.J: Trace Attempt  1	[0.21 s]
+0.0.J: Trace Attempt  1	[0.29 s]
+0.0.J: Trace Attempt  1	[0.36 s]
+0.0.L: Trace Attempt 106	[177.85 s]
+0.0.L: Interrupted. [181.30 s]
+0.0.L: Exited with Success (@ 181.40 s)
+0.0.L: Engine should be restarted (starts=1, unexpected_terminations=0)
+   Last recorded data: 0.00 s ago
+   Last recorded RSS memory usage: 292.06 MiB, peak 607.32 MiB
+   Last recorded free memory: 46.97 GiB out of 62.37 GiB, nadir 46.81 GiB
+0.0.L: Restarting engine (local)
+0.0.J: Trace Attempt  1	[0.44 s]
+0.0.L: Proofgrid shell started at 2807810@cadpc05(local) jg_2805038_cadpc05_1
+0.0.L: clocks: 3, declared: 3, looping: 0, posedge: 3, negedge: 0, noedge: 0, bothedge: 0
+0.0.L: Using trace diversification with seed 1 (0.05)
+0.0.L: Using LRU state removal heuristic
+0.0.L: Using states from traces to { (reset) }
+0.0.J: Trace Attempt  1	[0.52 s]
+0.0.L: Trace Attempt  3	[0.05 s]
+0.0.U2: Trace Attempt  1	[0.45 s]
+0.0.L: Trace Attempt  4	[0.09 s]
+0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
+0.0.J: Trace Attempt  1	[0.60 s]
+0.0.L: Trace Attempt  3	[0.14 s]
+0.0.L: Trace Attempt  4	[0.16 s]
+0.0.L: Using states from traces to { icache_check.icache_0.does_free:precondition1 (5) }
+0.0.J: Trace Attempt  1	[0.68 s]
+0.0.L: Trace Attempt  3	[0.21 s]
+0.0.L: Using states from traces to { icache_check.mem_0.data_out_lock:precondition1 (6) }
+0.0.L: Trace Attempt  3	[0.26 s]
+0.0.L: Using states from traces to { icache_check.icache_0.genblk1[2].slot_used (7) }
+0.0.J: Trace Attempt  1	[0.77 s]
+0.0.L: Trace Attempt  3	[0.30 s]
+0.0.L: Overconstrained local search, searching for dead end trace with 8 - 10 cycles
+0.0.J: Trace Attempt  1	[0.85 s]
+0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
+0.0.L: Using states from traces to { icache_check.mem_0.data_out_lock:precondition1 (6) }
+0.0.L: Trace Attempt  3	[0.40 s]
+0.0.L: Using states from traces to { icache_check.icache_0.addr_hidden <7> }
+0.0.U2: Trace Attempt  3	[0.82 s]
+0.0.L: Trace Attempt  3	[0.44 s]
+0.0.J: Trace Attempt  1	[0.93 s]
+0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
+0.0.L: Using states from traces to { icache_check.mem_0.data_out_lock:precondition1 (6) }
+0.0.L: Trace Attempt  3	[0.47 s]
+0.0.L: Trace Attempt  4	[0.49 s]
+0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
+0.0.L: Using states from traces to { icache_check.icache_0.does_free:precondition1 (5) }
+0.0.J: Trace Attempt  1	[1.00 s]
+0.0.L: Trace Attempt  3	[0.52 s]
+0.0.L: Trace Attempt  4	[0.55 s]
+0.0.U2: Trace Attempt  1	[0.94 s]
+0.0.L: Trace Attempt  5	[0.57 s]
+0.0.L: Overconstrained local search, discarded 1 start state(s) and retrying
+0.0.L: Using states from traces to { icache_check.icache_0.unique_addr:precondition1 (3) }
+0.0.J: Trace Attempt  1	[1.06 s]
+0.0.L: Trace Attempt  3	[0.60 s]
+0.0.L: Trace Attempt  4	[0.62 s]
+0.0.L: Trace Attempt  5	[0.64 s]
+0.0.J: Trace Attempt  1	[1.13 s]
+0.0.U2: Trace Attempt  1	[1.06 s]
+0.0.J: Trace Attempt  1	[1.19 s]
+0.0.J: Trace Attempt  1	[1.25 s]
+0.0.U2: Trace Attempt  4	[1.17 s]
+0.0.U2: Trace Attempt  1	[1.21 s]
+0.0.J: Trace Attempt  1	[1.32 s]
+0.0.J: Trace Attempt  1	[1.38 s]
+0.0.U2: Trace Attempt  5	[1.32 s]
+0.0.J: Trace Attempt  1	[1.44 s]
+0.0.U2: Trace Attempt  1	[1.34 s]
+0.0.J: Trace Attempt  1	[1.50 s]
+0.0.U2: Trace Attempt  1	[1.41 s]
+0.0.J: Trace Attempt  1	[1.56 s]
+0.0.U2: Trace Attempt  1	[1.49 s]
+0.0.J: Trace Attempt  1	[1.62 s]
+0.0.J: Trace Attempt  1	[1.69 s]
+0.0.U2: Trace Attempt  4	[1.59 s]
+0.0.J: Trace Attempt  1	[1.75 s]
+0.0.U2: Trace Attempt  1	[1.68 s]
+0.0.J: Trace Attempt  1	[1.81 s]
+0.0.U2: Trace Attempt  1	[1.75 s]
+0.0.J: Trace Attempt  1	[1.87 s]
+0.0.J: Trace Attempt  1	[1.93 s]
+0.0.U2: Trace Attempt  1	[1.88 s]
+0.0.J: Trace Attempt  1	[2.00 s]
+0.0.J: Trace Attempt  1	[2.06 s]
+0.0.U2: Trace Attempt  1	[2.00 s]
+0.0.J: Trace Attempt  1	[2.12 s]
+0.0.J: Trace Attempt  1	[2.19 s]
+0.0.U2: Trace Attempt  4	[2.11 s]
+0.0.J: Trace Attempt  1	[2.25 s]
+0.0.U2: Trace Attempt  1	[2.15 s]
+0.0.J: Trace Attempt  1	[2.32 s]
+0.0.U2: Trace Attempt  1	[2.24 s]
+0.0.J: Trace Attempt  1	[2.38 s]
+0.0.J: Trace Attempt  1	[2.44 s]
+0.0.U2: Trace Attempt  5	[2.35 s]
+0.0.J: Trace Attempt  1	[2.51 s]
+0.0.U2: Trace Attempt  5	[2.46 s]
+0.0.B: Trace Attempt 133	[175.06 s]
+0.0.J: Trace Attempt  1	[2.57 s]
+0.0.U2: Trace Attempt  1	[2.48 s]
+0.0.J: Trace Attempt  1	[2.63 s]
+0.0.U2: Trace Attempt  1	[2.55 s]
+0.0.J: Trace Attempt  1	[2.69 s]
+0.0.U2: Trace Attempt  1	[2.61 s]
+0.0.J: Trace Attempt  1	[2.75 s]
+0.0.U2: Trace Attempt  1	[2.68 s]
+0.0.J: Trace Attempt  1	[2.81 s]
+0.0.J: Trace Attempt  1	[2.88 s]
+0.0.U2: Trace Attempt  5	[2.79 s]
+0.0.J: Trace Attempt  1	[2.94 s]
+0.0.J: Trace Attempt  1	[3.00 s]
+0.0.U2: Trace Attempt  5	[2.90 s]
+0.0.U2: Trace Attempt  1	[2.94 s]
+0.0.J: Trace Attempt  1	[3.06 s]
+0.0.J: Trace Attempt  1	[3.12 s]
+0.0.J: Trace Attempt  1	[3.18 s]
+0.0.J: Trace Attempt  1	[3.24 s]
+0.0.U2: Trace Attempt  5	[3.15 s]
+0.0.U2: Trace Attempt  1	[3.17 s]
+0.0.J: Trace Attempt  1	[3.30 s]
+0.0.J: Trace Attempt  1	[3.37 s]
+0.0.U2: Trace Attempt  4	[3.28 s]
+0.0.J: Trace Attempt  1	[3.43 s]
+0.0.J: Trace Attempt  1	[3.49 s]
+0.0.J: Trace Attempt  1	[3.55 s]
+0.0.U2: Trace Attempt  5	[3.49 s]
+0.0.J: Trace Attempt  1	[3.61 s]
+0.0.U2: Trace Attempt  1	[3.52 s]
+0.0.J: Trace Attempt  1	[3.67 s]
+0.0.J: Trace Attempt  1	[3.73 s]
+0.0.J: Trace Attempt  1	[3.80 s]
+0.0.J: Trace Attempt  1	[3.86 s]
+0.0.J: Trace Attempt  1	[3.92 s]
+0.0.U2: Trace Attempt  3	[3.82 s]
+0.0.J: Trace Attempt  1	[3.98 s]
+0.0.U2: Trace Attempt  5	[3.92 s]
+0.0.J: Trace Attempt  1	[4.04 s]
+0.0.J: Trace Attempt  1	[4.10 s]
+0.0.U2: Trace Attempt  1	[4.03 s]
+0.0.J: Trace Attempt  1	[4.16 s]
+0.0.U2: Trace Attempt  1	[4.10 s]
+0.0.J: Trace Attempt  1	[4.22 s]
+0.0.U2: Trace Attempt  1	[4.18 s]
+0.0.J: Trace Attempt  1	[4.29 s]
+0.0.J: Trace Attempt  1	[4.35 s]
+0.0.U2: Trace Attempt  1	[4.25 s]
+0.0.J: Trace Attempt  1	[4.41 s]
+0.0.U2: Trace Attempt  1	[4.36 s]
+0.0.J: Trace Attempt  1	[4.47 s]
+0.0.J: Trace Attempt  1	[4.53 s]
+0.0.U2: Trace Attempt  1	[4.42 s]
+0.0.J: Trace Attempt  1	[4.59 s]
+0.0.U2: Trace Attempt  4	[4.53 s]
+0.0.J: Trace Attempt  1	[4.65 s]
+0.0.J: Trace Attempt  1	[4.71 s]
+0.0.J: Trace Attempt  1	[4.77 s]
+0.0.J: Trace Attempt  1	[4.83 s]
+0.0.U2: Trace Attempt  1	[4.76 s]
+0.0.J: Trace Attempt  1	[4.89 s]
+0.0.J: Trace Attempt  1	[4.96 s]
+0.0.J: Trace Attempt  1	[5.01 s]
+0.0.J: Trace Attempt  1	[5.08 s]
+0.0.U2: Trace Attempt  4	[4.97 s]
+0.0.J: Trace Attempt  1	[5.14 s]
+0.0.U2: Trace Attempt  1	[5.05 s]
+0.0.J: Trace Attempt  1	[5.20 s]
+0.0.U2: Trace Attempt  5	[5.16 s]
+0.0.J: Trace Attempt  1	[5.26 s]
+0.0.U2: Trace Attempt  1	[5.17 s]
+0.0.J: Trace Attempt  1	[5.32 s]
+0.0.J: Trace Attempt  1	[5.38 s]
+0.0.J: Trace Attempt  1	[5.44 s]
+0.0.L: Trace Attempt 17	[4.97 s]
+0.0.U2: Trace Attempt  1	[5.35 s]
+0.0.J: Trace Attempt  1	[5.50 s]
+0.0.J: Trace Attempt  1	[5.56 s]
+0.0.U2: Trace Attempt  5	[5.46 s]
+0.0.J: Trace Attempt  1	[5.62 s]
+0.0.J: Trace Attempt  1	[5.69 s]
+0.0.U2: Trace Attempt  1	[5.58 s]
+0.0.J: Trace Attempt  1	[5.75 s]
+0.0.U2: Trace Attempt  1	[5.65 s]
+0.0.J: Trace Attempt  1	[5.81 s]
+0.0.U2: Trace Attempt  1	[5.73 s]
+0.0.J: Trace Attempt  1	[5.87 s]
+0.0.J: Trace Attempt  1	[5.93 s]
+0.0.U2: Trace Attempt  1	[5.84 s]
+0.0.J: Trace Attempt  1	[5.99 s]
+0.0.U2: Trace Attempt  5	[5.94 s]
+0.0.J: Trace Attempt  1	[6.05 s]
+0.0.U2: Trace Attempt  1	[5.96 s]
+0.0.J: Trace Attempt  1	[6.11 s]
+0.0.U2: Trace Attempt  1	[6.06 s]
+0.0.J: Trace Attempt  1	[6.17 s]
+0.0.J: Trace Attempt  1	[6.24 s]
+0.0.U2: Trace Attempt  5	[6.17 s]
+0.0.J: Trace Attempt  1	[6.30 s]
+0.0.U2: Trace Attempt  1	[6.20 s]
+0.0.J: Trace Attempt  1	[6.36 s]
+0.0.U2: Trace Attempt  5	[6.31 s]
+0.0.J: Trace Attempt  1	[6.42 s]
+0.0.Hp: Trace Attempt 199	[187.42 s]
+0.0.J: Trace Attempt  1	[6.48 s]
+0.0.U2: Trace Attempt  1	[6.40 s]
+0.0.J: Trace Attempt  1	[6.54 s]
+0.0.J: Trace Attempt  1	[6.60 s]
+0.0.U2: Trace Attempt  1	[6.52 s]
+0.0.J: Trace Attempt  1	[6.66 s]
+0.0.J: Trace Attempt  1	[6.72 s]
+0.0.Ht: Trace Attempt 203	[187.66 s]
+0.0.J: Trace Attempt  1	[6.79 s]
+0.0.J: Trace Attempt  1	[6.85 s]
+0.0.U2: Trace Attempt  4	[6.75 s]
+0.0.J: Trace Attempt  1	[6.91 s]
+0.0.U2: Trace Attempt  1	[6.83 s]
+0.0.J: Trace Attempt  1	[6.97 s]
+0.0.J: Trace Attempt  1	[7.03 s]
+0.0.U2: Trace Attempt  1	[6.99 s]
+0.0.J: Trace Attempt  1	[7.09 s]
+0.0.J: Trace Attempt  1	[7.16 s]
+0.0.U2: Trace Attempt  1	[7.07 s]
+0.0.J: Trace Attempt  1	[7.22 s]
+0.0.U2: Trace Attempt  1	[7.15 s]
+0.0.J: Trace Attempt  1	[7.28 s]
+0.0.J: Trace Attempt  1	[7.34 s]
+0.0.U2: Trace Attempt  4	[7.27 s]
+0.0.J: Trace Attempt  1	[7.40 s]
+0.0.J: Trace Attempt  1	[7.46 s]
+0.0.J: Trace Attempt  1	[7.53 s]
+0.0.U2: Trace Attempt  1	[7.43 s]
+0.0.J: Trace Attempt  1	[7.59 s]
+0.0.U2: Trace Attempt  1	[7.50 s]
+0.0.J: Trace Attempt  1	[7.65 s]
+0.0.U2: Trace Attempt  1	[7.58 s]
+0.0.J: Trace Attempt  1	[7.71 s]
+0.0.U2: Trace Attempt  1	[7.66 s]
+0.0.J: Trace Attempt  1	[7.77 s]
+0.0.J: Trace Attempt  1	[7.83 s]
+0.0.U2: Trace Attempt  4	[7.76 s]
+0.0.J: Trace Attempt  1	[7.89 s]
+0.0.J: Trace Attempt  1	[7.95 s]
+0.0.J: Trace Attempt  1	[8.01 s]
+0.0.U2: Trace Attempt  1	[7.96 s]
+0.0.J: Trace Attempt  1	[8.07 s]
+0.0.J: Trace Attempt  1	[8.13 s]
+0.0.U2: Trace Attempt  4	[8.06 s]
+0.0.J: Trace Attempt  1	[8.20 s]
+0.0.U2: Trace Attempt  1	[8.15 s]
+0.0.J: Trace Attempt  1	[8.26 s]
+0.0.J: Trace Attempt  1	[8.32 s]
+0.0.J: Trace Attempt  1	[8.38 s]
+0.0.J: Trace Attempt  1	[8.44 s]
+0.0.U2: Trace Attempt  4	[8.36 s]
+0.0.J: Trace Attempt  1	[8.50 s]
+0.0.J: Trace Attempt  1	[8.56 s]
+0.0.J: Trace Attempt  1	[8.62 s]
+0.0.U2: Trace Attempt  1	[8.56 s]
+0.0.J: Trace Attempt  1	[8.69 s]
+0.0.U2: Trace Attempt  1	[8.63 s]
+0.0.J: Trace Attempt  1	[8.75 s]
+0.0.U2: Trace Attempt  1	[8.69 s]
+0.0.J: Trace Attempt  1	[8.81 s]
+0.0.J: Trace Attempt  1	[8.87 s]
+0.0.U2: Trace Attempt  5	[8.80 s]
+0.0.U2: Trace Attempt  1	[8.83 s]
+0.0.J: Trace Attempt  1	[8.93 s]
+0.0.J: Trace Attempt  1	[8.99 s]
+0.0.J: Trace Attempt  1	[9.05 s]
+0.0.J: Trace Attempt  1	[9.12 s]
+0.0.J: Trace Attempt  1	[9.18 s]
+0.0.U2: Trace Attempt  1	[9.07 s]
+0.0.J: Trace Attempt  1	[9.24 s]
+0.0.U2: Trace Attempt  1	[9.14 s]
+0.0.J: Trace Attempt  1	[9.30 s]
+0.0.U2: Trace Attempt  4	[9.25 s]
+0.0.J: Trace Attempt  1	[9.36 s]
+0.0.U2: Trace Attempt  1	[9.27 s]
+0.0.J: Trace Attempt  1	[9.42 s]
+0.0.J: Trace Attempt  1	[9.48 s]
+0.0.J: Trace Attempt  1	[9.54 s]
+0.0.U2: Trace Attempt  1	[9.48 s]
+0.0.J: Trace Attempt  1	[9.61 s]
+0.0.Bm: Trace Attempt 203	[190.55 s]
+0.0.U2: Trace Attempt  1	[9.54 s]
+0.0.J: Trace Attempt  1	[9.67 s]
+0.0.U2: Trace Attempt  1	[9.60 s]
+0.0.J: Trace Attempt  1	[9.73 s]
+0.0.J: Trace Attempt  1	[9.79 s]
+0.0.J: Trace Attempt  1	[9.85 s]
+0.0.J: Trace Attempt  1	[9.91 s]
+0.0.J: Trace Attempt  1	[9.98 s]
+0.0.J: Trace Attempt  1	[10.04 s]
+0.0.J: Trace Attempt  1	[10.10 s]
+0.0.U2: Trace Attempt  5	[10.05 s]
+0.0.J: Trace Attempt  1	[10.16 s]
+0.0.Mpcustom4: Trace Attempt  8	[191.09 s]
+0.0.J: Trace Attempt  1	[10.22 s]
+0.0.U2: Trace Attempt  4	[10.16 s]
+0.0.J: Trace Attempt  1	[10.29 s]
+0.0.U2: Trace Attempt  1	[10.19 s]
+0.0.L: Trace Attempt 23	[9.86 s]
+0.0.J: Trace Attempt  1	[10.35 s]
+0.0.U2: Trace Attempt  5	[10.29 s]
+0.0.J: Trace Attempt  1	[10.41 s]
+0.0.J: Trace Attempt  1	[10.47 s]
+0.0.J: Trace Attempt  1	[10.53 s]
+0.0.U2: Trace Attempt  1	[10.44 s]
+0.0.J: Trace Attempt  1	[10.59 s]
+0.0.U2: Trace Attempt  1	[10.52 s]
+0.0.J: Trace Attempt  1	[10.65 s]
+0.0.J: Trace Attempt  1	[10.72 s]
+0.0.U2: Trace Attempt  4	[10.62 s]
+0.0.U2: Trace Attempt  1	[10.64 s]
+0.0.J: Trace Attempt  1	[10.78 s]
+0.0.U2: Trace Attempt  1	[10.70 s]
+0.0.J: Trace Attempt  1	[10.84 s]
+0.0.J: Trace Attempt  1	[10.90 s]
+0.0.J: Trace Attempt  1	[10.96 s]
+0.0.J: Trace Attempt  1	[11.02 s]
+0.0.U2: Trace Attempt  3	[10.94 s]
+0.0.J: Trace Attempt  1	[11.08 s]
+0.0.J: Trace Attempt  1	[11.14 s]
+0.0.U2: Trace Attempt  4	[11.04 s]
+0.0.J: Trace Attempt  1	[11.20 s]
+0.0.U2: Trace Attempt  1	[11.12 s]
+0.0.J: Trace Attempt  1	[11.26 s]
+0.0.J: Trace Attempt  1	[11.32 s]
+0.0.J: Trace Attempt  1	[11.38 s]
+0.0.J: Trace Attempt  1	[11.45 s]
+0.0.J: Trace Attempt  1	[11.51 s]
+0.0.U2: Trace Attempt  1	[11.44 s]
+0.0.J: Trace Attempt  1	[11.57 s]
+0.0.U2: Trace Attempt  1	[11.52 s]
+0.0.J: Trace Attempt  1	[11.63 s]
+0.0.Ht: Trace Attempt 207	[192.56 s]
+0.0.J: Trace Attempt  1	[11.69 s]
+0.0.J: Trace Attempt  1	[11.75 s]
+0.0.B: Trace Attempt 135	[184.31 s]
+0.0.J: Trace Attempt  1	[11.82 s]
+0.0.U2: Trace Attempt  1	[11.74 s]
+0.0.J: Trace Attempt  1	[11.88 s]
+0.0.J: Trace Attempt  1	[11.94 s]
+0.0.J: Trace Attempt  1	[12.00 s]
+0.0.J: Trace Attempt  1	[12.06 s]
+0.0.U2: Trace Attempt  4	[11.97 s]
+0.0.J: Trace Attempt  1	[12.12 s]
+0.0.J: Trace Attempt  1	[12.19 s]
+0.0.U2: Trace Attempt  1	[12.14 s]
+0.0.J: Trace Attempt  1	[12.25 s]
+0.0.J: Trace Attempt  1	[12.31 s]
+0.0.U2: Trace Attempt  5	[12.24 s]
+0.0.J: Trace Attempt  1	[12.37 s]
+0.0.J: Trace Attempt  1	[12.43 s]
+0.0.U2: Trace Attempt  5	[12.35 s]
+0.0.J: Trace Attempt  1	[12.49 s]
+0.0.J: Trace Attempt  1	[12.55 s]
+0.0.U2: Trace Attempt  1	[12.45 s]
+0.0.J: Trace Attempt  1	[12.62 s]
+0.0.J: Trace Attempt  1	[12.68 s]
+0.0.J: Trace Attempt  1	[12.74 s]
+0.0.U2: Trace Attempt  3	[12.67 s]
+0.0.J: Trace Attempt  1	[12.80 s]
+0.0.U2: Trace Attempt  1	[12.74 s]
+0.0.J: Trace Attempt  1	[12.86 s]
+0.0.J: Trace Attempt  1	[12.92 s]
+0.0.U2: Trace Attempt  4	[12.86 s]
+0.0.J: Trace Attempt  1	[12.98 s]
+0.0.J: Trace Attempt  1	[13.04 s]
+0.0.U2: Trace Attempt  1	[12.96 s]
+0.0.J: Trace Attempt  1	[13.10 s]
+0.0.U2: Trace Attempt  1	[13.05 s]
+0.0.J: Trace Attempt  1	[13.16 s]
+0.0.J: Trace Attempt  1	[13.23 s]
+0.0.U2: Trace Attempt  5	[13.16 s]
+0.0.J: Trace Attempt  1	[13.29 s]
+0.0.U2: Trace Attempt  1	[13.22 s]
+0.0.J: Trace Attempt  1	[13.35 s]
+0.0.J: Trace Attempt  1	[13.41 s]
+0.0.U2: Trace Attempt  1	[13.32 s]
+0.0.J: Trace Attempt  1	[13.47 s]
+0.0.U2: Trace Attempt  4	[13.43 s]
+0.0.J: Trace Attempt  1	[13.53 s]
+0.0.J: Trace Attempt  1	[13.59 s]
+0.0.J: Trace Attempt  1	[13.65 s]
+0.0.J: Trace Attempt  1	[13.72 s]
+0.0.U2: Trace Attempt  1	[13.67 s]
+0.0.J: Trace Attempt  1	[13.78 s]
+0.0.J: Trace Attempt  1	[13.84 s]
+0.0.Bm: Trace Attempt 209	[194.81 s]
+0.0.J: Trace Attempt  1	[13.90 s]
+0.0.U2: Trace Attempt  1	[13.80 s]
+0.0.J: Trace Attempt  1	[13.96 s]
+0.0.U2: Trace Attempt  4	[13.92 s]
+0.0.J: Trace Attempt  1	[14.02 s]
+0.0.U2: Trace Attempt  1	[13.98 s]
+0.0.J: Trace Attempt  1	[14.08 s]
+0.0.J: Trace Attempt  1	[14.15 s]
+0.0.U2: Trace Attempt  5	[14.08 s]
+0.0.J: Trace Attempt  1	[14.21 s]
+0.0.J: Trace Attempt  1	[14.27 s]
+0.0.J: Trace Attempt  1	[14.33 s]
+0.0.L: Trace Attempt 29	[13.89 s]
+0.0.U2: Trace Attempt  1	[14.28 s]
+0.0.J: Trace Attempt  1	[14.39 s]
+0.0.J: Trace Attempt  1	[14.45 s]
+0.0.U2: Trace Attempt  5	[14.38 s]
+0.0.J: Trace Attempt  1	[14.51 s]
+0.0.U2: Trace Attempt  1	[14.46 s]
+0.0.J: Trace Attempt  1	[14.57 s]
+0.0.J: Trace Attempt  1	[14.63 s]
+0.0.U2: Trace Attempt  1	[14.55 s]
+0.0.J: Trace Attempt  1	[14.70 s]
+0.0.J: Trace Attempt  1	[14.76 s]
+0.0.U2: Trace Attempt  5	[14.66 s]
+0.0.U2: Trace Attempt  1	[14.71 s]
+0.0.J: Trace Attempt  1	[14.82 s]
+0.0.J: Trace Attempt  1	[14.88 s]
+0.0.U2: Trace Attempt  3	[14.81 s]
+0.0.J: Trace Attempt  1	[14.94 s]
+0.0.J: Trace Attempt  1	[15.00 s]
+0.0.J: Trace Attempt  1	[15.06 s]
+0.0.U2: Trace Attempt  1	[14.98 s]
+0.0.J: Trace Attempt  1	[15.13 s]
+0.0.J: Trace Attempt  1	[15.19 s]
+0.0.U2: Trace Attempt  5	[15.09 s]
+0.0.U2: Trace Attempt  1	[15.13 s]
+0.0.J: Trace Attempt  1	[15.25 s]
+0.0.J: Trace Attempt  1	[15.31 s]
+0.0.U2: Trace Attempt  1	[15.22 s]
+0.0.J: Trace Attempt  1	[15.37 s]
+0.0.J: Trace Attempt  1	[15.44 s]
+0.0.J: Trace Attempt  1	[15.50 s]
+0.0.U2: Trace Attempt  1	[15.39 s]
+0.0.J: Trace Attempt  1	[15.56 s]
+0.0.J: Trace Attempt  1	[15.62 s]
+0.0.J: Trace Attempt  1	[15.68 s]
+0.0.J: Trace Attempt  1	[15.74 s]
+0.0.J: Trace Attempt  1	[15.81 s]
+0.0.J: Trace Attempt  1	[15.87 s]
+0.0.J: Trace Attempt  1	[15.93 s]
+0.0.U2: Trace Attempt  4	[15.85 s]
+0.0.J: Trace Attempt  1	[15.99 s]
+0.0.J: Trace Attempt  1	[16.05 s]
+0.0.U2: Trace Attempt  1	[15.96 s]
+0.0.J: Trace Attempt  1	[16.12 s]
+0.0.Ht: Trace Attempt 213	[197.09 s]
+0.0.U2: Trace Attempt  1	[16.07 s]
+0.0.J: Trace Attempt  1	[16.18 s]
+0.0.J: Trace Attempt  1	[16.24 s]
+0.0.U2: Trace Attempt  1	[16.16 s]
+0.0.J: Trace Attempt  1	[16.30 s]
+0.0.J: Trace Attempt  1	[16.36 s]
+0.0.U2: Trace Attempt  1	[16.28 s]
+0.0.J: Trace Attempt  1	[16.42 s]
+0.0.J: Trace Attempt  1	[16.49 s]
+0.0.U2: Trace Attempt  1	[16.41 s]
+0.0.J: Trace Attempt  1	[16.55 s]
+0.0.J: Trace Attempt  1	[16.61 s]
+0.0.U2: Trace Attempt  5	[16.52 s]
+0.0.J: Trace Attempt  1	[16.67 s]
+0.0.U2: Trace Attempt  5	[16.63 s]
+0.0.J: Trace Attempt  1	[16.73 s]
+0.0.J: Trace Attempt  1	[16.79 s]
+0.0.U2: Trace Attempt  1	[16.73 s]
+0.0.J: Trace Attempt  1	[16.86 s]
+0.0.J: Trace Attempt  1	[16.92 s]
+0.0.U2: Trace Attempt  1	[16.84 s]
+0.0.J: Trace Attempt  1	[16.98 s]
+0.0.J: Trace Attempt  1	[17.04 s]
+0.0.U2: Trace Attempt  5	[16.95 s]
+0.0.U2: Trace Attempt  1	[16.96 s]
+0.0.J: Trace Attempt  1	[17.10 s]
+0.0.U2: Trace Attempt  1	[17.01 s]
+0.0.J: Trace Attempt  1	[17.16 s]
+0.0.U2: Trace Attempt  5	[17.12 s]
+0.0.J: Trace Attempt  1	[17.23 s]
+0.0.J: Trace Attempt  1	[17.29 s]
+0.0.U2: Trace Attempt  5	[17.23 s]
+0.0.U2: Trace Attempt  1	[17.24 s]
+0.0.J: Trace Attempt  1	[17.35 s]
+0.0.J: Trace Attempt  1	[17.41 s]
+0.0.U2: Trace Attempt  5	[17.35 s]
+0.0.U2: Trace Attempt  1	[17.36 s]
+0.0.J: Trace Attempt  1	[17.48 s]
+0.0.J: Trace Attempt  1	[17.54 s]
+0.0.U2: Trace Attempt  4	[17.46 s]
+0.0.J: Trace Attempt  1	[17.60 s]
+0.0.U2: Trace Attempt  1	[17.53 s]
+0.0.J: Trace Attempt  1	[17.66 s]
+0.0.J: Trace Attempt  1	[17.72 s]
+0.0.U2: Trace Attempt  4	[17.63 s]
+0.0.J: Trace Attempt  1	[17.78 s]
+0.0.U2: Trace Attempt  1	[17.71 s]
+0.0.J: Trace Attempt  1	[17.84 s]
+0.0.J: Trace Attempt  1	[17.91 s]
+0.0.U2: Trace Attempt  4	[17.83 s]
+0.0.J: Trace Attempt  1	[17.97 s]
+0.0.J: Trace Attempt  1	[18.03 s]
+0.0.J: Trace Attempt  1	[18.09 s]
+0.0.U2: Trace Attempt  1	[18.01 s]
+0.0.J: Trace Attempt  1	[18.15 s]
+0.0.J: Trace Attempt  1	[18.21 s]
+0.0.U2: Trace Attempt  5	[18.12 s]
+0.0.U2: Trace Attempt  1	[18.13 s]
+0.0.J: Trace Attempt  1	[18.27 s]
+0.0.J: Trace Attempt  1	[18.33 s]
+0.0.U2: Trace Attempt  5	[18.23 s]
+0.0.U2: Trace Attempt  1	[18.26 s]
+0.0.J: Trace Attempt  1	[18.39 s]
+0.0.J: Trace Attempt  1	[18.46 s]
+0.0.U2: Trace Attempt  5	[18.38 s]
+0.0.J: Trace Attempt  1	[18.52 s]
+0.0.U2: Trace Attempt  1	[18.43 s]
+0.0.J: Trace Attempt  1	[18.58 s]
+0.0.J: Trace Attempt  1	[18.64 s]
+0.0.U2: Trace Attempt  3	[18.54 s]
+0.0.U2: Trace Attempt  1	[18.58 s]
+0.0.J: Trace Attempt  1	[18.70 s]
+0.0.J: Trace Attempt  1	[18.77 s]
+0.0.L: Trace Attempt 35	[18.32 s]
+0.0.U2: Trace Attempt  5	[18.69 s]
+0.0.J: Trace Attempt  1	[18.83 s]
+0.0.U2: Trace Attempt  1	[18.74 s]
+0.0.J: Trace Attempt  1	[18.89 s]
+0.0.U2: Trace Attempt  1	[18.83 s]
+0.0.J: Trace Attempt  1	[18.95 s]
+0.0.J: Trace Attempt  1	[19.01 s]
+0.0.U2: Trace Attempt  1	[18.93 s]
+0.0.J: Trace Attempt  1	[19.07 s]
+0.0.U2: Trace Attempt  1	[19.01 s]
+0.0.J: Trace Attempt  1	[19.14 s]
+0.0.J: Trace Attempt  1	[19.20 s]
+0.0.U2: Trace Attempt  1	[19.12 s]
+0.0.J: Trace Attempt  1	[19.26 s]
+0.0.J: Trace Attempt  1	[19.32 s]
+0.0.U2: Trace Attempt  4	[19.22 s]
+0.0.U2: Trace Attempt  1	[19.24 s]
+0.0.J: Trace Attempt  1	[19.38 s]
+0.0.U2: Trace Attempt  1	[19.30 s]
+0.0.J: Trace Attempt  1	[19.44 s]
+0.0.J: Trace Attempt  1	[19.50 s]
+0.0.U2: Trace Attempt  1	[19.40 s]
+0.0.J: Trace Attempt  1	[19.56 s]
+0.0.U2: Trace Attempt  1	[19.48 s]
+0.0.J: Trace Attempt  1	[19.62 s]
+0.0.U2: Trace Attempt  1	[19.54 s]
+0.0.J: Trace Attempt  1	[19.68 s]
+0.0.U2: Trace Attempt  1	[19.60 s]
+0.0.J: Trace Attempt  1	[19.74 s]
+0.0.U2: Trace Attempt  1	[19.65 s]
+0.0.J: Trace Attempt  1	[19.80 s]
+0.0.U2: Trace Attempt  1	[19.70 s]
+0.0.J: Trace Attempt  1	[19.87 s]
+0.0.U2: Trace Attempt  5	[19.81 s]
+0.0.U2: Trace Attempt  1	[19.81 s]
+0.0.J: Trace Attempt  1	[19.93 s]
+0.0.J: Trace Attempt  1	[19.99 s]
+0.0.U2: Trace Attempt  4	[19.92 s]
+0.0.J: Trace Attempt  1	[20.05 s]
+0.0.U2: Trace Attempt  1	[19.96 s]
+0.0.J: Trace Attempt  1	[20.12 s]
+0.0.U2: Trace Attempt  1	[20.05 s]
+0.0.J: Trace Attempt  1	[20.18 s]
+0.0.J: Trace Attempt  1	[20.24 s]
+0.0.U2: Trace Attempt  1	[20.14 s]
+0.0.J: Trace Attempt  1	[20.30 s]
+0.0.U2: Trace Attempt  1	[20.23 s]
+0.0.J: Trace Attempt  1	[20.36 s]
+0.0.J: Trace Attempt  1	[20.42 s]
+0.0.U2: Trace Attempt  3	[20.34 s]
+0.0.J: Trace Attempt  1	[20.48 s]
+0.0.J: Trace Attempt  1	[20.55 s]
+0.0.J: Trace Attempt  1	[20.61 s]
+0.0.J: Trace Attempt  1	[20.67 s]
+0.0.J: Trace Attempt  1	[20.73 s]
+0.0.J: Trace Attempt  1	[20.79 s]
+0.0.J: Trace Attempt  1	[20.85 s]
+0.0.J: Trace Attempt  1	[20.92 s]
+0.0.J: Trace Attempt  1	[20.98 s]
+0.0.B: Trace Attempt 137	[193.52 s]
+0.0.J: Trace Attempt  1	[21.04 s]
+0.0.J: Trace Attempt  1	[21.11 s]
+0.0.J: Trace Attempt  1	[21.16 s]
+0.0.J: Trace Attempt  1	[21.23 s]
+0.0.U2: Trace Attempt  1	[21.13 s]
+0.0.J: Trace Attempt  1	[21.29 s]
+0.0.U2: Trace Attempt  1	[21.24 s]
+0.0.J: Trace Attempt  1	[21.35 s]
+0.0.J: Trace Attempt  1	[21.41 s]
+0.0.J: Trace Attempt  1	[21.47 s]
+0.0.U2: Trace Attempt  1	[21.41 s]
+0.0.J: Trace Attempt  1	[21.53 s]
+0.0.J: Trace Attempt  1	[21.59 s]
+0.0.J: Trace Attempt  1	[21.65 s]
+0.0.U2: Trace Attempt  1	[21.61 s]
+0.0.J: Trace Attempt  1	[21.71 s]
+0.0.Ht: Trace Attempt 215	[202.69 s]
+0.0.J: Trace Attempt  1	[21.78 s]
+0.0.U2: Trace Attempt  5	[21.71 s]
+0.0.J: Trace Attempt  1	[21.84 s]
+0.0.J: Trace Attempt  1	[21.90 s]
+0.0.J: Trace Attempt  1	[21.96 s]
+0.0.U2: Trace Attempt  1	[21.90 s]
+0.0.J: Trace Attempt  1	[22.02 s]
+0.0.J: Trace Attempt  1	[22.09 s]
+0.0.U2: Trace Attempt  5	[22.01 s]
+0.0.J: Trace Attempt  1	[22.16 s]
+0.0.U2: Trace Attempt  1	[22.10 s]
+0.0.J: Trace Attempt  1	[22.22 s]
+0.0.U2: Trace Attempt  1	[22.18 s]
+0.0.J: Trace Attempt  1	[22.29 s]
+0.0.Bm: Trace Attempt 215	[203.21 s]
+0.0.J: Trace Attempt  1	[22.35 s]
+0.0.U2: Trace Attempt  1	[22.25 s]
+0.0.J: Trace Attempt  1	[22.41 s]
+0.0.U2: Trace Attempt  1	[22.31 s]
+0.0.J: Trace Attempt  1	[22.47 s]
+0.0.U2: Trace Attempt  1	[22.40 s]
+0.0.J: Trace Attempt  1	[22.53 s]
+0.0.J: Trace Attempt  1	[22.59 s]
+0.0.U2: Trace Attempt  5	[22.50 s]
+0.0.J: Trace Attempt  1	[22.66 s]
+0.0.U2: Trace Attempt  1	[22.58 s]
+0.0.J: Trace Attempt  1	[22.72 s]
+0.0.J: Trace Attempt  1	[22.78 s]
+0.0.U2: Trace Attempt  3	[22.68 s]
+0.0.J: Trace Attempt  1	[22.85 s]
+0.0.U2: Trace Attempt  4	[22.79 s]
+0.0.J: Trace Attempt  1	[22.91 s]
+0.0.J: Trace Attempt  1	[22.98 s]
+0.0.J: Trace Attempt  1	[23.04 s]
+0.0.U2: Trace Attempt  1	[22.96 s]
+0.0.J: Trace Attempt  1	[23.10 s]
+0.0.U2: Trace Attempt  1	[23.02 s]
+0.0.J: Trace Attempt  1	[23.16 s]
+0.0.U2: Trace Attempt  1	[23.08 s]
+0.0.J: Trace Attempt  1	[23.23 s]
+0.0.U2: Trace Attempt  5	[23.19 s]
+0.0.J: Trace Attempt  1	[23.29 s]
+0.0.J: Trace Attempt  1	[23.36 s]
+0.0.U2: Trace Attempt  1	[23.26 s]
+0.0.J: Trace Attempt  1	[23.42 s]
+0.0.U2: Trace Attempt  5	[23.37 s]
+0.0.J: Trace Attempt  1	[23.48 s]
+0.0.U2: Trace Attempt  1	[23.38 s]
+0.0.L: Trace Attempt 43	[23.04 s]
+0.0.J: Trace Attempt  1	[23.54 s]
+0.0.U2: Trace Attempt  1	[23.45 s]
+0.0.J: Trace Attempt  1	[23.61 s]
+0.0.U2: Trace Attempt  1	[23.52 s]
+0.0.J: Trace Attempt  1	[23.67 s]
+0.0.U2: Trace Attempt  1	[23.57 s]
+0.0.J: Trace Attempt  1	[23.73 s]
+0.0.U2: Trace Attempt  5	[23.68 s]
+0.0.J: Trace Attempt  1	[23.80 s]
+0.0.J: Trace Attempt  1	[23.86 s]
+0.0.J: Trace Attempt  1	[23.92 s]
+0.0.J: Trace Attempt  1	[23.98 s]
+0.0.J: Trace Attempt  1	[24.04 s]
+0.0.J: Trace Attempt  1	[24.11 s]
+0.0.J: Trace Attempt  1	[24.17 s]
+0.0.J: Trace Attempt  1	[24.23 s]
+0.0.J: Trace Attempt  1	[24.29 s]
+0.0.J: Trace Attempt  1	[24.35 s]
+0.0.J: Trace Attempt  1	[24.41 s]
+0.0.J: Trace Attempt  1	[24.48 s]
+0.0.J: Trace Attempt  1	[24.54 s]
+0.0.U2: Trace Attempt  1	[24.46 s]
+0.0.J: Trace Attempt  1	[24.60 s]
+0.0.J: Trace Attempt  1	[24.66 s]
+0.0.J: Trace Attempt  1	[24.72 s]
+0.0.U2: Trace Attempt  1	[24.63 s]
+0.0.J: Trace Attempt  1	[24.78 s]
+0.0.U2: Trace Attempt  1	[24.73 s]
+0.0.J: Trace Attempt  1	[24.84 s]
+0.0.J: Trace Attempt  1	[24.90 s]
+0.0.U2: Trace Attempt  4	[24.85 s]
+0.0.J: Trace Attempt  1	[24.96 s]
+0.0.J: Trace Attempt  1	[25.02 s]
+0.0.J: Trace Attempt  1	[25.09 s]
+0.0.J: Trace Attempt  1	[25.15 s]
+0.0.U2: Trace Attempt  1	[25.07 s]
+0.0.J: Trace Attempt  1	[25.21 s]
+0.0.J: Trace Attempt  1	[25.27 s]
+0.0.U2: Trace Attempt  5	[25.19 s]
+0.0.J: Trace Attempt  1	[25.33 s]
+0.0.U2: Trace Attempt  1	[25.27 s]
+0.0.J: Trace Attempt  1	[25.39 s]
+0.0.J: Trace Attempt  1	[25.45 s]
+0.0.U2: Trace Attempt  4	[25.37 s]
+0.0.J: Trace Attempt  1	[25.52 s]
+0.0.J: Trace Attempt  1	[25.58 s]
+0.0.U2: Trace Attempt  5	[25.48 s]
+0.0.U2: Trace Attempt  1	[25.51 s]
+0.0.J: Trace Attempt  1	[25.64 s]
+0.0.U2: Trace Attempt  1	[25.59 s]
+0.0.J: Trace Attempt  1	[25.70 s]
+0.0.J: Trace Attempt  1	[25.76 s]
+0.0.U2: Trace Attempt  4	[25.70 s]
+0.0.J: Trace Attempt  1	[25.82 s]
+0.0.J: Trace Attempt  1	[25.88 s]
+0.0.U2: Trace Attempt  1	[25.80 s]
+0.0.J: Trace Attempt  1	[25.94 s]
+0.0.U2: Trace Attempt  1	[25.89 s]
+0.0.J: Trace Attempt  1	[26.00 s]
+0.0.J: Trace Attempt  1	[26.06 s]
+0.0.U2: Trace Attempt  1	[25.96 s]
+0.0.J: Trace Attempt  1	[26.12 s]
+0.0.U2: Trace Attempt  1	[26.04 s]
+0.0.J: Trace Attempt  1	[26.19 s]
+0.0.U2: Trace Attempt  1	[26.10 s]
+0.0.J: Trace Attempt  1	[26.25 s]
+0.0.U2: Trace Attempt  5	[26.20 s]
+0.0.J: Trace Attempt  1	[26.31 s]
+0.0.J: Trace Attempt  1	[26.37 s]
+0.0.J: Trace Attempt  1	[26.43 s]
+0.0.J: Trace Attempt  1	[26.50 s]
+0.0.U2: Trace Attempt  5	[26.42 s]
+0.0.J: Trace Attempt  1	[26.56 s]
+0.0.Ht: Trace Attempt 221	[207.52 s]
+0.0.J: Trace Attempt  1	[26.62 s]
+0.0.U2: Trace Attempt  1	[26.54 s]
+0.0.J: Trace Attempt  1	[26.68 s]
+0.0.J: Trace Attempt  1	[26.74 s]
+0.0.J: Trace Attempt  1	[26.80 s]
+0.0.Bm: Trace Attempt 219	[207.75 s]
+0.0.U2: Trace Attempt  5	[26.75 s]
+0.0.J: Trace Attempt  1	[26.86 s]
+0.0.U2: Trace Attempt  1	[26.81 s]
+0.0.J: Trace Attempt  1	[26.93 s]
+0.0.J: Trace Attempt  1	[26.99 s]
+0.0.U2: Trace Attempt  1	[26.92 s]
+0.0.J: Trace Attempt  1	[27.05 s]
+0.0.J: Trace Attempt  1	[27.11 s]
+0.0.U2: Trace Attempt  1	[27.02 s]
+0.0.J: Trace Attempt  1	[27.17 s]
+0.0.U2: Trace Attempt  4	[27.13 s]
+0.0.J: Trace Attempt  1	[27.24 s]
+0.0.U2: Trace Attempt  1	[27.15 s]
+0.0.J: Trace Attempt  1	[27.30 s]
+0.0.U2: Trace Attempt  1	[27.24 s]
+0.0.J: Trace Attempt  1	[27.36 s]
+0.0.J: Trace Attempt  1	[27.42 s]
+0.0.U2: Trace Attempt  4	[27.35 s]
+0.0.J: Trace Attempt  1	[27.48 s]
+0.0.U2: Trace Attempt  1	[27.39 s]
+0.0.J: Trace Attempt  1	[27.54 s]
+0.0.U2: Trace Attempt  1	[27.48 s]
+0.0.J: Trace Attempt  1	[27.60 s]
+0.0.J: Trace Attempt  1	[27.66 s]
+0.0.J: Trace Attempt  1	[27.73 s]
+0.0.U2: Trace Attempt  1	[27.68 s]
+0.0.J: Trace Attempt  1	[27.79 s]
+0.0.J: Trace Attempt  1	[27.85 s]
+0.0.U2: Trace Attempt  4	[27.78 s]
+0.0.J: Trace Attempt  1	[27.91 s]
+0.0.U2: Trace Attempt  1	[27.82 s]
+0.0.J: Trace Attempt  1	[27.97 s]
+0.0.U2: Trace Attempt  1	[27.91 s]
+0.0.J: Trace Attempt  1	[28.03 s]
+0.0.J: Trace Attempt  1	[28.10 s]
+0.0.U2: Trace Attempt  1	[28.03 s]
+0.0.J: Trace Attempt  1	[28.16 s]
+0.0.J: Trace Attempt  1	[28.22 s]
+0.0.U2: Trace Attempt  5	[28.14 s]
+0.0.U2: Trace Attempt  1	[28.14 s]
+0.0.L: Trace Attempt 51	[27.80 s]
+0.0.J: Trace Attempt  1	[28.28 s]
+0.0.U2: Trace Attempt  1	[28.22 s]
+0.0.J: Trace Attempt  1	[28.34 s]
+0.0.J: Trace Attempt  1	[28.41 s]
+0.0.U2: Trace Attempt  4	[28.32 s]
+0.0.J: Trace Attempt  1	[28.47 s]
+0.0.U2: Trace Attempt  1	[28.37 s]
+0.0.J: Trace Attempt  1	[28.53 s]
+0.0.U2: Trace Attempt  4	[28.48 s]
+0.0.J: Trace Attempt  1	[28.59 s]
+0.0.J: Trace Attempt  1	[28.65 s]
+0.0.U2: Trace Attempt  4	[28.58 s]
+0.0.J: Trace Attempt  1	[28.71 s]
+0.0.J: Trace Attempt  1	[28.77 s]
+0.0.U2: Trace Attempt  1	[28.72 s]
+0.0.J: Trace Attempt  1	[28.83 s]
+0.0.J: Trace Attempt  1	[28.89 s]
+0.0.U2: Trace Attempt  5	[28.82 s]
+0.0.J: Trace Attempt  1	[28.96 s]
+0.0.U2: Trace Attempt  1	[28.89 s]
+0.0.J: Trace Attempt  1	[29.02 s]
+0.0.U2: Trace Attempt  1	[28.96 s]
+0.0.J: Trace Attempt  1	[29.08 s]
+0.0.U2: Trace Attempt  1	[29.02 s]
+0.0.J: Trace Attempt  1	[29.14 s]
+0.0.J: Trace Attempt  1	[29.20 s]
+0.0.U2: Trace Attempt  5	[29.13 s]
+0.0.J: Trace Attempt  1	[29.26 s]
+0.0.U2: Trace Attempt  1	[29.16 s]
+0.0.J: Trace Attempt  1	[29.32 s]
+0.0.U2: Trace Attempt  1	[29.25 s]
+0.0.J: Trace Attempt  1	[29.38 s]
+0.0.J: Trace Attempt  1	[29.44 s]
+0.0.U2: Trace Attempt  5	[29.36 s]
+0.0.U2: Trace Attempt  1	[29.38 s]
+0.0.J: Trace Attempt  1	[29.50 s]
+0.0.J: Trace Attempt  1	[29.56 s]
+0.0.U2: Trace Attempt  3	[29.48 s]
+0.0.J: Trace Attempt  1	[29.63 s]
+0.0.J: Trace Attempt  1	[29.69 s]
+0.0.U2: Trace Attempt  1	[29.59 s]
+0.0.J: Trace Attempt  1	[29.75 s]
+0.0.U2: Trace Attempt  1	[29.68 s]
+0.0.J: Trace Attempt  1	[29.81 s]
+0.0.J: Trace Attempt  1	[29.87 s]
+0.0.U2: Trace Attempt  3	[29.78 s]
+0.0.J: Trace Attempt  1	[29.93 s]
+0.0.J: Trace Attempt  1	[29.99 s]
+0.0.U2: Trace Attempt  4	[29.89 s]
+0.0.U2: Trace Attempt  1	[29.94 s]
+0.0.J: Trace Attempt  1	[30.05 s]
+0.0.J: Trace Attempt  1	[30.11 s]
+0.0.U2: Trace Attempt  3	[30.04 s]
+0.0.J: Trace Attempt  1	[30.18 s]
+0.0.U2: Trace Attempt  1	[30.08 s]
+0.0.J: Trace Attempt  1	[30.24 s]
+0.0.U2: Trace Attempt  5	[30.20 s]
+0.0.J: Trace Attempt  1	[30.30 s]
+0.0.J: Trace Attempt  1	[30.36 s]
+0.0.U2: Trace Attempt  1	[30.32 s]
+0.0.J: Trace Attempt  1	[30.42 s]
+0.0.J: Trace Attempt  1	[30.49 s]
+0.0.U2: Trace Attempt  1	[30.40 s]
+0.0.J: Trace Attempt  1	[30.55 s]
+0.0.U2: Trace Attempt  4	[30.50 s]
+0.0.J: Trace Attempt  1	[30.61 s]
+0.0.U2: Trace Attempt  1	[30.52 s]
+0.0.Mpcustom4: Trace Attempt  8	[211.55 s]
+0.0.J: Trace Attempt  1	[30.67 s]
+0.0.U2: Trace Attempt  1	[30.60 s]
+0.0.J: Trace Attempt  1	[30.73 s]
+0.0.J: Trace Attempt  1	[30.79 s]
+0.0.U2: Trace Attempt  3	[30.71 s]
+0.0.U2: Trace Attempt  1	[30.75 s]
+0.0.J: Trace Attempt  1	[30.86 s]
+0.0.J: Trace Attempt  1	[30.92 s]
+0.0.U2: Trace Attempt  5	[30.85 s]
+0.0.J: Trace Attempt  1	[30.98 s]
+0.0.J: Trace Attempt  1	[31.04 s]
+0.0.U2: Trace Attempt  5	[30.96 s]
+0.0.J: Trace Attempt  1	[31.10 s]
+0.0.J: Trace Attempt  1	[31.16 s]
+0.0.U2: Trace Attempt  3	[31.07 s]
+0.0.J: Trace Attempt  1	[31.22 s]
+0.0.U2: Trace Attempt  5	[31.18 s]
+0.0.J: Trace Attempt  1	[31.28 s]
+0.0.U2: Trace Attempt  1	[31.20 s]
+0.0.J: Trace Attempt  1	[31.34 s]
+0.0.U2: Trace Attempt  1	[31.27 s]
+0.0.J: Trace Attempt  1	[31.41 s]
+0.0.J: Trace Attempt  1	[31.47 s]
+0.0.U2: Trace Attempt  5	[31.37 s]
+0.0.J: Trace Attempt  1	[31.53 s]
+0.0.U2: Trace Attempt  1	[31.47 s]
+0.0.J: Trace Attempt  1	[31.59 s]
+0.0.J: Trace Attempt  1	[31.66 s]
+0.0.U2: Trace Attempt  1	[31.59 s]
+0.0.J: Trace Attempt  1	[31.72 s]
+0.0.J: Trace Attempt  1	[31.78 s]
+0.0.U2: Trace Attempt  5	[31.70 s]
+0.0.J: Trace Attempt  1	[31.84 s]
+0.0.J: Trace Attempt  1	[31.90 s]
+0.0.U2: Trace Attempt  3	[31.82 s]
+0.0.J: Trace Attempt  1	[31.96 s]
+0.0.J: Trace Attempt  1	[32.02 s]
+0.0.U2: Trace Attempt  1	[31.92 s]
+0.0.U2: Trace Attempt  1	[31.97 s]
+0.0.J: Trace Attempt  1	[32.08 s]
+0.0.U2: Trace Attempt  1	[32.04 s]
+0.0.J: Trace Attempt  1	[32.15 s]
+0.0.J: Trace Attempt  1	[32.21 s]
+0.0.U2: Trace Attempt  3	[32.14 s]
+0.0.J: Trace Attempt  1	[32.27 s]
+0.0.J: Trace Attempt  1	[32.33 s]
+0.0.U2: Trace Attempt  1	[32.25 s]
+0.0.J: Trace Attempt  1	[32.39 s]
+0.0.U2: Trace Attempt  1	[32.32 s]
+0.0.J: Trace Attempt  1	[32.46 s]
+0.0.J: Trace Attempt  1	[32.52 s]
+0.0.J: Trace Attempt  1	[32.58 s]
+0.0.U2: Trace Attempt  1	[32.47 s]
+0.0.J: Trace Attempt  1	[32.64 s]
+0.0.U2: Trace Attempt  1	[32.58 s]
+0.0.J: Trace Attempt  1	[32.70 s]
+0.0.J: Trace Attempt  1	[32.76 s]
+0.0.U2: Trace Attempt  5	[32.69 s]
+0.0.J: Trace Attempt  1	[32.82 s]
+0.0.U2: Trace Attempt  1	[32.75 s]
+0.0.J: Trace Attempt  1	[32.88 s]
+0.0.J: Trace Attempt  1	[32.94 s]
+0.0.U2: Trace Attempt  1	[32.85 s]
+0.0.J: Trace Attempt  1	[33.00 s]
+0.0.U2: Trace Attempt  1	[32.94 s]
+0.0.J: Trace Attempt  1	[33.06 s]
+0.0.J: Trace Attempt  1	[33.12 s]
+0.0.U2: Trace Attempt  5	[33.06 s]
+0.0.L: Trace Attempt 59	[32.68 s]
+0.0.J: Trace Attempt  1	[33.19 s]
+0.0.U2: Trace Attempt  1	[33.13 s]
+0.0.J: Trace Attempt  1	[33.25 s]
+0.0.J: Trace Attempt  1	[33.31 s]
+0.0.U2: Trace Attempt  3	[33.23 s]
+0.0.J: Trace Attempt  1	[33.37 s]
+0.0.J: Trace Attempt  1	[33.43 s]
+0.0.U2: Trace Attempt  1	[33.33 s]
+0.0.J: Trace Attempt  1	[33.49 s]
+0.0.J: Trace Attempt  1	[33.55 s]
+0.0.J: Trace Attempt  1	[33.61 s]
+0.0.J: Trace Attempt  1	[33.67 s]
+0.0.J: Trace Attempt  1	[33.73 s]
+0.0.J: Trace Attempt  1	[33.79 s]
+0.0.J: Trace Attempt  1	[33.85 s]
+0.0.J: Trace Attempt  1	[33.92 s]
+0.0.J: Trace Attempt  1	[33.98 s]
+0.0.U2: Trace Attempt  1	[33.90 s]
+0.0.J: Trace Attempt  1	[34.04 s]
+0.0.J: Trace Attempt  1	[34.10 s]
+0.0.U2: Trace Attempt  3	[34.02 s]
+0.0.J: Trace Attempt  1	[34.16 s]
+0.0.J: Trace Attempt  1	[34.22 s]
+0.0.U2: Trace Attempt  3	[34.12 s]
+0.0.J: Trace Attempt  1	[34.28 s]
+0.0.U2: Trace Attempt  1	[34.23 s]
+0.0.J: Trace Attempt  1	[34.34 s]
+0.0.J: Trace Attempt  1	[34.41 s]
+0.0.J: Trace Attempt  1	[34.47 s]
+0.0.J: Trace Attempt  1	[34.53 s]
+0.0.J: Trace Attempt  1	[34.59 s]
+0.0.J: Trace Attempt  1	[34.66 s]
+0.0.J: Trace Attempt  1	[34.72 s]
+0.0.J: Trace Attempt  1	[34.78 s]
+0.0.J: Trace Attempt  1	[34.84 s]
+0.0.U2: Trace Attempt  1	[34.74 s]
+0.0.J: Trace Attempt  1	[34.90 s]
+0.0.J: Trace Attempt  1	[34.96 s]
+0.0.J: Trace Attempt  1	[35.02 s]
+0.0.J: Trace Attempt  1	[35.09 s]
+0.0.U2: Trace Attempt  1	[35.04 s]
+0.0.J: Trace Attempt  1	[35.15 s]
+0.0.J: Trace Attempt  1	[35.21 s]
+0.0.U2: Trace Attempt  5	[35.15 s]
+0.0.U2: Trace Attempt  1	[35.16 s]
+0.0.J: Trace Attempt  1	[35.27 s]
+0.0.U2: Trace Attempt  1	[35.22 s]
+0.0.J: Trace Attempt  1	[35.33 s]
+0.0.J: Trace Attempt  1	[35.39 s]
+0.0.U2: Trace Attempt  1	[35.30 s]
+0.0.J: Trace Attempt  1	[35.45 s]
+0.0.J: Trace Attempt  1	[35.51 s]
+0.0.U2: Trace Attempt  1	[35.45 s]
+0.0.J: Trace Attempt  1	[35.57 s]
+0.0.J: Trace Attempt  1	[35.63 s]
+0.0.U2: Trace Attempt  1	[35.58 s]
+0.0.J: Trace Attempt  1	[35.70 s]
+0.0.J: Trace Attempt  1	[35.76 s]
+0.0.U2: Trace Attempt  5	[35.69 s]
+0.0.J: Trace Attempt  1	[35.82 s]
+0.0.U2: Trace Attempt  1	[35.76 s]
+0.0.J: Trace Attempt  1	[35.88 s]
+0.0.U2: Trace Attempt  1	[35.82 s]
+0.0.J: Trace Attempt  1	[35.94 s]
+0.0.J: Trace Attempt  1	[36.00 s]
+0.0.U2: Trace Attempt  4	[35.94 s]
+0.0.J: Trace Attempt  1	[36.06 s]
+0.0.J: Trace Attempt  1	[36.12 s]
+0.0.J: Trace Attempt  1	[36.19 s]
+0.0.J: Trace Attempt  1	[36.25 s]
+0.0.U2: Trace Attempt  5	[36.15 s]
+0.0.N: Validation of fixpoint was successful. Time = 0.61
+0.0.J: Trace Attempt  1	[36.31 s]
+0.0.U2: Trace Attempt  5	[36.26 s]
 0.0.N: Requesting engine job to terminate
 0.0.B: Requesting engine job to terminate
 0.0.AM: Requesting engine job to terminate
@@ -472,66 +1886,77 @@ INFO (IPF051): 0.0.N: The cover property "icache_check.icache_0.ever_full" was p
 0.0.Bm: Requesting engine job to terminate
 0.0.Mpcustom4: Requesting engine job to terminate
 0.0.L: Requesting engine job to terminate
-INFO (IPF144): 0: Initiating shutdown of proof [2.44 s]
-0.0.N: A proof was found: No trace exists. [0.02 s]
-INFO (IPF057): 0.0.N: The property "icache_check.icache_0.never_full" was proven in 0.02 s.
-0.0.N: Stopped processing property "icache_check.icache_0.never_full"	[0.02 s].
-0.0.B: Trace Attempt  6	[0.01 s]
-0.0.B: Stopped processing property "icache_check.icache_0.never_full"	[0.01 s].
-0.0.N: All properties determined. [0.02 s]
-0.0.B: All properties determined. [0.01 s]
-0.0.B: Exited with Success (@ 2.45 s)
+0.0.J: Requesting engine job to terminate
+0.0.U2: Requesting engine job to terminate
+INFO (IPF144): 0: Initiating shutdown of proof [217.38 s]
+0.0.N: Trace Attempt 12	[168.94 s]
+0.0.N: A proof was found: No trace exists. [208.91 s]
+INFO (IPF057): 0.0.N: The property "icache_check.icache_0.cache_insert_consistent" was proven in 208.91 s.
+0.0.N: Stopped processing property "icache_check.icache_0.cache_insert_consistent"	[208.91 s].
+0.0.J: Trace Attempt  1	[36.37 s]
+0.0.J: All properties determined. [36.37 s]
+0.0.J: Exited with Success (@ 217.39 s)
 0: ProofGrid usable level: 0
-0.0.N: Exited with Success (@ 2.45 s)
-0.0.AM: Trace Attempt 16	[0.62 s]
-0.0.AM: Stopped processing property "icache_check.icache_0.genblk1[0].slot_used"	[0.75 s].
-0.0.AM: All properties determined. [0.75 s]
-0.0.AM: Exited with Success (@ 2.48 s)
+0.0.N: All properties determined. [208.92 s]
 0.0.Hp: Interrupted (multi)
-0.0.Hp: All properties determined. [2.48 s]
-0.0.Mpcustom4: Trace Attempt 12	[2.35 s]
-0.0.Mpcustom4: All properties determined. [2.44 s]
-0.0.Mpcustom4: Exited with Success (@ 2.54 s)
-0.0.L: Trace Attempt 37	[2.34 s]
-0.0.L: All properties determined. [2.46 s]
-0.0.Hp: Exited with Success (@ 2.56 s)
-0.0.L: Exited with Success (@ 2.57 s)
-0.0.Bm: Trace Attempt 97	[2.31 s]
-0.0.Bm: All properties determined. [2.48 s]
-0.0.Bm: Exited with Success (@ 2.82 s)
+0.0.Hp: Trace Attempt 202	[187.49 s]
+0.0.Hp: All properties determined. [217.40 s]
+0.0.N: Exited with Success (@ 217.41 s)
+0.0.AM: Trace Attempt  8	[1.00 s]
+0.0.AM: Stopped processing property "icache_check.icache_0.cache_insert_consistent"	[208.91 s].
+0.0.AM: All properties determined. [208.91 s]
+0.0.AM: Exited with Success (@ 217.45 s)
+0.0.U2: All properties determined. [36.34 s]
+0.0.U2: Exited with Success (@ 217.60 s)
+0.0.Mpcustom4: All properties determined. [217.50 s]
+0.0.Mpcustom4: Exited with Success (@ 217.62 s)
+0.0.L: Trace Attempt 62	[34.33 s]
+0.0.L: All properties determined. [36.13 s]
+0.0.L: Exited with Success (@ 217.63 s)
+0.0.B: Trace Attempt 138	[193.63 s]
+0.0.B: Stopped processing property "icache_check.icache_0.cache_insert_consistent"	[209.13 s].
+0.0.B: All properties determined. [209.13 s]
+0.0.B: Exited with Success (@ 217.66 s)
+0.0.Bm: Trace Attempt 224	[210.47 s]
+0.0.Bm: All properties determined. [217.67 s]
+0.0.Bm: Exited with Success (@ 217.77 s)
 0.0.Ht: Interrupted (multi)
-0.0.Ht: Trace Attempt 66	[1.50 s]
-0.0.Ht: All properties determined. [2.76 s]
-0.0.Ht: Exited with Success (@ 2.91 s)
+0.0.Ht: Trace Attempt 224	[209.83 s]
+0.0.Ht: All properties determined. [218.11 s]
+0.0.Ht: Exited with Success (@ 218.24 s)
+0.0.Hp: Exited with Success (@ 218.64 s)
 0: --------------------------------------------------------------
-ProofGrid Summary (utilization 96.32 %)
+ProofGrid Summary (utilization 99.94 %)
 --------------------------------------------------------------
-     engines started                               :     9
-     engine jobs started                           :     9
+     engines started                               :    12
+     engine jobs started                           :    12
 
     Average time in state (seconds)
     ------------------------------------------------------
     Engine  Pending     Running        Dead    Utilization
     ------------------------------------------------------
-      N        0.08        2.43        0.00       96.70 %
-     Hp        0.06        2.43        0.00       97.55 %
-     Ht        0.08        2.36        0.00       96.62 %
-     Bm        0.08        2.35        0.00       96.72 %
-    Mpcustom4        0.09        2.34        0.00       96.29 %
-     Oh        0.09        0.50        0.00       84.79 %
-      L        0.09        2.34        0.00       96.44 %
-      B        0.09        2.32        0.00       96.14 %
-     AM        0.08        2.34        0.00       96.84 %
-    all        0.08        2.16        0.00       96.32 %
+      N        0.08      217.36        0.00       99.96 %
+     Hp        0.06      217.37        0.00       99.97 %
+     Ht        0.08      217.29        0.00       99.96 %
+     Bm        0.09      217.28        0.00       99.96 %
+    Mpcustom4        0.09      217.27        0.00       99.96 %
+     Oh        0.09        1.25        0.00       93.24 %
+      L        0.17      216.80        0.00       99.92 %
+      B        0.08      217.28        0.00       99.96 %
+     AM        0.08      217.28        0.00       99.96 %
+      J        0.11       36.36        0.00       99.68 %
+      U        0.11        0.04        0.00       25.56 %
+     U2        0.10       36.26        0.00       99.73 %
+    all        0.10      150.99        0.00       99.94 %
 
     Total time in state (seconds)
     -----------------------------------------
             Pending     Running        Dead  
     -----------------------------------------
-               0.74       19.42        0.00
+               1.15     1811.85        0.00
 
-    Data read    : 252.84 kiB
-    Data written : 41.09 kiB
+    Data read    : 930.06 kiB
+    Data written : 262.46 kiB
 
 0: All pending notifications were processed.
 INFO (IPF059): 0: Completed proof on task: "<embedded>"
@@ -539,21 +1964,21 @@ INFO (IPF059): 0: Completed proof on task: "<embedded>"
 ==============================================================
 SUMMARY
 ==============================================================
-           Properties Considered              : 26
-                 assertions                   : 10
-                  - proven                    : 9 (90%)
+           Properties Considered              : 32
+                 assertions                   : 13
+                  - proven                    : 12 (92.3077%)
                   - bounded_proven (user)     : 0 (0%)
                   - bounded_proven (auto)     : 0 (0%)
                   - marked_proven             : 0 (0%)
-                  - cex                       : 1 (10%)
+                  - cex                       : 1 (7.69231%)
                   - ar_cex                    : 0 (0%)
                   - undetermined              : 0 (0%)
                   - unknown                   : 0 (0%)
                   - error                     : 0 (0%)
-                 covers                       : 16
-                  - unreachable               : 4 (25%)
+                 covers                       : 19
+                  - unreachable               : 4 (21.0526%)
                   - bounded_unreachable (user): 0 (0%)
-                  - covered                   : 12 (75%)
+                  - covered                   : 15 (78.9474%)
                   - ar_covered                : 0 (0%)
                   - undetermined              : 0 (0%)
                   - unknown                   : 0 (0%)
@@ -567,7 +1992,7 @@ determined
     2024.06p002 64 bits for Linux64 3.10.0-1160.21.1.el7.x86_64
     Host Name: cadpc05.ee.columbia.edu
     User Name: das2313
-    Printed on: Tuesday, Dec16, 2025 08:27:18 PM EST
+    Printed on: Wednesday, Dec17, 2025 12:13:16 PM EST
     Working Directory: /homes/user/stud/fall23/das2313/csee4824/csee4824-final-project
 
 
@@ -575,37 +2000,43 @@ determined
 RESULTS
 ==============================================================
 
-------------------------------------------------------------------------------------------------------------------
-       Name                                                      |    Result    |  Engine  |  Bound  |  Time    
-------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+       Name                                                            |    Result    |  Engine  |  Bound  |  Time    
+------------------------------------------------------------------------------------------------------------------------
 
----[ <embedded> ]-------------------------------------------------------------------------------------------------
-[1]   icache_check.mem_0.data_out_lock:precondition1                  covered         N             7    0.189 s      
-[2]   icache_check.mem_0.data_in_flight:precondition1                 covered         N             7    0.189 s      
-[3]   icache_check.icache_0.unique_addr                               proven          Hp     Infinite    0.861 s      
-[4]   icache_check.icache_0.unique_addr:precondition1                 covered         N             4    0.189 s      
-[5]   icache_check.icache_0.try_service                               proven          PRE    Infinite    0.000 s      
-[6]   icache_check.icache_0.try_service:precondition1                 covered         N             4    0.189 s      
-[7]   icache_check.icache_0.addr_hidden                               cex             Bm            8    0.183 s      
-[8]   icache_check.icache_0.addr_hidden:precondition1                 covered         Bm            8    0.183 s      
-[9]   icache_check.icache_0.does_free                                 proven          Hp     Infinite    0.862 s      
-[10]  icache_check.icache_0.does_free:precondition1                   covered         N         4 - 6    0.189 s      
-[11]  icache_check.icache_0.finish_in_3                               proven          AM     Infinite    0.850 s      
-[12]  icache_check.icache_0.finish_in_3:precondition1                 covered         N             4    0.189 s      
-[13]  icache_check.icache_0.latency_lt_3                              proven          PRE    Infinite    0.000 s      
-[14]  icache_check.icache_0.genblk1[0].slot_used                      unreachable     N      Infinite    0.659 s      
-[15]  icache_check.icache_0.genblk1[1].slot_used                      unreachable     N      Infinite    0.017 s      
-[16]  icache_check.icache_0.genblk1[2].slot_used                      covered         Bm            8    0.163 s      
-[17]  icache_check.icache_0.genblk1[3].slot_used                      covered         Bm            6    0.139 s      
-[18]  icache_check.icache_0.genblk1[4].slot_used                      covered         N             4    0.189 s      
-[19]  icache_check.icache_0.wont_clobber                              proven          Hp     Infinite    0.022 s      
-[20]  icache_check.icache_0.wont_clobber:precondition1                unreachable     N      Infinite    0.019 s      
-[21]  icache_check.icache_0.never_full                                proven          N      Infinite    0.017 s      
-[22]  icache_check.icache_0.ever_full                                 unreachable     N      Infinite    0.020 s      
-[23]  icache_check.icache_0.count_progresses                          proven          Hp     Infinite    0.862 s      
-[24]  icache_check.icache_0.count_progresses:precondition1            covered         N             4    0.189 s      
-[25]  icache_check.icache_0.continue_attempts                         proven          PRE    Infinite    0.000 s      
-[26]  icache_check.icache_0.continue_attempts:precondition1           covered         N             4    0.189 s      
+---[ <embedded> ]-------------------------------------------------------------------------------------------------------
+[1]   icache_check.mem_0.data_out_lock:precondition1                        covered         N             7    0.235 s      
+[2]   icache_check.mem_0.data_in_flight:precondition1                       covered         N             7    0.235 s      
+[3]   icache_check.icache_0.unique_addr                                     proven          Hp     Infinite    8.043 s      
+[4]   icache_check.icache_0.unique_addr:precondition1                       covered         N             4    0.235 s      
+[5]   icache_check.icache_0.try_service                                     proven          PRE    Infinite    0.000 s      
+[6]   icache_check.icache_0.try_service:precondition1                       covered         N             4    0.235 s      
+[7]   icache_check.icache_0.addr_hidden                                     cex             Bm            8    0.181 s      
+[8]   icache_check.icache_0.addr_hidden:precondition1                       covered         Bm            8    0.181 s      
+[9]   icache_check.icache_0.does_free                                       proven          AM     Infinite    0.103 s      
+[10]  icache_check.icache_0.does_free:precondition1                         covered         N         5 - 6    0.235 s      
+[11]  icache_check.icache_0.finish_in_3                                     proven          N      Infinite    0.406 s      
+[12]  icache_check.icache_0.finish_in_3:precondition1                       covered         N             4    0.235 s      
+[13]  icache_check.icache_0.latency_lt_3                                    proven          PRE    Infinite    0.000 s      
+[14]  icache_check.icache_0.genblk1[0].slot_used                            unreachable     Hp     Infinite    8.044 s      
+[15]  icache_check.icache_0.genblk1[1].slot_used                            unreachable     N      Infinite    0.791 s      
+[16]  icache_check.icache_0.genblk1[2].slot_used                            covered         Bm            8    0.181 s      
+[17]  icache_check.icache_0.genblk1[3].slot_used                            covered         N         5 - 6    0.235 s      
+[18]  icache_check.icache_0.genblk1[4].slot_used                            covered         N             4    0.235 s      
+[19]  icache_check.icache_0.wont_clobber                                    proven          Hp     Infinite    0.053 s      
+[20]  icache_check.icache_0.wont_clobber:precondition1                      unreachable     N      Infinite    0.022 s      
+[21]  icache_check.icache_0.never_full                                      proven          N      Infinite    0.023 s      
+[22]  icache_check.icache_0.ever_full                                       unreachable     N      Infinite    0.023 s      
+[23]  icache_check.icache_0.count_progresses                                proven          N      Infinite    0.170 s      
+[24]  icache_check.icache_0.count_progresses:precondition1                  covered         N             4    0.235 s      
+[25]  icache_check.icache_0.continue_attempts                               proven          PRE    Infinite    0.000 s      
+[26]  icache_check.icache_0.continue_attempts:precondition1                 covered         N             4    0.235 s      
+[27]  icache_check.icache_0.cache_out_consistent                            proven          PRE    Infinite    0.000 s      
+[28]  icache_check.icache_0.cache_out_consistent:precondition1              covered         Bm            8    0.181 s      
+[29]  icache_check.icache_0.cache_insert_consistent                         proven          N      Infinite    208.910 s    
+[30]  icache_check.icache_0.cache_insert_consistent:precondition1           covered         N         5 - 6    0.235 s      
+[31]  icache_check.icache_0.stable_icache_data                              proven          Hp     Infinite    8.044 s      
+[32]  icache_check.icache_0.stable_icache_data:precondition1                covered         Bm            2    0.122 s      
 
 ==============================================================
 ASSUMPTIONS
@@ -614,12 +2045,13 @@ ASSUMPTIONS
 -------------------------------------------------------------------------------
        Name    |  Expression  |  Location     |  Status      |  Dependencies                  
 -------------------------------------------------------------------------------
-[1]   <embedded>::icache_check.mem_data_addr_known  mem_data_addr_known  N/A temporary        
-[2]   <embedded>::icache_check.mem_aligned  mem_aligned  N/A temporary                        
-[3]   <embedded>::icache_check.mem_0._assume_1  mem_0._assume_1  N/A temporary                
-[4]   <embedded>::icache_check.mem_0.data_out_lock  mem_0.data_out_lock  N/A temporary        
-[5]   <embedded>::icache_check.mem_0.data_in_flight  mem_0.data_in_flight  N/A temporary      
-[6]   <embedded>::icache_check.mem_0._assume_4  mem_0._assume_4  N/A temporary                
+[1]   <embedded>::icache_check._assume_1  _assume_1  N/A temporary                            
+[2]   <embedded>::icache_check.mem_data_addr_known  mem_data_addr_known  N/A temporary        
+[3]   <embedded>::icache_check.mem_aligned  mem_aligned  N/A temporary                        
+[4]   <embedded>::icache_check.mem_0._assume_1  mem_0._assume_1  N/A temporary                
+[5]   <embedded>::icache_check.mem_0.data_out_lock  mem_0.data_out_lock  N/A temporary        
+[6]   <embedded>::icache_check.mem_0.data_in_flight  mem_0.data_in_flight  N/A temporary      
+[7]   <embedded>::icache_check.mem_0._assume_4  mem_0._assume_4  N/A temporary                
 [<embedded>] % 
 [<embedded>] % 
 [<embedded>] % exit -force
@@ -627,6 +2059,6 @@ INFO (IPL005): Received request to exit from the console.
 INFO (IPL014): Waiting for the Tcl-thread to exit.
 INFO: Waiting for proof threads to stop...
 INFO: Proof threads stopped.
-INFO (IPL018): The peak resident set memory use for this session was 0.474 GB.
+INFO (IPL018): The peak resident set memory use for this session was 6.013 GB.
 INFO (IPL015): The Tcl-thread exited with status 0.
 INFO (IPL016): Exiting the analysis session with status 0.
