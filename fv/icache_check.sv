@@ -20,14 +20,12 @@ module icache_check;
     logic [63:0] cache_data_out;
     logic        cache_valid_out;
 
-    logic [63:0] fv_load_data;
     /* Memory handling section */
     mem mem_0 (
         .clk(clock), .reset(reset),
         .proc2mem_addr(proc2mem_addr),
         // .proc2mem_data(proc2mem_data),
         .proc2mem_command(proc2mem_command),
-        .fv_load_data(fv_load_data),
 
         .mem2proc_response(mem2proc_response),
         .mem2proc_data(mem2proc_data),

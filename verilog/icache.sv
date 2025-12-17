@@ -14,7 +14,7 @@
 `define CACHE_LINES 32
 `define CACHE_LINE_BITS $clog2(`CACHE_LINES)
 // how many outstanding misses to handle at a time
-`define MSHR_SLOTS 2
+`define MSHR_SLOTS 5
 
 typedef struct packed {
     logic [63:0]                  data;
@@ -96,13 +96,6 @@ module icache (
 
         LAST_ICACHE last_icache_addr [`CACHE_LINES-1:0];
 
-        // always_ff @(posedge clock) begin
-        //     if (reset)
-        //         for (int formal_i = 0; formal_i < `CACHE_LINES; formal_i++) begin
-        //             last_icache_addr[formal_i] <= '0;
-        //         end
-        // end
-
         // address only will ever occupy one mshr slot
         int o;
         logic addr_seen;
@@ -115,23 +108,23 @@ module icache (
         end
         unique_addr: assert property(@(posedge clock) mshr[`MSHR_SLOTS-1].valid |-> !addr_seen);
 
-        // if cache_valid out -> address is same as requested
-
         // cache will respond to memory servicing
         try_service: assert property(@(posedge clock) miss_outstanding |-> BUS_LOAD == proc2Imem_command);
 
+        // if cache_valid out -> address is same as requested (interesting edge case)
         addr_hidden: assert property(@(posedge clock)
             (!mem_forward && Icache_valid_out) |-> 
-                    last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]
-        );
+                    last_icache_addr[main_index].addr == proc2Icache_addr[`XLEN-1:3]);
         
-        // cache will continue trying to service cache_addr until done
-
         does_free: assert property(@(posedge clock)
-            got_mem_data |-> ##1 mshr[$past(mshr_resp_idx)].valid == `FALSE
-        );
+            got_mem_data |-> ##1 mshr[$past(mshr_resp_idx)].valid == `FALSE);
 
         // if possible, cache will attempt prefetch
+        finish_in_3: assert property(@(posedge clock) disable iff (reset)
+            mshr[`MSHR_SLOTS-1].valid |-> ##[1:3] $fell(mshr[`MSHR_SLOTS-1].valid));
+        // if this is false obvously above is
+        latency_lt_3: assert property(
+            `MEM_LATENCY_IN_CYCLES <= 3);
 
         // cache will occupy all mshr slots
         genvar i;

@@ -19,12 +19,13 @@ module mem (
     input [63:0]      proc2mem_data, // address for current command
     input [1:0]       proc2mem_command, // `BUS_NONE `BUS_LOAD or `BUS_STORE
 
-    input logic [63:0] fv_load_data,
-
     output logic [3:0]  mem2proc_response, // 0 = can't accept, other=tag of transaction
     output logic [63:0] mem2proc_data,     // data resulting from a load
     output logic [3:0]  mem2proc_tag       // 0 = no value, other=tag of transaction
 );
+    logic [63:0] fv_load_data;
+
+    assume property(@(negedge clk) !$isunknown(fv_load_data));
 
     typedef struct packed {
         logic [`XLEN-1:3] addr;
