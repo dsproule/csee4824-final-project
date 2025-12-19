@@ -2,31 +2,36 @@
 `include "verilog/sys_defs.svh"
 `include "verilog/ISA.svh"
 
-module equiv_check;
+module equiv_check(
+    input  logic                 clock,
+    input  logic                 reset,
 
-    logic clock;
-    logic reset;
-
-    logic [1:0]       dut_proc2mem_command;
-    logic [`XLEN-1:0] dut_proc2mem_addr;
-    logic [63:0]      dut_proc2mem_data;
+    // DUT -> MEM (requests driven by DUT/pipeline)
+    output logic [1:0]           dut_proc2mem_command,
+    output logic [`XLEN-1:0]     dut_proc2mem_addr,
+    output logic [63:0]          dut_proc2mem_data,
 `ifndef CACHE_MODE
-    MEM_SIZE          dut_proc2mem_size;
+    output MEM_SIZE              dut_proc2mem_size,
 `endif
-    logic [3:0]       dut_mem2proc_response;
-    logic [63:0]      dut_mem2proc_data;
-    logic [3:0]       dut_mem2proc_tag;
 
+    // MEM -> DUT (responses returned to DUT)
+    input  logic [3:0]           dut_mem2proc_response,
+    input  logic [63:0]          dut_mem2proc_data,
+    input  logic [3:0]           dut_mem2proc_tag,
 
-    logic [1:0]       ref_proc2mem_command;
-    logic [`XLEN-1:0] ref_proc2mem_addr;
-    logic [63:0]      ref_proc2mem_data;
+    // REF -> MEM
+    output logic [1:0]           ref_proc2mem_command,
+    output logic [`XLEN-1:0]     ref_proc2mem_addr,
+    output logic [63:0]          ref_proc2mem_data,
 `ifndef CACHE_MODE
-    MEM_SIZE          ref_proc2mem_size;
+    output MEM_SIZE              ref_proc2mem_size,
 `endif
-    logic [3:0]       ref_mem2proc_response;
-    logic [63:0]      ref_mem2proc_data;
-    logic [3:0]       ref_mem2proc_tag;
+
+    // MEM -> REF
+    input  logic [3:0]           ref_mem2proc_response,
+    input  logic [63:0]          ref_mem2proc_data,
+    input  logic [3:0]           ref_mem2proc_tag
+);
 
     logic [3:0]       dut_pipeline_completed_insts;
     EXCEPTION_CODE    dut_pipeline_error_status;
@@ -68,20 +73,6 @@ module equiv_check;
         .pipeline_commit_NPC     (dut_pipeline_commit_NPC)
     );
 
-    mem mem_dut (
-        .clk(clock),
-        .proc2mem_addr(dut_proc2mem_addr),
-        .proc2mem_data(dut_proc2mem_data),
-`ifndef CACHE_MODE
-        .proc2mem_size(dut_proc2mem_size),
-`endif
-        .proc2mem_command(dut_proc2mem_command),
-
-        .mem2proc_response(dut_mem2proc_response),
-        .mem2proc_data(dut_mem2proc_data),
-        .mem2proc_tag(dut_mem2proc_tag)
-    );
-
     // ----------------------------
     // Instantiate REF + its mem
     // ----------------------------
@@ -108,24 +99,6 @@ module equiv_check;
         .pipeline_commit_NPC     (ref_pipeline_commit_NPC)
     );
 
-    mem mem_ref (
-        .clk(clock),
-        .proc2mem_addr(ref_proc2mem_addr),
-        .proc2mem_data(ref_proc2mem_data),
-`ifndef CACHE_MODE
-        .proc2mem_size(ref_proc2mem_size),
-`endif
-        .proc2mem_command(ref_proc2mem_command),
-
-        .mem2proc_response(ref_mem2proc_response),
-        .mem2proc_data(ref_mem2proc_data),
-        .mem2proc_tag(ref_mem2proc_tag)
-    );
-
-    function automatic logic [63:0] imem_fn(input logic [`XLEN-1:3] addr);
-        imem_fn = $anyconst;
-    endfunction
-
     // --------------------------------------------------------------------
     // Assumptions: reg/control only
     // --------------------------------------------------------------------
@@ -135,28 +108,49 @@ module equiv_check;
         (ref_pipeline_completed_insts <= 1)
     );
 
+    // MEMORY CONSTRAINTS
+
     // No stores at all (read-only memory model for now).
-    // If your core uses BUS_LOAD for IFetch, that's fine; we just ban BUS_STORE.
     assume property (@(posedge clock) disable iff (reset)
         (dut_proc2mem_command != BUS_STORE) &&
         (ref_proc2mem_command != BUS_STORE)
     );
 
+    // assume addr[`XLEN-3:3] < 10, and lower 3 bits always 0. Always aligned
+    valid_inst_addr: assume property (@(posedge clock) disable iff (reset)
+        (dut_proc2mem_addr[`XLEN-3:3] < 10) &&
+        (dut_proc2mem_addr[2:0] == 3'b0) &&
+        (ref_proc2mem_addr[`XLEN-3:3] < 10) &&
+        (ref_proc2mem_addr[2:0] == 3'b0)
+    );
+
+    // Valid instruction opcode constraints
     // Also constrain instruction opcodes to reg/control subset.
     // Do it only when a memory return is actually presenting data (tag != 0).
     property p_valid_inst_dut;
         @(posedge clock) disable iff (reset)
-            (dut_mem2proc_tag != 0) |-> (dut_mem2proc_data[6:0] inside {
-                `RV32_OP,
-                `RV32_OP_IMM,
-                `RV32_BRANCH,
-                `RV32_JAL_OP,
-                `RV32_JALR_OP,
-                `RV32_LUI,
-                `RV32_AUIPC
-            });
+            (dut_mem2proc_tag != 0) |-> (
+                (dut_mem2proc_data[6:0]   inside {
+                    `RV32_OP,
+                    `RV32_OP_IMM,
+                    `RV32_BRANCH,
+                    `RV32_JAL_OP,
+                    `RV32_JALR_OP,
+                    `RV32_LUI,
+                    `RV32_AUIPC
+                }) &&
+                (dut_mem2proc_data[38:32] inside {
+                    `RV32_OP,
+                    `RV32_OP_IMM,
+                    `RV32_BRANCH,
+                    `RV32_JAL_OP,
+                    `RV32_JALR_OP,
+                    `RV32_LUI,
+                    `RV32_AUIPC
+                })
+            );
     endproperty
-    assume property (p_valid_inst_dut);
+    valid_inst: assume property (p_valid_inst_dut);
 
     property p_valid_inst_ref;
         @(posedge clock) disable iff (reset)
@@ -168,38 +162,34 @@ module equiv_check;
                 `RV32_JALR_OP,
                 `RV32_LUI,
                 `RV32_AUIPC
+            }) && (ref_mem2proc_data[38:32] inside {
+                `RV32_OP,
+                `RV32_OP_IMM,
+                `RV32_BRANCH,
+                `RV32_JAL_OP,
+                `RV32_JALR_OP,
+                `RV32_LUI,
+                `RV32_AUIPC
             });
     endproperty
     assume property (p_valid_inst_ref);
 
-    // --------------------------------------------------------------------
-    // Shared instruction memory contents constraint (read-only program)
-    //
-    // mem.sv initializes unified_memory to 0's in an initial block, which is
-    // not what we want for formal. So we "overlay" a symbolic ROM content and
-    // assume both mem instances return data consistent with that ROM.
-    //
-    // This avoids forcing DUT/REF to fetch in lockstep.
-    // --------------------------------------------------------------------
-
-    // We constrain "returned data" to be the same on both sides whenever both
-    // return a word in the same cycle. This makes them run the same program
-    // without requiring same timing.
-    //
-    // Stronger (and better) would be "data returned is a function of address".
-    // Without a PC-visible fetch address signal, this is the minimal safe step.
+    //processor requestion bus load will only present a response after `MEM_LATENCY_IN_CYCLES for OoO and the same cycle for ref
     assume property (@(posedge clock) disable iff (reset)
-        ((dut_mem2proc_tag != 0) && (ref_mem2proc_tag != 0)) |->
-            (dut_mem2proc_data == ref_mem2proc_data)
+        (dut_proc2mem_command == BUS_LOAD) |-> ##[`MEM_LATENCY_IN_CYCLES]
+            (dut_mem2proc_tag != 0)
     );
 
-    // If you can tolerate a small extra assumption for bring-up:
-    // when both cores request a load in the same cycle, it's for the same address.
-    // Comment this out if you already have separate I-mem interfaces.
+    //reference has magical memory that always returns next cycle
     assume property (@(posedge clock) disable iff (reset)
-        ((dut_proc2mem_command == BUS_LOAD) && (ref_proc2mem_command == BUS_LOAD)) |->
-            (dut_proc2mem_addr == ref_proc2mem_addr)
+        (ref_proc2mem_command == BUS_LOAD) |-> (ref_mem2proc_tag != 0)
     );
+
+    //Make a mini instruction memory table of 10 words max that is shared.
+
+    
+
+
 
     // --------------------------------------------------------------------
     // Commit-order matching (FIFO)
