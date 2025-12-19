@@ -10,7 +10,7 @@ analyze -sv \
     -incdir ${ROOT_PATH} \
     ${RTL_PATH}/sys_defs.svh \
     ${RTL_PATH}/icache.sv \
-    ${ROOT_PATH}/test/mem.sv \
+    ${FV_PATH}/fv_mem.sv \
     ${FV_PATH}/icache_check.sv
 
 elaborate -top icache_check

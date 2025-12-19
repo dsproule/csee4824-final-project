@@ -22,14 +22,25 @@ module icache_check;
 
     /* Memory handling section */
     mem mem_0 (
-        .clk(clock),
+        .clk(clock), .reset(reset),
         .proc2mem_addr(proc2mem_addr),
-        // .proc2mem_data(proc2mem_data),
         .proc2mem_command(proc2mem_command),
 
         .mem2proc_response(mem2proc_response),
         .mem2proc_data(mem2proc_data),
         .mem2proc_tag(mem2proc_tag)
+    );
+
+    assume property(proc2mem_command != BUS_STORE);
+
+    // values going to cache/mem must be known
+    mem_data_addr_known: assume property(
+        !$isunknown(mem2proc_data) && !$isunknown(proc2mem_addr)
+        && !$isunknown(proc2cache_addr)
+    );
+
+    mem_aligned: assume property(
+        (proc2mem_addr[2:0]==3'b0) & (proc2mem_addr < `MEM_SIZE_IN_BYTES)
     );
 
     icache icache_0 (
@@ -50,11 +61,6 @@ module icache_check;
         // To fetch stage
         .Icache_data_out(cache_data_out),
         .Icache_valid_out(cache_valid_out)
-    );
-
-    assume property(@(posedge clock)
-        !$isunknown(mem2proc_data) && !$isunknown(proc2cache_addr) &&
-        !$isunknown(proc2cache_addr) && !$isunknown(proc2mem_addr)
     );
     
 endmodule
