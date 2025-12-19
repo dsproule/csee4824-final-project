@@ -182,11 +182,13 @@ module equiv_check(
 
     //reference has magical memory that always returns next cycle
     assume property (@(posedge clock) disable iff (reset)
-        (ref_proc2mem_command == BUS_LOAD) |-> (ref_mem2proc_tag != 0)
+        (ref_proc2mem_command == BUS_LOAD) |-> ##0
+        (ref_mem2proc_tag != 0 && 
+        ref_mem2proc_data == imem[$past(ref_proc2mem_addr[`XLEN-3:3])])
     );
 
     //Make a mini instruction memory table of 10 words max that is shared.
-
+    logic [63:0] imem [0:9];
     
 
 

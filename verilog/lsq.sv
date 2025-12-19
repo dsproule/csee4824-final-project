@@ -378,4 +378,18 @@ module lsq(
             end
         end
     end
+
+
+    // Don’t allocate into a full queue
+    assume property (@(posedge clock) disable iff (reset) sq_alloc |-> !sq_full);
+    assume property (@(posedge clock) disable iff (reset) lq_alloc |-> !lq_full);
+
+    // Only update a valid entry (your logic expects it)
+    assume property (@(posedge clock) disable iff (reset) store_X |-> S_X_store.valid);
+    assume property (@(posedge clock) disable iff (reset) load_X  |-> S_X_load.valid);
+
+    // D$ valid means request was accepted (simple handshake)
+    assume property (@(posedge clock) disable iff (reset) mem_read_en  |-> Dcache_valid_out);
+    assume property (@(posedge clock) disable iff (reset) mem_write_en |-> Dcache_valid_out);
+
 endmodule
