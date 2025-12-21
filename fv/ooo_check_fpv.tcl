@@ -1,9 +1,12 @@
-set ROOT_PATH .
+set ROOT_PATH ..
 set RTL_PATH ${ROOT_PATH}/verilog
 
 set hdlin_enable_sv true
+set CLOCK_PERIOD 1300
 
 analyze -sv \
+    +define+CLOCK_PERIOD=${CLOCK_PERIOD} \
+    +define+FORMAL \
   -incdir ${ROOT_PATH} \
   ${RTL_PATH}/pipeline.sv \
   ${RTL_PATH}/regfile.sv \
@@ -23,11 +26,9 @@ analyze -sv \
   ${RTL_PATH}/lsq.sv \
   ${RTL_PATH}/dcache_nb.sv \
   ${RTL_PATH}/two_bit_pred.sv \
-  ${ROOT_PATH}/test/mem.sv \
   ${RTL_PATH}/branch_pred.sv \
-  ${ROOT_PATH}/fv/ooo_check.sv
 
-elaborate -top ooo_check
+elaborate -top pipeline 
 
 clock clock -both_edges
 reset reset

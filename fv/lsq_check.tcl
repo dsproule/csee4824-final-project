@@ -1,4 +1,4 @@
-set ROOT_PATH .
+set ROOT_PATH ..
 set RTL_PATH ${ROOT_PATH}/verilog
 set FV_PATH ${ROOT_PATH}/fv
 

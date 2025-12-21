@@ -160,7 +160,6 @@ module lsq(
         // Forwarding logic
         best_T_store = 0;
         fwd_packet_wire = 0;
-
         for (int i = 0; i < `SQ_SZ; i++) begin // best_T select largest tag less than load
             if (sq[i].valid && sq[i].addr_valid && sq[i].data_valid &&
                     (sq[i].addr == S_X_load_addr) && update_lq && sq[i].T >= best_T_store) begin
@@ -379,17 +378,146 @@ module lsq(
         end
     end
 
+`ifdef FORMAL
+    // Don’t allocate into a full queue, supported by rs_stall in pipeline.sv
+    valid_sq_enq: assume property (@(posedge clock) disable iff (reset) sq_alloc |-> !sq_full);
+    valid_lq_enq: assume property (@(posedge clock) disable iff (reset) lq_alloc |-> !lq_full);
 
-    // Don’t allocate into a full queue
-    assume property (@(posedge clock) disable iff (reset) sq_alloc |-> !sq_full);
-    assume property (@(posedge clock) disable iff (reset) lq_alloc |-> !lq_full);
-
-    // Only update a valid entry (your logic expects it)
-    assume property (@(posedge clock) disable iff (reset) store_X |-> S_X_store.valid);
-    assume property (@(posedge clock) disable iff (reset) load_X  |-> S_X_load.valid);
+    // Only update a valid entry
+    valid_sq_update: assume property (@(posedge clock) disable iff (reset) store_X |-> S_X_store.valid);
+    valid_lq_update: assume property (@(posedge clock) disable iff (reset) load_X  |-> S_X_load.valid);
 
     // D$ valid means request was accepted (simple handshake)
     assume property (@(posedge clock) disable iff (reset) mem_read_en  |-> Dcache_valid_out);
     assume property (@(posedge clock) disable iff (reset) mem_write_en |-> Dcache_valid_out);
+
+    // alloc implies the source tag T is meaningful
+    nonezeroT: assume property (@(posedge clock) disable iff (reset) (sq_alloc || lq_alloc) |-> (T != '0) ); 
+
+
+   // Assume no valid tag is 0, assumption from ROB 
+generate
+  for (genvar i=0; i<`SQ_SZ; i++) begin
+      assume property (@(posedge clock) disable iff (reset)
+        (sq[i].valid) |-> (sq[i].T != 0)
+      );
+  end
+endgenerate
+
+generate
+  for (genvar i=0; i<`LQ_SZ; i++) begin
+      assume property (@(posedge clock) disable iff (reset)
+        (lq[i].valid) |-> (lq[i].T != 0)
+      );
+  end
+endgenerate 
+/*
+generate
+  for (genvar i=0; i<`SQ_SZ; i++) begin
+    for (genvar j=0; j<`LQ_SZ; j++) begin
+      assume property (@(posedge clock) disable iff (reset)
+        (sq[i].valid && lq[j].valid) |-> (sq[i].T != lq[j].T)
+      );
+
+      assume property (@(posedge clock) disable iff (reset) sq[i].mem_access == lq[j].mem_access);
+
+    end
+  end
+endgenerate
+
+generate
+  for (genvar i=0; i<`LQ_SZ; i++) begin
+    for (genvar j=i+1; j<`LQ_SZ; j++) begin
+      assume property (@(posedge clock) disable iff (reset)
+        (lq[i].valid && lq[j].valid) |-> (lq[i].T != lq[j].T)
+      );
+
+      assume property (@(posedge clock) disable iff (reset) lq[i].mem_access == lq[j].mem_access);
+    end
+  end
+endgenerate
+
+generate
+  for (genvar i=0; i<`SQ_SZ; i++) begin
+    for (genvar j=i+1; j<`SQ_SZ; j++) begin
+      assume property (@(posedge clock) disable iff (reset)
+        (sq[i].valid && sq[j].valid) |-> (sq[i].T != sq[j].T)
+      );
+
+      assume property (@(posedge clock) disable iff (reset) sq[i].mem_access == sq[j].mem_access);
+    end
+  end
+endgenerate
+*/
+   //a_unique_headT: assume property (@(posedge clock) disable iff (reset) (sq[sq_head].valid && lq[lq_head].valid) |-> (sq[sq_head].T != lq[lq_head].T));
+
+	//COVERS/ASSERTIONS
+	// Can only have a dcache collision if there is a tag match between
+		// the head of the sq and lq
+    a_no_collision: assert property (@(posedge clock) disable iff (reset) (sq[sq_head].T != lq[lq_head].T) |-> !(mem_read_en && mem_write_en));
+    a_collision: assert property (@(posedge clock) disable iff (reset) (mem_read_en && mem_write_en) |-> (lq[lq_head].T ==  sq[sq_head].T));
+
+    // for pipeline test
+    c_collision: cover property (@(posedge clock) disable iff (reset) lq[lq_head].T == sq[sq_head].T && lq[lq_head].valid && sq[sq_head].valid);	
+
+    a_store_issue_valid: assert property (@(posedge clock) disable iff (reset)
+            mem_write_en |-> (
+                !sq_empty &&
+                sq[sq_head].valid &&
+                sq[sq_head].addr_valid &&
+                sq[sq_head].data_valid &&
+                !sq[sq_head].dirty
+            )
+            );
+    a_load_issue_valid: assert property (@(posedge clock) disable iff (reset)
+        mem_read_en |-> (
+            !lq_empty &&
+            lq[lq_head].valid &&
+            lq[lq_head].addr_valid &&
+            (lq[lq_head].state == LQ_NONE)
+        )
+        );
+
+
+    // cannot pop from an empty queue
+    a_sq_empty: assert property (@(posedge clock) disable iff (reset) sq_empty |-> !mem_write_en);
+    a_lq_empty: assert property (@(posedge clock) disable iff (reset) lq_empty |-> !mem_read_en);
+
+    // flushing means the lq gets empty
+    a_flush_lq: assert property (@(posedge clock) disable iff (reset)
+        take_branch |-> ##1 lq_empty
+    );
+
+    // flushing means not retired --> dirty, everything in sq must be not
+    // valid, dirty, or retired
+generate
+  for (genvar i = 0; i < `SQ_SZ; i++) begin : G_SQ_FLUSH_DIRTY
+    assert property (@(posedge clock) disable iff (reset)
+      (take_branch && sq[i].valid && !sq[i].retired) |-> ##1 sq[i].dirty 
+    );
+  end
+endgenerate
+
+
+generate
+  for (genvar i = 0; i < `SQ_SZ; i++) begin : G_SQ_FLUSH_VALID
+    assert property (@(posedge clock) disable iff (reset)
+      take_branch |-> ##1 (!sq[i].valid || sq[i].retired || sq[i].dirty)
+    );
+  end
+endgenerate
+
+    c_forwarding: cover property (@(posedge clock) disable iff (reset) fwd_head);
+
+    // will not request from dcache if the data has been forwarded
+    a_forwarding_redundancy: assert property (@(posedge clock) disable iff (reset) mem_read_en |-> !(lq[lq_head].state == DATA_READY || fwd_head) );
+
+    a_lq_needs_addr: assert property (@(posedge clock) disable iff (reset)
+    (lq[lq_head].valid && (lq[lq_head].state == WAITING)) |-> !mem_read_en
+    );
+
+
+`endif
+
 
 endmodule
